@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>..\..\bin\</BaseOutputPath>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AssemblyName>Vorcyc.Mathematics</AssemblyName>
+    <RootNamespace>Vorcyc.Mathematics</RootNamespace>
+    <Authors>cyclone_dll ( linliduan )</Authors>
+    <Company>Vorcyc | 昆明涡旋科技有限公司 | vorcyc.com</Company>
+    <Description>A pure dotNET and high performance math library.</Description>
+    <Copyright>Vorcyc® Mathematics 昆明涡旋科技有限公司 段琳立</Copyright>
+    <Product>Vorcyc Mathematics 1.0</Product>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <Title>Vorcy Mathematics</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILGPU" Version="1.5.1" />
+    <PackageReference Include="ILGPU.Algorithms" Version="1.5.1" />
+  </ItemGroup>
+
+  <Import Project="..\..\shared projects\ComputingContext\ComputingContext.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Core\Core.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\LinearAlgebra\LinearAlgebra.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Numerics\Numerics.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\SignalProcessing\SignalProcessing.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Statistics\Statistics.projitems" Label="Shared" />
+
+</Project>
