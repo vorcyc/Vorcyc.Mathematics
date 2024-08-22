@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>..\..\bin\</BaseOutputPath>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AssemblyName>Vorcyc.Mathematics</AssemblyName>
+    <RootNamespace>Vorcyc.Mathematics</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILGPU" Version="1.5.1" />
+    <PackageReference Include="ILGPU.Algorithms" Version="1.5.1" />
+  </ItemGroup>
+
+  <Import Project="..\..\shared projects\ComputingContext\ComputingContext.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Core\Core.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\LinearAlgebra\LinearAlgebra.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Numerics\Numerics.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\SignalProcessing\SignalProcessing.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Statistics\Statistics.projitems" Label="Shared" />
+
+</Project>

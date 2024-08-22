@@ -1,0 +1,79 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35219.272
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared projects", "shared projects", "{0B7B090A-F8B5-46A1-A425-BBB95BBB1746}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ComputingContext", "shared projects\ComputingContext\ComputingContext.shproj", "{EDC9AD20-9DB1-43E7-8512-BA9156A87172}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core", "shared projects\Core\Core.shproj", "{61CDF5AE-6D99-4A3E-A3CD-30293C143FE6}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LinearAlgebra", "shared projects\LinearAlgebra\LinearAlgebra.shproj", "{D8A93FFC-AB0F-400A-95E7-F1ED6B0B812F}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Numerics", "shared projects\Numerics\Numerics.shproj", "{7EE17963-00E5-412C-A6DE-FB94C21E4F57}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SignalProcessing", "shared projects\SignalProcessing\SignalProcessing.shproj", "{B2C3419E-250A-487D-BC7C-0C89640B96AE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Statistics", "shared projects\Statistics\Statistics.shproj", "{8116AE5E-9C08-4C27-9EB9-E9E50D69BA0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "targets", "targets", "{E0B00A4A-8D98-4AD3-AA39-F39CFCFCBC4F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNET8_Portable", "targets\dotNET8_Portable\dotNET8_Portable.csproj", "{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TESTS", "TESTS", "{D5EB45E7-1CD1-4F11-B3F5-07714F84190D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "core_module_test", "TESTS\core_module_test\core_module_test.csproj", "{2B689EB0-E9AA-487E-84A6-2750AA6896D8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FBD0847F-1FAF-43AF-B39A-E915B2955752}"
+	ProjectSection(SolutionItems) = preProject
+		logo1.png = logo1.png
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B689EB0-E9AA-487E-84A6-2750AA6896D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B689EB0-E9AA-487E-84A6-2750AA6896D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B689EB0-E9AA-487E-84A6-2750AA6896D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B689EB0-E9AA-487E-84A6-2750AA6896D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EDC9AD20-9DB1-43E7-8512-BA9156A87172} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{61CDF5AE-6D99-4A3E-A3CD-30293C143FE6} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{D8A93FFC-AB0F-400A-95E7-F1ED6B0B812F} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{7EE17963-00E5-412C-A6DE-FB94C21E4F57} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{B2C3419E-250A-487D-BC7C-0C89640B96AE} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{8116AE5E-9C08-4C27-9EB9-E9E50D69BA0B} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76} = {E0B00A4A-8D98-4AD3-AA39-F39CFCFCBC4F}
+		{2B689EB0-E9AA-487E-84A6-2750AA6896D8} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		shared projects\Core\Core.projitems*{61cdf5ae-6d99-4a3e-a3cd-30293c143fe6}*SharedItemsImports = 13
+		shared projects\Numerics\Numerics.projitems*{7ee17963-00e5-412c-a6de-fb94c21e4f57}*SharedItemsImports = 13
+		shared projects\Statistics\Statistics.projitems*{8116ae5e-9c08-4c27-9eb9-e9e50d69ba0b}*SharedItemsImports = 13
+		shared projects\SignalProcessing\SignalProcessing.projitems*{b2c3419e-250a-487d-bc7c-0c89640b96ae}*SharedItemsImports = 13
+		shared projects\ComputingContext\ComputingContext.projitems*{bb96f4df-3f0a-4ac3-accd-9a80ef1d5c76}*SharedItemsImports = 5
+		shared projects\Core\Core.projitems*{bb96f4df-3f0a-4ac3-accd-9a80ef1d5c76}*SharedItemsImports = 5
+		shared projects\LinearAlgebra\LinearAlgebra.projitems*{bb96f4df-3f0a-4ac3-accd-9a80ef1d5c76}*SharedItemsImports = 5
+		shared projects\Numerics\Numerics.projitems*{bb96f4df-3f0a-4ac3-accd-9a80ef1d5c76}*SharedItemsImports = 5
+		shared projects\SignalProcessing\SignalProcessing.projitems*{bb96f4df-3f0a-4ac3-accd-9a80ef1d5c76}*SharedItemsImports = 5
+		shared projects\Statistics\Statistics.projitems*{bb96f4df-3f0a-4ac3-accd-9a80ef1d5c76}*SharedItemsImports = 5
+		shared projects\LinearAlgebra\LinearAlgebra.projitems*{d8a93ffc-ab0f-400a-95e7-f1ed6b0b812f}*SharedItemsImports = 13
+		shared projects\ComputingContext\ComputingContext.projitems*{edc9ad20-9db1-43e7-8512-ba9156a87172}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal

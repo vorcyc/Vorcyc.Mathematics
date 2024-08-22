@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>7ee17963-00e5-412c-a6de-fb94c21e4f57</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Vorcyc.Mathematics.Numerics</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ComplexFp32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Complex_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Int24.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IntRange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Range_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UInt24.cs" />
+  </ItemGroup>
+</Project>
