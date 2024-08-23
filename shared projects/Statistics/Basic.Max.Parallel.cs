@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace Vorcyc.Mathematics.Statistics;
 
-namespace Vorcyc.Mathematics.Statistics;
-
-public static partial class MaxHelper
+/// <summary>
+/// Basic statistical functions
+/// </summary>
+public static partial class SBasic
 {
 
 

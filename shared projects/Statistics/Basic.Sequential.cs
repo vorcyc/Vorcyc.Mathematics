@@ -1,9 +1,10 @@
-﻿namespace Vorcyc.Mathematics;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
-public static partial class VMath
+namespace Vorcyc.Mathematics.Statistics;
+
+public static partial class SBasic
 {
-
-
 
 
     #region Max Min
@@ -15,6 +16,7 @@ public static partial class VMath
     /// <param name="start"></param>
     /// <param name="length"></param>
     /// <returns></returns>
+    [method:MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (float max, float min) MaxMin(
         this float[] array,
         int start, int length)
@@ -35,22 +37,55 @@ public static partial class VMath
     }
 
 
-
+    /// <summary>
+    /// Finds the maximum and minimum values in the given array segment.
+    /// </summary>
+    /// <param name="arraySegment">The segment of the array to search.</param>
+    /// <returns>A tuple containing the maximum and minimum values in the array segment.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the array in the segment is null.</exception>
+    [method:MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (float max, float min) MaxMin(
         this ArraySegment<float> arraySegment)
     {
-        var returnMin = float.MaxValue;
-        var returnMax = float.MinValue;
+        if (arraySegment.Array == null)
+            throw new ArgumentNullException(nameof(arraySegment.Array), "Array cannot be null.");
 
-        for (int i = arraySegment.Offset; i < (arraySegment.Offset + arraySegment.Count); i++)
+        float returnMin = arraySegment[0];
+        float returnMax = arraySegment[0];
+
+        for (int i = 1; i < arraySegment.Count; i++)
         {
-            float value = arraySegment.Array[i];
-            returnMin = (value < returnMin) ? value : returnMin;
-            returnMax = (value > returnMax) ? value : returnMax;
+            float value = arraySegment[i];
+            if (value < returnMin) returnMin = value;
+            if (value > returnMax) returnMax = value;
         }
 
         return (returnMax, returnMin);
     }
+
+    /// <summary>
+    /// Finds the maximum and minimum values in the given span.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the span. Must implement <see cref="INumber{T}"/>.</typeparam>
+    /// <param name="span">The span of elements to search.</param>
+    /// <returns>A tuple containing the maximum and minimum values in the span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (T max, T min) MaxMin<T>(this Span<T> span)
+        where T : INumber<T>
+    {
+        var max = span[0];
+        var min = span[0];
+
+        for (int i = 1; i < span.Length; i++)
+        {
+            if (span[i] > max) max = span[i];
+            if (span[i] < min) min = span[i];
+        }
+
+        return (max, min);
+    }
+
 
 
     #endregion

@@ -1,6 +1,10 @@
-﻿namespace Vorcyc.Mathematics.Statistics;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
-public static partial class MaxHelper
+namespace Vorcyc.Mathematics.Statistics;
+
+
+public static partial class SBasic
 {
 
 
@@ -121,6 +125,55 @@ public static partial class MaxHelper
 
     #endregion
 
+    #region Span<T> and INumber<T>
+
+    /// <summary>
+    /// Gets the max value in <see cref="Span{T}"/> of type <see cref="INumberBase{TSelf}"/>.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="span"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Max<T>(this Span<T> span)
+        where T : INumber<T>
+    {
+        var result = span[0];
+        for (int i = 0; i < span.Length; i++)
+        {
+            if (span[i] > result)
+                result = span[i];
+        }
+
+        return result;
+    }
+
+
+
+    /// <summary>
+    /// Gets the max value and it's index in <see cref="Span{T}"/> of type <see cref="INumberBase{TSelf}"/>.
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="span"></param>
+    /// <returns></returns>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (int index, TValue value) LocateMax<TValue>(this Span<TValue> span)
+        where TValue : INumber<TValue>
+    {
+        TValue result = span[0];
+        int resultIndex = 0;
+        for (int i = 0; i < span.Length; i++)
+        {
+            if (span[i] > result)
+            {
+                result = span[i];
+                resultIndex = i;
+            }
+        }
+        return (resultIndex, result);
+    }
+
+
+    #endregion
 
 
     /// <summary>

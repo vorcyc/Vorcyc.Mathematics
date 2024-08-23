@@ -24,6 +24,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PinnableArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VMath2.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)VMath3.cs" />
   </ItemGroup>
 </Project>

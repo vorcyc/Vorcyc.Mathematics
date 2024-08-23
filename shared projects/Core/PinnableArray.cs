@@ -609,7 +609,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// Returns the maximum of current <see cref="PinnableArray{TScalar}"/>.
     /// </summary>
     /// <returns></returns>
-    public T Max() => MaxHelper.Max(_array);// _scalars.Max();
+    public T Max() => SBasic.Max(_array);// _scalars.Max();
 
 
     /// <summary>
@@ -651,9 +651,9 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
     #region Min
 
-    public T Min() => MinHelper.Min(_array);
+    public T Min() => SBasic.Min(_array);
 
-    public T Min(int start, int length) => MinHelper.Min(_array, start, length);
+    public T Min(int start, int length) => SBasic.Min(_array, start, length);
 
     public async Task<T> MinAsync(int? numberOfWorkers = null, bool useTPL = false)
         => await _array.MinAsync(numberOfWorkers, useTPL);

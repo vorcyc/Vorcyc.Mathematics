@@ -164,7 +164,7 @@ public static partial class VMath
             r = absB * MathF.Sqrt(1 + r * r);
         }
 
-        return (float)r;
+        return r;
     }
 
     /// <summary>
