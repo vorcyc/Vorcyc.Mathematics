@@ -42,18 +42,6 @@ public static partial class VMath
     //    return (int)Math.Pow(2, Math.Ceiling(Math.Log(n, 2)));
     //}
 
-    /// <summary>
-    /// Finds Greatest Common Divisor.
-    /// </summary>
-    public static int Gcd(int n, int m)
-    {
-        while (m != 0)
-        {
-            m = n % (n = m);
-        }
-        return n;
-    }
-
     ///// <summary>
     ///// Modulo function that works correctly with negative numbers (as np.mod).
     ///// </summary>

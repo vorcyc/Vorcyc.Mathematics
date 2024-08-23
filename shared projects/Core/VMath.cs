@@ -22,25 +22,48 @@ public static partial class VMath
 
     #region 最大公约数
 
+
     /// <summary>
-    /// 求最大公约数（最大公因数）。指两个或多个整数共有约数中最大的一个，即，同时能被两个数都整除的最大的数。
-    /// Greatest Common Divisor(GCD) 别名 ：Highest Common Factor(HCF)
+    /// 使用欧几里得算法计算两个整数的最大公约数（GCD）。
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
+    /// <param name="n">第一个整数。</param>
+    /// <param name="m">第二个整数。</param>
+    /// <returns>两个整数的最大公约数。</returns>
+    public static int Gcd(int n, int m)
+    {
+        // 继续循环直到余数为零
+        while (m != 0)
+        {
+            // 更新 m 为 n 除以 m 的余数
+            m = n % (n = m);
+        }
+        // 返回最大公约数
+        return n;
+    }
+
+
+    /// <summary>
+    /// 计算两个整数的最大公约数（HCF），使用递归方法。
+    /// </summary>
+    /// <param name="a">第一个整数。</param>
+    /// <param name="b">第二个整数。</param>
+    /// <returns>两个整数的最大公约数。</returns>
     public static int Hcf(int a, int b)
     {
+        // 如果两个数相等，返回其中一个数
         if (a == b)
         {
             return b;
         }
+        // 如果 a 小于 b，递归调用 Hcf(a, b - a)
         if (a < b)
         {
             return Hcf(a, b - a);
         }
+        // 否则，递归调用 Hcf(a - b, b)
         return Hcf(a - b, b);
     }
+
 
 
     ////另一种写法
@@ -164,7 +187,7 @@ public static partial class VMath
             r = absB * MathF.Sqrt(1 + r * r);
         }
 
-        return (float)r;
+        return r;
     }
 
     /// <summary>

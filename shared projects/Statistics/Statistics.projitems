@@ -9,8 +9,12 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Statistics</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)MaxHelper.Parallel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MaxHelper.Sequential.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MinHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArrayExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Basic.Max.Parallel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Basic.Max.Sequential.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Basic.Min.Parallel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Basic.Min.Sequential.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Basic.Sequential.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExtremeValueFinder.cs" />
   </ItemGroup>
 </Project>

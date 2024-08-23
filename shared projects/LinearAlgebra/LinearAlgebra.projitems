@@ -13,5 +13,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)DimensionMismatchException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Matrix.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Matrix_g.cs" />
   </ItemGroup>
 </Project>

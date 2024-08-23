@@ -8,7 +8,7 @@ using System.Numerics;
 /// Contains the most widely used contracts / guard clauses.
 /// </summary>
 [DebuggerStepThrough]
-public static class Guard
+internal static class Guard
 {
     /// <summary>
     /// Guards against negative number or zero.

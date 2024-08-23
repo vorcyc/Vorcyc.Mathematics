@@ -110,7 +110,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
         if (this.Maximum.IsLessThan(range.Minimum) || this.Minimum.IsGreaterThan(range.Maximum))
             return null;
 
-        return new Range<T>(MaxHelper.Max(this.Minimum, range.Maximum), MinHelper.Min(this.Maximum, range.Maximum));
+        return new Range<T>(SBasic.Max(this.Minimum, range.Maximum), SBasic.Min(this.Maximum, range.Maximum));
     }
 
 
@@ -123,7 +123,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
     /// between this range and the <paramref name="range"/> given as argument.</returns>
     public Range<T> Union(Range<T> range)
     {
-        return new Range<T>(MinHelper.Min(this.Minimum, range.Minimum), MaxHelper.Max(this.Maximum, range.Maximum));
+        return new Range<T>(SBasic.Min(this.Minimum, range.Minimum), SBasic.Max(this.Maximum, range.Maximum));
     }
 
 
