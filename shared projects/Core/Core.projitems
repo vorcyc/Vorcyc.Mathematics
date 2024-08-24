@@ -21,7 +21,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Trigonometry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VMath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Guard.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PinnableArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VMath2.cs" />
   </ItemGroup>
