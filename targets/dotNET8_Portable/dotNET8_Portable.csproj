@@ -10,18 +10,45 @@
     <AssemblyName>Vorcyc.Mathematics</AssemblyName>
     <RootNamespace>Vorcyc.Mathematics</RootNamespace>
     <Authors>cyclone_dll ( linliduan )</Authors>
-    <Company>Vorcyc | 昆明涡旋科技有限公司 | vorcyc.com</Company>
+    <Company>Vorcyc</Company>
     <Description>A pure dotNET and high performance math library.</Description>
-    <Copyright>Vorcyc® Mathematics 昆明涡旋科技有限公司 段琳立</Copyright>
-    <Product>Vorcyc Mathematics 1.0</Product>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <Title>Vorcy Mathematics</Title>
+    <Copyright>Vorcyc® Mathematics</Copyright>
+    <Product>Vorcyc Mathematics 0.1.0</Product>
+    <Version>0.1.0.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <Title>Vorcy.Mathematics</Title>
+    <PackageIcon>logo1.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>.NET Math Statistics DSP LinearAlgebra Numerics ArrayEx Generic-Math misc</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\License.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\logo1.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ILGPU" Version="1.5.1" />
     <PackageReference Include="ILGPU.Algorithms" Version="1.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="License.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <Import Project="..\..\shared projects\ComputingContext\ComputingContext.projitems" Label="Shared" />

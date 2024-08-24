@@ -1,5 +1,6 @@
 ﻿namespace Vorcyc.Mathematics;
 
+using ILGPU.Backends.IL;
 using System.Runtime.CompilerServices;
 using Vorcyc.Mathematics.Statistics;
 
@@ -91,8 +92,8 @@ public static partial class ArrayExtension
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<(int startIndex, int length)> SplitAsMarks<T>(this T[] array, int segmentLength)
     {
-        if (segmentLength <= 0)
-            throw new ArgumentException("Segment length must be greater than zero.", nameof(segmentLength));
+        //if (segmentLength <= 0)
+        //    throw new ArgumentException("Segment length must be greater than zero.", nameof(segmentLength));
 
         // 计算余数
         var remainder = array.Length % segmentLength;
@@ -149,6 +150,99 @@ public static partial class ArrayExtension
         if (remainder != 0)
             yield return (start + len - remainder, remainder);
     }
+
+
+    #region Zip
+
+
+
+    /// <summary>
+    /// Segments an array into smaller parts of a specified target length.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array.</typeparam>
+    /// <param name="array">The original array to segment.</param>
+    /// <param name="targetLength">The desired number of segments.</param>
+    /// <returns>An enumerable of array segments.</returns>
+    public static IEnumerable<ArraySegment<T>> Zip<T>(this T[] array, int targetLength)
+    {
+        double xStep = (double)array.Length / targetLength;
+        var segmentLength = (int)xStep;
+
+        for (int i = 0; i < array.Length; i += segmentLength)
+        {
+            yield return new ArraySegment<T>(array, i, segmentLength);
+        }
+    }
+
+    /// <summary>
+    /// Segments a specified range of an array into smaller parts of a specified target length.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array.</typeparam>
+    /// <param name="array">The original array to segment.</param>
+    /// <param name="startIndex">The starting index of the range to segment.</param>
+    /// <param name="length">The number of elements to include in the range.</param>
+    /// <param name="targetLength">The desired number of segments.</param>
+    /// <returns>An enumerable of array segments.</returns>
+    public static IEnumerable<ArraySegment<T>> Zip<T>(
+        this T[] array,
+        int startIndex, int length,
+        int targetLength)
+    {
+        double xStep = (double)length / targetLength;
+        var segmentLength = (int)xStep;
+
+        for (int i = startIndex; i < startIndex + length - segmentLength; i += segmentLength)
+        {
+            yield return new ArraySegment<T>(array, i, segmentLength);
+        }
+    }
+
+    /// <summary>
+    /// Segments an array into smaller parts of a specified target length and returns the start index and length of each segment.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array.</typeparam>
+    /// <param name="array">The original array to segment.</param>
+    /// <param name="targetLength">The desired number of segments.</param>
+    /// <returns>An enumerable of tuples containing the start index and length of each segment.</returns>
+    public static IEnumerable<(int startIndex, int length)> ZipAsMarks<T>(this T[] array, int targetLength)
+    {
+        double xStep = (double)array.Length / targetLength;
+        var segmentLength = (int)xStep;
+
+        for (int i = 0; i < array.Length; i += segmentLength)
+        {
+            yield return (i, segmentLength);
+        }
+    }
+
+    /// <summary>
+    /// Segments a specified range of an array into smaller parts of a specified target length and returns the start index and length of each segment.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array.</typeparam>
+    /// <param name="array">The original array to segment.</param>
+    /// <param name="startIndex">The starting index of the range to segment.</param>
+    /// <param name="length">The number of elements to include in the range.</param>
+    /// <param name="targetLength">The desired number of segments.</param>
+    /// <returns>An enumerable of tuples containing the start index and length of each segment.</returns>
+    public static IEnumerable<(int startIndex, int length)> ZipAsMarks<T>(
+        this T[] array,
+        int startIndex, int length,
+        int targetLength)
+    {
+        double xStep = (double)length / targetLength;
+        var segmentLength = (int)xStep;
+
+        for (int i = startIndex; i < startIndex + length - segmentLength; i += segmentLength)
+        {
+            yield return (i, segmentLength);
+        }
+    }
+
+
+
+    #endregion
+
+
 
 
 

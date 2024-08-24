@@ -27,11 +27,11 @@ public static class ExtremeValueFinder
         this float[] array,
         int start, int length)
     {
-        if (array == null)
-            throw new ArgumentNullException(nameof(array), "Array cannot be null.");
+        //if (array == null)
+        //    throw new ArgumentNullException(nameof(array), "Array cannot be null.");
 
-        if (start < 0 || length < 0 || start + length > array.Length)
-            throw new ArgumentOutOfRangeException("Start or length is out of range.");
+        //if (start < 0 || length < 0 || start + length > array.Length)
+        //    throw new ArgumentOutOfRangeException("Start or length is out of range.");
 
         var returnMin = array[start];
         var returnMax = array[start];

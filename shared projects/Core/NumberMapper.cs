@@ -119,7 +119,6 @@ public static class NumberMapper
         var outputRange = outMax - outMin;
         var ratio = outputRange / inputRange;
         return outMin + ratio * (number - inMin);
-
     }
 
 

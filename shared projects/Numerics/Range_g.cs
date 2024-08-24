@@ -20,7 +20,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
     /// <param name="maximum">指定区间的最大值</param>
     public Range(T minimum, T maximum)
     {
-        if (maximum.IsLessThanOrEqual(minimum)) throw new ArgumentException("Maximum must greater than minimun.");
+        if (maximum.LessThanOrEqual(minimum)) throw new ArgumentException("Maximum must greater than minimun.");
 
         Minimum = minimum;
         Maximum = maximum;
@@ -35,7 +35,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
     /// <param name="value"></param>
     public Range(T minimun, T maximum, T value)
     {
-        if (maximum.IsLessThanOrEqual(minimun)) throw new ArgumentException("Maximum must greater than minimun.");
+        if (maximum.LessThanOrEqual(minimun)) throw new ArgumentException("Maximum must greater than minimun.");
 
         Minimum = minimun;
         Maximum = maximum;
@@ -91,7 +91,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
     /// 
     public bool IsInside(T x)
     {
-        return IComparableExtension.IsGreaterThanOrEqual(x, Minimum) && IComparableExtension.IsLessThanOrEqual(x, Maximum);
+        return IComparableExtension.GreaterThanOrEqual(x, Minimum) && IComparableExtension.LessThanOrEqual(x, Maximum);
     }
 
 
@@ -107,7 +107,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
     /// 
     public Range<T> Intersection(Range<T> range)
     {
-        if (this.Maximum.IsLessThan(range.Minimum) || this.Minimum.IsGreaterThan(range.Maximum))
+        if (this.Maximum.LessThan(range.Minimum) || this.Minimum.GreaterThan(range.Maximum))
             return null;
 
         return new Range<T>(SBasic.Max(this.Minimum, range.Maximum), SBasic.Min(this.Maximum, range.Maximum));
@@ -193,7 +193,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
     /// 
     public static bool operator !=(Range<T> range1, Range<T> range2)
     {
-        return (range1.Minimum.NotEquals(range2.Minimum) || range1.Maximum.NotEquals(range2.Maximum));
+        return (range1.Minimum.NotEqual(range2.Minimum) || range1.Maximum.NotEqual(range2.Maximum));
     }
 
 

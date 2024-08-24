@@ -1,0 +1,30 @@
+﻿Software Name: Vorcyc.Mathematics
+
+Version: 0.1.0.0
+
+Copyright © 2024 Vorcyc
+
+End User License Agreement (EULA)
+Please read this End User License Agreement (“Agreement”) carefully. This is a legal agreement between you (an individual or a single entity) and Vorcyc (“Licensor”) regarding the use of Vorcyc.Mathematics (“Software”).
+
+1. Grant of License
+The Licensor grants you a non-exclusive, non-transferable license to use this Software for free, provided you comply with the terms of this Agreement.
+
+2. Restrictions on Use
+You may not reverse engineer, decompile, or disassemble the Software.
+You may not modify, adapt, or create derivative works of the Software.
+You may not remove or alter any copyright or other proprietary notices contained in the Software.
+You must acknowledge the use of this Software in your application, indicating that it was developed by Vorcyc.
+3. Copyright and Ownership
+The Software and all copies thereof are the intellectual property of and are owned by the Licensor. You only have the right to use the Software.
+
+4. Disclaimer
+The Software is provided “as is” without any express or implied warranties. The Licensor does not warrant the performance or suitability of the Software and is not liable for any damages arising from its use or inability to use the Software.
+
+5. Termination
+The Licensor may terminate this Agreement immediately if you fail to comply with any of its terms. Upon termination, you must cease using the Software and destroy all copies of it.
+
+6. Governing Law
+This Agreement is governed by the local laws applicable to you, without regard to its conflict of law principles.
+
+By using this Software, you acknowledge that you have read and agree to the terms of this Agreemen
