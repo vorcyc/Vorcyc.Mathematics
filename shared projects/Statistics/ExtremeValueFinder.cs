@@ -23,7 +23,7 @@ public static class ExtremeValueFinder
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="start"/> or <paramref name="length"/> is out of range.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (float max, float min) GetExtremeValue(
+    public static (float max, float min) FindExtremeValue(
         this float[] array,
         int start, int length)
     {
@@ -33,14 +33,51 @@ public static class ExtremeValueFinder
         if (start < 0 || length < 0 || start + length > array.Length)
             throw new ArgumentOutOfRangeException("Start or length is out of range.");
 
-        var returnMin = float.MaxValue;
-        var returnMax = float.MinValue;
+        var returnMin = array[start];
+        var returnMax = array[start];
 
         var end = System.Math.Min(start + length, array.Length);
 
         for (int i = start; i < end; i++)
         {
             float value = array[i];
+            returnMin = (value < returnMin) ? value : returnMin;
+            returnMax = (value > returnMax) ? value : returnMax;
+        }
+
+        return (returnMax, returnMin);
+    }
+
+    /// <summary>
+    /// Finds the maximum and minimum values in a specified range of an array.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array. Must implement <see cref="INumber{T}"/>.</typeparam>
+    /// <param name="array">The array to search for extreme values.</param>
+    /// <param name="start">The starting index of the range to search.</param>
+    /// <param name="length">The number of elements to include in the range.</param>
+    /// <returns>A tuple containing the maximum and minimum values in the specified range of the array.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the start or length is out of range.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (T max, T min) FindExtremeValue<T>(
+        this T[] array,
+        int start, int length)
+        where T : INumber<T>
+    {
+        if (array == null)
+            throw new ArgumentNullException(nameof(array), "Array cannot be null.");
+
+        if (start < 0 || length < 0 || start + length > array.Length)
+            throw new ArgumentOutOfRangeException("Start or length is out of range.");
+
+        var returnMin = array[start];
+        var returnMax = array[start];
+
+        var end = System.Math.Min(start + length, array.Length);
+
+        for (int i = start; i < end; i++)
+        {
+            T value = array[i];
             returnMin = (value < returnMin) ? value : returnMin;
             returnMax = (value > returnMax) ? value : returnMax;
         }
@@ -56,7 +93,7 @@ public static class ExtremeValueFinder
     /// <returns>A tuple containing the maximum and minimum values.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (float max, float min) GetExtremeValue(this float[] array)
+    public static (float max, float min) FindExtremeValue(this float[] array)
     {
         // Check if the array is null
         if (array is null)
@@ -79,6 +116,38 @@ public static class ExtremeValueFinder
     }
 
 
+    /// <summary>
+    /// Finds the maximum and minimum values in an array.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array. Must implement <see cref="INumber{T}"/>.</typeparam>
+    /// <param name="array">The array to search for extreme values.</param>
+    /// <returns>A tuple containing the maximum and minimum values in the array.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (T max, T min) FindExtremeValue<T>(this T[] array)
+        where T : INumber<T>
+    {
+        // Check if the array is null
+        if (array is null)
+            throw new ArgumentNullException(nameof(array), "Array cannot be null.");
+
+        // Initialize the minimum and maximum values
+        var returnMin = array[0];
+        var returnMax = array[0];
+
+        // Iterate through the array to find the minimum and maximum values
+        for (int i = 1; i < array.Length; i++)
+        {
+            T value = array[i];
+            returnMin = (value < returnMin) ? value : returnMin;
+            returnMax = (value > returnMax) ? value : returnMax;
+        }
+
+        // Return the maximum and minimum values
+        return (returnMax, returnMin);
+    }
+
+
 
 
     /// <summary>
@@ -88,7 +157,7 @@ public static class ExtremeValueFinder
     /// <returns>A tuple containing the maximum and minimum values in the array segment.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the array in the segment is null.</exception>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (float max, float min) GetExtremeValue(
+    public static (float max, float min) FindExtremeValue(
         this ArraySegment<float> arraySegment)
     {
         if (arraySegment.Array is null)
@@ -108,9 +177,40 @@ public static class ExtremeValueFinder
     }
 
 
+    /// <summary>
+    /// Finds the maximum and minimum values in an <see cref="ArraySegment{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array segment. Must implement <see cref="INumber{T}"/>.</typeparam>
+    /// <param name="arraySegment">The array segment to search for extreme values.</param>
+    /// <returns>A tuple containing the maximum and minimum values in the array segment.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the array segment's array is null.</exception>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (T max, T min) FindExtremeValue<T>(
+        this ArraySegment<T> arraySegment)
+        where T : INumber<T>
+    {
+        if (arraySegment.Array is null)
+            throw new ArgumentNullException(nameof(arraySegment.Array), "Array cannot be null.");
+
+        T returnMin = arraySegment[0];
+        T returnMax = arraySegment[0];
+
+        for (int i = 1; i < arraySegment.Count; i++)
+        {
+            T value = arraySegment[i];
+            if (value < returnMin) returnMin = value;
+            if (value > returnMax) returnMax = value;
+        }
+
+        return (returnMax, returnMin);
+    }
+
 
 
     #endregion
+
+
+
 
 
     #region 硬件加速的 GetExtremeValue
@@ -123,7 +223,7 @@ public static class ExtremeValueFinder
     /// <returns>A tuple containing the maximum and minimum values in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (T max, T min) GetExtremeValue_Normal<T>(this Span<T> span)
+    internal static (T max, T min) FindExtremeValue_Normal<T>(this Span<T> span)
         where T : unmanaged, INumber<T>
     {
         var max = span[0];
@@ -147,7 +247,7 @@ public static class ExtremeValueFinder
     /// <exception cref="ArgumentException">当数组为空时抛出。</exception>
     /// <exception cref="PlatformNotSupportedException">当平台不支持 SSE2 时抛出。</exception>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (float max, float min) GetExtremeValue_Vector128(this Span<float> segment)
+    internal static (float max, float min) FindExtremeValue_Vector128(this Span<float> segment)
     {
         // 检查数组是否为空
         if (segment.Length == 0)
@@ -198,7 +298,7 @@ public static class ExtremeValueFinder
     /// <exception cref="ArgumentException">当数组为空时抛出。</exception>
     /// <exception cref="PlatformNotSupportedException">当平台不支持 AVX2 时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (float max, float min) GetExtremeValue_Vector256(this Span<float> segment)
+    internal static (float max, float min) FindExtremeValue_Vector256(this Span<float> segment)
     {
         // 检查数组是否为空
         if (segment == null || segment.Length == 0)
@@ -251,7 +351,7 @@ public static class ExtremeValueFinder
     /// <exception cref="ArgumentException">当数组为空时抛出。</exception>
     /// <exception cref="PlatformNotSupportedException">当平台不支持 AVX512 时抛出。</exception>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (float max, float min) GetExtremeValue_Vector512(Span<float> segment)
+    internal static (float max, float min) FindExtremeValue_Vector512(Span<float> segment)
     {
         // 检查数组是否为空
         if (segment == null || segment.Length == 0)
@@ -305,20 +405,20 @@ public static class ExtremeValueFinder
     /// <param name="segment">A span containing float values.</param>
     /// <returns>A tuple containing the maximum and minimum values.</returns>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (float max, float min) GetExtremeValue(this Span<float> segment)
+    public static (float max, float min) FindExtremeValue(this Span<float> segment)
     {
         // 如果硬件支持 AVX512，则使用 AVX512 方法
         if (Vector512.IsHardwareAccelerated)
-            return GetExtremeValue_Vector512(segment);
+            return FindExtremeValue_Vector512(segment);
         // 如果硬件支持 AVX2，则使用 AVX2 方法
         else if (Vector256.IsHardwareAccelerated)
-            return GetExtremeValue_Normal(segment);
+            return FindExtremeValue_Normal(segment);
         // 如果硬件支持 SSE2，则使用 SSE2 方法
         else if (Vector128.IsHardwareAccelerated)
-            return GetExtremeValue_Vector128(segment);
+            return FindExtremeValue_Vector128(segment);
         // 否则，使用普通方法
         else
-            return GetExtremeValue_Normal(segment);
+            return FindExtremeValue_Normal(segment);
     }
 
     #endregion

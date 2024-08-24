@@ -2,7 +2,7 @@
 
 using System.Runtime.InteropServices;
 
-public static class ArrayExtension
+public static partial class ArrayExtension
 {
 
     #region Generic

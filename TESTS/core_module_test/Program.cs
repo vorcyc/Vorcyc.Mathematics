@@ -12,6 +12,9 @@ var array = new float[10];
 for (int i = 0; i < 10; i++)
     array[i] = i;
 
+var a2 = new double[10];
+a2.FindExtremeValue();
+
 var max = Vorcyc.Mathematics.Statistics.SBasic.Max(array);
 
 Console.WriteLine(max);

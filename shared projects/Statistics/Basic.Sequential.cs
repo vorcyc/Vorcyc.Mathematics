@@ -7,83 +7,50 @@ public static partial class SBasic
 {
 
 
-    #region Max Min
+    #region Sum
 
     /// <summary>
-    /// 找最大值和最小值，并返回TupleValue&lt;T1,T2&gt;
+    /// Calculates the sum of the elements in an <see cref="ArraySegment{T}"/> of floats.
     /// </summary>
-    /// <param name="array"></param>
-    /// <param name="start"></param>
-    /// <param name="length"></param>
-    /// <returns></returns>
-    [method:MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (float max, float min) MaxMin(
-        this float[] array,
-        int start, int length)
+    /// <param name="arraySegment">The array segment of floats.</param>
+    /// <returns>The sum of the elements in the array segment.</returns>
+    public static float Sum(this ArraySegment<float> arraySegment)
     {
-        var returnMin = float.MaxValue;
-        var returnMax = float.MinValue;
-
-        var end = System.Math.Min(start + length, array.Length);
-
-        for (int i = start; i < end; i++)
-        {
-            float value = array[i];
-            returnMin = (value < returnMin) ? value : returnMin;
-            returnMax = (value > returnMax) ? value : returnMax;
-        }
-
-        return (returnMax, returnMin);
-    }
-
-
-    /// <summary>
-    /// Finds the maximum and minimum values in the given array segment.
-    /// </summary>
-    /// <param name="arraySegment">The segment of the array to search.</param>
-    /// <returns>A tuple containing the maximum and minimum values in the array segment.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the array in the segment is null.</exception>
-    [method:MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (float max, float min) MaxMin(
-        this ArraySegment<float> arraySegment)
-    {
-        if (arraySegment.Array == null)
-            throw new ArgumentNullException(nameof(arraySegment.Array), "Array cannot be null.");
-
-        float returnMin = arraySegment[0];
-        float returnMax = arraySegment[0];
-
-        for (int i = 1; i < arraySegment.Count; i++)
-        {
-            float value = arraySegment[i];
-            if (value < returnMin) returnMin = value;
-            if (value > returnMax) returnMax = value;
-        }
-
-        return (returnMax, returnMin);
+        float result = 0.0f;
+        foreach (var ele in arraySegment)
+            result += ele;
+        return result;
     }
 
     /// <summary>
-    /// Finds the maximum and minimum values in the given span.
+    /// Calculates the sum of the elements in a <see cref="Span{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of the elements in the span. Must implement <see cref="INumber{T}"/>.</typeparam>
-    /// <param name="span">The span of elements to search.</param>
-    /// <returns>A tuple containing the maximum and minimum values in the span.</returns>
-    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (T max, T min) MaxMin<T>(this Span<T> span)
-        where T : INumber<T>
+    /// <param name="span">The span of elements.</param>
+    /// <returns>The sum of the elements in the span.</returns>
+    public static T Sum<T>(this Span<T> span) where T : INumber<T>
     {
-        var max = span[0];
-        var min = span[0];
+        T result = T.Zero;
+        for (int i = 0; i < span.Length; i++)
+            result += span[i];
+        return result;
+    }
 
-        for (int i = 1; i < span.Length; i++)
+    /// <summary>
+    /// Calculates the sum of a specified range of elements in an array of floats.
+    /// </summary>
+    /// <param name="array">The array of floats.</param>
+    /// <param name="start">The starting index of the range to sum.</param>
+    /// <param name="length">The number of elements to include in the sum.</param>
+    /// <returns>The sum of the specified range of elements in the array.</returns>
+    public static float Sum(this float[] array, int start, int length)
+    {
+        float result = 0.0f;
+        for (int i = start; i < start + length; i++)
         {
-            if (span[i] > max) max = span[i];
-            if (span[i] < min) min = span[i];
+            result += array[i];
         }
-
-        return (max, min);
+        return result;
     }
 
 
@@ -129,7 +96,7 @@ public static partial class SBasic
     /// <returns>The average of the elements in the specified subarray.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="start"/> or <paramref name="length"/> is out of range.</exception>
-    [MethodImpl( MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Average(this float[] array, int start, int length)
     {
         if (array is null)
@@ -158,7 +125,7 @@ public static partial class SBasic
     /// <returns>The average of the elements in the array as a double.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when the <paramref name="array"/> is empty.</exception>
-    [method:MethodImpl( MethodImplOptions.AggressiveInlining)]
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Average(this byte[] array)
     {
         if (array == null)
@@ -197,6 +164,35 @@ public static partial class SBasic
             sum += span[i];
         }
         return sum / T.CreateChecked(span.Length);
+    }
+
+    /// <summary>
+    /// Calculates the sum of the elements in an <see cref="ArraySegment{T}"/> of floats.
+    /// </summary>
+    /// <param name="arraySegment">The array segment of floats.</param>
+    /// <returns>The sum of the elements in the array segment.</returns>
+    public static float Average(this ArraySegment<float> arraySegment)
+    {
+        return Sum(arraySegment) / arraySegment.Count;
+    }
+
+    /// <summary>
+    /// Calculates the average of multiple <see cref="ArraySegment{T}"/> instances of floats.
+    /// </summary>
+    /// <param name="arraySegments">The enumerable of array segments of floats.</param>
+    /// <returns>The average value of the elements in the array segments.</returns>
+    public static float Average(this IEnumerable<ArraySegment<float>> arraySegments)
+    {
+        int count = 0;
+        float avgSum = 0.0f;
+
+        foreach (var segment in arraySegments)
+        {
+            avgSum += Average(segment);
+            count++;
+        }
+
+        return avgSum / count;
     }
 
 
