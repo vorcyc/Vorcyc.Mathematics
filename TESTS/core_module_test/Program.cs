@@ -12,6 +12,7 @@ var array = new float[10];
 for (int i = 0; i < 10; i++)
     array[i] = i;
 
-//var max = Vorcyc.Mathematics.Statistics.SBasic.Max(array);
+var max = Vorcyc.Mathematics.Statistics.SBasic.Max(array);
 
 Console.WriteLine(max);
+
