@@ -13,7 +13,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Complex_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Int24.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IntRange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Point_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PointFP32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Range_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RectangleFP32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SizeFP32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Size_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UInt24.cs" />
   </ItemGroup>
 </Project>

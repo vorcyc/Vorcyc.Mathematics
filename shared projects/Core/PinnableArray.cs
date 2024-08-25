@@ -189,7 +189,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     #region AsSpan
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Span<T> AsSpan() => new(_array);
+    public Span<T> AsSpan() => new(_array, 0, _length);
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -569,7 +569,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// Converts to a <see cref="Span{T}"/>
     /// </summary>
     /// <param name="pinableArray"></param>
-    public static implicit operator Span<T>(PinnableArray<T> pinableArray) => pinableArray._array.AsSpan();
+    public static implicit operator Span<T>(PinnableArray<T> pinableArray) => pinableArray._array.AsSpan(0, pinableArray._length);
 
 
     public static unsafe implicit operator nint(PinnableArray<T> pinableArray)
