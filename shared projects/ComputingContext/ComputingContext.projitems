@@ -9,6 +9,7 @@
     <Import_RootNamespace>Vorcyc.Mathematics</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComputingContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComputingDevice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />

@@ -1,5 +1,6 @@
 ﻿namespace Vorcyc.Mathematics;
 
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 public static partial class ArrayExtension
@@ -39,6 +40,12 @@ public static partial class ArrayExtension
 
 
 
+    /// <summary>
+    /// Fills the entire array with the specified value.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="value">The value to fill the array with.</param>
     public static void Fill<T>(this T[] array, T value)
     {
         for (int i = 0; i < array.Length; i++)
@@ -47,7 +54,16 @@ public static partial class ArrayExtension
         }
     }
 
-
+    /// <summary>
+    /// Fills a specified range of the array with the specified value.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="start">The start index of the range to fill.</param>
+    /// <param name="end">The end index of the range to fill.</param>
+    /// <param name="value">The value to fill the array with.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the start or end index is out of range.</exception>
     public static void Fill<T>(this T[] array, int start, int end, T value)
     {
         if (array == null)
@@ -63,6 +79,75 @@ public static partial class ArrayExtension
         {
             array[i] = value;
         }
+    }
+
+    /// <summary>
+    /// Fills a specified range of the array with the specified value.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="range">The range to fill.</param>
+    /// <param name="value">The value to fill the array with.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the range is out of bounds.</exception>
+    public static void Fill<T>(this T[] array, Range range, T value)
+    {
+        ArgumentNullException.ThrowIfNull(array);
+
+        var (offset, length) = range.GetOffsetAndLength(array.Length);
+        for (int i = offset; i < offset + length; i++)
+        {
+            array[i] = value;
+        }
+    }
+
+    /// <summary>
+    /// Fills the span with random float numbers.
+    /// </summary>
+    /// <param name="span">The span to fill.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the span length is less than 1.</exception>
+    public static void FillWithRandomNumber(this Span<float> span)
+    {
+        if (span.Length < 1)
+            throw new ArgumentOutOfRangeException(nameof(span));
+
+        for (int i = 0; i < span.Length; i++)
+        {
+            span[i] = Random.Shared.NextSingle();
+        }
+    }
+
+    /// <summary>
+    /// Fills the array with random numbers.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array, which must implement IFloatingPointIeee754.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    public static void FillWithRandomNumber<T>(this T[] array)
+        where T : IFloatingPointIeee754<T>
+    {
+        ArgumentNullException.ThrowIfNull(array);
+
+        for (int i = 0; i < array.Length; i++)
+            array[i] = T.CreateTruncating(Random.Shared.NextDouble())-T.One;
+    }
+
+    /// <summary>
+    /// Fills a specified range of the array with random numbers.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the array, which must implement IFloatingPointIeee754.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="range">The range to fill.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the range is out of bounds.</exception>
+    public static void FillWithRandomNumber<T>(this T[] array, Range range)
+        where T : IFloatingPointIeee754<T>
+    {
+        ArgumentNullException.ThrowIfNull(array);
+
+        var (offset, length) = range.GetOffsetAndLength(array.Length);
+        for (int i = offset; i < offset + length; i++)
+            array[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
 
 

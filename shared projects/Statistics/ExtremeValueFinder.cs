@@ -231,8 +231,9 @@ public static class ExtremeValueFinder
 
         for (int i = 1; i < span.Length; i++)
         {
-            if (span[i] > max) max = span[i];
-            if (span[i] < min) min = span[i];
+            var current = span[i];
+            if (current > max) max = current;
+            if (current < min) min = current;
         }
 
         return (max, min);
@@ -246,44 +247,46 @@ public static class ExtremeValueFinder
     /// <returns>包含最大值和最小值的元组。</returns>
     /// <exception cref="ArgumentException">当数组为空时抛出。</exception>
     /// <exception cref="PlatformNotSupportedException">当平台不支持 SSE2 时抛出。</exception>
-    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (float max, float min) FindExtremeValue_Vector128(this Span<float> segment)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static (float max, float min) FindExtremeValue_Vector128(this Span<float> span)
     {
-        // 检查数组是否为空
-        if (segment.Length == 0)
-            throw new ArgumentException("Array is null or empty");
+        if (span.IsEmpty)
+            throw new ArgumentException("Span 不能为空", nameof(span));
 
-        // 检查平台是否支持 SSE2
-        if (!Sse2.IsSupported)
-            throw new PlatformNotSupportedException("SSE2 is not supported on this platform.");
+        if (!Sse.IsSupported)
+            throw new PlatformNotSupportedException("SSE is not supported on this platform.");
 
         var vectorSize = Vector128<float>.Count;
         var maxVector = Vector128.Create(float.MinValue);
         var minVector = Vector128.Create(float.MaxValue);
 
         int i = 0;
-        // 使用 SSE2 指令集处理数据
-        for (; i <= segment.Length - vectorSize; i += vectorSize)
+        for (; i <= span.Length - vectorSize; i += vectorSize)
         {
-            var currentVector = Vector128.Create(segment[i], segment[i + 1], segment[i + 2], segment[i + 3]);
-            maxVector = Sse2.Max(currentVector, maxVector);
+            //var currentVector = Vector128.Create(span[i], span[i + 1], span[i + 2], span[i + 3]);
+            var currentVector = Vector128.LoadUnsafe(ref span[i]);
+            maxVector = Sse.Max(currentVector, maxVector);
             minVector = Sse.Min(currentVector, minVector);
         }
 
         // 提取向量中的最大值和最小值
+        //float max = maxVector.ToScalar();
+        //float min = minVector.ToScalar();
         float max = maxVector[0];
         float min = minVector[0];
         for (int j = 1; j < vectorSize; j++)
         {
+            //max = Math.Max(max, maxVector.GetElement(j));
+            //min = Math.Min(min, minVector.GetElement(j));   
             max = Math.Max(max, maxVector[j]);
             min = Math.Min(min, minVector[j]);
         }
 
         // 处理剩余的数据
-        for (; i < segment.Length; i++)
+        for (; i < span.Length; i++)
         {
-            max = Math.Max(segment[i], max);
-            min = Math.Min(segment[i], min);
+            max = Math.Max(span[i], max);
+            min = Math.Min(span[i], min);
         }
 
         return (max, min);
@@ -293,15 +296,15 @@ public static class ExtremeValueFinder
     /// <summary>
     /// 使用 AVX2 指令集优化，从浮点数的 Span 中获取最大值和最小值。
     /// </summary>
-    /// <param name="segment">包含浮点数的 Span。</param>
+    /// <param name="span">包含浮点数的 Span。</param>
     /// <returns>包含最大值和最小值的元组。</returns>
     /// <exception cref="ArgumentException">当数组为空时抛出。</exception>
     /// <exception cref="PlatformNotSupportedException">当平台不支持 AVX2 时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (float max, float min) FindExtremeValue_Vector256(this Span<float> segment)
+    internal static (float max, float min) FindExtremeValue_Vector256(this Span<float> span)
     {
         // 检查数组是否为空
-        if (segment == null || segment.Length == 0)
+        if (span == null || span.Length == 0)
             throw new ArgumentException("Array is null or empty");
 
         // 检查平台是否支持 AVX2
@@ -315,28 +318,33 @@ public static class ExtremeValueFinder
 
         int i = 0;
         // 使用 AVX2 指令集处理数据
-        for (; i <= segment.Length - vectorSize; i += vectorSize)
+        for (; i <= span.Length - vectorSize; i += vectorSize)
         {
-            var currentVector = Vector256.Create(segment[i], segment[i + 1], segment[i + 2], segment[i + 3],
-                                                 segment[i + 4], segment[i + 5], segment[i + 6], segment[i + 7]);
-            maxVector = Avx.Max(currentVector, maxVector);
-            minVector = Avx.Min(currentVector, minVector);
+            //var currentVector = Vector256.Create(segment[i], segment[i + 1], segment[i + 2], segment[i + 3],
+            //                                     segment[i + 4], segment[i + 5], segment[i + 6], segment[i + 7]);
+            var currentVector = Vector256.LoadUnsafe(ref span[i]);
+            maxVector = Avx2.Max(currentVector, maxVector);
+            minVector = Avx2.Min(currentVector, minVector);
         }
 
         // 提取向量中的最大值和最小值
+        //float max = maxVector.ToScalar();
+        //float min = minVector.ToScalar();
         float max = maxVector[0];
         float min = minVector[0];
         for (int j = 1; j < vectorSize; j++)
-        {
+        {  
+            //max = Math.Max(max, maxVector.GetElement(j));
+            //min = Math.Min(min, minVector.GetElement(j));   
             max = Math.Max(max, maxVector[j]);
             min = Math.Min(min, minVector[j]);
         }
 
         // 处理剩余的数据
-        for (; i < segment.Length; i++)
+        for (; i < span.Length; i++)
         {
-            max = Math.Max(segment[i], max);
-            min = Math.Min(segment[i], min);
+            max = Math.Max(span[i], max);
+            min = Math.Min(span[i], min);
         }
 
         return (max, min);
@@ -369,11 +377,11 @@ public static class ExtremeValueFinder
         // 使用 AVX512 指令集处理数据
         for (; i <= segment.Length - vectorSize; i += vectorSize)
         {
-            var currentVector = Vector512.Create(segment[i], segment[i + 1], segment[i + 2], segment[i + 3],
-                                                 segment[i + 4], segment[i + 5], segment[i + 6], segment[i + 7],
-                                                 segment[i + 8], segment[i + 9], segment[i + 10], segment[i + 11],
-                                                 segment[i + 12], segment[i + 13], segment[i + 14], segment[i + 15]);
-
+            //var currentVector = Vector512.Create(segment[i], segment[i + 1], segment[i + 2], segment[i + 3],
+            //                                     segment[i + 4], segment[i + 5], segment[i + 6], segment[i + 7],
+            //                                     segment[i + 8], segment[i + 9], segment[i + 10], segment[i + 11],
+            //                                     segment[i + 12], segment[i + 13], segment[i + 14], segment[i + 15]);
+            var currentVector = Vector512.LoadUnsafe(ref segment[i]);
             maxVector = Avx512F.Max(currentVector, maxVector);
             minVector = Avx512F.Min(currentVector, minVector);
         }
