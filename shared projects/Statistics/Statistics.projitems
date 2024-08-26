@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Basic.Min.Sequential.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic.Sequential.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExtremeValueFinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MultipleLinearRegression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleLinearRegression.cs" />
   </ItemGroup>
 </Project>
