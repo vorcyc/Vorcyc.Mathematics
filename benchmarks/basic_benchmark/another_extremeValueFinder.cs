@@ -28,8 +28,8 @@ internal static class another_extremeValueFinder
         int i = 0;
         for (; i <= span.Length - vectorSize; i += vectorSize)
         {
-            //var currentVector = Vector128.Create(span[i], span[i + 1], span[i + 2], span[i + 3]);
-            var currentVector = Vector128.LoadUnsafe(ref span[i]);
+            var currentVector = Vector128.Create(span[i], span[i + 1], span[i + 2], span[i + 3]);
+            //var currentVector = Vector128.LoadUnsafe(ref span[i]);
             maxVector = Sse.Max(currentVector, maxVector);
             minVector = Sse.Min(currentVector, minVector);
         }
@@ -73,7 +73,10 @@ internal static class another_extremeValueFinder
         int i = 0;
         for (; i <= span.Length - vectorSize; i += vectorSize)
         {
-            var currentVector = Vector256.LoadUnsafe(ref span[i]);
+            var currentVector = Vector256.Create(span[i], span[i + 1], span[i + 2], span[i + 3],
+                                                 span[i + 4], span[i + 5], span[i + 6], span[i + 7]);
+
+            //var currentVector = Vector256.LoadUnsafe(ref span[i]);
             maxVector = Avx.Max(currentVector, maxVector);
             minVector = Avx.Min(currentVector, minVector);
         }
