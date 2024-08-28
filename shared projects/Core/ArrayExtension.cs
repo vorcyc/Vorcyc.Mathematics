@@ -1,5 +1,6 @@
 ﻿namespace Vorcyc.Mathematics;
 
+using System.ComponentModel.Design;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -90,9 +91,9 @@ public static partial class ArrayExtension
     /// <param name="value">The value to fill the array with.</param>
     /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the range is out of bounds.</exception>
-    public static void Fill<T>(this T[] array, Range range, T value)
+    public static void Fill<T>(this Span<T> array, Range range, T value)
     {
-        ArgumentNullException.ThrowIfNull(array);
+        if (array.IsEmpty) throw new ArgumentNullException(nameof(array));
 
         var (offset, length) = range.GetOffsetAndLength(array.Length);
         for (int i = offset; i < offset + length; i++)
@@ -126,10 +127,10 @@ public static partial class ArrayExtension
     public static void FillWithRandomNumber<T>(this T[] array)
         where T : IFloatingPointIeee754<T>
     {
-        ArgumentNullException.ThrowIfNull(array);
+        ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
 
         for (int i = 0; i < array.Length; i++)
-            array[i] = T.CreateTruncating(Random.Shared.NextDouble())-T.One;
+            array[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
 
     /// <summary>
@@ -143,12 +144,71 @@ public static partial class ArrayExtension
     public static void FillWithRandomNumber<T>(this T[] array, Range range)
         where T : IFloatingPointIeee754<T>
     {
-        ArgumentNullException.ThrowIfNull(array);
+        ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
 
         var (offset, length) = range.GetOffsetAndLength(array.Length);
         for (int i = offset; i < offset + length; i++)
             array[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
+
+
+
+    public static void FillWithRandomNumber(this int[] array, (int max, int min)? limit = null)
+    {
+        ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
+        if (limit is null)
+            for (int i = 0; i < array.Length; i++)
+                array[i] = Random.Shared.Next();
+        else
+            for (int i = 0; i < array.Length; i++)
+                array[i] = Random.Shared.Next(limit.Value.min, limit.Value.max);
+    }
+
+
+
+    public static void FillWithRandomNumber(this int[] array, Range range)
+    {
+        ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
+        var (offset, length) = range.GetOffsetAndLength(array.Length);
+        for (int i = offset; i < offset + length; i++)
+            array[i] = Random.Shared.Next();
+    }
+
+
+    public static void FillWithRandomNumber(this long[] array)
+    {
+        ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
+        for (int i = 0; i < array.Length; i++)
+            array[i] = Random.Shared.NextInt64();
+    }
+
+
+
+    public static void FillWithRandomNumber(this long[] array, Range range)
+    {
+        ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
+        var (offset, length) = range.GetOffsetAndLength(array.Length);
+        for (int i = offset; i < offset + length; i++)
+            array[i] = Random.Shared.NextInt64();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

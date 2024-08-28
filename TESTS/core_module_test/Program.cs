@@ -1,20 +1,13 @@
-﻿using System.Drawing;
+﻿using core_module_test;
+using System.Drawing;
 using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.Numerics;
 using Vorcyc.Mathematics.Statistics;
 
-var x = new PinnableArray<float>(100, false);
-var y = new PinnableArray<float>(100, false);
-x.FillWithRandomNumber();
-y.FillWithRandomNumber();
+
+//SimpleLinearRegression_test.go();
 
 
-var r = Vorcyc.Mathematics.Statistics.SimpleLinearRegression.ComputeParameters<float>(x, y);
+//ExtremeValueFinder_test.go();
 
-Console.WriteLine(r);
-Console.WriteLine("-------------");
-
-
-var r2 = Vorcyc.Mathematics.Statistics.another_SimpleLinearRegression.ComputeParameters(x, y);
-Console.WriteLine(  r2);
-
+FFT.new_realOnlyFFT();

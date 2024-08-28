@@ -420,7 +420,7 @@ public static class ExtremeValueFinder
             return FindExtremeValue_Vector512(segment);
         // 如果硬件支持 AVX2，则使用 AVX2 方法
         else if (Vector256.IsHardwareAccelerated)
-            return FindExtremeValue_Normal(segment);
+            return FindExtremeValue_Vector256(segment);
         // 如果硬件支持 SSE2，则使用 SSE2 方法
         else if (Vector128.IsHardwareAccelerated)
             return FindExtremeValue_Vector128(segment);

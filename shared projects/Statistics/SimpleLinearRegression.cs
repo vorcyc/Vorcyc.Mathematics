@@ -104,6 +104,50 @@ public static class SimpleLinearRegression
         return (b, a, r);
     }
 
+    //public static (float slope, float intercept, float correlationCoefficient) ComputeParametersF(Span<float> x, Span<float> y)
+    //{
+    //    if (x.Length != y.Length || x.Length < 2)
+    //    {
+    //        throw new ArgumentException("The lengths of x and y must be equal and greater than 1.");
+    //    }
+
+    //    // 计算自变量 x 的平均值
+    //    var avgX = x.Average();
+    //    // 计算因变量 y 的平均值
+    //    var avgY = y.Average();
+
+    //    // 初始化变量，用于存储平方和和协方差
+    //    var sumOfSquaresX = 0f;
+    //    var sumOfSquaresY = 0f;
+    //    var sumOfProductsXY = 0f;
+    //    var two = 2f;
+
+    //    // 遍历所有数据点，计算平方和和协方差
+    //    for (int i = 0; i < x.Length; i++)
+    //    {
+    //        var xn = x[i];
+    //        // 计算自变量 x 的平方和
+    //        sumOfSquaresX += MathF.Pow(xn - avgX, two);
+
+    //        var yn = y[i];
+    //        // 计算因变量 y 的平方和
+    //        sumOfSquaresY += MathF.Pow(yn - avgY, two);
+
+    //        // 计算自变量和因变量的协方差
+    //        sumOfProductsXY += (xn - avgX) * (yn - avgY);
+    //    }
+
+    //    // 计算斜率 b
+    //    var b = sumOfProductsXY / sumOfSquaresX;
+    //    // 计算截距 a
+    //    var a = avgY - b * avgX;
+    //    // 计算相关系数 r
+    //    var r = sumOfProductsXY / MathF.Sqrt(sumOfSquaresX * sumOfSquaresY);
+
+    //    // 返回截距、斜率和相关系数
+    //    return (b, a, r);
+    //}
+
 
     /// <summary>
     /// 计算线性回归模型的斜率和截距。

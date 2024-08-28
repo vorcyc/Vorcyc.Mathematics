@@ -6,12 +6,12 @@ namespace basic_benchmark;
 public class ExtremeValueFinder_benchmark
 {
 
-    [Params(10000, 100000, 1000000, 10000000, 100000000)]
+    [Params(32000, 320000, 3200000, 32000000, 320000000)]
     public int N;
 
 
     //public float[] _array;
-    private PinnableArray<float> _array;
+    private PinnableArray<float>? _array;
 
     [GlobalSetup]
     public void Setup()
@@ -22,12 +22,13 @@ public class ExtremeValueFinder_benchmark
         //    _array[i] = Random.Shared.NextSingle();
         //}
         _array?.Dispose();
-        _array = new(N, true);
+        _array = null;
+        _array = new(N, false);
     }
 
     [Benchmark]
     public (float max, float min) Normal() =>
-        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue(_array);
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Normal(_array.AsSpan());
 
 
     [Benchmark]

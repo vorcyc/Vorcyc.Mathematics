@@ -268,7 +268,7 @@ public class RealFft : IComplexTransform
     /// <param name="re">Input data (real parts)</param>
     /// <param name="im">Input data (imaginary parts)</param>
     /// <param name="output">Output data (real)</param>
-    public void InverseNorm(float[] re, float[] im, float[] output)
+    public void InverseNorm( float[] re, float[] im, float[] output)
     {
         // do the first step:
 
