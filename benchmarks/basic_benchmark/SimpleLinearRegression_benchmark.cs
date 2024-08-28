@@ -23,11 +23,11 @@ public class SimpleLinearRegression_benchmark
 
 
     [Benchmark]
-    public (float slope, float intercept) Normal() =>
-        Vorcyc.Mathematics.Statistics.SimpleLinearRegression.ComputeParameters(x, y); 
+    public (float slope, float intercept, float correlationCoefficient) Normal() =>
+        Vorcyc.Mathematics.Statistics.SimpleLinearRegression.ComputeParameters<float>(x, y); 
     
     [Benchmark]
-    public (float slope, float intercept) SIMD() =>
+    public (float slope, float intercept, float correlationCoefficient) SIMD() =>
         Vorcyc.Mathematics.Statistics.another_SimpleLinearRegression.ComputeParameters(x, y);
 
 

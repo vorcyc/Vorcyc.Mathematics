@@ -119,28 +119,83 @@ public static class SimpleLinearRegression
     {
         if (x.Length != y.Length || x.Length < 2)
         {
-            throw new ArgumentException("The lengths of x and y must be equal and greater than 1.");
+            throw new ArgumentException("x 和 y 的长度必须相等且大于 1。");
         }
 
-        float sumX = 0f;
-        float sumY = 0f;
-        float sumXY = 0f;
-        float sumX2 = 0f;
-        float n = x.Length;
+        int n = x.Length;
+        int simdLength = Vector<float>.Count;
+        int i = 0;
 
-        for (int i = 0; i < x.Length; i++)
+        Vector<float> sumX = Vector<float>.Zero;
+        Vector<float> sumY = Vector<float>.Zero;
+        Vector<float> sumXY = Vector<float>.Zero;
+        Vector<float> sumX2 = Vector<float>.Zero;
+
+        for (; i <= n - simdLength; i += simdLength)
         {
-            sumX += x[i];
-            sumY += y[i];
-            sumXY += x[i] * y[i];
-            sumX2 += x[i] * x[i];
+            var vx = new Vector<float>(x.Slice(i, simdLength));
+            var vy = new Vector<float>(y.Slice(i, simdLength));
+
+            sumX += vx;
+            sumY += vy;
+            sumXY += vx * vy;
+            sumX2 += vx * vx;
         }
 
-        var slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-        var intercept = (sumY - slope * sumX) / n;
+        float totalSumX = 0;
+        float totalSumY = 0;
+        float totalSumXY = 0;
+        float totalSumX2 = 0;
+
+        for (int j = 0; j < simdLength; j++)
+        {
+            totalSumX += sumX[j];
+            totalSumY += sumY[j];
+            totalSumXY += sumXY[j];
+            totalSumX2 += sumX2[j];
+        }
+
+        for (; i < n; i++)
+        {
+            totalSumX += x[i];
+            totalSumY += y[i];
+            totalSumXY += x[i] * y[i];
+            totalSumX2 += x[i] * x[i];
+        }
+
+        float slope = (n * totalSumXY - totalSumX * totalSumY) / (n * totalSumX2 - totalSumX * totalSumX);
+        float intercept = (totalSumY - slope * totalSumX) / n;
 
         return (slope, intercept);
     }
+
+    // 常规版本，低性能
+    //public static (float slope, float intercept) ComputeParameters(Span<float> x, Span<float> y)
+    //{
+    //    if (x.Length != y.Length || x.Length < 2)
+    //    {
+    //        throw new ArgumentException("The lengths of x and y must be equal and greater than 1.");
+    //    }
+
+    //    float sumX = 0f;
+    //    float sumY = 0f;
+    //    float sumXY = 0f;
+    //    float sumX2 = 0f;
+    //    float n = x.Length;
+
+    //    for (int i = 0; i < x.Length; i++)
+    //    {
+    //        sumX += x[i];
+    //        sumY += y[i];
+    //        sumXY += x[i] * y[i];
+    //        sumX2 += x[i] * x[i];
+    //    }
+
+    //    var slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    //    var intercept = (sumY - slope * sumX) / n;
+
+    //    return (slope, intercept);
+    //}
 
     /// <summary>
     /// 计算线性回归模型的斜率和截距。

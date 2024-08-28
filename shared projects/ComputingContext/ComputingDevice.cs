@@ -7,3 +7,12 @@
 //    HeterogeneousGPU,
 
 //}
+
+public enum ComputingMethodPriority
+{
+    Sequential_Normal,
+    Sequential_SIMD,
+    Parallel,
+
+    GPU
+}
