@@ -9,6 +9,7 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Statistics</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)another_SimpleLinearRegression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic.Max.Parallel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic.Max.Sequential.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic.Min.Parallel.cs" />
@@ -16,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Basic.Sequential.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExtremeValueFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MultipleLinearRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)old_extremeValueFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleLinearRegression.cs" />
   </ItemGroup>
 </Project>

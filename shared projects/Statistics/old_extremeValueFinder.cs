@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 using System.Runtime.Intrinsics;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace basic_benchmark;
+namespace Vorcyc.Mathematics.Statistics;
 
-internal static class another_extremeValueFinder
+internal static class old_extremeValueFinder
 {
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,7 +99,4 @@ internal static class another_extremeValueFinder
 
         return (max, min);
     }
-
-
-
 }

@@ -8,13 +8,6 @@ var y = new PinnableArray<float>(100, false);
 x.FillWithRandomNumber();
 y.FillWithRandomNumber();
 
-//var x = new float[100];
-//var y = new float[100];
-//for (int i = 0; i < 100; i++)
-//{
-//    x[i] = i;
-//    y[i] = 2*i;
-//}
 
 var r = Vorcyc.Mathematics.Statistics.SimpleLinearRegression.ComputeParameters(x, y);
 
@@ -22,36 +15,12 @@ var r = Vorcyc.Mathematics.Statistics.SimpleLinearRegression.ComputeParameters(x
 //Console.WriteLine(  y.ToString());
 
 Console.WriteLine(r);
-Console.WriteLine(  SimpleLinearRegression.GetX(50,r));
+Console.WriteLine(SimpleLinearRegression.GetX(50, r));
 Console.WriteLine("-------------");
 
 
-var points = new Point<float>[100];
-for (int i = 0; i < points.Length; i++)
-{
-    points[i] = new Point<float>(x[i], y[i]);
-}
-
-//foreach (var point in points)
-//{
-//    Console.Write(point);
-//    Console.Write(',');
-//}
-//Console.WriteLine(  );
-var r2 = Vorcyc.Mathematics.Statistics.SimpleLinearRegression.ComputeParameters(points);
+var r2 = Vorcyc.Mathematics.Statistics.another_SimpleLinearRegression.ComputeParameters(x, y);
 Console.WriteLine(  r2);
-Console.WriteLine(  SimpleLinearRegression.GetX(50,r2));
-
-Console.WriteLine("-----------------");
-
-//var data = new PointF[100];
-//for (int i = 0; i < data.Length; i++)
-//{
-//    data[i] = new PointF(x[i], y[i]);
-//}
-//var lr = new LinearRegression(data);
-//Console.WriteLine($"Slope: {lr.Slope}");
-//Console.WriteLine($"Intercept: {lr.Intercept}");
 
 
 

@@ -1,6 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System;
 using Vorcyc.Mathematics;
 
 namespace basic_benchmark;
@@ -47,10 +45,10 @@ public class ExtremeValueFinder_benchmark
 
     [Benchmark]
     public (float max, float min) Vector128_p() =>
-        another_extremeValueFinder.FindExtremeValue_Vector128(_array);
+        Vorcyc.Mathematics.Statistics.old_extremeValueFinder.FindExtremeValue_Vector128(_array);
 
     [Benchmark]
     public (float max, float min) Vector256_p() =>
-        another_extremeValueFinder.FindExtremeValue_Vector256(_array);
+        Vorcyc.Mathematics.Statistics.old_extremeValueFinder.FindExtremeValue_Vector256(_array);
 
 }
