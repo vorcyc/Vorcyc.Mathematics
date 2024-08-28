@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System;
+using Vorcyc.Mathematics;
 
 namespace basic_benchmark;
 
@@ -11,16 +12,19 @@ public class ExtremeValueFinder_benchmark
     public int N;
 
 
-    public float[] _array;
+    //public float[] _array;
+    private PinnableArray<float> _array;
 
     [GlobalSetup]
     public void Setup()
     {
-        _array = new float[N];
+        //_array = new float[N];
         //for (int i = 0; i < _array.Length; i++)
         //{
         //    _array[i] = Random.Shared.NextSingle();
         //}
+        _array?.Dispose();
+        _array = new(N, true);
     }
 
     [Benchmark]
