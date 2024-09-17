@@ -13,8 +13,8 @@ internal class another_SimpleLinearRegression
             throw new ArgumentException("x 和 y 的长度必须相等且大于 1。");
         }
 
-        var avgX = x.Average();
-        var avgY = y.Average();
+        var avgX = x.Average<float>();
+        var avgY = y.Average<float>();
 
         float sumOfSquaresX = 0f;
         float sumOfSquaresY = 0f;

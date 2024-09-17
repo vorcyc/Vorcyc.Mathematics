@@ -56,7 +56,7 @@ public class FFT_new_old_benchmark
 
 
     [Benchmark]
-    public bool my_method() => FastFourierTransform2.Forward(_array.AsSpan(), _out);
+    public bool my_method() => FastFourierTransform.Forward(_array.AsSpan(), _out);
 
 
     [Benchmark]

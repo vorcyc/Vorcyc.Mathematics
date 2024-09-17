@@ -10,4 +10,6 @@ using Vorcyc.Mathematics.Statistics;
 
 //ExtremeValueFinder_test.go();
 
-FFT.new_realOnlyFFT();
+//FFT.new_realOnlyFFT();
+
+Statistics_test.go();

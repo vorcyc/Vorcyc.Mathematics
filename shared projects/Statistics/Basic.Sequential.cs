@@ -14,6 +14,7 @@ public static partial class SBasic
     /// </summary>
     /// <param name="arraySegment">The array segment of floats.</param>
     /// <returns>The sum of the elements in the array segment.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sum(this ArraySegment<float> arraySegment)
     {
         float result = 0.0f;
@@ -28,6 +29,7 @@ public static partial class SBasic
     /// <typeparam name="T">The type of the elements in the span. Must implement <see cref="INumber{T}"/>.</typeparam>
     /// <param name="span">The span of elements.</param>
     /// <returns>The sum of the elements in the span.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Sum<T>(this Span<T> span) where T : INumber<T>
     {
         T result = T.Zero;
@@ -43,6 +45,7 @@ public static partial class SBasic
     /// <param name="start">The starting index of the range to sum.</param>
     /// <param name="length">The number of elements to include in the sum.</param>
     /// <returns>The sum of the specified range of elements in the array.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sum(this float[] array, int start, int length)
     {
         float result = 0.0f;
@@ -53,10 +56,94 @@ public static partial class SBasic
         return result;
     }
 
+    /// <summary>
+    /// Calculates the sum of the elements in the given span using SIMD for optimization.
+    /// </summary>
+    /// <param name="values">A span of double values to calculate the sum from.</param>
+    /// <returns>The sum of the elements in the span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Sum(this Span<double> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Data span cannot be empty.");
+
+        int length = values.Length;
+        int simdLength = Vector<double>.Count;
+        int remainder = length % simdLength;
+
+        Vector<double> sumVector = Vector<double>.Zero;
+        int i = 0;
+
+        // Process data in chunks of Vector<double>.Count
+        for (; i < length - remainder; i += simdLength)
+        {
+            Vector<double> vector = new Vector<double>(values.Slice(i, simdLength));
+            sumVector += vector;
+        }
+
+        // Sum the elements of the sumVector
+        double sum = 0;
+        for (int j = 0; j < simdLength; j++)
+        {
+            sum += sumVector[j];
+        }
+
+        // Process remaining elements
+        for (; i < length; i++)
+        {
+            sum += values[i];
+        }
+
+        return sum;
+    }
+
+
+    /// <summary>
+    /// Calculates the sum of the elements in the given span using SIMD for optimization.
+    /// </summary>
+    /// <param name="values">A span of float values to calculate the sum from.</param>
+    /// <returns>The sum of the elements in the span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float Sum(this Span<float> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Data span cannot be empty.");
+
+        int length = values.Length;
+        int simdLength = Vector<float>.Count;
+        int remainder = length % simdLength;
+
+        Vector<float> sumVector = Vector<float>.Zero;
+        int i = 0;
+
+        // Process data in chunks of Vector<float>.Count
+        for (; i < length - remainder; i += simdLength)
+        {
+            Vector<float> vector = new Vector<float>(values.Slice(i, simdLength));
+            sumVector += vector;
+        }
+
+        // Sum the elements of the sumVector
+        float sum = 0;
+        for (int j = 0; j < simdLength; j++)
+        {
+            sum += sumVector[j];
+        }
+
+        // Process remaining elements
+        for (; i < length; i++)
+        {
+            sum += values[i];
+        }
+
+        return sum;
+    }
+
 
 
     #endregion
-
 
 
     #region Average
@@ -68,6 +155,7 @@ public static partial class SBasic
     /// <returns>The average of the elements in the array.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when the <paramref name="array"/> is empty.</exception>    
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Average(this float[] array)
     {
         if (array == null)
@@ -165,6 +253,91 @@ public static partial class SBasic
         }
         return sum / T.CreateChecked(span.Length);
     }
+
+    /// <summary>
+    /// Calculates the average of the elements in the given span using SIMD for optimization.
+    /// </summary>
+    /// <param name="values">A span of float values to calculate the average from.</param>
+    /// <returns>The average of the elements in the span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float Average(this Span<float> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Data span cannot be empty.");
+
+        int length = values.Length;
+        int simdLength = Vector<float>.Count;
+        int remainder = length % simdLength;
+
+        Vector<float> sumVector = Vector<float>.Zero;
+        int i = 0;
+
+        // Process data in chunks of Vector<float>.Count
+        for (; i < length - remainder; i += simdLength)
+        {
+            Vector<float> vector = new Vector<float>(values.Slice(i, simdLength));
+            sumVector += vector;
+        }
+
+        // Sum the elements of the sumVector
+        float sum = 0;
+        for (int j = 0; j < simdLength; j++)
+        {
+            sum += sumVector[j];
+        }
+
+        // Process remaining elements
+        for (; i < length; i++)
+        {
+            sum += values[i];
+        }
+
+        return sum / length;
+    }
+
+    /// <summary>
+    /// Calculates the average of the elements in the given span using SIMD for optimization.
+    /// </summary>
+    /// <param name="values">A span of double values to calculate the average from.</param>
+    /// <returns>The average of the elements in the span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [method: MethodImpl()]
+    public static double Average(this Span<double> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Data span cannot be empty.");
+
+        int length = values.Length;
+        int simdLength = Vector<double>.Count;
+        int remainder = length % simdLength;
+
+        Vector<double> sumVector = Vector<double>.Zero;
+        int i = 0;
+
+        // Process data in chunks of Vector<double>.Count
+        for (; i < length - remainder; i += simdLength)
+        {
+            Vector<double> vector = new Vector<double>(values.Slice(i, simdLength));
+            sumVector += vector;
+        }
+
+        // Sum the elements of the sumVector
+        double sum = 0;
+        for (int j = 0; j < simdLength; j++)
+        {
+            sum += sumVector[j];
+        }
+
+        // Process remaining elements
+        for (; i < length; i++)
+        {
+            sum += values[i];
+        }
+
+        return sum / length;
+    }
+
 
     /// <summary>
     /// Calculates the sum of the elements in an <see cref="ArraySegment{T}"/> of floats.
@@ -295,6 +468,102 @@ public static partial class SBasic
     }
 
 
+    /// <summary>
+    /// Calculates the average and variance of the elements in the given span using SIMD for optimization.
+    /// </summary>
+    /// <param name="values">A span of float values to calculate the average and variance from.</param>
+    /// <returns>A tuple containing the average and variance of the elements in the span.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the span is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (float average, float variance) Variance(this Span<float> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Array cannot be empty.", nameof(values));
+
+        var mean = values.Average();
+        var result = 0.0f;
+
+        int length = values.Length;
+        int simdLength = Vector<float>.Count;
+        int remainder = length % simdLength;
+
+        Vector<float> meanVector = new Vector<float>(mean);
+        Vector<float> sumVector = Vector<float>.Zero;
+        int i = 0;
+
+        // Process data in chunks of Vector<float>.Count
+        for (; i < length - remainder; i += simdLength)
+        {
+            Vector<float> vector = new Vector<float>(values.Slice(i, simdLength));
+            Vector<float> diff = vector - meanVector;
+            sumVector += diff * diff;
+        }
+
+        // Sum the elements of the sumVector
+        for (int j = 0; j < simdLength; j++)
+        {
+            result += sumVector[j];
+        }
+
+        // Process remaining elements
+        for (; i < length; i++)
+        {
+            var v = values[i];
+            result += (v - mean) * (v - mean);
+        }
+
+        result /= values.Length - 1;
+        return (mean, result);
+    }
+
+    /// <summary>
+    /// Calculates the average and variance of the elements in the given span using SIMD for optimization.
+    /// </summary>
+    /// <param name="values">A span of double values to calculate the average and variance from.</param>
+    /// <returns>A tuple containing the average and variance of the elements in the span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (double average, double variance) Variance(this Span<double> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Array cannot be empty.", nameof(values));
+
+        var mean = values.Average();
+        var result = 0.0;
+
+        int length = values.Length;
+        int simdLength = Vector<double>.Count;
+        int remainder = length % simdLength;
+
+        Vector<double> meanVector = new Vector<double>(mean);
+        Vector<double> sumVector = Vector<double>.Zero;
+        int i = 0;
+
+        // Process data in chunks of Vector<double>.Count
+        for (; i < length - remainder; i += simdLength)
+        {
+            Vector<double> vector = new Vector<double>(values.Slice(i, simdLength));
+            Vector<double> diff = vector - meanVector;
+            sumVector += diff * diff;
+        }
+
+        // Sum the elements of the sumVector
+        for (int j = 0; j < simdLength; j++)
+        {
+            result += sumVector[j];
+        }
+
+        // Process remaining elements
+        for (; i < length; i++)
+        {
+            var v = values[i];
+            result += (v - mean) * (v - mean);
+        }
+
+        result /= values.Length - 1;
+        return (mean, result);
+    }
 
     #endregion
 

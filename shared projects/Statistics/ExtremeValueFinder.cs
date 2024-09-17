@@ -359,7 +359,7 @@ public static class ExtremeValueFinder
     /// <exception cref="ArgumentException">当数组为空时抛出。</exception>
     /// <exception cref="PlatformNotSupportedException">当平台不支持 AVX512 时抛出。</exception>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (float max, float min) FindExtremeValue_Vector512(Span<float> segment)
+    internal static (float max, float min) FindExtremeValue_Vector512(this Span<float> segment)
     {
         // 检查数组是否为空
         if (segment == null || segment.Length == 0)
