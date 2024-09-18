@@ -14,6 +14,7 @@ public static partial class SBasic
     /// </summary>
     /// <param name="arraySegment">The array segment of floats.</param>
     /// <returns>The sum of the elements in the array segment.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sum(this ArraySegment<float> arraySegment)
     {
@@ -29,6 +30,7 @@ public static partial class SBasic
     /// <typeparam name="T">The type of the elements in the span. Must implement <see cref="INumber{T}"/>.</typeparam>
     /// <param name="span">The span of elements.</param>
     /// <returns>The sum of the elements in the span.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Sum<T>(this Span<T> span) where T : INumber<T>
     {
@@ -45,6 +47,7 @@ public static partial class SBasic
     /// <param name="start">The starting index of the range to sum.</param>
     /// <param name="length">The number of elements to include in the sum.</param>
     /// <returns>The sum of the specified range of elements in the array.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sum(this float[] array, int start, int length)
     {
@@ -62,6 +65,7 @@ public static partial class SBasic
     /// <param name="values">A span of double values to calculate the sum from.</param>
     /// <returns>The sum of the elements in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Sum(this Span<double> values)
     {
@@ -105,6 +109,7 @@ public static partial class SBasic
     /// <param name="values">A span of float values to calculate the sum from.</param>
     /// <returns>The sum of the elements in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sum(this Span<float> values)
     {
@@ -155,6 +160,7 @@ public static partial class SBasic
     /// <returns>The average of the elements in the array.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when the <paramref name="array"/> is empty.</exception>    
+    [DeviceDependency(DeviceDependency.CPU)]
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Average(this float[] array)
     {
@@ -184,6 +190,7 @@ public static partial class SBasic
     /// <returns>The average of the elements in the specified subarray.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="start"/> or <paramref name="length"/> is out of range.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Average(this float[] array, int start, int length)
     {
@@ -213,6 +220,7 @@ public static partial class SBasic
     /// <returns>The average of the elements in the array as a double.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when the <paramref name="array"/> is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Average(this byte[] array)
     {
@@ -239,6 +247,7 @@ public static partial class SBasic
     /// <param name="span">The span of values to calculate the average of.</param>
     /// <returns>The average of the elements in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the <paramref name="span"/> is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Average<T>(this Span<T> span)
         where T : INumber<T>
@@ -260,6 +269,7 @@ public static partial class SBasic
     /// <param name="values">A span of float values to calculate the average from.</param>
     /// <returns>The average of the elements in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Average(this Span<float> values)
     {
@@ -302,6 +312,7 @@ public static partial class SBasic
     /// <param name="values">A span of double values to calculate the average from.</param>
     /// <returns>The average of the elements in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [method: MethodImpl()]
     public static double Average(this Span<double> values)
     {
@@ -344,6 +355,7 @@ public static partial class SBasic
     /// </summary>
     /// <param name="arraySegment">The array segment of floats.</param>
     /// <returns>The sum of the elements in the array segment.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
     public static float Average(this ArraySegment<float> arraySegment)
     {
         return Sum(arraySegment) / arraySegment.Count;
@@ -354,6 +366,7 @@ public static partial class SBasic
     /// </summary>
     /// <param name="arraySegments">The enumerable of array segments of floats.</param>
     /// <returns>The average value of the elements in the array segments.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
     public static float Average(this IEnumerable<ArraySegment<float>> arraySegments)
     {
         int count = 0;
@@ -381,6 +394,7 @@ public static partial class SBasic
     /// <returns>A tuple containing the average and variance of the elements in the array.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when the <paramref name="array"/> is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (float average, float variance) Variance(this float[] array)
     {
@@ -414,6 +428,7 @@ public static partial class SBasic
     /// <returns>A tuple containing the average and variance of the elements in the specified subarray.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="start"/> or <paramref name="length"/> is out of range.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (float average, float variance) Variance(this float[] array, int start, int length)
     {
@@ -447,6 +462,7 @@ public static partial class SBasic
     /// <param name="array">The span of values to calculate the average and variance of.</param>
     /// <returns>A tuple containing the average and variance of the elements in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the <paramref name="array"/> is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (T average, T variance) Variance<T>(this Span<T> array)
         where T : INumber<T>
@@ -475,6 +491,7 @@ public static partial class SBasic
     /// <returns>A tuple containing the average and variance of the elements in the span.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the span is null.</exception>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (float average, float variance) Variance(this Span<float> values)
     {
@@ -523,6 +540,7 @@ public static partial class SBasic
     /// <param name="values">A span of double values to calculate the average and variance from.</param>
     /// <returns>A tuple containing the average and variance of the elements in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (double average, double variance) Variance(this Span<double> values)
     {

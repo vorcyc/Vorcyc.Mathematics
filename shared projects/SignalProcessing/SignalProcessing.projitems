@@ -158,6 +158,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Filters\SavitzkyGolayFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\ThiranFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\WienerFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Fourier\CudaFFT.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Fourier\CUDA_FFT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransform2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransform3.cs" />

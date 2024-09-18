@@ -2,6 +2,7 @@
 using System.Drawing;
 using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.Numerics;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.Statistics;
 
 
@@ -12,4 +13,6 @@ using Vorcyc.Mathematics.Statistics;
 
 //FFT.new_realOnlyFFT();
 
-Statistics_test.go();
+//Statistics_test.go();
+
+CuFFT_test.my();
