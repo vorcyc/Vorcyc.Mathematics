@@ -74,6 +74,50 @@ public static class NumberMapper
     }
 
 
+    /// <summary>
+    /// Maps a floating-point number from one range to another and returns a boolean indicating success.
+    /// </summary>
+    /// <typeparam name="TFloatingNumber">The floating-point number type, which must implement the <see cref="IFloatingPointIeee754{TFloatingNumber}"/> interface.</typeparam>
+    /// <param name="input">The floating-point number to map.</param>
+    /// <param name="inputMin">The minimum value of the input range.</param>
+    /// <param name="inputMax">The maximum value of the input range.</param>
+    /// <param name="outputMin">The minimum value of the output range.</param>
+    /// <param name="outputMax">The maximum value of the output range.</param>
+    /// <param name="result">The mapped floating-point number if the mapping is successful; otherwise, NaN.</param>
+    /// <returns>True if the mapping is successful; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool Map<TFloatingNumber>(
+        TFloatingNumber input,
+        TFloatingNumber inputMin, TFloatingNumber inputMax,
+        TFloatingNumber outputMin, TFloatingNumber outputMax,
+        out TFloatingNumber result)
+        where TFloatingNumber : unmanaged, IFloatingPointIeee754<TFloatingNumber>
+    {
+        if (input < inputMin || input > inputMax)
+        {
+            result = TFloatingNumber.NaN;
+            return false;
+        }
+
+        if (inputMin >= inputMax)
+        {
+            result = TFloatingNumber.NaN;
+            return false;
+        }
+
+        if (outputMin >= outputMax)
+        {
+            result = TFloatingNumber.NaN;
+            return false;
+        }
+
+        var inputRange = inputMax - inputMin;
+        var outputRange = outputMax - outputMin;
+        var ratio = outputRange / inputRange;
+        result = outputMin + ratio * (input - inputMin);
+        return true;
+    }
+
 
     //#region normal form
 
