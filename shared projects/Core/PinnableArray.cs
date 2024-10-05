@@ -60,13 +60,19 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
     private ArrayPool<T> _pool = ArrayPool<T>.Create();
 
+
+
+
     #region constructor
 
-    public PinnableArray(ArraySegment<T> segment, bool pin = true)
+    public PinnableArray(ArraySegment<T> segment, bool pin = false)
     {
         _length = segment.Count;
-        _array = _pool.Rent(_length);
-        //_array = new T[_length];
+
+        if (Option.UseLeasingMode)
+            _array = _pool.Rent(_length);
+        else
+            _array = new T[_length];
 
         Buffer.BlockCopy(segment.Array, segment.Offset, _array, 0, _length);
 
@@ -74,11 +80,14 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     }
 
 
-    public PinnableArray(Span<T> span, bool pin = true)
+    public PinnableArray(Span<T> span, bool pin = false)
     {
         _length = span.Length;
 
-        _array = _pool.Rent(_length);
+        if (Option.UseLeasingMode)
+            _array = _pool.Rent(_length);
+        else
+            _array = new T[_length];
 
         Buffer.BlockCopy(span.ToArray(), 0, _array, 0, span.Length);
 
@@ -86,7 +95,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     }
 
 
-    public PinnableArray(T[] array, bool pin = true)
+    public PinnableArray(T[] array, bool pin = false)
     {
         _length = array.Length;
 
@@ -100,8 +109,10 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
             Buffer.BlockCopy 的参数是基于字节的，而Array.Copy的参数是基于索引的，因此Buffer.BlockCopy更容易出错4。
             */
 
-        //_array = new T[_length];
-        _array = _pool.Rent(_length);
+        if (Option.UseLeasingMode)
+            _array = _pool.Rent(_length);
+        else
+            _array = new T[_length];
 
         Buffer.BlockCopy(array, 0, _array, 0, _length * Unsafe.SizeOf<T>());
         //_array = new TScalar[_count];
@@ -112,7 +123,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     }
 
 
-    public PinnableArray(T[] array, int offset, int count, bool pin = true)
+    public PinnableArray(T[] array, int offset, int count, bool pin = false)
     {
         if (offset < 0 || offset > array.Length)
             throw new IndexOutOfRangeException(nameof(offset));
@@ -122,24 +133,32 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
         _length = count;
 
-        //_array = new T[_length];
-        _array = _pool.Rent(_length);
+        if (Option.UseLeasingMode)
+            _array = _pool.Rent(_length);
+        else
+            _array = new T[_length];
 
         Buffer.BlockCopy(array, offset, _array, 0, count * Unsafe.SizeOf<T>());
 
         if (pin) Pin();
     }
 
-    public PinnableArray(int count, bool pin = true)
+    public PinnableArray(int count, bool pin = false)
     {
-        //_array = new T[count];
         _length = count;
-        _array = _pool.Rent(_length);
+
+        if (Option.UseLeasingMode)
+            _array = _pool.Rent(_length);
+        else
+            _array = new T[_length];
 
         if (pin) Pin();
     }
 
     #endregion
+
+
+    #region pin and unpin
 
     /// <summary>
     /// Pin this <see cref="PinnableArray{T}"/> , so you can access it's address and interactive with unmanaged code.
@@ -164,6 +183,8 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
             _isPinned = false;
         }
     }
+
+    #endregion
 
 
     #region Properites
@@ -557,11 +578,17 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
     #region type conversion
 
-
+    /// <summary>
+    /// The returns array may larger than it's length when using leasing mode.
+    /// </summary>
+    /// <param name="pinableArray"></param>
     public static implicit operator T[](PinnableArray<T> pinableArray)
         => pinableArray._array;
 
-
+    /// <summary>
+    /// Gets the unmanaged pointer is pinned  , otherwise null.
+    /// </summary>
+    /// <param name="pinableArray"></param>
     public static unsafe implicit operator T*(PinnableArray<T> pinableArray)
         => pinableArray._isPinned ? pinableArray.Pointer : null;
 
@@ -1227,6 +1254,20 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
     #endregion
 
+
+    #region static prop
+
+    private static PinnableArrayOption s_options = new();
+
+    /// <summary>
+    /// Global option for all <see cref="PinnableArray{T}"/>.
+    /// </summary>
+    /// <remarks>
+    /// Use this with type paramater for specified type . You should set this before any instance created.
+    /// </remarks>
+    public static PinnableArrayOption Option => s_options;
+
+    #endregion
 
 
 

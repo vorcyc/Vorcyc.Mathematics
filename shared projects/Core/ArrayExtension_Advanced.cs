@@ -1,6 +1,5 @@
 ﻿namespace Vorcyc.Mathematics;
 
-using ILGPU.Backends.IL;
 using System.Runtime.CompilerServices;
 using Vorcyc.Mathematics.Statistics;
 
@@ -10,6 +9,21 @@ using Vorcyc.Mathematics.Statistics;
 /// </summary>
 public static partial class ArrayExtension
 {
+
+    //    主要区别
+    //分割方式：
+
+    //Split<T> 按固定长度 segmentLength 分割，并处理剩余元素。
+
+    //Zip<T> 通过计算每段的步长 xStep 分割，每段的长度尽量相等。
+
+    //应用场景：
+
+    //Split<T> 适用于需要按固定长度分割数组的场景，适合精确控制每段的长度。
+
+    //Zip<T> 适用于需要将数组分割成尽量相等长度的段的场景，更适合用于对数组进行均匀分割。
+
+    #region Split
 
 
     /// <summary>
@@ -151,9 +165,10 @@ public static partial class ArrayExtension
             yield return (start + len - remainder, remainder);
     }
 
+    #endregion
+
 
     #region Zip
-
 
 
     /// <summary>
@@ -163,6 +178,7 @@ public static partial class ArrayExtension
     /// <param name="array">The original array to segment.</param>
     /// <param name="targetLength">The desired number of segments.</param>
     /// <returns>An enumerable of array segments.</returns>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<ArraySegment<T>> Zip<T>(this T[] array, int targetLength)
     {
         double xStep = (double)array.Length / targetLength;
@@ -183,6 +199,7 @@ public static partial class ArrayExtension
     /// <param name="length">The number of elements to include in the range.</param>
     /// <param name="targetLength">The desired number of segments.</param>
     /// <returns>An enumerable of array segments.</returns>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<ArraySegment<T>> Zip<T>(
         this T[] array,
         int startIndex, int length,
@@ -204,6 +221,7 @@ public static partial class ArrayExtension
     /// <param name="array">The original array to segment.</param>
     /// <param name="targetLength">The desired number of segments.</param>
     /// <returns>An enumerable of tuples containing the start index and length of each segment.</returns>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<(int startIndex, int length)> ZipAsMarks<T>(this T[] array, int targetLength)
     {
         double xStep = (double)array.Length / targetLength;
@@ -215,6 +233,8 @@ public static partial class ArrayExtension
         }
     }
 
+
+
     /// <summary>
     /// Segments a specified range of an array into smaller parts of a specified target length and returns the start index and length of each segment.
     /// </summary>
@@ -224,6 +244,7 @@ public static partial class ArrayExtension
     /// <param name="length">The number of elements to include in the range.</param>
     /// <param name="targetLength">The desired number of segments.</param>
     /// <returns>An enumerable of tuples containing the start index and length of each segment.</returns>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<(int startIndex, int length)> ZipAsMarks<T>(
         this T[] array,
         int startIndex, int length,
@@ -245,6 +266,7 @@ public static partial class ArrayExtension
 
 
 
+    #region TransformArray
 
 
 
@@ -315,5 +337,7 @@ public static partial class ArrayExtension
 
         return result;
     }
+
+    #endregion
 
 }

@@ -15,4 +15,15 @@ using Vorcyc.Mathematics.Statistics;
 
 //Statistics_test.go();
 
-CuFFT_test.my();
+//CuFFT_test.my();
+
+PinnableArray<float>.Option.UseLeasingMode = true;
+
+
+PinnableArray<float> a = new(1000);
+a.FillWithRandomNumber();
+
+Console.WriteLine(a.ToString());
+
+Console.WriteLine(  a.Values.Length);
+Console.WriteLine(  a.Length);
