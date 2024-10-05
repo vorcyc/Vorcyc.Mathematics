@@ -43,7 +43,8 @@ public static class NumberMapper
     public static TNumber Map<TNumber>(
         this TNumber number,
         TNumber inMin, TNumber inMax,
-        TNumber outMin, TNumber outMax, InputValueOutOfRangeHandleBehavior handleBehavior = InputValueOutOfRangeHandleBehavior.Saturating)
+        TNumber outMin, TNumber outMax, 
+        InputValueOutOfRangeHandleBehavior handleBehavior = InputValueOutOfRangeHandleBehavior.Saturating)
         where TNumber : unmanaged, INumber<TNumber>
     {
 
