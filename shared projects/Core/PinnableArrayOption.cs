@@ -13,3 +13,4 @@ public class PinnableArrayOption
     public bool UseLeasingMode { get; set; } = false;
 
 }
+
