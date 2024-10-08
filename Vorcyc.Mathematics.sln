@@ -30,13 +30,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		targets\dotNET8_Portable\License.txt = targets\dotNET8_Portable\License.txt
 		logo1.png = logo1.png
 		README.md = README.md
+		C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath more prominent.png = C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath more prominent.png
+		C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath prominent.png = C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath prominent.png
+		C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard.png = C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard.png
+		C:\Users\cyclo\Desktop\黑板上的数学符号，不要有人.png = C:\Users\cyclo\Desktop\黑板上的数学符号，不要有人.png
 	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MachineLearning", "shared projects\MachineLearning\MachineLearning.shproj", "{05C9CE82-9814-4A38-A874-444151D41DAA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{A400C121-D7CE-4E88-9417-CD4F07F3F973}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "basic_benchmark", "benchmarks\basic_benchmark\basic_benchmark.csproj", "{5D073D85-2F34-4D36-B255-E3275E039737}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "basic_benchmark", "benchmarks\basic_benchmark\basic_benchmark.csproj", "{5D073D85-2F34-4D36-B255-E3275E039737}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
