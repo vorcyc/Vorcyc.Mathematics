@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>c60535f6-5504-48a9-934a-53d6b572d846</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Vorcyc.Mathematics.Experimental</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\FrequencyDomain.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\IFrequencyDomain.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\ITimeDomainSignal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\Signal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalSegment.cs" />
+  </ItemGroup>
+</Project>
