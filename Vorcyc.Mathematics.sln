@@ -30,10 +30,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		targets\dotNET8_Portable\License.txt = targets\dotNET8_Portable\License.txt
 		logo1.png = logo1.png
 		README.md = README.md
-		C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath more prominent.png = C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath more prominent.png
-		C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath prominent.png = C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard, VMath prominent.png
-		C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard.png = C:\Users\cyclo\Desktop\VMath logo with colorful math symbols on a blackboard.png
-		C:\Users\cyclo\Desktop\黑板上的数学符号，不要有人.png = C:\Users\cyclo\Desktop\黑板上的数学符号，不要有人.png
+		VMath logo with colorful math symbols on a blackboard, VMath more prominent.png = VMath logo with colorful math symbols on a blackboard, VMath more prominent.png
+		VMath logo with colorful math symbols on a blackboard, VMath prominent.png = VMath logo with colorful math symbols on a blackboard, VMath prominent.png
+		VMath logo with colorful math symbols on a blackboard.png = VMath logo with colorful math symbols on a blackboard.png
+		黑板上的数学符号，不要有人.png = 黑板上的数学符号，不要有人.png
 	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MachineLearning", "shared projects\MachineLearning\MachineLearning.shproj", "{05C9CE82-9814-4A38-A874-444151D41DAA}"
