@@ -160,7 +160,10 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
     /// </summary>
     int SamplingRate { get; }
 
-
+    /// <summary>
+    /// 获取信号的长度。
+    /// </summary>
+    int Length { get; }
 
 
     internal static Span<float> GetArraySegment(float[] array, int start, int length)

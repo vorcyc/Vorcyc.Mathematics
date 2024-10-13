@@ -48,6 +48,20 @@ public static class PrintHelper
         });
         Console.WriteLine(']');
     }
+    
+    public static void PrintLine<T>(this scoped Span<T> array, ConsoleColor elementColor = ConsoleColor.Red)
+    {
+        Console.Write('[');
+        for (int i = 0;i<array.Length;i++)
+        {
+            Console.ForegroundColor = elementColor;
+            Console.Write(array[i].ToString());
+            Console.ResetColor();
+            if (i < array.Length - 1)
+                Console.Write(',');
+        }
+        Console.WriteLine(']');
+    }
 
 
 

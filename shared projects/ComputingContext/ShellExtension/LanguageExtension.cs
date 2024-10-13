@@ -21,6 +21,15 @@ public static class LanguageExtension
             action(index++, item);
         }
     }
+       
+    public static void Each<T>(this Span<T> collection, Action<int, T> action)
+    {
+        int index = 0;
+        foreach (var item in collection)
+        {
+            action(index++, item);
+        }
+    }
 
 
     public static bool ToBool(this int x) => x != 0;

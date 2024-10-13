@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Signals\IFrequencyDomain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ITimeDomainSignal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Signal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalSegment.cs" />
   </ItemGroup>
 </Project>

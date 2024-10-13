@@ -27,7 +27,6 @@ public class Signal : ITimeDomainSignal
     /// </summary>
     public Span<float> Samples => _samples.AsSpan(0, _length);
 
-
     /// <summary>
     /// 获取信号的采样率。
     /// </summary>
