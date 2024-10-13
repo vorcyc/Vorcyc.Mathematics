@@ -14,5 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Matrix.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Matrix_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tensor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tensor_g.cs" />
   </ItemGroup>
 </Project>

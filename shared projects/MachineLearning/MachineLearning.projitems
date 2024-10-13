@@ -6,8 +6,48 @@
     <SharedGUID>05c9ce82-9814-4a38-a874-444151d41daa</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>MachineLearning</Import_RootNamespace>
+    <Import_RootNamespace>Vorcyc.Mathematics.MachineLearning</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\KMeansClusterer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\BatchNormLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\Conv2DLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\DenseLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\FusionLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\JoinLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\LinearLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\MaxPool2DLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\ReLULayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\SigmoidLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\Upsample2DLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Angular.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\ArgMax.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\BrayCurtis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Canberra.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Chebyshev.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Cosine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Dice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Euclidean.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Hamming.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Hellinger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\IDistance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\ISimilarity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Jaccard.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Kulczynski.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Levenshtein.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Manhattan.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Matching.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Minkowski.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\PearsonCorrelation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\RogersTanimoto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\RusselRao.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\SokalMichener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\SokalSneath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedEuclidean.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedSquareEuclidean.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Yule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Distances\readme.md" />
   </ItemGroup>
 </Project>

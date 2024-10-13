@@ -34,7 +34,8 @@ using Vorcyc.Mathematics.LanguageExtension;
 
 
 var s = new Signal(100, 100);
-s.GenerateWave(WaveShape.Triangle, 10);
+var seg = s[10, 50];
+seg.GenerateWave(WaveShape.Triangle, 10);
 
 
 for (int i = 0; i < s.Length; i++)
