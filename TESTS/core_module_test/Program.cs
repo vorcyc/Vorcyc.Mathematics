@@ -6,6 +6,8 @@ using Vorcyc.Mathematics.Numerics;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.Statistics;
 using Vorcyc.Mathematics.LanguageExtension;
+using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
 
 //SimpleLinearRegression_test.go();
 
@@ -18,29 +20,5 @@ using Vorcyc.Mathematics.LanguageExtension;
 
 //CuFFT_test.my();
 
-//{
-//    PinnableArray<float>.Option.UseLeasingMode = true;
 
-
-//    PinnableArray<float> a = new(1000);
-//    a.FillWithRandomNumber();
-
-//    Console.WriteLine(a.ToString());
-
-//    Console.WriteLine(a.Values.Length);
-//    Console.WriteLine(a.Length);
-//}
-
-
-
-var s = new Signal(100, 100);
-var seg = s[10, 50];
-seg.GenerateWave(WaveShape.Triangle, 10);
-
-
-for (int i = 0; i < s.Length; i++)
-{
-    Console.WriteLine(s.Samples[i]);
-}
-
-
+signal_test.go();

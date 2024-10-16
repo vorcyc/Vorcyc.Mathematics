@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Fourier;
+﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.Experimental.Signals;
@@ -70,6 +71,14 @@ public class Signal : ITimeDomainSignal
 
 
 
+    public ITimeDomainSignal Clone()
+    {
+        var result = new Signal(_length, _samplingRate);
+        this.Samples.CopyTo(result.Samples);
+        return result;
+    }
+
+
     public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null)
     {
         if (window is null && _length.IsPowerOf2())//若不应用窗函数，则直接使用补过 0 后的样本进行变换
@@ -84,6 +93,18 @@ public class Signal : ITimeDomainSignal
             return new FrequencyDomain(0, windowedSamples.Length, _length, result, this, window);
         }
     }
+
+    public Signal Resample(
+        int destnationSamplingRate,
+        FirFilter? filter = null,
+        int order = 15)
+    {
+        return ITimeDomainSignal.Resample(this, destnationSamplingRate, filter, order);
+    }
+
+
+
+    #region Indexer
 
 
     /// <summary>
@@ -118,5 +139,6 @@ public class Signal : ITimeDomainSignal
         }
     }
 
+    #endregion
 
 }

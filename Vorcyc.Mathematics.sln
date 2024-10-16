@@ -25,17 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TESTS", "TESTS", "{D5EB45E7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "core_module_test", "TESTS\core_module_test\core_module_test.csproj", "{2B689EB0-E9AA-487E-84A6-2750AA6896D8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FBD0847F-1FAF-43AF-B39A-E915B2955752}"
-	ProjectSection(SolutionItems) = preProject
-		targets\dotNET8_Portable\License.txt = targets\dotNET8_Portable\License.txt
-		logo1.png = logo1.png
-		README.md = README.md
-		VMath logo with colorful math symbols on a blackboard, VMath more prominent.png = VMath logo with colorful math symbols on a blackboard, VMath more prominent.png
-		VMath logo with colorful math symbols on a blackboard, VMath prominent.png = VMath logo with colorful math symbols on a blackboard, VMath prominent.png
-		VMath logo with colorful math symbols on a blackboard.png = VMath logo with colorful math symbols on a blackboard.png
-		黑板上的数学符号，不要有人.png = 黑板上的数学符号，不要有人.png
-	EndProjectSection
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MachineLearning", "shared projects\MachineLearning\MachineLearning.shproj", "{05C9CE82-9814-4A38-A874-444151D41DAA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{A400C121-D7CE-4E88-9417-CD4F07F3F973}"
@@ -43,6 +32,21 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "basic_benchmark", "benchmarks\basic_benchmark\basic_benchmark.csproj", "{5D073D85-2F34-4D36-B255-E3275E039737}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Experimental", "shared projects\Experimental\Experimental.shproj", "{C60535F6-5504-48A9-934A-53D6B572D846}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C288D331-8806-4DEA-8CD9-2FD047BFA947}"
+	ProjectSection(SolutionItems) = preProject
+		docs\License.txt = docs\License.txt
+		docs\README.md = docs\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "logos", "logos", "{2768E470-4251-4508-91F0-0146EA8EFD62}"
+	ProjectSection(SolutionItems) = preProject
+		docs\logos\logo1.png = docs\logos\logo1.png
+		docs\logos\VMath logo with colorful math symbols on a blackboard, VMath more prominent.png = docs\logos\VMath logo with colorful math symbols on a blackboard, VMath more prominent.png
+		docs\logos\VMath logo with colorful math symbols on a blackboard, VMath prominent.png = docs\logos\VMath logo with colorful math symbols on a blackboard, VMath prominent.png
+		docs\logos\VMath logo with colorful math symbols on a blackboard.png = docs\logos\VMath logo with colorful math symbols on a blackboard.png
+		docs\logos\黑板上的数学符号，不要有人.png = docs\logos\黑板上的数学符号，不要有人.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +82,7 @@ Global
 		{05C9CE82-9814-4A38-A874-444151D41DAA} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{5D073D85-2F34-4D36-B255-E3275E039737} = {A400C121-D7CE-4E88-9417-CD4F07F3F973}
 		{C60535F6-5504-48A9-934A-53D6B572D846} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{2768E470-4251-4508-91F0-0146EA8EFD62} = {C288D331-8806-4DEA-8CD9-2FD047BFA947}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}

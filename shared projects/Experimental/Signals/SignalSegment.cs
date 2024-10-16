@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Fourier;
+﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.Experimental.Signals;
@@ -69,6 +70,17 @@ public class SignalSegment : ITimeDomainSignal
     /// </summary>
     public float Energy => ITimeDomainCharacteristics.GetEnergy_SIMD(this.Samples);
 
+
+
+    public ITimeDomainSignal Clone()
+    {
+        var result = new SignalSegment(_signal, _start, _length);
+        this.Samples.CopyTo(result.Samples);
+        return result;
+    }
+
+
+
     /// <summary>
     /// 将信号段转换为频域信号。
     /// </summary>
@@ -88,4 +100,13 @@ public class SignalSegment : ITimeDomainSignal
             return new FrequencyDomain(_start, windowedSamples.Length, _length, result, this, window);
         }
     }
+
+    public Signal Resample(
+            int destnationSamplingRate,
+            FirFilter? filter = null,
+            int order = 15)
+    {
+        return ITimeDomainSignal.Resample(this, destnationSamplingRate, filter, order);
+    }
+
 }

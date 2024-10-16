@@ -212,6 +212,47 @@ public class FirFilter : LtiFilter
     }
 
     /// <summary>
+    /// Processes all <paramref name="samples"/> in loop.
+    /// </summary>
+    /// <param name="samples">Samples</param>
+    public float[] ProcessAllSamples(Span<float> samples)
+    {
+        // The Process() code is inlined here in the loop for better performance
+        // (especially for smaller kernels).
+
+        var filtered = new float[samples.Length + _kernelSize - 1];
+
+        var k = 0;
+        while (k < samples.Length)
+        {
+            _delayLine[_delayLineOffset] = samples[k];
+
+            var output = 0f;
+
+            for (int i = 0, j = _kernelSize - _delayLineOffset; i < _kernelSize; i++, j++)
+            {
+                output += _delayLine[i] * _b[j];
+            }
+
+            if (--_delayLineOffset < 0)
+            {
+                _delayLineOffset = _kernelSize - 1;
+            }
+
+            filtered[k++] = output;
+        }
+
+        while (k < filtered.Length)
+        {
+            filtered[k++] = Process(0);
+        }
+
+        return filtered;
+    }
+
+
+
+    /// <summary>
     /// The most straightforward implementation of the difference equation: 
     /// code the difference equation as it is (it's slower than ProcessAllSamples).
     /// </summary>

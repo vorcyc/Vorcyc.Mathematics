@@ -1,4 +1,7 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.LinearAlgebra;
+using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 using Vorcyc.Mathematics.Statistics;
 
@@ -142,7 +145,10 @@ public interface ITimeDomainCharacteristics
 
 }
 
-public interface ITimeDomainSignal : ITimeDomainCharacteristics
+/// <summary>
+/// 定义用于表示时域信号的接口。
+/// </summary>
+public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITimeDomainSignal>
 {
 
     /// <summary>
@@ -165,7 +171,15 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
     /// </summary>
     int Length { get; }
 
-
+    /// <summary>
+    /// 获取数组的片段。
+    /// </summary>
+    /// <param name="array">输入数组。</param>
+    /// <param name="start">起始索引。</param>
+    /// <param name="length">片段的长度。</param>
+    /// <returns>数组片段的 <see cref="Span{T}"/> 对象。</returns>
+    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    /// <exception cref="ArgumentOutOfRangeException">当起始索引或长度不在有效范围内时抛出。</exception>
     internal static Span<float> GetArraySegment(float[] array, int start, int length)
     {
         if (array == null)
@@ -225,11 +239,80 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
     }
 
 
-
-
+    /// <summary>
+    /// 将时域信号转换为频域信号。
+    /// </summary>
+    /// <param name="window">加窗类型（可选）。</param>
+    /// <returns>频域信号的 <see cref="FrequencyDomain"/> 对象。</returns>
     FrequencyDomain TransformToFrequencyDomain(WindowType? window = null);
 
 
+    /// <summary>
+    /// 重采样信号。
+    /// </summary>
+    /// <param name="destnationSamplingRate">目标采样率。</param>
+    /// <param name="filter">可选的 FIR 滤波器。</param>
+    /// <param name="order">滤波器阶数，默认为 15。</param>
+    /// <returns>重采样后的 <see cref="ITimeDomainSignal"/> 对象。</returns>
+    Signal Resample(int destnationSamplingRate, FirFilter? filter = null, int order = 15);
 
+    /// <summary>
+    /// 重采样信号。
+    /// </summary>
+    /// <param name="signal">输入的时域信号。</param>
+    /// <param name="destnationSamplingRate">目标采样率。</param>
+    /// <param name="filter">可选的 FIR 滤波器。</param>
+    /// <param name="order">滤波器阶数，默认为 15。</param>
+    /// <returns>重采样后的 <see cref="ITimeDomainSignal"/> 对象。</returns>
+    internal static Signal Resample(
+        ITimeDomainSignal signal,
+        int destnationSamplingRate,
+        FirFilter? filter = null,
+        int order = 15)
+    {
+        if (signal.SamplingRate == destnationSamplingRate)
+        {
+            var sameResult = new Signal(signal.Length, signal.SamplingRate);
+            signal.Samples.CopyTo(sameResult.Samples);
+            return sameResult;
+        }
 
+        var g = (float)destnationSamplingRate / signal.SamplingRate;
+
+        var input = signal.Samples;
+        var output = new float[(int)(input.Length * g)];
+
+        if (g < 1 && filter is null)
+        {
+            filter = new FirFilter(DesignFilter.FirWinLp(101, g / 2));
+
+            input = filter.ProcessAllSamples(signal.Samples);  // filter.ApplyTo(signal).Samples;
+        }
+
+        var step = 1 / g;
+
+        for (var n = 0; n < output.Length; n++)
+        {
+            var x = n * step;
+
+            for (var i = -order; i < order; i++)
+            {
+                var j = (int)Math.Floor(x) - i;
+
+                if (j < 0 || j >= input.Length)
+                {
+                    continue;
+                }
+
+                var t = x - j;
+                float w = 0.5f * (1.0f + MathF.Cos(t / order * ConstantsFp32.PI));    // Hann window
+                float sinc = VMath.Sinc(t);                             // Sinc function
+                output[n] += w * sinc * input[j];
+            }
+        }
+
+        var result = new Signal(output.Length, destnationSamplingRate);
+        output.CopyTo(result.Samples);
+        return result;
+    }
 }

@@ -13,8 +13,8 @@
     <Company>Vorcyc</Company>
     <Description>A pure dotNET and high performance math library.</Description>
     <Copyright>Vorcyc® Mathematics</Copyright>
-    <Version>0.2.1.0</Version>
-    <AssemblyVersion>0.2.1.0</AssemblyVersion>
+    <Version>0.2.3.0</Version>
+    <AssemblyVersion>0.2.3.0</AssemblyVersion>
     <Title>Vorcy.Mathematics</Title>
     <PackageIcon>logo1.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -24,15 +24,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\License.txt">
+    <None Include="..\..\docs\License.txt">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\..\logo1.png">
+    <None Include="..\..\docs\logos\logo1.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\..\README.md">
+    <None Include="..\..\docs\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
