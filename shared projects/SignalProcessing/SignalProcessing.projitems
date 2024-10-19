@@ -221,6 +221,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Transforms\Base\IComplexTransform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transforms\Base\ITransform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transforms\CepstralTransform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Transforms\ZTransform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transforms\Dct\Dct1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transforms\Dct\Dct2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Transforms\Dct\Dct3.cs" />
