@@ -172,92 +172,113 @@ public static partial class ArrayExtension
 
 
     /// <summary>
-    /// Segments an array into smaller parts of a specified target length.
+    /// 对数组进行压缩并生成数组片段序列，确保没有数据被遗漏。
     /// </summary>
-    /// <typeparam name="T">The type of the elements in the array.</typeparam>
-    /// <param name="array">The original array to segment.</param>
-    /// <param name="targetLength">The desired number of segments.</param>
-    /// <returns>An enumerable of array segments.</returns>
-    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    /// <typeparam name="T">数组元素的类型。</typeparam>
+    /// <param name="array">要进行压缩的数组。</param>
+    /// <param name="targetLength">压缩后的目标长度。</param>
+    /// <returns>一个包含数组片段的序列。</returns>
+    /// <remarks>
+    /// 使用 <see cref="MethodImplOptions.AggressiveInlining"/> 指示编译器进行内联优化。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<ArraySegment<T>> Zip<T>(this T[] array, int targetLength)
     {
         double xStep = (double)array.Length / targetLength;
-        var segmentLength = (int)xStep;
-
-        for (int i = 0; i < array.Length; i += segmentLength)
+        int segmentStart = 0;
+        for (int i = 0; i < targetLength; i++)
         {
-            yield return new ArraySegment<T>(array, i, segmentLength);
+            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
+            yield return new ArraySegment<T>(array, segmentStart, segmentLength);
+            segmentStart += segmentLength;
         }
     }
 
+
     /// <summary>
-    /// Segments a specified range of an array into smaller parts of a specified target length.
+    /// 对数组进行压缩并生成数组片段序列，确保没有数据被遗漏。
     /// </summary>
-    /// <typeparam name="T">The type of the elements in the array.</typeparam>
-    /// <param name="array">The original array to segment.</param>
-    /// <param name="startIndex">The starting index of the range to segment.</param>
-    /// <param name="length">The number of elements to include in the range.</param>
-    /// <param name="targetLength">The desired number of segments.</param>
-    /// <returns>An enumerable of array segments.</returns>
-    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    /// <typeparam name="T">数组元素的类型。</typeparam>
+    /// <param name="array">要进行压缩的数组。</param>
+    /// <param name="startIndex">数组的起始索引。</param>
+    /// <param name="length">数组的长度。</param>
+    /// <param name="targetLength">压缩后的目标长度。</param>
+    /// <returns>一个包含数组片段的序列。</returns>
+    /// <remarks>
+    /// 使用 <see cref="MethodImplOptions.AggressiveInlining"/> 指示编译器进行内联优化。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<ArraySegment<T>> Zip<T>(
         this T[] array,
         int startIndex, int length,
         int targetLength)
     {
         double xStep = (double)length / targetLength;
-        var segmentLength = (int)xStep;
-
-        for (int i = startIndex; i < startIndex + length - segmentLength; i += segmentLength)
+        int segmentStart = startIndex;
+        for (int i = 0; i < targetLength; i++)
         {
-            yield return new ArraySegment<T>(array, i, segmentLength);
+            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
+            yield return new ArraySegment<T>(array, segmentStart, segmentLength);
+            segmentStart += segmentLength;
         }
     }
 
+
+
     /// <summary>
-    /// Segments an array into smaller parts of a specified target length and returns the start index and length of each segment.
+    /// 对数组进行压缩并生成标记序列，确保没有数据被遗漏。
     /// </summary>
-    /// <typeparam name="T">The type of the elements in the array.</typeparam>
-    /// <param name="array">The original array to segment.</param>
-    /// <param name="targetLength">The desired number of segments.</param>
-    /// <returns>An enumerable of tuples containing the start index and length of each segment.</returns>
-    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    /// <typeparam name="T">数组元素的类型。</typeparam>
+    /// <param name="array">要进行压缩的数组。</param>
+    /// <param name="targetLength">压缩后的目标长度。</param>
+    /// <returns>一个包含起始索引和长度的标记序列。</returns>
+    /// <remarks>
+    /// 使用 <see cref="MethodImplOptions.AggressiveInlining"/> 指示编译器进行内联优化。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<(int startIndex, int length)> ZipAsMarks<T>(this T[] array, int targetLength)
     {
         double xStep = (double)array.Length / targetLength;
-        var segmentLength = (int)xStep;
-
-        for (int i = 0; i < array.Length; i += segmentLength)
+        int segmentStart = 0;
+        for (int i = 0; i < targetLength; i++)
         {
-            yield return (i, segmentLength);
+            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
+            yield return (segmentStart, segmentLength);
+            segmentStart += segmentLength;
         }
     }
 
 
 
     /// <summary>
-    /// Segments a specified range of an array into smaller parts of a specified target length and returns the start index and length of each segment.
+    /// 对数组进行压缩并生成标记序列，确保没有数据被遗漏。
     /// </summary>
-    /// <typeparam name="T">The type of the elements in the array.</typeparam>
-    /// <param name="array">The original array to segment.</param>
-    /// <param name="startIndex">The starting index of the range to segment.</param>
-    /// <param name="length">The number of elements to include in the range.</param>
-    /// <param name="targetLength">The desired number of segments.</param>
-    /// <returns>An enumerable of tuples containing the start index and length of each segment.</returns>
-    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    /// <typeparam name="T">数组元素的类型。</typeparam>
+    /// <param name="array">要进行压缩的数组。</param>
+    /// <param name="startIndex">数组的起始索引。</param>
+    /// <param name="length">数组的长度。</param>
+    /// <param name="targetLength">目标长度。</param>
+    /// <returns>一个包含起始索引和长度的标记序列。</returns>
+    /// <remarks>
+    /// 使用 <see cref="MethodImplOptions.AggressiveInlining"/> 指示编译器进行内联优化。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<(int startIndex, int length)> ZipAsMarks<T>(
         this T[] array,
         int startIndex, int length,
         int targetLength)
     {
         double xStep = (double)length / targetLength;
-        var segmentLength = (int)xStep;
-
-        for (int i = startIndex; i < startIndex + length - segmentLength; i += segmentLength)
+        int segmentStart = startIndex;
+        for (int i = 0; i < targetLength; i++)
         {
-            yield return (i, segmentLength);
+            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
+            yield return (segmentStart, segmentLength);
+            segmentStart += segmentLength;
         }
     }
+
+
 
 
 
