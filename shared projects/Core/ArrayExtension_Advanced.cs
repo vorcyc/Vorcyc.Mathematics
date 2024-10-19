@@ -176,7 +176,7 @@ public static partial class ArrayExtension
     /// </summary>
     /// <typeparam name="T">数组元素的类型。</typeparam>
     /// <param name="array">要进行压缩的数组。</param>
-    /// <param name="targetLength">压缩后的目标长度。</param>
+    /// <param name="targetLength">目标长度。</param>
     /// <returns>一个包含数组片段的序列。</returns>
     /// <remarks>
     /// 使用 <see cref="MethodImplOptions.AggressiveInlining"/> 指示编译器进行内联优化。
@@ -185,12 +185,17 @@ public static partial class ArrayExtension
     public static IEnumerable<ArraySegment<T>> Zip<T>(this T[] array, int targetLength)
     {
         double xStep = (double)array.Length / targetLength;
-        int segmentStart = 0;
+        int currentStart = 0;
         for (int i = 0; i < targetLength; i++)
         {
-            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
-            yield return new ArraySegment<T>(array, segmentStart, segmentLength);
-            segmentStart += segmentLength;
+            int nextStart = (int)Math.Round(xStep * (i + 1));
+            int segmentLength = nextStart - currentStart;
+            if (currentStart + segmentLength > array.Length)
+            {
+                segmentLength = array.Length - currentStart;
+            }
+            yield return new ArraySegment<T>(array, currentStart, segmentLength);
+            currentStart = nextStart;
         }
     }
 
@@ -202,7 +207,7 @@ public static partial class ArrayExtension
     /// <param name="array">要进行压缩的数组。</param>
     /// <param name="startIndex">数组的起始索引。</param>
     /// <param name="length">数组的长度。</param>
-    /// <param name="targetLength">压缩后的目标长度。</param>
+    /// <param name="targetLength">目标长度。</param>
     /// <returns>一个包含数组片段的序列。</returns>
     /// <remarks>
     /// 使用 <see cref="MethodImplOptions.AggressiveInlining"/> 指示编译器进行内联优化。
@@ -214,15 +219,19 @@ public static partial class ArrayExtension
         int targetLength)
     {
         double xStep = (double)length / targetLength;
-        int segmentStart = startIndex;
+        int currentStart = startIndex;
         for (int i = 0; i < targetLength; i++)
         {
-            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
-            yield return new ArraySegment<T>(array, segmentStart, segmentLength);
-            segmentStart += segmentLength;
+            int nextStart = (int)Math.Round(xStep * (i + 1)) + startIndex;
+            int segmentLength = nextStart - currentStart;
+            if (currentStart + segmentLength > startIndex + length)
+            {
+                segmentLength = startIndex + length - currentStart;
+            }
+            yield return new ArraySegment<T>(array, currentStart, segmentLength);
+            currentStart = nextStart;
         }
     }
-
 
 
     /// <summary>
@@ -230,7 +239,7 @@ public static partial class ArrayExtension
     /// </summary>
     /// <typeparam name="T">数组元素的类型。</typeparam>
     /// <param name="array">要进行压缩的数组。</param>
-    /// <param name="targetLength">压缩后的目标长度。</param>
+    /// <param name="targetLength">目标长度。</param>
     /// <returns>一个包含起始索引和长度的标记序列。</returns>
     /// <remarks>
     /// 使用 <see cref="MethodImplOptions.AggressiveInlining"/> 指示编译器进行内联优化。
@@ -242,12 +251,16 @@ public static partial class ArrayExtension
         int segmentStart = 0;
         for (int i = 0; i < targetLength; i++)
         {
-            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
+            int nextStart = (int)Math.Round(xStep * (i + 1));
+            int segmentLength = nextStart - segmentStart;
+            if (segmentStart + segmentLength > array.Length)
+            {
+                segmentLength = array.Length - segmentStart;
+            }
             yield return (segmentStart, segmentLength);
-            segmentStart += segmentLength;
+            segmentStart = nextStart;
         }
     }
-
 
 
     /// <summary>
@@ -269,15 +282,19 @@ public static partial class ArrayExtension
         int targetLength)
     {
         double xStep = (double)length / targetLength;
-        int segmentStart = startIndex;
+        int currentStart = startIndex;
         for (int i = 0; i < targetLength; i++)
         {
-            int segmentLength = (int)Math.Round(xStep * (i + 1)) - segmentStart;
-            yield return (segmentStart, segmentLength);
-            segmentStart += segmentLength;
+            int nextStart = (int)Math.Round(xStep * (i + 1)) + startIndex;
+            int segmentLength = nextStart - currentStart;
+            if (currentStart + segmentLength > startIndex + length)
+            {
+                segmentLength = startIndex + length - currentStart;
+            }
+            yield return (currentStart, segmentLength);
+            currentStart = nextStart;
         }
     }
-
 
 
 
