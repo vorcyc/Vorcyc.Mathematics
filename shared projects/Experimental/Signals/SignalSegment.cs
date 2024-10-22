@@ -38,7 +38,8 @@ public class SignalSegment : ITimeDomainSignal
     /// <summary>
     /// 获取信号段的采样数据。
     /// </summary>
-    public Span<float> Samples => new(_signal._samples, _start, _length);
+    //public Span<float> Samples => new(_signal._samples, _start, _length);
+    public Span<float> Samples => _signal._samples.AsSpan(_start, _length);
 
     /// <summary>
     /// 获取信号段的持续时间。

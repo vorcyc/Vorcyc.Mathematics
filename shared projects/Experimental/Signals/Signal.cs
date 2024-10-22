@@ -9,24 +9,28 @@ namespace Vorcyc.Mathematics.Experimental.Signals;
 /// </summary>
 public class Signal : ITimeDomainSignal
 {
-    /// <summary>
-    /// 有可能是补 0  后的长度。这样虽然会浪费内存空间，但是节省了后期分配的时间。
-    /// </summary>
-    internal float[] _samples;
+
+    //internal float[] _samples;
+    internal PinnableArray<float> _samples;
     private int _length;
     private int _samplingRate;
 
     public Signal(int count, int samplingRate)
     {
         _length = count;
-        _samples = new float[count];
+        //_samples = new float[count];
+        _samples = new PinnableArray<float>(count);
         _samplingRate = samplingRate;
     }
 
     /// <summary>
     /// 获取信号样本数组。(实际长度，而非补 0 后的长度）
     /// </summary>
-    public Span<float> Samples => _samples.AsSpan(0, _length);
+    //public Span<float> Samples => _samples.AsSpan(0, _length);
+    public Span<float> Samples => _samples;
+
+
+    public PinnableArray<float> UnderlayingArray => _samples;
 
     /// <summary>
     /// 获取信号的采样率。

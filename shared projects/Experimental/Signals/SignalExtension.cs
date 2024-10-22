@@ -464,13 +464,28 @@ public static class SignalExtension
     /// <param name="action">对每个生成的值执行的操作。</param>
     internal static void GenerateSquareWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
-        float increment = ConstantsFp32.TWO_PI * frequency / signal.SamplingRate;
+        //float increment = ConstantsFp32.TWO_PI * frequency / signal.SamplingRate;
+        //for (int i = 0; i < signal.Length; i++)
+        //{
+        //    var value = MathF.Sign(MathF.Sin(increment * i));
+        //    action(i, value);
+        //}
 
+        //var multiple = 2.0f * frequency / signal.SamplingRate;
+        //for (int i = 0; i < signal.Length; i++)
+        //{
+        //    var sampleSaw = ((i * multiple) % 2) - 1;
+        //    var sample = sampleSaw > 0 ? 1 : -1;
+        //    action(i, sample);
+        //}
+
+        var period = signal.SamplingRate / frequency;
         for (int i = 0; i < signal.Length; i++)
         {
-            var value = MathF.Sign(MathF.Sin(increment * i));
-            action(i, value);
+            var sample = (i % period) < (period / 2) ? 1.0f : -1.0f;
+            action(i, sample);
         }
+
     }
 
     /// <summary>
@@ -516,7 +531,7 @@ public static class SignalExtension
     {
         for (int i = 0; i < signal.Length; i++)
         {
-            var value = 2 * Random.Shared.NextSingle() - 1; // 生成范围在 -1 到 1 之间的随机数
+            var value = 2f * Random.Shared.NextSingle() - 1f; // 生成范围在 -1 到 1 之间的随机数
             action(i, value);
         }
     }

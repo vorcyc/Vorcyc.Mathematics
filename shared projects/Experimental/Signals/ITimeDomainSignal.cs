@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using Vorcyc.Mathematics.LinearAlgebra;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
