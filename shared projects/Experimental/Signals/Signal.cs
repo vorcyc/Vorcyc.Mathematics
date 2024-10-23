@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+﻿using System.Runtime.CompilerServices;
+using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
@@ -22,6 +23,14 @@ public class Signal : ITimeDomainSignal
         _samples = new PinnableArray<float>(count);
         _samplingRate = samplingRate;
     }
+
+    public Signal(TimeSpan duration, int samplingRate)
+        : this(ITimeDomainSignal.TimeToArrayIndexOrLength(duration, samplingRate), samplingRate)
+    { }
+
+
+
+
 
     /// <summary>
     /// 获取信号样本数组。(实际长度，而非补 0 后的长度）
@@ -142,6 +151,15 @@ public class Signal : ITimeDomainSignal
             return new SignalSegment(this, start, length);
         }
     }
+
+    public SignalSegment this[TimeSpan startTime, TimeSpan duration]
+        => this
+        [
+            ITimeDomainSignal.TimeToArrayIndexOrLength(startTime, _samplingRate),
+            ITimeDomainSignal.TimeToArrayIndexOrLength(duration, _samplingRate)
+        ];
+
+
 
     #endregion
 

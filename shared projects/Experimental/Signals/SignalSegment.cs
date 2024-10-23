@@ -31,9 +31,20 @@ public class SignalSegment : ITimeDomainSignal
     public int Start => _start;
 
     /// <summary>
+    /// 当前信号段的起始时间
+    /// </summary>
+    public TimeSpan StartTime => ITimeDomainSignal.ArrayIndexOrLengthToTime(_start, _signal.SamplingRate);
+
+    /// <summary>
     /// 获取信号段的长度。
     /// </summary>
     public int Length => _length;
+
+
+    /// <summary>
+    /// 获取信号段的持续时间。
+    /// </summary>
+    public TimeSpan Duration => ITimeDomainSignal.ArrayIndexOrLengthToTime(_length, _signal.SamplingRate);// TimeSpan.FromSeconds(1f / (float)_signal.SamplingRate * _length);
 
     /// <summary>
     /// 获取信号段的采样数据。
@@ -41,10 +52,6 @@ public class SignalSegment : ITimeDomainSignal
     //public Span<float> Samples => new(_signal._samples, _start, _length);
     public Span<float> Samples => _signal._samples.AsSpan(_start, _length);
 
-    /// <summary>
-    /// 获取信号段的持续时间。
-    /// </summary>
-    public TimeSpan Duration => TimeSpan.FromSeconds(1f / (float)_signal.SamplingRate * _length);
 
     /// <summary>
     /// 获取信号的采样率。

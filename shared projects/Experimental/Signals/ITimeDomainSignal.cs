@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
@@ -314,4 +315,26 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
         output.CopyTo(result.Samples);
         return result;
     }
+
+
+    /// <summary>
+    /// 转成数据量(对应于数组的索引或长度)
+    /// </summary>
+    /// <param name="time"></param>
+    /// <param name="samplingRate"></param>
+    /// <returns></returns>
+    [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
+    internal static int TimeToArrayIndexOrLength(TimeSpan time, int samplingRate)
+        => (int)(time.TotalSeconds * samplingRate);
+
+
+    /// <summary>
+    /// 数据量(对应于数组的索引或长度) 转成时间
+    /// </summary>
+    /// <param name="indexOrLength"></param>
+    /// <param name="samplingRate"></param>
+    /// <returns></returns>
+    [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
+    internal static TimeSpan ArrayIndexOrLengthToTime(int indexOrLength, int samplingRate)
+        => TimeSpan.FromSeconds((double)indexOrLength / (double)samplingRate);
 }
