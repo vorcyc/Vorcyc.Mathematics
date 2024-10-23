@@ -131,28 +131,49 @@ public class Signal : ITimeDomainSignal
         set => Samples[index] = value;
     }
 
+
+
     /// <summary>
-    /// 获取信号段的子段。
+    /// 以索引获取信号段的子段。
     /// </summary>
-    /// <param name="start">子段的起始位置。</param>
+    /// <param name="start">子段的起始索引。</param>
     /// <param name="length">子段的长度。</param>
-    /// <returns>指定起始位置和长度的信号子段。</returns>
+    /// <param name="throwException">是否允许抛出异常</param>
+    /// <returns>指定起始位置和长度的信号子段。若索引超出边界则返回 null。</returns>
     /// <exception cref="ArgumentOutOfRangeException">当起始位置或长度不在有效范围内时抛出。</exception>
-    public SignalSegment this[int start, int length]
+    public SignalSegment? this[int start, int length, bool throwException = false]
     {
         get
         {
-            if (start < 0 || start >= _length)
-                throw new ArgumentOutOfRangeException(nameof(start), "Start index is out of range.");
+            if (throwException)
+            {
+                if (start < 0 || start >= _length)
+                    throw new ArgumentOutOfRangeException(nameof(start), "Start index is out of range.");
 
-            if (length <= 0 || length > _length || (start + length) > _length)
-                throw new ArgumentOutOfRangeException(nameof(length), "Length is out of range.");
+                if (length <= 0 || length > _length || (start + length) > _length)
+                    throw new ArgumentOutOfRangeException(nameof(length), "Length is out of range.");
+            }
+            else
+            {
+                if (start < 0 || start >= _length)
+                    return null;
+
+                if (length <= 0 || length > _length || (start + length) > _length)
+                    return null;
+            }
 
             return new SignalSegment(this, start, length);
         }
     }
 
-    public SignalSegment this[TimeSpan startTime, TimeSpan duration]
+    /// <summary>
+    /// 以时间量获取信号的子段
+    /// </summary>
+    /// <param name="startTime">字段的起始时间</param>
+    /// <param name="duration">子段的时长</param>
+    /// <param name="throwException">是否允许抛出异常</param>
+    /// <returns>指定起始时间和时长的信号子段。若时间超出边界则返回 null。</returns>
+    public SignalSegment? this[TimeSpan startTime, TimeSpan duration, bool throwException = false]
         => this
         [
             ITimeDomainSignal.TimeToArrayIndexOrLength(startTime, _samplingRate),
