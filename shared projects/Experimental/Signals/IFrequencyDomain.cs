@@ -14,6 +14,11 @@ public interface IFrequencyDomainCharacteristics
     float[] Magnitudes { get; }
 
     /// <summary>
+    /// 获取质心 ( Mass Center)
+    /// </summary>
+    float Centroid { get; }
+
+    /// <summary>
     /// 获取频域信号的频率。
     /// </summary>
     float Frequency { get; }
@@ -44,6 +49,25 @@ public interface IFrequencyDomainCharacteristics
         // 忽略直流分量（第一个元素）
         magnitudes[0] = 0;
         return magnitudes;
+    }
+
+    /// <summary>
+    /// 计算质心 Mass Center.
+    /// </summary>
+    /// <param name="fftResult"></param>
+    /// <param name="actualLength"></param>
+    /// <param name="samplingRate"></param>
+    /// <returns></returns>
+    internal static float GetCentroid(ComplexFp32[] fftResult, int actualLength, int samplingRate)
+    {
+        int N = actualLength;
+        float[] magnitudes = GetMagnitudes(fftResult, actualLength);
+        float[] freqs = Enumerable.Range(0, N).Select(i => i * (float)samplingRate / N).ToArray();
+        // 计算质心
+        float numerator = freqs.Select((f, i) => f * magnitudes[i]).Sum();
+        float denominator = magnitudes.Sum(); 
+        float centroid = numerator / denominator;
+        return centroid;
     }
 
     /// <summary>

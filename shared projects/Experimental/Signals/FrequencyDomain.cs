@@ -60,6 +60,8 @@ public class FrequencyDomain : IFrequencyDomain
 
     public float[] Magnitudes => IFrequencyDomainCharacteristics.GetMagnitudes(_fftResult, _actualLength);
 
+    public float Centroid => IFrequencyDomainCharacteristics.GetCentroid(_fftResult, _actualLength, _signal.SamplingRate);
+
     public float Frequency => IFrequencyDomainCharacteristics.GetFrequency(Magnitudes, _signal.SamplingRate, _resolution);
 
     public static float IndexToFrequency(int index, int samplingRate, int fftLen)
@@ -117,5 +119,8 @@ public class FrequencyDomain : IFrequencyDomain
             _signal.Samples[signalIndex] = _fftResult[freqIndex].Magnitude; // 使用幅度代替实部
         }
     }
+
+
+
 
 }
