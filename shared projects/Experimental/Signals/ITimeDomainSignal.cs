@@ -8,6 +8,9 @@ using Vorcyc.Mathematics.Statistics;
 namespace Vorcyc.Mathematics.Experimental.Signals;
 
 
+/// <summary>
+/// Represents the time-domain characteristics of signal.
+/// </summary>
 public interface ITimeDomainCharacteristics
 {
     /// <summary>
@@ -219,6 +222,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
     /// <param name="actualLen">实际长度，用于从源数组中拷贝的数据长度</param>
     /// <param name="windowingType"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static float[] PadZerosAndWindowing
         (
             float[] samples,
@@ -337,4 +341,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
     [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
     internal static TimeSpan ArrayIndexOrLengthToTime(int indexOrLength, int samplingRate)
         => TimeSpan.FromSeconds((double)indexOrLength / (double)samplingRate);
+
+
+  
 }

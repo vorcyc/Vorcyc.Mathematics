@@ -39,7 +39,7 @@ public class Signal : ITimeDomainSignal
     public Span<float> Samples => _samples;
 
 
-    public PinnableArray<float> UnderlayingArray => _samples;
+    internal PinnableArray<float> UnderlayingArray => _samples;
 
     /// <summary>
     /// 获取信号的采样率。
@@ -127,7 +127,9 @@ public class Signal : ITimeDomainSignal
     /// <returns>指定索引处的采样值。</returns>
     public float this[int index]
     {
+        [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
         get => Samples[index];
+        [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
         set => Samples[index] = value;
     }
 
@@ -143,6 +145,7 @@ public class Signal : ITimeDomainSignal
     /// <exception cref="ArgumentOutOfRangeException">当起始位置或长度不在有效范围内时抛出。</exception>
     public SignalSegment? this[int start, int length, bool throwException = false]
     {
+        [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
         get
         {
             if (throwException)
