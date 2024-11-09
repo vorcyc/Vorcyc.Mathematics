@@ -167,7 +167,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
     /// <summary>
     /// 获取信号的采样率。
     /// </summary>
-    int SamplingRate { get; }
+    float SamplingRate { get; }
 
     /// <summary>
     /// 获取信号的长度。
@@ -270,7 +270,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
     /// <returns>重采样后的 <see cref="ITimeDomainSignal"/> 对象。</returns>
     internal static Signal Resample(
         ITimeDomainSignal signal,
-        int destnationSamplingRate,
+        float destnationSamplingRate,
         FirFilter? filter = null,
         int order = 15)
     {
@@ -281,7 +281,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
             return sameResult;
         }
 
-        var g = (float)destnationSamplingRate / signal.SamplingRate;
+        var g = destnationSamplingRate / signal.SamplingRate;
 
         var input = signal.Samples;
         var output = new float[(int)(input.Length * g)];
@@ -328,7 +328,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
     /// <param name="samplingRate"></param>
     /// <returns></returns>
     [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-    internal static int TimeToArrayIndexOrLength(TimeSpan time, int samplingRate)
+    internal static int TimeToArrayIndexOrLength(TimeSpan time, float samplingRate)
         => (int)(time.TotalSeconds * samplingRate);
 
 
@@ -339,8 +339,8 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
     /// <param name="samplingRate"></param>
     /// <returns></returns>
     [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-    internal static TimeSpan ArrayIndexOrLengthToTime(int indexOrLength, int samplingRate)
-        => TimeSpan.FromSeconds((double)indexOrLength / (double)samplingRate);
+    internal static TimeSpan ArrayIndexOrLengthToTime(int indexOrLength, float samplingRate)
+        => TimeSpan.FromSeconds(indexOrLength / samplingRate);
 
 
   

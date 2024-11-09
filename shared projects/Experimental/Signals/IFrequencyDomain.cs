@@ -52,17 +52,17 @@ public interface IFrequencyDomainCharacteristics
     }
 
     /// <summary>
-    /// 计算质心 Mass Center.
+    /// 计算质心 (Mass Center).
     /// </summary>
     /// <param name="fftResult"></param>
     /// <param name="actualLength"></param>
     /// <param name="samplingRate"></param>
     /// <returns></returns>
-    internal static float GetCentroid(ComplexFp32[] fftResult, int actualLength, int samplingRate)
+    internal static float GetCentroid(ComplexFp32[] fftResult, int actualLength, float samplingRate)
     {
         int N = actualLength;
         float[] magnitudes = GetMagnitudes(fftResult, actualLength);
-        float[] freqs = Enumerable.Range(0, N).Select(i => i * (float)samplingRate / N).ToArray();
+        float[] freqs = Enumerable.Range(0, N).Select(i => i * samplingRate / N).ToArray();
         // 计算质心
         float numerator = freqs.Select((f, i) => f * magnitudes[i]).Sum();
         float denominator = magnitudes.Sum(); 
@@ -77,7 +77,7 @@ public interface IFrequencyDomainCharacteristics
     /// <param name="samplingRate">采样率。</param>
     /// <param name="resolution">频率分辨率。</param>
     /// <returns>频域信号的频率。</returns>
-    internal static float GetFrequency(float[] magnitudes, int samplingRate, float resolution)
+    internal static float GetFrequency(float[] magnitudes, float samplingRate, float resolution)
     {
         // 找到最大幅度对应的索引
         // int maxIndex = Array.IndexOf(magnitudes, magnitudes.Max());
@@ -114,7 +114,7 @@ public interface IFrequencyDomainCharacteristics
     /// <param name="phases">相位数组。</param>
     /// <param name="samplingRate">采样率。</param>
     /// <returns>角速度数组。</returns>
-    internal static float[] GetAngularVelocities(float[] phases, int samplingRate)
+    internal static float[] GetAngularVelocities(float[] phases, float samplingRate)
     {
         float[] angularVelocity = new float[phases.Length - 1];
         for (int i = 0; i < phases.Length - 1; i++)

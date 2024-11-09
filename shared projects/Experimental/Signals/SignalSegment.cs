@@ -56,7 +56,7 @@ public class SignalSegment : ITimeDomainSignal
     /// <summary>
     /// 获取信号的采样率。
     /// </summary>
-    public int SamplingRate => _signal.SamplingRate;
+    public float SamplingRate => _signal.SamplingRate;
 
     /// <summary>
     /// 获取信号段的振幅。

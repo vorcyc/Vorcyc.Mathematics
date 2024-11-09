@@ -14,9 +14,9 @@ public class Signal : ITimeDomainSignal
     //internal float[] _samples;
     internal PinnableArray<float> _samples;
     private int _length;
-    private int _samplingRate;
+    private float _samplingRate;
 
-    public Signal(int count, int samplingRate)
+    public Signal(int count, float samplingRate)
     {
         _length = count;
         //_samples = new float[count];
@@ -24,7 +24,7 @@ public class Signal : ITimeDomainSignal
         _samplingRate = samplingRate;
     }
 
-    public Signal(TimeSpan duration, int samplingRate)
+    public Signal(TimeSpan duration, float samplingRate)
         : this(ITimeDomainSignal.TimeToArrayIndexOrLength(duration, samplingRate), samplingRate)
     { }
 
@@ -44,7 +44,7 @@ public class Signal : ITimeDomainSignal
     /// <summary>
     /// 获取信号的采样率。
     /// </summary>
-    public int SamplingRate => _samplingRate;
+    public float SamplingRate => _samplingRate;
 
 
     public TimeSpan Duration => TimeSpan.FromSeconds(1f / (float)_samplingRate * _length);
