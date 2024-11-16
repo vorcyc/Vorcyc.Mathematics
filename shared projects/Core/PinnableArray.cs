@@ -69,7 +69,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     {
         _length = segment.Count;
 
-        if (Option.UseLeasingMode)
+        if (Options.UseLeasingMode)
             _array = _pool.Rent(_length);
         else
             _array = new T[_length];
@@ -84,7 +84,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     {
         _length = span.Length;
 
-        if (Option.UseLeasingMode)
+        if (Options.UseLeasingMode)
             _array = _pool.Rent(_length);
         else
             _array = new T[_length];
@@ -109,7 +109,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
             Buffer.BlockCopy 的参数是基于字节的，而Array.Copy的参数是基于索引的，因此Buffer.BlockCopy更容易出错4。
             */
 
-        if (Option.UseLeasingMode)
+        if (Options.UseLeasingMode)
             _array = _pool.Rent(_length);
         else
             _array = new T[_length];
@@ -133,7 +133,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
         _length = count;
 
-        if (Option.UseLeasingMode)
+        if (Options.UseLeasingMode)
             _array = _pool.Rent(_length);
         else
             _array = new T[_length];
@@ -147,7 +147,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     {
         _length = count;
 
-        if (Option.UseLeasingMode)
+        if (Options.UseLeasingMode)
             _array = _pool.Rent(_length);
         else
             _array = new T[_length];
@@ -1228,7 +1228,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
                 // TODO: 释放托管状态(托管对象)
                 if (_isPinned) _memoryHandle.Dispose();
 
-                _pool.Return(_array, false);
+                if (Options.UseLeasingMode) _pool.Return(_array, false);
             }
 
             // TODO: 释放未托管的资源(未托管的对象)并重写终结器
@@ -1265,7 +1265,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// <remarks>
     /// Use this with type paramater for specified type . You should set this before any instance created.
     /// </remarks>
-    public static PinnableArrayOption Option => s_options;
+    public static PinnableArrayOption Options => s_options;
 
     #endregion
 
