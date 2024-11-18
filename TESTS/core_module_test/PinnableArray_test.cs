@@ -13,7 +13,7 @@ internal class PinnableArray_test
     public static void go()
     {
         {
-            PinnableArray<float>.Option.UseLeasingMode = true;
+            PinnableArray<float>.Options.UseLeasingMode = true;
 
 
             PinnableArray<float> a = new(1000);

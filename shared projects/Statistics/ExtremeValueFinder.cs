@@ -304,7 +304,7 @@ public static class ExtremeValueFinder
     internal static (float max, float min) FindExtremeValue_Vector256(this Span<float> span)
     {
         // 检查数组是否为空
-        if (span == null || span.Length == 0)
+        if (span.IsEmpty || span.Length == 0)
             throw new ArgumentException("Array is null or empty");
 
         // 检查平台是否支持 AVX2
@@ -362,7 +362,7 @@ public static class ExtremeValueFinder
     internal static (float max, float min) FindExtremeValue_Vector512(this Span<float> segment)
     {
         // 检查数组是否为空
-        if (segment == null || segment.Length == 0)
+        if (segment.IsEmpty || segment.Length == 0)
             throw new ArgumentException("Array is null or empty");
 
         // 检查平台是否支持 AVX512

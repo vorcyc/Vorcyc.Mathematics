@@ -12,4 +12,6 @@ using Vorcyc.Mathematics;
 
 //BenchmarkRunner.Run<SimpleLinearRegression_benchmark>();
 
-BenchmarkRunner.Run<Statistics_benchmark>();
+//BenchmarkRunner.Run<Statistics_benchmark>();
+
+BenchmarkRunner.Run<SpanMathExtensionBenchmarks>();

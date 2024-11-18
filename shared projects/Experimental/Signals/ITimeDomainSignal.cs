@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
+using Vorcyc.Mathematics.Helpers;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
@@ -151,7 +152,7 @@ public interface ITimeDomainCharacteristics
 /// <summary>
 /// 定义用于表示时域信号的接口。
 /// </summary>
-public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITimeDomainSignal>
+public interface ITimeDomainSignal : ITimeDomainCharacteristics
 {
 
     /// <summary>
@@ -173,6 +174,100 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
     /// 获取信号的长度。
     /// </summary>
     int Length { get; }
+
+
+    #region Operators
+
+    
+    #region 老叫我去实现接口，用类的不行
+
+
+    //static abstract ITimeDomainSignal operator +(ITimeDomainSignal left, float right);
+
+    //static abstract ITimeDomainSignal operator +(ITimeDomainSignal left, ITimeDomainSignal right);
+
+
+    //static abstract ITimeDomainSignal operator -(ITimeDomainSignal left, float right);
+
+    //static abstract ITimeDomainSignal operator -(ITimeDomainSignal left, ITimeDomainSignal right);
+
+
+    //static abstract ITimeDomainSignal operator *(ITimeDomainSignal left, float right);
+
+    //static abstract ITimeDomainSignal operator *(ITimeDomainSignal left, ITimeDomainSignal right);
+
+
+    //static abstract ITimeDomainSignal operator /(ITimeDomainSignal left, float right);
+
+    //static abstract ITimeDomainSignal operator /(ITimeDomainSignal left, ITimeDomainSignal right);
+
+    #endregion
+
+
+    #region 这样做毫无意义 ，我认为是语言漏洞
+
+    //static ITimeDomainSignal operator +(ITimeDomainSignal left, float right)
+    //{
+    //    var result = left.Clone();
+    //    result.Samples.Add(right);
+    //    return result;
+    //}
+
+    //static ITimeDomainSignal? operator +(ITimeDomainSignal left, ITimeDomainSignal right)
+    //{
+    //    if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+    //        return null;
+    //    var result = left.Clone();
+    //    result.Samples.Add(right.Samples);
+    //    return result;
+    //}
+
+
+    //static ITimeDomainSignal operator -(ITimeDomainSignal left, float right)
+    //{
+    //    var result = left.Clone();
+    //    result.Samples.Subtract(right);
+    //    return result;
+    //}
+
+    //static ITimeDomainSignal? operator -(ITimeDomainSignal left, ITimeDomainSignal right)
+    //{
+    //    if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+    //        return null;
+    //    var result = left.Clone();
+    //    result.Samples.Subtract(right.Samples);
+    //    return result;
+    //}
+
+    //static ITimeDomainSignal operator *(ITimeDomainSignal left, float right)
+    //{
+    //    var result = left.Clone();
+    //    result.Samples.Multiply(right);
+    //    return result;
+    //}
+
+    //static ITimeDomainSignal? operator *(ITimeDomainSignal left, ITimeDomainSignal right)
+    //{
+    //    if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+    //        return null;
+    //    var result = left.Clone();
+    //    result.Samples.Multiply(right.Samples);
+    //    return result;
+    //}
+
+    //static ITimeDomainSignal operator /(ITimeDomainSignal left, float right)
+    //{
+    //    var result = left.Clone();
+    //    result.Samples.Divide(right);
+    //    return result;
+    //}  
+
+
+    #endregion
+
+
+    #endregion
+
 
     /// <summary>
     /// 获取数组的片段。
@@ -343,5 +438,5 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics, ICloneable<ITim
         => TimeSpan.FromSeconds(indexOrLength / samplingRate);
 
 
-  
+
 }

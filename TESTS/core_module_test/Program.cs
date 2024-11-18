@@ -8,6 +8,7 @@ using Vorcyc.Mathematics.Statistics;
 using Vorcyc.Mathematics.LanguageExtension;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
+using Vorcyc.Mathematics.Helpers;
 
 //SimpleLinearRegression_test.go();
 
@@ -21,4 +22,14 @@ using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
 //CuFFT_test.my();
 
 
-signal_test.go();
+//signal_test.go();
+
+var s1 = new Signal(100, 8000);
+var s2 = new Signal(100, 8000);
+
+s1.UnderlayingArray.Fill(1);
+s2.UnderlayingArray.Fill(2);
+
+var s3 = s1 * s2;
+
+Console.WriteLine(s3);

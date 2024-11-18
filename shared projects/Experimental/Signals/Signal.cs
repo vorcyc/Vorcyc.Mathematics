@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Vorcyc.Mathematics.Helpers;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
@@ -8,7 +9,7 @@ namespace Vorcyc.Mathematics.Experimental.Signals;
 /// <summary>
 /// 表示一个信号类，包含信号样本和采样率，并提供计算信号属性的方法。
 /// </summary>
-public class Signal : ITimeDomainSignal
+public class Signal : ITimeDomainSignal, ICloneable<Signal>
 {
 
     //internal float[] _samples;
@@ -46,10 +47,14 @@ public class Signal : ITimeDomainSignal
     /// </summary>
     public float SamplingRate => _samplingRate;
 
+    /// <summary>
+    /// 获取信号的持续时间。
+    /// </summary>
+    public TimeSpan Duration => TimeSpan.FromSeconds(1f / _samplingRate * _length);
 
-    public TimeSpan Duration => TimeSpan.FromSeconds(1f / (float)_samplingRate * _length);
-
-
+    /// <summary>
+    /// 获取信号的长度。
+    /// </summary>
     public int Length => _length;
 
 
@@ -64,7 +69,7 @@ public class Signal : ITimeDomainSignal
     /// <summary>
     /// 获取信号的周期（采样率的倒数）。
     /// </summary>
-    public float Period => 1f / (float)_samplingRate;
+    public float Period => 1f / _samplingRate;
 
 
     //public float Power => ITimeDomainSignal.GetPower_Normal(this.ValidSamples);
@@ -84,7 +89,7 @@ public class Signal : ITimeDomainSignal
 
 
 
-    public ITimeDomainSignal Clone()
+    public Signal Clone()
     {
         var result = new Signal(_length, _samplingRate);
         this.Samples.CopyTo(result.Samples);
@@ -114,6 +119,7 @@ public class Signal : ITimeDomainSignal
     {
         return ITimeDomainSignal.Resample(this, destnationSamplingRate, filter, order);
     }
+
 
 
 
@@ -186,5 +192,112 @@ public class Signal : ITimeDomainSignal
 
 
     #endregion
+
+
+
+
+    #region Operators
+
+    public static Signal operator +(Signal left, float right)
+    {
+        var result = left.Clone();
+        result.Samples.Add(right);
+        return result;
+    }
+
+    public static Signal? operator +(Signal left, Signal right)
+    {
+        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+            return null;
+        var result = left.Clone();
+        result.Samples.Add(right.Samples);
+        return result;
+    }
+
+
+    public static Signal operator -(Signal left, float right)
+    {
+        var result = left.Clone();
+        result.Samples.Subtract(right);
+        return result;
+    }
+
+    public static Signal? operator -(Signal left, Signal right)
+    {
+        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+            return null;
+        var result = left.Clone();
+        result.Samples.Subtract(right.Samples);
+        return result;
+    }
+
+    public static Signal operator *(Signal left, float right)
+    {
+        var result = left.Clone();
+        result.Samples.Multiply(right);
+        return result;
+    }
+
+    public static Signal? operator *(Signal left, Signal right)
+    {
+        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+            return null;
+        var result = left.Clone();
+        result.Samples.Multiply(right.Samples);
+        return result;
+    }
+
+    public static Signal operator /(Signal left, float right)
+    {
+        var result = left.Clone();
+        result.Samples.Divide(right);
+        return result;
+    }
+
+
+    #endregion
+
+
+
+
+
+
+
+    public override string ToString()
+    {
+        return _samples.ToString();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

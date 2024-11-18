@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+﻿using Vorcyc.Mathematics.Helpers;
+using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
@@ -80,13 +81,6 @@ public class SignalSegment : ITimeDomainSignal
 
 
 
-    public ITimeDomainSignal Clone()
-    {
-        var result = new SignalSegment(_signal, _start, _length);
-        this.Samples.CopyTo(result.Samples);
-        return result;
-    }
-
 
 
     /// <summary>
@@ -116,5 +110,125 @@ public class SignalSegment : ITimeDomainSignal
     {
         return ITimeDomainSignal.Resample(this, destnationSamplingRate, filter, order);
     }
+
+
+    /// <summary>
+    /// 从所在信号中脱离成为单独的信号。
+    /// </summary>
+    /// <returns></returns>
+    public Signal Decouple()
+    {
+        var result = new Signal(this._length, this._signal.SamplingRate);
+        this.Samples.CopyTo(result.Samples);
+        return result;
+    }
+
+
+
+
+    #region Operators
+
+    /// <summary>
+    /// 将信号段与一个浮点数相加。
+    /// </summary>
+    /// <param name="left">信号段。</param>
+    /// <param name="right">浮点数。</param>
+    /// <returns>相加后的新信号。</returns>
+    public static Signal operator +(SignalSegment left, float right)
+    {
+        var result = left.Decouple();
+        result.Samples.Add(right);
+        return result;
+    }
+
+    /// <summary>
+    /// 将两个信号段相加。
+    /// </summary>
+    /// <param name="left">左侧信号段。</param>
+    /// <param name="right">右侧信号段。</param>
+    /// <returns>相加后的新信号，如果长度或采样率不匹配则返回 null。</returns>
+    public static Signal? operator +(SignalSegment left, SignalSegment right)
+    {
+        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+            return null;
+        var result = left.Decouple();
+        result.Samples.Add(right.Samples);
+        return result;
+    }
+
+    /// <summary>
+    /// 将信号段与一个浮点数相减。
+    /// </summary>
+    /// <param name="left">信号段。</param>
+    /// <param name="right">浮点数。</param>
+    /// <returns>相减后的新信号。</returns>
+    public static Signal operator -(SignalSegment left, float right)
+    {
+        var result = left.Decouple();
+        result.Samples.Subtract(right);
+        return result;
+    }
+
+    /// <summary>
+    /// 将两个信号段相减。
+    /// </summary>
+    /// <param name="left">左侧信号段。</param>
+    /// <param name="right">右侧信号段。</param>
+    /// <returns>相减后的新信号，如果长度或采样率不匹配则返回 null。</returns>
+    public static Signal? operator -(SignalSegment left, SignalSegment right)
+    {
+        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+            return null;
+        var result = left.Decouple();
+        result.Samples.Subtract(right.Samples);
+        return result;
+    }
+
+    /// <summary>
+    /// 将信号段与一个浮点数相乘。
+    /// </summary>
+    /// <param name="left">信号段。</param>
+    /// <param name="right">浮点数。</param>
+    /// <returns>相乘后的新信号。</returns>
+    public static Signal operator *(SignalSegment left, float right)
+    {
+        var result = left.Decouple();
+        result.Samples.Multiply(right);
+        return result;
+    }
+
+    /// <summary>
+    /// 将两个信号段相乘。
+    /// </summary>
+    /// <param name="left">左侧信号段。</param>
+    /// <param name="right">右侧信号段。</param>
+    /// <returns>相乘后的新信号，如果长度或采样率不匹配则返回 null。</returns>
+    public static Signal? operator *(SignalSegment left, SignalSegment right)
+    {
+        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
+            return null;
+        var result = left.Decouple();
+        result.Samples.Multiply(right.Samples);
+        return result;
+    }
+
+    /// <summary>
+    /// 将信号段与一个浮点数相除。
+    /// </summary>
+    /// <param name="left">信号段。</param>
+    /// <param name="right">浮点数。</param>
+    /// <returns>相除后的新信号。</returns>
+    public static Signal operator /(SignalSegment left, float right)
+    {
+        var result = left.Decouple();
+        result.Samples.Divide(right);
+        return result;
+    }
+
+
+    #endregion
+
+
+
 
 }

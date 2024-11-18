@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ConstantsFp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Direction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\IComparableExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\SpanMathExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NumberMapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PinnableArrayOption.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Scale.cs" />
