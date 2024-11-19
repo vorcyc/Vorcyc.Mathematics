@@ -39,11 +39,11 @@ public interface IFrequencyDomainCharacteristics
     /// 计算频域信号的幅度数组。
     /// </summary>
     /// <param name="fftResult">FFT 结果数组。</param>
-    /// <param name="actualLength">实际长度。</param>
+    /// <param name="retainedLength">保留或是采用的长度。</param>
     /// <returns>幅度数组。</returns>
-    internal static float[] GetMagnitudes(ComplexFp32[] fftResult, int actualLength)
+    internal static float[] GetMagnitudes(ComplexFp32[] fftResult, int retainedLength)
     {
-        float[] magnitudes = new float[actualLength];
+        float[] magnitudes = new float[retainedLength];
         for (int i = 0; i < magnitudes.Length; i++)
             magnitudes[i] = fftResult[i].Magnitude;
         // 忽略直流分量（第一个元素）
@@ -54,18 +54,16 @@ public interface IFrequencyDomainCharacteristics
     /// <summary>
     /// 计算质心 (Mass Center).
     /// </summary>
-    /// <param name="fftResult"></param>
-    /// <param name="actualLength"></param>
+    /// <param name="magnitudes"></param>
     /// <param name="samplingRate"></param>
     /// <returns></returns>
-    internal static float GetCentroid(ComplexFp32[] fftResult, int actualLength, float samplingRate)
+    internal static float GetCentroid(float[] magnitudes, float samplingRate)
     {
-        int N = actualLength;
-        float[] magnitudes = GetMagnitudes(fftResult, actualLength);
+        int N = magnitudes.Length;
         float[] freqs = Enumerable.Range(0, N).Select(i => i * samplingRate / N).ToArray();
         // 计算质心
         float numerator = freqs.Select((f, i) => f * magnitudes[i]).Sum();
-        float denominator = magnitudes.Sum(); 
+        float denominator = magnitudes.Sum();
         float centroid = numerator / denominator;
         return centroid;
     }
@@ -96,11 +94,11 @@ public interface IFrequencyDomainCharacteristics
     /// 计算频域信号的相位数组。
     /// </summary>
     /// <param name="fftResult">FFT 结果数组。</param>
-    /// <param name="actualLength">实际长度。</param>
+    /// <param name="retainedLength">保留或是采用的长度。</param>
     /// <returns>相位数组。</returns>
-    internal static float[] GetPhases(ComplexFp32[] fftResult, int actualLength)
+    internal static float[] GetPhases(ComplexFp32[] fftResult, int retainedLength)
     {
-        float[] phases = new float[actualLength];
+        float[] phases = new float[retainedLength];
         for (int i = 0; i < phases.Length; i++)
         {
             phases[i] = fftResult[i].Phase;

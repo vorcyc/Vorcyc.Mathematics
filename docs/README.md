@@ -5,7 +5,7 @@
 ![VMath logo](logo1.png "logo")
 
 
-***This package targets a minimum of .NET 8.***
+***This package targets a minimum of .NET 9.***
 
 ---
 

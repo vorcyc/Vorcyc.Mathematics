@@ -35,34 +35,71 @@ public class FrequencyDomain : IFrequencyDomain
         _resolution = (float)timeDomainSignal.SamplingRate / (float)transformLength;
     }
 
-
+    /// <summary>
+    /// 频域信号在原始数据中的起始量。
+    /// </summary>
     public int Offset => _offset;
 
 
+    /// <summary>
+    /// 未 补0 的长度。也是实际有效数据的长度。
+    /// </summary>
+    public int ActualLength => _actualLength;
+
+    /// <summary>
+    /// FFT 的长度。该值为 2的N次方，通常会比 <see cref="ActualLength"/> 大。
+    /// </summary>
     public int TransformLength => _transformLength;
 
 
-    public int ActualLength => _actualLength;
-
-
+    /// <summary>
+    /// 频率分辨率。
+    /// </summary>
     public float Resolution => _resolution;
 
-
+    /// <summary>
+    /// FFT 所使用的窗口类型。
+    /// </summary>
     public WindowType? WindowApplied => _windowType;
 
-
+    /// <summary>
+    /// 频域信号。即FFT变换的结果。
+    /// </summary>
     public ComplexFp32[] Result => _fftResult;
 
-
+    /// <summary>
+    /// 所关联的实信号。
+    /// </summary>
     public ITimeDomainSignal Signal => _signal;
 
 
+    /// <summary>
+    /// 使用复信号的一半（<see cref="Result"/> 的一半）来计算幅度。这样会丢弃镜像部分。
+    /// </summary>
+    public float[] Magnitudes => IFrequencyDomainCharacteristics.GetMagnitudes(_fftResult, _transformLength >> 1);
 
-    public float[] Magnitudes => IFrequencyDomainCharacteristics.GetMagnitudes(_fftResult, _actualLength);
+    /// <summary>
+    /// 使用复信号的一半（<see cref="Result"/> 的一半）来计算质心（Mass Center）。这样会丢弃镜像部分。
+    /// </summary>
+    public float Centroid => IFrequencyDomainCharacteristics.GetCentroid(Magnitudes, _signal.SamplingRate);
 
-    public float Centroid => IFrequencyDomainCharacteristics.GetCentroid(_fftResult, _actualLength, _signal.SamplingRate);
-
+    /// <summary>
+    /// 使用完整的复信号（未截取<see cref="Result"/> 的一半）来计算频率。
+    /// </summary>
     public float Frequency => IFrequencyDomainCharacteristics.GetFrequency(Magnitudes, _signal.SamplingRate, _resolution);
+
+    /// <summary>
+    /// 使用复信号的一半（<see cref="Result"/> 的一半）来计算相位。这样会丢弃镜像部分。
+    /// </summary>
+    public float[] Phases => IFrequencyDomainCharacteristics.GetPhases(_fftResult, _transformLength >> 1);
+
+    /// <summary>
+    /// 根据复信号的相位计算角速度。
+    /// </summary>
+    public float[] AngularVelocities => IFrequencyDomainCharacteristics.GetAngularVelocities(Phases, _signal.SamplingRate);
+
+
+
 
     public static float IndexToFrequency(int index, int samplingRate, int fftLen)
     {
@@ -97,10 +134,6 @@ public class FrequencyDomain : IFrequencyDomain
         return (int)(frequency / _resolution);
     }
 
-
-    public float[] Phases => IFrequencyDomainCharacteristics.GetPhases(_fftResult, _actualLength);
-
-    public float[] AngularVelocities => IFrequencyDomainCharacteristics.GetAngularVelocities(Phases, _signal.SamplingRate);
 
 
     /// <summary>
