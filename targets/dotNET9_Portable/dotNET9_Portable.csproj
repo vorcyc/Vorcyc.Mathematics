@@ -13,8 +13,8 @@
 	  <Company>Vorcyc</Company>
 	  <Description>A pure dotNET and high performance math library.</Description>
 	  <Copyright>Vorcyc® Mathematics</Copyright>
-	  <Version>0.2.16.0</Version>
-	  <AssemblyVersion>0.2.16.0</AssemblyVersion>
+	  <Version>0.2.17.0</Version>
+	  <AssemblyVersion>0.2.17.0</AssemblyVersion>
 	  <Title>Vorcy.Mathematics</Title>
 	  <PackageIcon>logo1.png</PackageIcon>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -41,7 +41,7 @@
   <ItemGroup>
 	  <PackageReference Include="ILGPU" Version="1.5.1" />
 	  <PackageReference Include="ILGPU.Algorithms" Version="1.5.1" />
-	  <PackageReference Include="System.Numerics.Tensors" Version="8.0.0" />
+	  <PackageReference Include="System.Numerics.Tensors" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
