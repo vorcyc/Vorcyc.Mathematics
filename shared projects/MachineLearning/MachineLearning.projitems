@@ -46,6 +46,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedEuclidean.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedSquareEuclidean.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\Yule.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NaiveBayes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PCA.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SupportVectorMachine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Distances\readme.md" />
