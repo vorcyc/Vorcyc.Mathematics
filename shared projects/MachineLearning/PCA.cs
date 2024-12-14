@@ -39,6 +39,7 @@
 //}
 
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Vorcyc.Mathematics.MachineLearning;
 
@@ -58,6 +59,7 @@ public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
     /// 初始化 PCA 类的新实例。
     /// </summary>
     /// <param name="data">输入数据集，每行是一个样本，每列是一个特征。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PCA(TSelf[,] data)
     {
         _data = data;
@@ -70,6 +72,7 @@ public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
     /// <summary>
     /// 计算每个特征的均值。
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ComputeMeans()
     {
         int numFeatures = _data.GetLength(1);
@@ -85,6 +88,7 @@ public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
     /// <summary>
     /// 对数据进行中心化处理。
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void CenterData()
     {
         for (int i = 0; i < _data.GetLength(0); i++)
@@ -99,6 +103,7 @@ public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
     /// <summary>
     /// 计算协方差矩阵。
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ComputeCovarianceMatrix()
     {
         int numFeatures = _data.GetLength(1);
@@ -117,6 +122,7 @@ public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
     /// <summary>
     /// 计算协方差矩阵的特征值和特征向量。
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ComputeEigenDecomposition()
     {
         int n = _covarianceMatrix.GetLength(0);
@@ -160,6 +166,7 @@ public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
     /// <param name="matrix">输入矩阵。</param>
     /// <param name="vector">输入向量。</param>
     /// <returns>结果向量。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static TSelf[] MatrixVectorMultiply(TSelf[,] matrix, TSelf[] vector)
     {
         int n = matrix.GetLength(0);
@@ -181,6 +188,7 @@ public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
     /// 将原始数据转换为主成分。
     /// </summary>
     /// <returns>转换后的主成分数据。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TSelf[,] Transform()
     {
         int numSamples = _data.GetLength(0);

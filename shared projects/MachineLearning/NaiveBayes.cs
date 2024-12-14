@@ -1,4 +1,6 @@
-﻿namespace Vorcyc.Mathematics.MachineLearning;
+﻿using System.Runtime.CompilerServices;
+
+namespace Vorcyc.Mathematics.MachineLearning;
 
 //var nb = new NaiveBayes();
 
@@ -37,6 +39,7 @@ public class NaiveBayes
     /// <summary>
     /// 初始化 NaiveBayes 类的新实例
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NaiveBayes()
     {
         _featureCountPerClass = new Dictionary<string, Dictionary<string, int>>();
@@ -49,6 +52,7 @@ public class NaiveBayes
     /// </summary>
     /// <param name="features">特征数组</param>
     /// <param name="label">类别标签</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Train(string[] features, string label)
     {
         // 如果类别标签不存在，则初始化
@@ -78,6 +82,7 @@ public class NaiveBayes
     /// </summary>
     /// <param name="features">特征数组</param>
     /// <returns>预测的类别标签</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Predict(string[] features)
     {
         double maxProbability = double.NegativeInfinity; // 最大概率
@@ -104,6 +109,7 @@ public class NaiveBayes
         return bestClass;
 
         // 局部函数：计算特征的条件概率和
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         double CalculateFeatureProbabilitySum(string classLabel, string[] features)
         {
             double featureProbabilitySum = 0.0; // 特征概率和
