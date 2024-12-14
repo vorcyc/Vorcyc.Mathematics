@@ -9,10 +9,12 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Numerics</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BigFloat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComplexFp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Complex_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Int24.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IntRange.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Number.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Point_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointFP32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Range_g.cs" />

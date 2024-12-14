@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ArrayExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ArrayExtension_Advanced.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BitMathExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Constants_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstantsFp32.cs" />
