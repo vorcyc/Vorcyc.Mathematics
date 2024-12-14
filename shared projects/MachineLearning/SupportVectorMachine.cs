@@ -1,4 +1,7 @@
-﻿namespace Vorcyc.Mathematics.MachineLearning;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
+
+namespace Vorcyc.Mathematics.MachineLearning;
 
 //double[][] inputs =
 //{
@@ -30,25 +33,27 @@
 /// <summary>
 /// 一个简单的线性支持向量机（SVM）实现。
 /// </summary>
-public class SupportVectorMachine
+public class SupportVectorMachine<TSelf>
+    where TSelf : struct, IFloatingPointIeee754<TSelf>
 {
-    private double[] weights;
-    private double bias;
-    private double learningRate;
-    private int epochs;
+    private TSelf[] _weights;
+    private TSelf _bias;
+    private TSelf _learningRate;
+    private int _epochs;
 
     /// <summary>
-    /// 初始化 <see cref="SupportVectorMachine"/> 类的新实例。
+    /// 初始化 <see cref="SupportVectorMachine{TSelf}"/> 类的新实例。
     /// </summary>
     /// <param name="featureCount">输入数据的特征数量。</param>
     /// <param name="learningRate">训练算法的学习率。</param>
     /// <param name="epochs">训练的轮数。</param>
-    public SupportVectorMachine(int featureCount, double learningRate = 0.01, int epochs = 1000)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public SupportVectorMachine(int featureCount, TSelf? learningRate = null, int epochs = 1000)
     {
-        weights = new double[featureCount];
-        bias = 0.0;
-        this.learningRate = learningRate;
-        this.epochs = epochs;
+        _weights = new TSelf[featureCount];
+        _bias = TSelf.Zero;
+        this._learningRate = learningRate is null ? TSelf.CreateChecked(0.01) : learningRate.Value;
+        this._epochs = epochs;
     }
 
     /// <summary>
@@ -56,23 +61,24 @@ public class SupportVectorMachine
     /// </summary>
     /// <param name="inputs">输入数据，每个元素是一个特征值数组。</param>
     /// <param name="outputs">与输入数据对应的输出标签。</param>
-    public void Train(double[][] inputs, int[] outputs)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Train(TSelf[][] inputs, int[] outputs)
     {
-        for (int epoch = 0; epoch < epochs; epoch++)
+        for (int epoch = 0; epoch < _epochs; epoch++)
         {
             for (int i = 0; i < inputs.Length; i++)
             {
-                double[] input = inputs[i];
-                int output = outputs[i];
+                TSelf[] input = inputs[i];
+                TSelf output = TSelf.CreateChecked(outputs[i]);
 
-                double prediction = PredictRaw(input);
-                if (output * prediction <= 0)
+                TSelf prediction = PredictRaw(input);
+                if (output * prediction <= TSelf.Zero)
                 {
-                    for (int j = 0; j < weights.Length; j++)
+                    for (int j = 0; j < _weights.Length; j++)
                     {
-                        weights[j] += learningRate * output * input[j];
+                        _weights[j] += _learningRate * output * input[j];
                     }
-                    bias += learningRate * output;
+                    _bias += _learningRate * output;
                 }
             }
         }
@@ -83,9 +89,10 @@ public class SupportVectorMachine
     /// </summary>
     /// <param name="input">输入数据，一个特征值数组。</param>
     /// <returns>预测的类别标签（1或-1）。</returns>
-    public int Predict(double[] input)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Predict(TSelf[] input)
     {
-        return PredictRaw(input) >= 0 ? 1 : -1;
+        return PredictRaw(input) >= TSelf.Zero ? 1 : -1;
     }
 
     /// <summary>
@@ -93,12 +100,13 @@ public class SupportVectorMachine
     /// </summary>
     /// <param name="input">输入数据，一个特征值数组。</param>
     /// <returns>原始预测值。</returns>
-    private double PredictRaw(double[] input)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private TSelf PredictRaw(TSelf[] input)
     {
-        double sum = bias;
+        TSelf sum = _bias;
         for (int i = 0; i < input.Length; i++)
         {
-            sum += weights[i] * input[i];
+            sum += _weights[i] * input[i];
         }
         return sum;
     }
