@@ -1469,6 +1469,7 @@ public class Number : IComparable<Number>
     #endregion
 
     #region IComparable<LargeNumber> Members
+
     /// <summary>
     /// Compares two numbers.
     /// </summary>

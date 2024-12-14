@@ -45,7 +45,7 @@ public class SupportVectorMachine<TSelf>
     /// 初始化 <see cref="SupportVectorMachine{TSelf}"/> 类的新实例。
     /// </summary>
     /// <param name="featureCount">输入数据的特征数量。</param>
-    /// <param name="learningRate">训练算法的学习率。</param>
+    /// <param name="learningRate">训练算法的学习率。为 null 时默认为 0.01 </param>
     /// <param name="epochs">训练的轮数。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SupportVectorMachine(int featureCount, TSelf? learningRate = null, int epochs = 1000)
