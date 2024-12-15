@@ -1,27 +1,95 @@
 ﻿namespace Vorcyc.Mathematics.LinearAlgebra;
 
 using System.Numerics;
+using System.Text;
 
-public class Matrix<T>
-    where T : INumber<T>
+/// <summary>
+/// 表示一个二维矩阵。
+/// </summary>
+/// <typeparam name="T">数值类型，必须实现 INumber 接口。</typeparam>
+public class Matrix<T> where T : INumber<T>
 {
-    private T[,] data;
+    private T[,] _data;
+
+    /// <summary>
+    /// 获取矩阵的行数。
+    /// </summary>
     public int Rows { get; }
+
+    /// <summary>
+    /// 获取矩阵的列数。
+    /// </summary>
     public int Columns { get; }
 
-    public Matrix(int rows, int columns)
+    /// <summary>
+    /// 使用指定的行数和列数构造一个矩阵。
+    /// </summary>
+    /// <param name="rows">行数。</param>
+    /// <param name="columns">列数。</param>
+    public Matrix(int rows, int columns )
     {
+
+        Guard.AgainstNonPositive(rows, "Number of rows");
+        Guard.AgainstNonPositive(columns, "Number of columns");
+
         Rows = rows;
         Columns = columns;
-        data = new T[rows, columns];
+        _data = new T[rows, columns];
     }
 
+    /// <summary>
+    /// 使用 T[,] 数据构造一个矩阵。
+    /// </summary>
+    /// <param name="data">二维数组形式的数据。</param>
+    public Matrix(T[,] data)
+    {
+        Rows = data.GetLength(0);
+        Columns = data.GetLength(1);
+        _data = new T[Rows, Columns];
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j < Columns; j++)
+            {
+                _data[i, j] = T.CreateChecked(data[i, j]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取或设置指定位置的元素。
+    /// </summary>
+    /// <param name="row">行索引。</param>
+    /// <param name="col">列索引。</param>
+    /// <returns>指定位置的元素。</returns>
     public T this[int row, int col]
     {
-        get { return data[row, col]; }
-        set { data[row, col] = value; }
+        get { return _data[row, col]; }
+        set { _data[row, col] = value; }
     }
 
+    /// <summary>
+    /// 隐式转换为 T[,]。
+    /// </summary>
+    /// <param name="matrix">要转换的矩阵。</param>
+    public static implicit operator T[,](Matrix<T> matrix)
+    {
+        T[,] result = new T[matrix.Rows, matrix.Columns];
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+            for (int j = 0; j < matrix.Columns; j++)
+            {
+                result[i, j] = matrix[i, j];
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 矩阵加法运算符。
+    /// </summary>
+    /// <param name="a">第一个矩阵。</param>
+    /// <param name="b">第二个矩阵。</param>
+    /// <returns>两个矩阵的和。</returns>
     public static Matrix<T> operator +(Matrix<T> a, Matrix<T> b)
     {
         if (a.Rows != b.Rows || a.Columns != b.Columns)
@@ -38,6 +106,12 @@ public class Matrix<T>
         return result;
     }
 
+    /// <summary>
+    /// 矩阵减法运算符。
+    /// </summary>
+    /// <param name="a">第一个矩阵。</param>
+    /// <param name="b">第二个矩阵。</param>
+    /// <returns>两个矩阵的差。</returns>
     public static Matrix<T> operator -(Matrix<T> a, Matrix<T> b)
     {
         if (a.Rows != b.Rows || a.Columns != b.Columns)
@@ -54,6 +128,12 @@ public class Matrix<T>
         return result;
     }
 
+    /// <summary>
+    /// 矩阵乘法运算符。
+    /// </summary>
+    /// <param name="a">第一个矩阵。</param>
+    /// <param name="b">第二个矩阵。</param>
+    /// <returns>两个矩阵的乘积。</returns>
     public static Matrix<T> operator *(Matrix<T> a, Matrix<T> b)
     {
         if (a.Columns != b.Rows)
@@ -73,6 +153,29 @@ public class Matrix<T>
         return result;
     }
 
+    /// <summary>
+    /// 矩阵乘法运算符，矩阵乘以标量。
+    /// </summary>
+    /// <param name="matrix">矩阵。</param>
+    /// <param name="scalar">标量。</param>
+    /// <returns>矩阵与标量的乘积。</returns>
+    public static Matrix<T> operator *(Matrix<T> matrix, T scalar)
+    {
+        Matrix<T> result = new(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+            for (int j = 0; j < matrix.Columns; j++)
+            {
+                result[i, j] = matrix[i, j] * scalar;
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 矩阵转置。
+    /// </summary>
+    /// <returns>转置后的矩阵。</returns>
     public Matrix<T> Transpose()
     {
         Matrix<T> result = new(Columns, Rows);
@@ -80,18 +183,22 @@ public class Matrix<T>
         {
             for (int j = 0; j < Columns; j++)
             {
-                result[j, i] = data[i, j];
+                result[j, i] = _data[i, j];
             }
         }
         return result;
     }
 
+    /// <summary>
+    /// 计算矩阵的行列式。
+    /// </summary>
+    /// <returns>矩阵的行列式。</returns>
     public T Determinant()
     {
         if (Rows != Columns)
             throw new InvalidOperationException("Matrix must be square to calculate determinant.");
 
-        return CalculateDeterminant(data);
+        return CalculateDeterminant(_data);
     }
 
     private T CalculateDeterminant(T[,] matrix)
@@ -121,6 +228,10 @@ public class Matrix<T>
         return det;
     }
 
+    /// <summary>
+    /// 计算矩阵的逆矩阵。
+    /// </summary>
+    /// <returns>矩阵的逆矩阵。</returns>
     public Matrix<T> Inverse()
     {
         if (Rows != Columns)
@@ -132,7 +243,7 @@ public class Matrix<T>
             throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
 
         Matrix<T> result = new(Rows, Columns);
-        T[,] adjoint = Adjoint(data);
+        T[,] adjoint = Adjoint(_data);
         for (int i = 0; i < Rows; i++)
         {
             for (int j = 0; j < Columns; j++)
@@ -171,28 +282,32 @@ public class Matrix<T>
         return adjoint;
     }
 
+    /// <summary>
+    /// 创建矩阵的深拷贝。
+    /// </summary>
+    /// <returns>矩阵的深拷贝。</returns>
     public Matrix<T> Clone()
     {
         Matrix<T> clone = new(Rows, Columns);
-        Array.Copy(data, clone.data, data.Length);
+        Array.Copy(_data, clone._data, _data.Length);
         return clone;
     }
 
+    /// <summary>
+    /// 返回矩阵的字符串表示形式。
+    /// </summary>
+    /// <returns>矩阵的字符串表示形式。</returns>
     public override string ToString()
     {
-        string result = "";
+        StringBuilder sb = new();
         for (int i = 0; i < Rows; i++)
         {
             for (int j = 0; j < Columns; j++)
             {
-                result += $"{data[i, j]:0.##}\t";
+                sb.AppendFormat("{0:0.##}\t", _data[i, j]);
             }
-            result += "\n";
+            sb.AppendLine();
         }
-        return result;
+        return sb.ToString();
     }
-
-
-
-
 }

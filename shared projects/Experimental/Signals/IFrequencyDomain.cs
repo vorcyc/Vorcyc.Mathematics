@@ -121,6 +121,23 @@ public interface IFrequencyDomainCharacteristics
         }
         return angularVelocity;
     }
+
+
+    /// <summary>
+    /// 计算功率谱密度。
+    /// </summary>
+    /// <param name="magnitudes"></param>
+    /// <param name="samplingRate"></param>
+    /// <returns></returns>
+    internal static float[] GetPowerSpectralDensity(float[] magnitudes, float samplingRate)
+    {
+        float[] psd = new float[magnitudes.Length];
+        for (int i = 0; i < magnitudes.Length; i++)
+        {
+            psd[i] = magnitudes[i] * magnitudes[i] / magnitudes.Length * 2 / samplingRate;
+        }
+        return psd;
+    }
 }
 
 

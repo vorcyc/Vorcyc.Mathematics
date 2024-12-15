@@ -33,13 +33,15 @@ namespace Vorcyc.Mathematics.MachineLearning;
 /// <summary>
 /// 一个简单的线性支持向量机（SVM）实现。
 /// </summary>
-public class SupportVectorMachine<TSelf>
+public class SupportVectorMachine<TSelf> : IMachineLearning
     where TSelf : struct, IFloatingPointIeee754<TSelf>
 {
     private TSelf[] _weights;
     private TSelf _bias;
     private TSelf _learningRate;
     private int _epochs;
+
+    public MachineLearningTask Task => MachineLearningTask.Classification | MachineLearningTask.Regression;
 
     /// <summary>
     /// 初始化 <see cref="SupportVectorMachine{TSelf}"/> 类的新实例。

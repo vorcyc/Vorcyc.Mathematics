@@ -41,19 +41,22 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Vorcyc.Mathematics.MachineLearning;
+namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 
 
 /// <summary>
 /// 主成分分析 (PCA) 类，用于降维和特征提取。
 /// </summary>
-public class PCA<TSelf> where TSelf : IFloatingPointIeee754<TSelf>
+public class PCA<TSelf> : IMachineLearning
+    where TSelf : IFloatingPointIeee754<TSelf>
 {
     private readonly TSelf[,] _data;
     private TSelf[] _means;
     private TSelf[,] _covarianceMatrix;
     private TSelf[] _eigenValues;
     private TSelf[][] _eigenVectors;
+
+    public MachineLearningTask Task => MachineLearningTask.DimensionalityReduction;
 
     /// <summary>
     /// 初始化 PCA 类的新实例。

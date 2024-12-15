@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vorcyc.Mathematics.MachineLearning;
+﻿using Vorcyc.Mathematics.MachineLearning.Classfication;
 
 namespace ML_module_test;
 

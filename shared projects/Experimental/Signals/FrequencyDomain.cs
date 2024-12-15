@@ -99,6 +99,10 @@ public class FrequencyDomain : IFrequencyDomain
     public float[] AngularVelocities => IFrequencyDomainCharacteristics.GetAngularVelocities(Phases, _signal.SamplingRate);
 
 
+    /// <summary>
+    /// 功率谱密度
+    /// </summary>
+    public float[] PowerSpectralDensity => IFrequencyDomainCharacteristics.GetPowerSpectralDensity(Magnitudes, _signal.SamplingRate);
 
 
     public static float IndexToFrequency(int index, int samplingRate, int fftLen)

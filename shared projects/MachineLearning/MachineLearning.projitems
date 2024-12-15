@@ -9,7 +9,9 @@
     <Import_RootNamespace>Vorcyc.Mathematics.MachineLearning</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\DBSCAN.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\KMeansClusterer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DecisionTree.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\BatchNormLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\Conv2DLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeepLearning\Layers\DenseLayer.cs" />
@@ -46,11 +48,21 @@
     <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedEuclidean.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedSquareEuclidean.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\Yule.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)NaiveBayes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PCA.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\FactorAnalysis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\HierarchicalClustering.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMachineLearning.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MachineLearningTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KNN.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classfication\NaiveBayes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\PCA.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RandomForest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SupportVectorMachine.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Distances\readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)DimensionalityReduction\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Classfication\" />
   </ItemGroup>
 </Project>

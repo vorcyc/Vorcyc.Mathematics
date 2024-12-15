@@ -72,40 +72,61 @@
 //}
 
 
+using System.Numerics;
+
 namespace Vorcyc.Mathematics.MachineLearning.Clustering;
 
 /// <summary>
-/// 提供 K 均值聚类算法的静态类。
-public static class KMeansClusterer
+/// 提供 K 均值聚类算法的类。
+/// </summary>
+/// <typeparam name="T">坐标的数值类型。</typeparam>
+public class KMeansClusterer<T> : IMachineLearning 
+    where T : struct, IFloatingPointIeee754<T>
 {
+    private readonly T[][] _data;
+    private readonly int _numClusters;
+    private readonly int _maxIterations;
+    private readonly T _tolerance;
+    private int[] _clustering;
+    private T[][] _centroids;
 
+    public MachineLearningTask Task => MachineLearningTask.Clustering;
 
     /// <summary>
-    /// K均值聚类算法。
+    /// 使用指定的数据、聚类数量、最大迭代次数和收敛容忍度初始化 <see cref="KMeansClusterer{T}"/> 类的新实例。
     /// </summary>
-    /// <param name="data">二维数组，表示要聚类的数据。</param>
+    /// <param name="data">要聚类的数据。</param>
     /// <param name="numClusters">要创建的聚类数量。</param>
     /// <param name="maxIterations">最大迭代次数。</param>
     /// <param name="tolerance">收敛容忍度。</param>
-    /// <returns>每个数据点的聚类分配。</returns>
-    public static int[] KMeans(float[][] data, int numClusters, int maxIterations, float tolerance)
+    public KMeansClusterer(T[][] data, int numClusters, int maxIterations, T tolerance)
     {
-        int numData = data.Length; // 数据的数量
-        int numFeatures = data[0].Length; // 数据的特征维度
-        int[] clustering = InitClustering(numData, numClusters); // 初始化聚类
-        float[][] centroids = Allocate(numClusters, numFeatures); // 分配聚类中心的空间
-        int iteration = 0; // 迭代次数
-        bool changed = true; // 聚类是否发生变化
-        bool success = true; // 聚类是否成功
+        _data = data;
+        _numClusters = numClusters;
+        _maxIterations = maxIterations;
+        _tolerance = tolerance;
+        _clustering = InitClustering(data.Length, numClusters);
+        _centroids = Allocate(numClusters, data[0].Length);
+    }
 
-        while (changed && success && iteration < maxIterations)
+    /// <summary>
+    /// 执行 K 均值聚类算法。
+    /// </summary>
+    /// <returns>每个数据点的聚类分配。</returns>
+    public int[] Cluster()
+    {
+        int iteration = 0;
+        bool changed = true;
+        bool success = true;
+
+        while (changed && success && iteration < _maxIterations)
         {
-            ++iteration; // 增加迭代次数
-            success = UpdateCentroids(data, clustering, centroids); // 更新聚类中心
-            changed = UpdateClustering(data, clustering, centroids); // 更新聚类
+            ++iteration;
+            success = UpdateCentroids();
+            changed = UpdateClustering();
         }
 
-        return clustering; // 返回聚类结果
+        return _clustering;
     }
 
     /// <summary>
@@ -113,12 +134,12 @@ public static class KMeansClusterer
     /// </summary>
     /// <param name="numData">数据的数量。</param>
     /// <param name="numClusters">聚类的数量。</param>
-    static int[] InitClustering(int numData, int numClusters)
+    private int[] InitClustering(int numData, int numClusters)
     {
         int[] clustering = new int[numData];
-        for (int i = 0; i < numClusters; ++i) // 将前numClusters个数据分别分配到不同的聚类
+        for (int i = 0; i < numClusters; ++i)
             clustering[i] = i;
-        for (int i = numClusters; i < numData; ++i) // 将剩余的数据随机分配到任意一个聚类
+        for (int i = numClusters; i < numData; ++i)
             clustering[i] = Random.Shared.Next(0, numClusters);
         return clustering;
     }
@@ -128,48 +149,45 @@ public static class KMeansClusterer
     /// </summary>
     /// <param name="numRows">行数。</param>
     /// <param name="numCols">列数。</param>
-    static float[][] Allocate(int numRows, int numCols)
+    private T[][] Allocate(int numRows, int numCols)
     {
-        float[][] result = new float[numRows][];
+        T[][] result = new T[numRows][];
         for (int i = 0; i < numRows; ++i)
-            result[i] = new float[numCols];
+            result[i] = new T[numCols];
         return result;
     }
 
     /// <summary>
     /// 更新质心（聚类中心）。
     /// </summary>
-    /// <param name="data">要聚类的数据。</param>
-    /// <param name="clustering">当前的聚类分配。</param>
-    /// <param name="centroids">质心（聚类中心）。</param>
-    static bool UpdateCentroids(float[][] data, int[] clustering, float[][] centroids)
+    private bool UpdateCentroids()
     {
-        int numClusters = centroids.Length;
-        int[] clusterCounts = new int[numClusters]; // 每个聚类中的数据数量
-        for (int i = 0; i < data.Length; ++i)
+        int numClusters = _centroids.Length;
+        int[] clusterCounts = new int[numClusters];
+        for (int i = 0; i < _data.Length; ++i)
         {
-            int cluster = clustering[i];
+            int cluster = _clustering[i];
             ++clusterCounts[cluster];
         }
 
         for (int k = 0; k < numClusters; ++k)
-            if (clusterCounts[k] == 0) // 如果某个聚类中没有数据，说明聚类失败
+            if (clusterCounts[k] == 0)
                 return false;
 
-        for (int k = 0; k < centroids.Length; ++k) // 将聚类中心清零
-            for (int j = 0; j < centroids[k].Length; ++j)
-                centroids[k][j] = 0.0f;
+        for (int k = 0; k < _centroids.Length; ++k)
+            for (int j = 0; j < _centroids[k].Length; ++j)
+                _centroids[k][j] = T.Zero;
 
-        for (int i = 0; i < data.Length; ++i) // 累加每个聚类中的数据
+        for (int i = 0; i < _data.Length; ++i)
         {
-            int cluster = clustering[i];
-            for (int j = 0; j < data[i].Length; ++j)
-                centroids[cluster][j] += data[i][j];
+            int cluster = _clustering[i];
+            for (int j = 0; j < _data[i].Length; ++j)
+                _centroids[cluster][j] += _data[i][j];
         }
 
-        for (int k = 0; k < centroids.Length; ++k) // 计算每个聚类中的数据的平均值，作为新的聚类中心
-            for (int j = 0; j < centroids[k].Length; ++j)
-                centroids[k][j] /= clusterCounts[k];
+        for (int k = 0; k < _centroids.Length; ++k)
+            for (int j = 0; j < _centroids[k].Length; ++j)
+                _centroids[k][j] /= T.CreateChecked(clusterCounts[k]);
 
         return true;
     }
@@ -177,67 +195,69 @@ public static class KMeansClusterer
     /// <summary>
     /// 更新聚类分配。
     /// </summary>
-    /// <param name="data">要聚类的数据。</param>
-    /// <param name="clustering">当前的聚类分配。</param>
-    /// <param name="centroids">质心（聚类中心）。</param>
-    static bool UpdateClustering(float[][] data, int[] clustering, float[][] centroids)
+    private bool UpdateClustering()
     {
-        int numClusters = centroids.Length;
+        int numClusters = _centroids.Length;
         bool isChanged = false;
 
-        int[] newClustering = new int[clustering.Length]; // 保存新的聚类结果
-        Array.Copy(clustering, newClustering, clustering.Length);
+        int[] newClustering = new int[_clustering.Length];
+        Array.Copy(_clustering, newClustering, _clustering.Length);
 
-        float[] distances = new float[numClusters]; // 保存数据到每个聚类中心的距离
+        T[] distances = new T[numClusters];
 
-        for (int i = 0; i < data.Length; ++i) // 遍历每个数据
+        for (int i = 0; i < _data.Length; ++i)
         {
-            for (int k = 0; k < numClusters; ++k) // 计算到每个聚类中心的距离
-                distances[k] = System.Numerics.Tensors.TensorPrimitives.Distance(data[i], centroids[k]);
+            for (int k = 0; k < numClusters; ++k)
+                distances[k] = Distance(_data[i], _centroids[k]);
 
-            int newCluster = MinIndex(distances); // 找到最近的聚类中心
-            if (newCluster != newClustering[i]) // 如果数据的聚类发生变化
+            int newCluster = MinIndex(distances);
+            if (newCluster != newClustering[i])
             {
-                isChanged = true; // 标记聚类发生变化
-                newClustering[i] = newCluster; // 更新数据的聚类
+                isChanged = true;
+                newClustering[i] = newCluster;
             }
         }
 
-        if (!isChanged) // 如果聚类没有变化，直接返回
+        if (!isChanged)
             return false;
 
-        int[] clusterCounts = new int[numClusters]; // 每个聚类中的数据数量
-        for (int i = 0; i < data.Length; ++i)
+        int[] clusterCounts = new int[numClusters];
+        for (int i = 0; i < _data.Length; ++i)
         {
             int cluster = newClustering[i];
             ++clusterCounts[cluster];
         }
 
         for (int k = 0; k < numClusters; ++k)
-            if (clusterCounts[k] == 0) // 如果某个聚类中没有数据，说明聚类失败
+            if (clusterCounts[k] == 0)
                 return false;
 
-        Array.Copy(newClustering, clustering, newClustering.Length); // 将新的聚类结果复制到原来的聚类
+        Array.Copy(newClustering, _clustering, newClustering.Length);
         return true;
     }
 
-    //// 计算两个向量的欧几里得距离
-    //static double Distance(double[] vector1, double[] vector2)
-    //{
-    //    double sum = 0.0;
-    //    for (int i = 0; i < vector1.Length; ++i)
-    //        sum += (vector1[i] - vector2[i]) * (vector1[i] - vector2[i]);
-    //    return Math.Sqrt(sum);
-    //}
+    /// <summary>
+    /// 计算两个向量之间的欧几里得距离。
+    /// </summary>
+    /// <param name="vector1">第一个向量。</param>
+    /// <param name="vector2">第二个向量。</param>
+    /// <returns>两个向量之间的欧几里得距离。</returns>
+    private T Distance(T[] vector1, T[] vector2)
+    {
+        T sum = T.Zero;
+        for (int i = 0; i < vector1.Length; ++i)
+            sum += (vector1[i] - vector2[i]) * (vector1[i] - vector2[i]);
+        return T.Sqrt(sum);
+    }
 
     /// <summary>
     /// 找到数组中最小值的索引。
     /// </summary>
     /// <param name="distances">表示距离的数组。</param>
-    static int MinIndex(float[] distances)
+    private int MinIndex(T[] distances)
     {
         int index = 0;
-        float min = distances[0];
+        T min = distances[0];
         for (int i = 0; i < distances.Length; ++i)
         {
             if (distances[i] < min)
@@ -249,4 +269,3 @@ public static class KMeansClusterer
         return index;
     }
 }
-
