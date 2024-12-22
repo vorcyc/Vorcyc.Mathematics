@@ -1,22 +1,22 @@
 ﻿using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
 
-namespace Vorcyc.Mathematics.MachineLearning.DeepLearning.Layers;
+namespace Vorcyc.Mathematics.DeepLearning.Layers;
 
 public static partial class Layers
 {
 
     /// <summary>
-    /// 合并两个张量层。
+    /// 合并两个张量。
     /// </summary>
     /// <typeparam name="T">张量元素的类型，必须实现 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 接口。</typeparam>
     /// <param name="input">输入的张量。</param>
     /// <param name="joint">要合并的张量。</param>
     /// <returns>合并后的张量。</returns>
-    public static Tensor<T> JoinLayer<T>(Tensor<T> input, Tensor<T> joint)
-          where T : IBinaryFloatingPointIeee754<T>
+    public static Tensor<T> Fusion<T>(Tensor<T> input, Tensor<T> joint)
+        where T : IBinaryFloatingPointIeee754<T>
     {
-        int height = input.Height;
+        var height = input.Height;
         var width = input.Width;
         var result = new Tensor<T>(input.Width, input.Height, input.Depth + joint.Depth);
 
@@ -43,19 +43,21 @@ public static partial class Layers
                 }
             }
         });
+
+
         return result;
     }
 
 
     /// <summary>
-    /// 合并两个张量层。
+    /// 合并两个张量。
     /// </summary>
     /// <param name="input">输入的张量。</param>
     /// <param name="joint">要合并的张量。</param>
     /// <returns>合并后的张量。</returns>
-    public static Tensor JoinLayer(Tensor input, Tensor joint)
+    public static Tensor Fusion(Tensor input, Tensor joint)
     {
-        int height = input.Height;
+        var height = input.Height;
         var width = input.Width;
         var result = new Tensor(input.Width, input.Height, input.Depth + joint.Depth);
 
@@ -82,6 +84,8 @@ public static partial class Layers
                 }
             }
         });
+
+
         return result;
     }
 

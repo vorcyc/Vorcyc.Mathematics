@@ -20,7 +20,7 @@ public class RandomForest : IMachineLearning
     {
         this._numTrees = numTrees;
         this._numAttributes = numAttributes;
-        this._trees = new List<DecisionTree>();
+        this._trees = [];
     }
 
     /// <summary>

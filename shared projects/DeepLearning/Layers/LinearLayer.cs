@@ -1,20 +1,20 @@
 ﻿using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
 
-namespace Vorcyc.Mathematics.MachineLearning.DeepLearning.Layers;
+namespace Vorcyc.Mathematics.DeepLearning.Layers;
 
 public static partial class Layers
 {
 
     /// <summary>
-    /// 对输入张量执行密集（全连接）层操作。
+    /// 对输入张量执行线性（全连接）层操作。
     /// </summary>
     /// <typeparam name="T">张量元素的类型，必须实现 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 接口。</typeparam>
     /// <param name="input">输入的张量。</param>
     /// <param name="weights">权重张量的数组。</param>
     /// <param name="biases">偏置张量。</param>
-    /// <returns>执行密集操作后的张量。</returns>
-    public static Tensor<T> Dense<T>(Tensor<T> input, Tensor<T>[] weights, Tensor<T> biases)
+    /// <returns>执行线性操作后的张量。</returns>
+    public static Tensor<T> LinearLayer<T>(Tensor<T> input, Tensor<T>[] weights, Tensor<T> biases)
         where T : IBinaryFloatingPointIeee754<T>
     {
 
@@ -47,13 +47,13 @@ public static partial class Layers
 
 
     /// <summary>
-    /// 对输入张量执行密集（全连接）层操作。
+    /// 对输入张量执行线性（全连接）层操作。
     /// </summary>
     /// <param name="input">输入的张量。</param>
     /// <param name="weights">权重张量的数组。</param>
     /// <param name="biases">偏置张量。</param>
-    /// <returns>执行密集操作后的张量。</returns>
-    public static Tensor Dense(Tensor input, Tensor[] weights, Tensor biases)
+    /// <returns>执行线性操作后的张量。</returns>
+    public static Tensor LinearLayer(Tensor input, Tensor[] weights, Tensor biases)
     {
 
         var height = input.Height;

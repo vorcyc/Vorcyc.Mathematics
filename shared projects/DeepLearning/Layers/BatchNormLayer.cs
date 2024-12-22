@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
 
-namespace Vorcyc.Mathematics.MachineLearning.DeepLearning.Layers;
+namespace Vorcyc.Mathematics.DeepLearning.Layers;
 
 ///<summary>Implements the neural network layers.</summary>
 public static partial class Layers

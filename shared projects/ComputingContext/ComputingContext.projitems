@@ -11,7 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComputingContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ComputingDevice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComputingBackend.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellExtension\LanguageExtension.cs" />

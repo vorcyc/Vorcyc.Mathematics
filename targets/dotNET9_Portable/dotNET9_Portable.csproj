@@ -67,4 +67,6 @@
 
   <Import Project="..\..\shared projects\ComputingContext\ComputingContext.projitems" Label="Shared" />
 
+  <Import Project="..\..\shared projects\DeepLearning\DeepLearning.projitems" Label="Shared" />
+
 </Project>

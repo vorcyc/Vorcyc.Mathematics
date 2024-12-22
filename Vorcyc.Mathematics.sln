@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNET9_Portable", "targets
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML_module_test", "TESTS\ML_module_test\ML_module_test.csproj", "{DBA1F647-6010-49E8-A3AD-A039494FEAF3}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DeepLearning", "shared projects\DeepLearning\DeepLearning.shproj", "{EAC6A8F4-E78E-4DA0-AA05-A6C1A9B1C6AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,7 @@ Global
 		{2768E470-4251-4508-91F0-0146EA8EFD62} = {C288D331-8806-4DEA-8CD9-2FD047BFA947}
 		{B6B8E014-C126-45DC-858E-C067D9916E03} = {E0B00A4A-8D98-4AD3-AA39-F39CFCFCBC4F}
 		{DBA1F647-6010-49E8-A3AD-A039494FEAF3} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
+		{EAC6A8F4-E78E-4DA0-AA05-A6C1A9B1C6AF} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}
@@ -110,6 +113,7 @@ Global
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b2c3419e-250a-487d-bc7c-0c89640b96ae}*SharedItemsImports = 13
 		shared projects\ComputingContext\ComputingContext.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Core\Core.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
+		shared projects\DeepLearning\DeepLearning.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Experimental\Experimental.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\LinearAlgebra\LinearAlgebra.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\MachineLearning\MachineLearning.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
@@ -118,6 +122,7 @@ Global
 		shared projects\Statistics\Statistics.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Experimental\Experimental.projitems*{c60535f6-5504-48a9-934a-53d6b572d846}*SharedItemsImports = 13
 		shared projects\LinearAlgebra\LinearAlgebra.projitems*{d8a93ffc-ab0f-400a-95e7-f1ed6b0b812f}*SharedItemsImports = 13
+		shared projects\DeepLearning\DeepLearning.projitems*{eac6a8f4-e78e-4da0-aa05-a6c1a9b1c6af}*SharedItemsImports = 13
 		shared projects\ComputingContext\ComputingContext.projitems*{edc9ad20-9db1-43e7-8512-ba9156a87172}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
