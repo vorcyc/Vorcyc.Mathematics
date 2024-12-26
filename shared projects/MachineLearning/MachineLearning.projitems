@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\DBSCAN.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\KMeansClusterer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DecisionTree.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\TSNE.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\Angular.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\ArgMax.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\BrayCurtis.cs" />
@@ -55,7 +56,6 @@
     <None Include="$(MSBuildThisFileDirectory)Distances\readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)DimensionalityReduction\" />
     <Folder Include="$(MSBuildThisFileDirectory)Classfication\" />
   </ItemGroup>
 </Project>
