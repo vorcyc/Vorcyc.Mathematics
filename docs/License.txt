@@ -1,6 +1,6 @@
 ﻿Software Name: Vorcyc.Mathematics
 
-Version: 0.2.19.0
+Version: 0.3.1.0
 
 Copyright © 2024 Vorcyc
 

@@ -103,6 +103,13 @@ public class SignalSegment : ITimeDomainSignal
         }
     }
 
+    /// <summary>
+    /// 重采样并返回新的信号。
+    /// </summary>
+    /// <param name="destnationSamplingRate"></param>
+    /// <param name="filter"></param>
+    /// <param name="order"></param>
+    /// <returns></returns>
     public Signal Resample(
             int destnationSamplingRate,
             FirFilter? filter = null,

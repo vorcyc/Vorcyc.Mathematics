@@ -34,12 +34,12 @@ public static partial class Layers
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        a += input[x, y, id] * f.W[i];
+                        a += input[x, y, id] * f.Values[i];
                         i += 1;
                     }
                 }
             }
-            result.W[d] = a + biases.W[d];
+            result.Values[d] = a + biases.Values[d];
         });
 
         return result;
@@ -72,12 +72,12 @@ public static partial class Layers
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        a += input[x, y, id] * f.W[i];
+                        a += input[x, y, id] * f.Values[i];
                         i += 1;
                     }
                 }
             }
-            result.W[d] = a + biases.W[d];
+            result.Values[d] = a + biases.Values[d];
         });
 
         return result;

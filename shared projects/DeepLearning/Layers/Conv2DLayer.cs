@@ -47,12 +47,12 @@ public static partial class Layers
                                 var ti = ((input.Width * oy) + ox) * input.Depth;
                                 for (var fd = 0; fd < f.Depth; fd++)
                                 {
-                                    a += f.W[fi + fd] * input.W[ti + fd];
+                                    a += f.Values[fi + fd] * input.Values[ti + fd];
                                 }
                             }
                         }
                     }
-                    result[ax, ay, d] = a + biases.W[d];
+                    result[ax, ay, d] = a + biases.Values[d];
                 }
             }
         });
@@ -100,12 +100,12 @@ public static partial class Layers
                                 var ti = ((input.Width * oy) + ox) * input.Depth;
                                 for (var fd = 0; fd < f.Depth; fd++)
                                 {
-                                    a += f.W[fi + fd] * input.W[ti + fd];
+                                    a += f.Values[fi + fd] * input.Values[ti + fd];
                                 }
                             }
                         }
                     }
-                    result[ax, ay, d] = a + biases.W[d];
+                    result[ax, ay, d] = a + biases.Values[d];
                 }
             }
         });
