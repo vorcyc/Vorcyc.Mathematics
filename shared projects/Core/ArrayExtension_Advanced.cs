@@ -1,7 +1,6 @@
 ﻿namespace Vorcyc.Mathematics;
 
 using System.Runtime.CompilerServices;
-using Vorcyc.Mathematics.Statistics;
 
 
 /// <summary>
@@ -324,7 +323,7 @@ public static partial class ArrayExtension
 
         foreach (var s in splited)
         {
-            yield return SBasic.Average(s);
+            yield return Statistics.Average(s);
         }
     }
 
@@ -364,13 +363,13 @@ public static partial class ArrayExtension
         foreach (var s in splited)
         {
             if (i > targetLength - 1) break;
-            result[i] = SBasic.Average(s);
+            result[i] = Statistics.Average(s);
             i++;
         }
         //剩余的一堆，再求次均值
         //Set the last one.
         var sub = splited.Skip(targetLength - 1);
-        result[targetLength - 1] = SBasic.Average(sub);
+        result[targetLength - 1] = Statistics.Average(sub);
 
 
         return result;

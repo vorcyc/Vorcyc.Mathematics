@@ -1,7 +1,6 @@
 ﻿namespace Vorcyc.Mathematics.Numerics;
 
 using Vorcyc.Mathematics.Helpers;
-using Vorcyc.Mathematics.Statistics;
 
 
 /// <summary>
@@ -110,7 +109,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
         if (this.Maximum.LessThan(range.Minimum) || this.Minimum.GreaterThan(range.Maximum))
             return null;
 
-        return new Range<T>(SBasic.Max(this.Minimum, range.Maximum), SBasic.Min(this.Maximum, range.Maximum));
+        return new Range<T>(IComparableExtension.CompareMax(this.Minimum, range.Maximum), IComparableExtension.CompareMin(this.Maximum, range.Maximum));
     }
 
 
@@ -123,7 +122,7 @@ public sealed class Range<T> : IEquatable<Range<T>>
     /// between this range and the <paramref name="range"/> given as argument.</returns>
     public Range<T> Union(Range<T> range)
     {
-        return new Range<T>(SBasic.Min(this.Minimum, range.Minimum), SBasic.Max(this.Maximum, range.Maximum));
+        return new Range<T>(IComparableExtension.CompareMin(this.Minimum, range.Minimum), IComparableExtension.CompareMax(this.Maximum, range.Maximum));
     }
 
 

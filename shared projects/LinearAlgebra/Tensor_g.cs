@@ -1,9 +1,12 @@
-﻿using System.Numerics;
+﻿namespace Vorcyc.Mathematics.LinearAlgebra;
 
-namespace Vorcyc.Mathematics.LinearAlgebra;
+
+using System.Numerics;
+using System.Runtime.CompilerServices;
+
 
 ///<summary>3-dimensional tensor of <see cref="IBinaryFloatingPointIeee754{TSelf}"/> data type.</summary>
-public class Tensor<T>
+public class Tensor<T> :ICloneable<Tensor<T>>
     where T : IBinaryFloatingPointIeee754<T>
 {
     private readonly T[] _values;
@@ -12,6 +15,7 @@ public class Tensor<T>
     ///<param name="w">Width.</param>
     ///<param name="h">Height.</param>
     ///<param name="d">Depth.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(int w, int h, int d)
     {
         if (w <= 0 || h <= 0 || d <= 0)
@@ -30,6 +34,7 @@ public class Tensor<T>
     ///<param name="h">Height.</param>
     ///<param name="d">Depth.</param>
     ///<param name="initialValue">Initial value for all elements.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(int w, int h, int d, T initialValue) : this(w, h, d)
     {
         for (int i = 0; i < _values.Length; i++)
@@ -40,6 +45,7 @@ public class Tensor<T>
 
     ///<summary>Initializes the Tensor from a 3D array.</summary>
     ///<param name="array">3D array to initialize the tensor.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(T[,,] array)
     {
         this.Width = array.GetLength(0);
@@ -80,11 +86,13 @@ public class Tensor<T>
     /// <returns>The value at the specified coordinates.</returns>
     public T this[int x, int y, int z]
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             ValidateIndices(x, y, z);
             return this._values[((this.Width * y) + x) * this.Depth + z];
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         set
         {
             ValidateIndices(x, y, z);
@@ -98,6 +106,7 @@ public class Tensor<T>
     /// <param name="x">X coordinate (Width).</param>
     /// <param name="y">Y coordinate (Height).</param>
     /// <param name="z">Z coordinate (Depth).</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ValidateIndices(int x, int y, int z)
     {
         if (x < 0 || x >= Width || y < 0 || y >= Height || z < 0 || z >= Depth)
@@ -110,6 +119,7 @@ public class Tensor<T>
     /// Fills the tensor with the specified value.
     /// </summary>
     /// <param name="value">The value to fill the tensor with.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Fill(T value)
     {
         for (int i = 0; i < _values.Length; i++)
@@ -118,14 +128,13 @@ public class Tensor<T>
         }
     }
 
-
     #region operators inline
-
 
     /// <summary>
     /// Adds another tensor to this tensor.
     /// </summary>
     /// <param name="other">The tensor to add.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Tensor<T> other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -143,6 +152,7 @@ public class Tensor<T>
     /// Subtracts another tensor from this tensor.
     /// </summary>
     /// <param name="other">The tensor to subtract.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Subtract(Tensor<T> other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -160,6 +170,7 @@ public class Tensor<T>
     /// Multiplies this tensor by a scalar value.
     /// </summary>
     /// <param name="scalar">The scalar value to multiply by.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Multiply(T scalar)
     {
         for (int i = 0; i < _values.Length; i++)
@@ -170,11 +181,11 @@ public class Tensor<T>
 
     #endregion
 
-
     /// <summary>
     /// Clones the tensor.
     /// </summary>
     /// <returns>A new tensor that is a copy of this tensor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor<T> Clone()
     {
         Tensor<T> clone = new Tensor<T>(Width, Height, Depth);
@@ -186,14 +197,13 @@ public class Tensor<T>
     /// Returns a string representation of the tensor.
     /// </summary>
     /// <returns>A string representation of the tensor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
         return $"Tensor<{typeof(T).Name}> [Width={Width}, Height={Height}, Depth={Depth}]";
     }
 
-
     #region operators
-
 
     /// <summary>
     /// Adds two tensors.
@@ -201,6 +211,7 @@ public class Tensor<T>
     /// <param name="a">The first tensor.</param>
     /// <param name="b">The second tensor.</param>
     /// <returns>The result of adding the two tensors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator +(Tensor<T> a, Tensor<T> b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
@@ -222,6 +233,7 @@ public class Tensor<T>
     /// <param name="a">The first tensor.</param>
     /// <param name="b">The second tensor.</param>
     /// <returns>The result of subtracting the second tensor from the first tensor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator -(Tensor<T> a, Tensor<T> b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
@@ -243,6 +255,7 @@ public class Tensor<T>
     /// <param name="tensor">The tensor.</param>
     /// <param name="scalar">The scalar value.</param>
     /// <returns>The result of multiplying the tensor by the scalar value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator *(Tensor<T> tensor, T scalar)
     {
         Tensor<T> result = new Tensor<T>(tensor.Width, tensor.Height, tensor.Depth);
@@ -259,6 +272,7 @@ public class Tensor<T>
     /// <param name="scalar">The scalar value.</param>
     /// <param name="tensor">The tensor.</param>
     /// <returns>The result of multiplying the tensor by the scalar value.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator *(T scalar, Tensor<T> tensor)
     {
         return tensor * scalar;
@@ -266,13 +280,13 @@ public class Tensor<T>
 
     #endregion
 
-
     /// <summary>
     /// Transposes the tensor along the specified axes.
     /// </summary>
     /// <param name="axis1">The first axis to transpose.</param>
     /// <param name="axis2">The second axis to transpose.</param>
     /// <returns>A new tensor that is the transpose of this tensor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor<T> Transpose(int axis1, int axis2)
     {
         if (axis1 < 0 || axis1 > 2 || axis2 < 0 || axis2 > 2 || axis1 == axis2)
@@ -306,14 +320,10 @@ public class Tensor<T>
     /// Computes the sum of all elements in the tensor.
     /// </summary>
     /// <returns>The sum of all elements in the tensor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Sum()
     {
-        T sum = T.Zero;
-        for (int i = 0; i < _values.Length; i++)
-        {
-            sum += _values[i];
-        }
-        return sum;
+        return Statistics.Sum(_values.AsSpan());
     }
 
     /// <summary>
@@ -321,6 +331,7 @@ public class Tensor<T>
     /// </summary>
     /// <param name="other">The other tensor.</param>
     /// <returns>The dot product of the two tensors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Dot(Tensor<T> other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -339,6 +350,7 @@ public class Tensor<T>
     /// <summary>
     /// Normalizes the tensor.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Normalize()
     {
         T norm = Norm();
@@ -357,6 +369,7 @@ public class Tensor<T>
     /// Computes the norm of the tensor.
     /// </summary>
     /// <returns>The norm of the tensor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Norm()
     {
         T sumOfSquares = T.Zero;
@@ -373,6 +386,7 @@ public class Tensor<T>
     /// <param name="axis">The axis to slice along.</param>
     /// <param name="index">The index at which to slice.</param>
     /// <returns>A new tensor that is a slice of this tensor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor<T> Slice(int axis, int index)
     {
         if (axis < 0 || axis > 2)
@@ -414,6 +428,7 @@ public class Tensor<T>
     /// <param name="a">The first tensor.</param>
     /// <param name="b">The second tensor.</param>
     /// <returns>True if the tensors are equal, otherwise false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Tensor<T> a, Tensor<T> b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
@@ -437,6 +452,7 @@ public class Tensor<T>
     /// <param name="a">The first tensor.</param>
     /// <param name="b">The second tensor.</param>
     /// <returns>True if the tensors are not equal, otherwise false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Tensor<T> a, Tensor<T> b)
     {
         return !(a == b);
@@ -447,6 +463,7 @@ public class Tensor<T>
     /// </summary>
     /// <param name="obj">The object to compare with the current object.</param>
     /// <returns>True if the specified object is equal to the current object, otherwise false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
         if (obj is Tensor<T> other)
@@ -460,6 +477,7 @@ public class Tensor<T>
     /// Serves as the default hash function.
     /// </summary>
     /// <returns>A hash code for the current object.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
         int hash = 17;

@@ -1,5 +1,4 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Windowing;
-using Vorcyc.Mathematics.Statistics;
 
 namespace Vorcyc.Mathematics.Experimental.Signals;
 

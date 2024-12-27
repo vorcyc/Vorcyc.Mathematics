@@ -22,7 +22,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Vorcyc.Mathematics.Statistics;
+using Vorcyc.Mathematics;
 
 //https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags#list
 
@@ -636,7 +636,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// Returns the maximum of current <see cref="PinnableArray{TScalar}"/>.
     /// </summary>
     /// <returns></returns>
-    public T Max() => SBasic.Max(_array);// _scalars.Max();
+    public T Max() => Statistics.Max(_array);// _scalars.Max();
 
 
     /// <summary>
@@ -645,7 +645,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// <param name="start"></param>
     /// <param name="length"></param>
     /// <returns></returns>
-    public T Max(int start, int length) => _array.Max(start, length);
+    public T Max(int start, int length) => Statistics.Max(_array, start, length);
 
 
     /// <summary>
@@ -656,7 +656,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// <param name="useTPL">If ture, use TPL and ingore the paramater <strong>numberOfWorkers</strong>,otherwise use self-defined methods instead.</param>
     /// <returns></returns>
     public async Task<T> MaxAsync(int? numberOfWorkers = null, bool useTPL = false)
-        => await _array.MaxAsync(numberOfWorkers, useTPL);
+        => await _array.CompareMaxAsync(numberOfWorkers, useTPL);
 
 
 
@@ -669,7 +669,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// <param name="useTPL">If ture, use TPL and ingore the paramater <strong>numberOfWorkers</strong>,otherwise use self-defined methods instead.</param>
     /// <returns></returns>
     public async Task<T> MaxAsync(int start, int length, int? numberOfWorkers = null, bool useTPL = false)
-        => await _array.MaxAsync(start, length, numberOfWorkers, useTPL);
+        => await _array.CompareMaxAsync(start, length, numberOfWorkers, useTPL);
 
 
 
@@ -678,16 +678,16 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
     #region Min
 
-    public T Min() => SBasic.Min(_array);
+    public T Min() => Statistics.Min(_array);
 
-    public T Min(int start, int length) => SBasic.Min(_array, start, length);
+    public T Min(int start, int length) => Statistics.Min(_array, start, length);
 
     public async Task<T> MinAsync(int? numberOfWorkers = null, bool useTPL = false)
-        => await _array.MinAsync(numberOfWorkers, useTPL);
+        => await _array.CompareMinAsync(numberOfWorkers, useTPL);
 
 
     public async Task<T> MinAsync(int start, int length, int? numberOfWorkers = null, bool useTPL = false)
-        => await _array.MinAsync(start, length, numberOfWorkers, useTPL);
+        => await _array.CompareMinAsync(start, length, numberOfWorkers, useTPL);
 
 
 

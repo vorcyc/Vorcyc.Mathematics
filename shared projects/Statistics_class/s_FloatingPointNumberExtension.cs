@@ -1,16 +1,17 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Vorcyc.Mathematics.Statistics;
+namespace Vorcyc.Mathematics;
 
-public static partial class SBasic
+public static partial class Statistics
 {
+
 
 
     #region Sum
 
     /// <summary>
-    /// Calculates the sum of the elements in an <see cref="ArraySegment{T}"/> of floats.
+    /// Calculates the sum of the elements in an <see cref="ArraySegment{System.Single}"/> of floats.
     /// </summary>
     /// <param name="arraySegment">The array segment of floats.</param>
     /// <returns>The sum of the elements in the array segment.</returns>
@@ -24,82 +25,20 @@ public static partial class SBasic
         return result;
     }
 
+
     /// <summary>
-    /// Calculates the sum of the elements in a <see cref="Span{T}"/>.
+    /// Calculates the sum of the elements in an <see cref="ArraySegment{System.Double}"/> of floats.
     /// </summary>
-    /// <typeparam name="T">The type of the elements in the span. Must implement <see cref="INumber{T}"/>.</typeparam>
-    /// <param name="span">The span of elements.</param>
-    /// <returns>The sum of the elements in the span.</returns>
+    /// <param name="arraySegment">The array segment of floats.</param>
+    /// <returns>The sum of the elements in the array segment.</returns>
     [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Sum<T>(this Span<T> span) where T : INumber<T>
+    public static double Sum(this ArraySegment<double> arraySegment)
     {
-        T result = T.Zero;
-        for (int i = 0; i < span.Length; i++)
-            result += span[i];
+        double result = 0.0;
+        foreach (var ele in arraySegment)
+            result += ele;
         return result;
-    }
-
-    /// <summary>
-    /// Calculates the sum of a specified range of elements in an array of floats.
-    /// </summary>
-    /// <param name="array">The array of floats.</param>
-    /// <param name="start">The starting index of the range to sum.</param>
-    /// <param name="length">The number of elements to include in the sum.</param>
-    /// <returns>The sum of the specified range of elements in the array.</returns>
-    [DeviceDependency(DeviceDependency.CPU)]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Sum(this float[] array, int start, int length)
-    {
-        float result = 0.0f;
-        for (int i = start; i < start + length; i++)
-        {
-            result += array[i];
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// Calculates the sum of the elements in the given span using SIMD for optimization.
-    /// </summary>
-    /// <param name="values">A span of double values to calculate the sum from.</param>
-    /// <returns>The sum of the elements in the span.</returns>
-    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
-    [DeviceDependency(DeviceDependency.CPU)]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double Sum(this Span<double> values)
-    {
-        if (values.IsEmpty)
-            throw new ArgumentException("Data span cannot be empty.");
-
-        int length = values.Length;
-        int simdLength = Vector<double>.Count;
-        int remainder = length % simdLength;
-
-        Vector<double> sumVector = Vector<double>.Zero;
-        int i = 0;
-
-        // Process data in chunks of Vector<double>.Count
-        for (; i < length - remainder; i += simdLength)
-        {
-            Vector<double> vector = new Vector<double>(values.Slice(i, simdLength));
-            sumVector += vector;
-        }
-
-        // Sum the elements of the sumVector
-        double sum = 0;
-        for (int j = 0; j < simdLength; j++)
-        {
-            sum += sumVector[j];
-        }
-
-        // Process remaining elements
-        for (; i < length; i++)
-        {
-            sum += values[i];
-        }
-
-        return sum;
     }
 
 
@@ -146,6 +85,103 @@ public static partial class SBasic
         return sum;
     }
 
+    /// <summary>
+    /// Calculates the sum of a specified range of elements in an array of floats.
+    /// </summary>
+    /// <param name="array">The array of floats.</param>
+    /// <param name="start">The starting index of the range to sum.</param>
+    /// <param name="length">The number of elements to include in the sum.</param>
+    /// <returns>The sum of the specified range of elements in the array.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float Sum(this float[] array, int start, int length) => Sum(new Span<float>(array, start, length));
+
+
+    /// <summary>
+    /// Calculates the sum of the elements in an array of floats.
+    /// </summary>
+    /// <param name="values">The array of float values to calculate the sum from.</param>
+    /// <returns>The sum of the elements in the array.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float Sum(this float[] values) => Sum(new Span<float>(values));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /// <summary>
+    /// Calculates the sum of the elements in the given span using SIMD for optimization.
+    /// </summary>
+    /// <param name="values">A span of double values to calculate the sum from.</param>
+    /// <returns>The sum of the elements in the span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    [DeviceDependency(DeviceDependency.CPU)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Sum(this Span<double> values)
+    {
+        if (values.IsEmpty)
+            throw new ArgumentException("Data span cannot be empty.");
+
+        int length = values.Length;
+        int simdLength = Vector<double>.Count;
+        int remainder = length % simdLength;
+
+        Vector<double> sumVector = Vector<double>.Zero;
+        int i = 0;
+
+        // Process data in chunks of Vector<double>.Count
+        for (; i < length - remainder; i += simdLength)
+        {
+            Vector<double> vector = new Vector<double>(values.Slice(i, simdLength));
+            sumVector += vector;
+        }
+
+        // Sum the elements of the sumVector
+        double sum = 0;
+        for (int j = 0; j < simdLength; j++)
+        {
+            sum += sumVector[j];
+        }
+
+        // Process remaining elements
+        for (; i < length; i++)
+        {
+            sum += values[i];
+        }
+
+        return sum;
+    }
+
+    /// <summary>
+    /// Calculates the sum of the elements in an array of doubles.
+    /// </summary>
+    /// <param name="values">The array of double values to calculate the sum from.</param>
+    /// <returns>The sum of the elements in the array.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Sum(this double[] values) => Sum(new Span<double>(values));
+
+    /// <summary>
+    /// Calculates the sum of a specified range of elements in an array of doubles.
+    /// </summary>
+    /// <param name="values">The array of double values.</param>
+    /// <param name="start">The starting index of the range to sum.</param>
+    /// <param name="length">The number of elements to include in the sum.</param>
+    /// <returns>The sum of the specified range of elements in the array.</returns>
+    [DeviceDependency(DeviceDependency.CPU)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Sum(this double[] values, int start, int length) => Sum(new Span<double>(values, start, length));
 
 
     #endregion
@@ -239,29 +275,6 @@ public static partial class SBasic
     }
 
 
-
-    /// <summary>
-    /// Calculates the average of the elements in a span.
-    /// </summary>
-    /// <typeparam name="T">The type of the elements in the span, which must implement <see cref="INumber{T}"/>.</typeparam>
-    /// <param name="span">The span of values to calculate the average of.</param>
-    /// <returns>The average of the elements in the span.</returns>
-    /// <exception cref="ArgumentException">Thrown when the <paramref name="span"/> is empty.</exception>
-    [DeviceDependency(DeviceDependency.CPU)]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Average<T>(this Span<T> span)
-        where T : INumber<T>
-    {
-        if (span.Length == 0)
-            throw new ArgumentException("Span cannot be empty.", nameof(span));
-
-        T sum = T.Zero;
-        for (int i = 0; i < span.Length; i++)
-        {
-            sum += span[i];
-        }
-        return sum / T.CreateChecked(span.Length);
-    }
 
     /// <summary>
     /// Calculates the average of the elements in the given span using SIMD for optimization.
@@ -455,33 +468,6 @@ public static partial class SBasic
 
 
 
-    /// <summary>
-    /// Calculates the average and variance of the elements in a span.
-    /// </summary>
-    /// <typeparam name="T">The type of the elements in the span, which must implement <see cref="INumber{T}"/>.</typeparam>
-    /// <param name="array">The span of values to calculate the average and variance of.</param>
-    /// <returns>A tuple containing the average and variance of the elements in the span.</returns>
-    /// <exception cref="ArgumentException">Thrown when the <paramref name="array"/> is empty.</exception>
-    [DeviceDependency(DeviceDependency.CPU)]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (T average, T variance) Variance<T>(this Span<T> array)
-        where T : INumber<T>
-    {
-        if (array.Length == 0)
-            throw new ArgumentException("Span cannot be empty.", nameof(array));
-
-        var mean = Average(array);
-        var result = T.Zero;
-
-        for (int i = 0; i < array.Length; i++)
-        {
-            var v = array[i];
-            result += (v - mean) * (v - mean);
-        }
-
-        result /= T.CreateChecked(array.Length - 1);
-        return (mean, result);
-    }
 
 
     /// <summary>
@@ -622,6 +608,7 @@ public static partial class SBasic
     }
 
     #endregion
+
 
 
 

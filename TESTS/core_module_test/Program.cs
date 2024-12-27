@@ -4,7 +4,6 @@ using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.Experimental.Signals;
 using Vorcyc.Mathematics.Numerics;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
-using Vorcyc.Mathematics.Statistics;
 using Vorcyc.Mathematics.LanguageExtension;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
@@ -24,12 +23,21 @@ using Vorcyc.Mathematics.Helpers;
 
 //signal_test.go();
 
-var s1 = new Signal(100, 8000);
-var s2 = new Signal(100, 8000);
+//var s1 = new Signal(100, 8000);
+//var s2 = new Signal(100, 8000);
 
-s1.UnderlayingArray.Fill(1);
-s2.UnderlayingArray.Fill(2);
+//s1.UnderlayingArray.Fill(1);
+//s2.UnderlayingArray.Fill(2);
 
-var s3 = s1 * s2;
+//var s3 = s1 * s2;
 
-Console.WriteLine(s3);
+//Console.WriteLine(s3);
+
+
+
+var a = new PinnableArray<float>(10000);
+a.FillWithRandomNumber();
+
+Console.WriteLine( a.Sum() );
+
+Console.WriteLine(  Statistics.Sum(a));

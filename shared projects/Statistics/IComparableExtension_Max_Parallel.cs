@@ -1,10 +1,8 @@
 ﻿namespace Vorcyc.Mathematics.Statistics;
 
-/// <summary>
-/// Basic statistical functions
-/// </summary>
-public static partial class SBasic
+public static partial class IComparableExtension
 {
+
 
 
     private static Task[] AllocateTasks_Max<TValue>(int workerCount, TValue[] values, int start, int length, out TValue[] maxValues)
@@ -343,6 +341,9 @@ public static partial class SBasic
 
         }
     }
+
+
+
 
 
 

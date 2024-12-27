@@ -40,6 +40,7 @@
 
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 
@@ -50,9 +51,9 @@ namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 public class PCA<TSelf> : IMachineLearning
     where TSelf : IFloatingPointIeee754<TSelf>
 {
-    private readonly TSelf[,] _data;
+    private readonly Matrix<TSelf> _data;
     private TSelf[] _means;
-    private TSelf[,] _covarianceMatrix;
+    private Matrix<TSelf> _covarianceMatrix;
     private TSelf[] _eigenValues;
     private TSelf[][] _eigenVectors;
 
@@ -65,7 +66,7 @@ public class PCA<TSelf> : IMachineLearning
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public PCA(TSelf[,] data)
     {
-        _data = data;
+        _data = new Matrix<TSelf>(data);
         ComputeMeans();
         CenterData();
         ComputeCovarianceMatrix();
@@ -78,13 +79,13 @@ public class PCA<TSelf> : IMachineLearning
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ComputeMeans()
     {
-        int numFeatures = _data.GetLength(1);
+        int numFeatures = _data.Columns;
         _means = new TSelf[numFeatures];
         for (int i = 0; i < numFeatures; i++)
         {
-            _means[i] = Enumerable.Range(0, _data.GetLength(0))
+            _means[i] = Enumerable.Range(0, _data.Rows)
                                   .Select(j => _data[j, i])
-                                  .Aggregate(TSelf.Zero, (acc, val) => acc + val) / TSelf.CreateChecked(_data.GetLength(0));
+                                  .Aggregate(TSelf.Zero, (acc, val) => acc + val) / TSelf.CreateChecked(_data.Rows);
         }
     }
 
@@ -94,9 +95,9 @@ public class PCA<TSelf> : IMachineLearning
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void CenterData()
     {
-        for (int i = 0; i < _data.GetLength(0); i++)
+        for (int i = 0; i < _data.Rows; i++)
         {
-            for (int j = 0; j < _data.GetLength(1); j++)
+            for (int j = 0; j < _data.Columns; j++)
             {
                 _data[i, j] -= _means[j];
             }
@@ -109,15 +110,15 @@ public class PCA<TSelf> : IMachineLearning
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ComputeCovarianceMatrix()
     {
-        int numFeatures = _data.GetLength(1);
-        _covarianceMatrix = new TSelf[numFeatures, numFeatures];
+        int numFeatures = _data.Columns;
+        _covarianceMatrix = new Matrix<TSelf>(numFeatures, numFeatures);
         for (int i = 0; i < numFeatures; i++)
         {
             for (int j = 0; j < numFeatures; j++)
             {
-                _covarianceMatrix[i, j] = Enumerable.Range(0, _data.GetLength(0))
+                _covarianceMatrix[i, j] = Enumerable.Range(0, _data.Rows)
                                                     .Select(k => _data[k, i] * _data[k, j])
-                                                    .Aggregate(TSelf.Zero, (acc, val) => acc + val) / TSelf.CreateChecked(_data.GetLength(0) - 1);
+                                                    .Aggregate(TSelf.Zero, (acc, val) => acc + val) / TSelf.CreateChecked(_data.Rows - 1);
             }
         }
     }
@@ -128,7 +129,7 @@ public class PCA<TSelf> : IMachineLearning
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ComputeEigenDecomposition()
     {
-        int n = _covarianceMatrix.GetLength(0);
+        int n = _covarianceMatrix.Rows;
         _eigenValues = new TSelf[n];
         _eigenVectors = new TSelf[n][];
 
@@ -170,9 +171,9 @@ public class PCA<TSelf> : IMachineLearning
     /// <param name="vector">输入向量。</param>
     /// <returns>结果向量。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static TSelf[] MatrixVectorMultiply(TSelf[,] matrix, TSelf[] vector)
+    private static TSelf[] MatrixVectorMultiply(Matrix<TSelf> matrix, TSelf[] vector)
     {
-        int n = matrix.GetLength(0);
+        int n = matrix.Rows;
         TSelf[] result = new TSelf[n];
 
         for (int i = 0; i < n; i++)
@@ -194,8 +195,8 @@ public class PCA<TSelf> : IMachineLearning
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TSelf[,] Transform()
     {
-        int numSamples = _data.GetLength(0);
-        int numFeatures = _data.GetLength(1);
+        int numSamples = _data.Rows;
+        int numFeatures = _data.Columns;
         TSelf[,] components = new TSelf[numSamples, numFeatures];
 
         for (int i = 0; i < numSamples; i++)

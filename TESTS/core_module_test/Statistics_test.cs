@@ -1,6 +1,5 @@
 ﻿using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.LanguageExtension;
-using Vorcyc.Mathematics.Statistics;
 
 namespace core_module_test;
 

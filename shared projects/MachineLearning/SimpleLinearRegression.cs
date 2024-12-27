@@ -1,7 +1,6 @@
 ﻿namespace Vorcyc.Mathematics.MachineLearning;
 
 using System.Numerics;
-using Vorcyc.Mathematics.Statistics;
 
 /// <summary>
 /// 一元线性回归工具

@@ -3,18 +3,18 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>8116ae5e-9c08-4c27-9eb9-e9e50d69ba0b</SharedGUID>
+    <SharedGUID>0b0fefde-c426-4203-b897-55e2d9da98bb</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Vorcyc.Mathematics.Statistics</Import_RootNamespace>
+    <Import_RootNamespace>Vorcyc.Mathematics</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ExtremeValueFinder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FloatingPointNumberExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)s_ExtremeValueFinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)s_FloatingPointNumberExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension_Max_Parallel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension_Min_Parallel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)INumberExtension.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)INumberExtension_Max_Min.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)s_INumberExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)s_INumberExtension_Max_Min.cs" />
   </ItemGroup>
 </Project>

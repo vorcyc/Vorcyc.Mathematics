@@ -1,10 +1,8 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
-using Vorcyc.Mathematics.Helpers;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
-using Vorcyc.Mathematics.Statistics;
 
 namespace Vorcyc.Mathematics.Experimental.Signals;
 
@@ -52,7 +50,7 @@ public interface ITimeDomainCharacteristics
     /// </summary>
     internal static float GetAmplitude_SIMD(Span<float> samples)
     {
-        var (max, min) = ExtremeValueFinder.FindExtremeValue(samples);
+        var (max, min) = Statistics.FindExtremeValue(samples);
         return max - min;
     }
 

@@ -26,13 +26,11 @@ internal class SimpleLinearRegression_test
             y.FillWithRandomNumber();
 
 
-            var r = Vorcyc.Mathematics.Statistics.SimpleLinearRegression.ComputeParameters(x, y);
+            var r = new Vorcyc.Mathematics.MachineLearning.SimpleLinearRegression<float>();
+            var c= r.Learn(x, y);
 
-            r.PrintLine(ConsoleColor.Red);
+            c.PrintLine(ConsoleColor.Red);
 
-
-            var r2 = Vorcyc.Mathematics.Statistics.another_SimpleLinearRegression.ComputeParameters(x, y);
-            r2.PrintLine(ConsoleColor.Red);
 
             Console.WriteLine("-------------");
 
