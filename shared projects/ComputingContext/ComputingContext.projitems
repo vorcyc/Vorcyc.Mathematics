@@ -16,7 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellExtension\LanguageExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShellExtension\PrintHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)ShellExtension\" />

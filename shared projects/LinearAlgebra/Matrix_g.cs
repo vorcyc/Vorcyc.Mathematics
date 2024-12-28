@@ -1,4 +1,6 @@
-﻿namespace Vorcyc.Mathematics.LinearAlgebra;
+﻿// 未使用 SIMD 优化
+
+namespace Vorcyc.Mathematics.LinearAlgebra;
 
 using System.Numerics;
 using System.Text;
@@ -7,7 +9,8 @@ using System.Text;
 /// 表示一个二维矩阵。
 /// </summary>
 /// <typeparam name="T">数值类型，必须实现 INumber 接口。</typeparam>
-public class Matrix<T> where T : INumber<T>
+public class Matrix<T> : ICloneable<Matrix<T>>
+    where T : INumber<T>
 {
     private T[,] _data;
 
@@ -26,9 +29,8 @@ public class Matrix<T> where T : INumber<T>
     /// </summary>
     /// <param name="rows">行数。</param>
     /// <param name="columns">列数。</param>
-    public Matrix(int rows, int columns )
+    public Matrix(int rows, int columns)
     {
-
         Guard.AgainstNonPositive(rows, "Number of rows");
         Guard.AgainstNonPositive(columns, "Number of columns");
 
@@ -139,18 +141,8 @@ public class Matrix<T> where T : INumber<T>
         if (a.Columns != b.Rows)
             throw new ArgumentException("Matrices must have compatible dimensions for multiplication.");
 
-        Matrix<T> result = new(a.Rows, b.Columns);
-        for (int i = 0; i < a.Rows; i++)
-        {
-            for (int j = 0; j < b.Columns; j++)
-            {
-                for (int k = 0; k < a.Columns; k++)
-                {
-                    result[i, j] += a[i, k] * b[k, j];
-                }
-            }
-        }
-        return result;
+        T[,] resultData = MatrixOperations.Multiply(a._data, b._data);
+        return new Matrix<T>(resultData);
     }
 
     /// <summary>
@@ -280,6 +272,129 @@ public class Matrix<T> where T : INumber<T>
             }
         }
         return adjoint;
+    }
+
+    /// <summary>
+    /// LU分解。
+    /// </summary>
+    /// <param name="L">输出的下三角矩阵。</param>
+    /// <param name="U">输出的上三角矩阵。</param>
+    public void LUDecomposition(out Matrix<T> L, out Matrix<T> U)
+    {
+        int n = Rows;
+        L = new Matrix<T>(n, n);
+        U = new Matrix<T>(n, n);
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (i <= j)
+                {
+                    U[i, j] = _data[i, j];
+                    for (int k = 0; k < i; k++)
+                    {
+                        U[i, j] -= L[i, k] * U[k, j];
+                    }
+                    if (i == j)
+                    {
+                        L[i, j] = T.One;
+                    }
+                    else
+                    {
+                        L[i, j] = T.Zero;
+                    }
+                }
+                else
+                {
+                    L[i, j] = _data[i, j];
+                    for (int k = 0; k < j; k++)
+                    {
+                        L[i, j] -= L[i, k] * U[k, j];
+                    }
+                    L[i, j] /= U[j, j];
+                    U[i, j] = T.Zero;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// QR分解。
+    /// </summary>
+    /// <param name="Q">输出的正交矩阵。</param>
+    /// <param name="R">输出的上三角矩阵。</param>
+    public void QRDecomposition(out Matrix<T> Q, out Matrix<T> R)
+    {
+        int m = Rows;
+        int n = Columns;
+        Q = new Matrix<T>(m, m);
+        R = new Matrix<T>(m, n);
+
+        T[,] A = (T[,])_data.Clone();
+
+        for (int k = 0; k < n; k++)
+        {
+            T norm = T.Zero;
+            for (int i = 0; i < m; i++)
+            {
+                norm += A[i, k] * A[i, k];
+            }
+
+            norm = Sqrt(norm);
+
+            R[k, k] = norm;
+            for (int i = 0; i < m; i++)
+            {
+                Q[i, k] = A[i, k] / norm;
+            }
+
+            for (int j = k + 1; j < n; j++)
+            {
+                T dotProduct = T.Zero;
+                for (int i = 0; i < m; i++)
+                {
+                    dotProduct += Q[i, k] * A[i, j];
+                }
+                R[k, j] = dotProduct;
+                for (int i = 0; i < m; i++)
+                {
+                    A[i, j] -= Q[i, k] * dotProduct;
+                }
+            }
+        }
+    }
+
+    private static T Sqrt(T value)
+    {
+        if (typeof(T) == typeof(float))
+        {
+            return (T)(object)MathF.Sqrt((float)(object)value);
+        }
+        else if (typeof(T) == typeof(double))
+        {
+            return (T)(object)Math.Sqrt((double)(object)value);
+        }
+        else if (typeof(T) == typeof(decimal))
+        {
+            return (T)(object)Math.Sqrt((double)(object)value);
+        }
+        else if (typeof(T) == typeof(int))
+        {
+            return (T)(object)(int)Math.Sqrt((int)(object)value);
+        }
+        else if (typeof(T) == typeof(long))
+        {
+            return (T)(object)(long)Math.Sqrt((long)(object)value);
+        }
+        else if (typeof(T) == typeof(short))
+        {
+            return (T)(object)(short)Math.Sqrt((short)(object)value);
+        }
+        else
+        {
+            throw new NotSupportedException($"Sqrt is not supported for type {typeof(T)}.");
+        }
     }
 
     /// <summary>

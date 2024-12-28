@@ -5,7 +5,7 @@ namespace Vorcyc.Mathematics.LinearAlgebra;
 /// <summary>
 /// Represents 2D matrix.
 /// </summary>
-public class Matrix
+public class Matrix : ICloneable<Matrix>
 {
     private readonly float[][] _matrix;
 
@@ -40,7 +40,23 @@ public class Matrix
         Columns = columns;
     }
 
-  
+    /// <summary>
+    /// Constructs <see cref="Matrix"/> from a 2D array.
+    /// </summary>
+    public Matrix(float[][] data)
+    {
+        Rows = data.Length;
+        Columns = data[0].Length;
+        _matrix = new float[Rows][];
+        for (int i = 0; i < Rows; i++)
+        {
+            _matrix[i] = new float[Columns];
+            for (int j = 0; j < Columns; j++)
+            {
+                _matrix[i][j] = data[i][j];
+            }
+        }
+    }
 
     /// <summary>
     /// Gets reference to underlying 2D array.
@@ -353,6 +369,96 @@ public class Matrix
         }
 
         return adjoint;
+    }
+
+    /// <summary>
+    /// LU decomposition.
+    /// </summary>
+    /// <param name="L">Output lower triangular matrix.</param>
+    /// <param name="U">Output upper triangular matrix.</param>
+    public void LUDecomposition(out Matrix L, out Matrix U)
+    {
+        int n = Rows;
+        L = new Matrix(n, n);
+        U = new Matrix(n, n);
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (i <= j)
+                {
+                    U[i][j] = _matrix[i][j];
+                    for (int k = 0; k < i; k++)
+                    {
+                        U[i][j] -= L[i][k] * U[k][j];
+                    }
+                    if (i == j)
+                    {
+                        L[i][j] = 1;
+                    }
+                    else
+                    {
+                        L[i][j] = 0;
+                    }
+                }
+                else
+                {
+                    L[i][j] = _matrix[i][j];
+                    for (int k = 0; k < j; k++)
+                    {
+                        L[i][j] -= L[i][k] * U[k][j];
+                    }
+                    L[i][j] /= U[j][j];
+                    U[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// QR decomposition.
+    /// </summary>
+    /// <param name="Q">Output orthogonal matrix.</param>
+    /// <param name="R">Output upper triangular matrix.</param>
+    public void QRDecomposition(out Matrix Q, out Matrix R)
+    {
+        int m = Rows;
+        int n = Columns;
+        Q = new Matrix(m, m);
+        R = new Matrix(m, n);
+
+        float[][] A = (float[][])_matrix.Clone();
+
+        for (int k = 0; k < n; k++)
+        {
+            float norm = 0;
+            for (int i = 0; i < m; i++)
+            {
+                norm += A[i][k] * A[i][k];
+            }
+            norm = MathF.Sqrt(norm);
+
+            R[k][k] = norm;
+            for (int i = 0; i < m; i++)
+            {
+                Q[i][k] = A[i][k] / norm;
+            }
+
+            for (int j = k + 1; j < n; j++)
+            {
+                float dotProduct = 0;
+                for (int i = 0; i < m; i++)
+                {
+                    dotProduct += Q[i][k] * A[i][j];
+                }
+                R[k][j] = dotProduct;
+                for (int i = 0; i < m; i++)
+                {
+                    A[i][j] -= Q[i][k] * dotProduct;
+                }
+            }
+        }
     }
 
     /// <summary>

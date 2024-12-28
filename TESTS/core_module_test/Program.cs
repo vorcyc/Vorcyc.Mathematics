@@ -8,6 +8,7 @@ using Vorcyc.Mathematics.LanguageExtension;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
 using Vorcyc.Mathematics.Helpers;
+using Vorcyc.Mathematics.LinearAlgebra;
 
 //SimpleLinearRegression_test.go();
 
@@ -34,10 +35,17 @@ using Vorcyc.Mathematics.Helpers;
 //Console.WriteLine(s3);
 
 
+Matrix<int> m = new Matrix<int>(3, 3);
+for (int x = 0; x < m.Rows; x++)
+{
+    for (int y = 0; y < m.Columns; y++)
+    {
+        m[x, y] = x + y;
+    }
+}
 
-var a = new PinnableArray<float>(10000);
-a.FillWithRandomNumber();
 
-Console.WriteLine( a.Sum() );
+m.QRDecomposition(out var q, out var r);
 
-Console.WriteLine(  Statistics.Sum(a));
+Console.WriteLine(  q);
+Console.WriteLine(  r);

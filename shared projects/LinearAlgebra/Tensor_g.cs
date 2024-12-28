@@ -118,22 +118,34 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     /// <summary>
     /// Fills the tensor with the specified value.
     /// </summary>
-    /// <param name="value">The value to fill the tensor with.</param>
+    /// <param name="value">The value to fill the tensor with。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Fill(T value)
     {
-        for (int i = 0; i < _values.Length; i++)
+        int simdLength = System.Numerics.Vector<T>.Count;
+        int i = 0;
+
+        // SIMD部分
+        var simdValue = new System.Numerics.Vector<T>(value);
+        for (; i <= _values.Length - simdLength; i += simdLength)
+        {
+            simdValue.CopyTo(_values, i);
+        }
+
+        // 处理剩余部分
+        for (; i < _values.Length; i++)
         {
             _values[i] = value;
         }
     }
+
 
     #region operators inline
 
     /// <summary>
     /// Adds another tensor to this tensor.
     /// </summary>
-    /// <param name="other">The tensor to add.</param>
+    /// <param name="other">The tensor to add。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Tensor<T> other)
     {
@@ -142,7 +154,19 @@ public class Tensor<T> :ICloneable<Tensor<T>>
             throw new ArgumentException("Tensor dimensions must match.");
         }
 
-        for (int i = 0; i < _values.Length; i++)
+        int simdLength = System.Numerics.Vector<T>.Count;
+        int i = 0;
+
+        // SIMD部分
+        for (; i <= _values.Length - simdLength; i += simdLength)
+        {
+            var vec1 = new System.Numerics.Vector<T>(_values, i);
+            var vec2 = new System.Numerics.Vector<T>(other._values, i);
+            (vec1 + vec2).CopyTo(_values, i);
+        }
+
+        // 处理剩余部分
+        for (; i < _values.Length; i++)
         {
             _values[i] += other._values[i];
         }
@@ -151,7 +175,7 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     /// <summary>
     /// Subtracts another tensor from this tensor.
     /// </summary>
-    /// <param name="other">The tensor to subtract.</param>
+    /// <param name="other">The tensor to subtract。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Subtract(Tensor<T> other)
     {
@@ -160,7 +184,19 @@ public class Tensor<T> :ICloneable<Tensor<T>>
             throw new ArgumentException("Tensor dimensions must match.");
         }
 
-        for (int i = 0; i < _values.Length; i++)
+        int simdLength = System.Numerics.Vector<T>.Count;
+        int i = 0;
+
+        // SIMD部分
+        for (; i <= _values.Length - simdLength; i += simdLength)
+        {
+            var vec1 = new System.Numerics.Vector<T>(_values, i);
+            var vec2 = new System.Numerics.Vector<T>(other._values, i);
+            (vec1 - vec2).CopyTo(_values, i);
+        }
+
+        // 处理剩余部分
+        for (; i < _values.Length; i++)
         {
             _values[i] -= other._values[i];
         }
@@ -169,11 +205,23 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     /// <summary>
     /// Multiplies this tensor by a scalar value.
     /// </summary>
-    /// <param name="scalar">The scalar value to multiply by.</param>
+    /// <param name="scalar">The scalar value to multiply by。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Multiply(T scalar)
     {
-        for (int i = 0; i < _values.Length; i++)
+        int simdLength = System.Numerics.Vector<T>.Count;
+        int i = 0;
+
+        // SIMD部分
+        var simdScalar = new System.Numerics.Vector<T>(scalar);
+        for (; i <= _values.Length - simdLength; i += simdLength)
+        {
+            var vec = new System.Numerics.Vector<T>(_values, i);
+            (vec * simdScalar).CopyTo(_values, i);
+        }
+
+        // 处理剩余部分
+        for (; i < _values.Length; i++)
         {
             _values[i] *= scalar;
         }
@@ -329,8 +377,8 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     /// <summary>
     /// Computes the dot product of two tensors.
     /// </summary>
-    /// <param name="other">The other tensor.</param>
-    /// <returns>The dot product of the two tensors.</returns>
+    /// <param name="other">The other tensor。</param>
+    /// <returns>The dot product of the two tensors。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Dot(Tensor<T> other)
     {
@@ -340,10 +388,30 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         }
 
         T dotProduct = T.Zero;
-        for (int i = 0; i < _values.Length; i++)
+        int simdLength = System.Numerics.Vector<T>.Count;
+        int i = 0;
+
+        // SIMD部分
+        var simdDotProduct = new System.Numerics.Vector<T>(T.Zero);
+        for (; i <= _values.Length - simdLength; i += simdLength)
+        {
+            var vec1 = new System.Numerics.Vector<T>(_values, i);
+            var vec2 = new System.Numerics.Vector<T>(other._values, i);
+            simdDotProduct += vec1 * vec2;
+        }
+
+        // 处理剩余部分
+        for (; i < _values.Length; i++)
         {
             dotProduct += _values[i] * other._values[i];
         }
+
+        // 汇总SIMD结果
+        for (int j = 0; j < simdLength; j++)
+        {
+            dotProduct += simdDotProduct[j];
+        }
+
         return dotProduct;
     }
 
@@ -359,7 +427,19 @@ public class Tensor<T> :ICloneable<Tensor<T>>
             throw new InvalidOperationException("Cannot normalize a tensor with zero norm.");
         }
 
-        for (int i = 0; i < _values.Length; i++)
+        int simdLength = System.Numerics.Vector<T>.Count;
+        int i = 0;
+
+        // SIMD部分
+        var simdNorm = new System.Numerics.Vector<T>(norm);
+        for (; i <= _values.Length - simdLength; i += simdLength)
+        {
+            var vec = new System.Numerics.Vector<T>(_values, i);
+            (vec / simdNorm).CopyTo(_values, i);
+        }
+
+        // 处理剩余部分
+        for (; i < _values.Length; i++)
         {
             _values[i] /= norm;
         }
@@ -368,15 +448,34 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     /// <summary>
     /// Computes the norm of the tensor.
     /// </summary>
-    /// <returns>The norm of the tensor.</returns>
+    /// <returns>The norm of the tensor。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Norm()
     {
         T sumOfSquares = T.Zero;
-        for (int i = 0; i < _values.Length; i++)
+        int simdLength = System.Numerics.Vector<T>.Count;
+        int i = 0;
+
+        // SIMD部分
+        var simdResult = new System.Numerics.Vector<T>(T.Zero);
+        for (; i <= _values.Length - simdLength; i += simdLength)
+        {
+            var vec = new System.Numerics.Vector<T>(_values, i);
+            simdResult += vec * vec;
+        }
+
+        // 处理剩余部分
+        for (; i < _values.Length; i++)
         {
             sumOfSquares += _values[i] * _values[i];
         }
+
+        // 汇总SIMD结果
+        for (int j = 0; j < simdLength; j++)
+        {
+            sumOfSquares += simdResult[j];
+        }
+
         return T.Sqrt(sumOfSquares);
     }
 

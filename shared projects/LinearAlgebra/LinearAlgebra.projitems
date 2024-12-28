@@ -13,8 +13,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)DimensionMismatchException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Matrix.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MatrixOperations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Matrix_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Quaternion.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tensor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tensor_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Vector.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Vector_g.cs" />
   </ItemGroup>
 </Project>

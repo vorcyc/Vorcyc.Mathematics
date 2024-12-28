@@ -5,7 +5,6 @@
 namespace Vorcyc.Mathematics.LinearAlgebra;
 
 using System.Collections;
-using System.Runtime.CompilerServices;
 
 public static class MatrixHelper
 {

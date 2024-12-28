@@ -2,7 +2,7 @@
 
 
 ///<summary>3维张量，数据类型为 <see cref="float"/>。</summary>
-public class Tensor
+public class Tensor : ICloneable<Tensor>
 {
     private readonly float[] _values;
 
@@ -118,10 +118,6 @@ public class Tensor
 
     #region operators inline
 
-    /// <summary>
-    /// 将另一个张量加到当前张量。
-    /// </summary>
-    /// <param name="other">要相加的张量。</param>
     public void Add(Tensor other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -129,16 +125,22 @@ public class Tensor
             throw new ArgumentException("张量维度必须匹配。");
         }
 
-        for (int i = 0; i < _values.Length; i++)
+        int vectorSize = System.Numerics.Vector<float>.Count;
+        int i = 0;
+
+        for (; i <= _values.Length - vectorSize; i += vectorSize)
+        {
+            var v1 = new System.Numerics.Vector<float>(_values, i);
+            var v2 = new System.Numerics.Vector<float>(other._values, i);
+            (v1 + v2).CopyTo(_values, i);
+        }
+
+        for (; i < _values.Length; i++)
         {
             _values[i] += other._values[i];
         }
     }
 
-    /// <summary>
-    /// 从当前张量中减去另一个张量。
-    /// </summary>
-    /// <param name="other">要减去的张量。</param>
     public void Subtract(Tensor other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -146,19 +148,35 @@ public class Tensor
             throw new ArgumentException("张量维度必须匹配。");
         }
 
-        for (int i = 0; i < _values.Length; i++)
+        int vectorSize = System.Numerics.Vector<float>.Count;
+        int i = 0;
+
+        for (; i <= _values.Length - vectorSize; i += vectorSize)
+        {
+            var v1 = new System.Numerics.Vector<float>(_values, i);
+            var v2 = new System.Numerics.Vector<float>(other._values, i);
+            (v1 - v2).CopyTo(_values, i);
+        }
+
+        for (; i < _values.Length; i++)
         {
             _values[i] -= other._values[i];
         }
     }
 
-    /// <summary>
-    /// 将当前张量乘以一个标量值。
-    /// </summary>
-    /// <param name="scalar">要乘以的标量值。</param>
     public void Multiply(float scalar)
     {
-        for (int i = 0; i < _values.Length; i++)
+        int vectorSize = System.Numerics.Vector<float>.Count;
+        int i = 0;
+        var vScalar = new System.Numerics.Vector<float>(scalar);
+
+        for (; i <= _values.Length - vectorSize; i += vectorSize)
+        {
+            var v = new System.Numerics.Vector<float>(_values, i);
+            (v * vScalar).CopyTo(_values, i);
+        }
+
+        for (; i < _values.Length; i++)
         {
             _values[i] *= scalar;
         }
@@ -172,7 +190,7 @@ public class Tensor
     /// <returns>一个新的张量，它是当前张量的副本。</returns>
     public Tensor Clone()
     {
-        Tensor clone = new Tensor(Width, Height, Depth);
+        Tensor clone = new(Width, Height, Depth);
         Array.Copy(_values, clone._values, _values.Length);
         return clone;
     }
@@ -320,12 +338,29 @@ public class Tensor
             throw new ArgumentException("张量维度必须匹配。");
         }
 
-        float dotProduct = 0;
-        for (int i = 0; i < _values.Length; i++)
+        int vectorSize = System.Numerics.Vector<float>.Count;
+        int i = 0;
+        var dotProduct = System.Numerics.Vector<float>.Zero;
+
+        for (; i <= _values.Length - vectorSize; i += vectorSize)
         {
-            dotProduct += _values[i] * other._values[i];
+            var v1 = new System.Numerics.Vector<float>(_values, i);
+            var v2 = new System.Numerics.Vector<float>(other._values, i);
+            dotProduct += v1 * v2;
         }
-        return dotProduct;
+
+        float result = 0;
+        for (int j = 0; j < vectorSize; j++)
+        {
+            result += dotProduct[j];
+        }
+
+        for (; i < _values.Length; i++)
+        {
+            result += _values[i] * other._values[i];
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -339,11 +374,22 @@ public class Tensor
             throw new InvalidOperationException("无法归一化范数为零的张量。");
         }
 
-        for (int i = 0; i < _values.Length; i++)
+        int vectorSize = System.Numerics.Vector<float>.Count;
+        int i = 0;
+        var vNorm = new System.Numerics.Vector<float>(norm);
+
+        for (; i <= _values.Length - vectorSize; i += vectorSize)
+        {
+            var v = new System.Numerics.Vector<float>(_values, i);
+            (v / vNorm).CopyTo(_values, i);
+        }
+
+        for (; i < _values.Length; i++)
         {
             _values[i] /= norm;
         }
     }
+
 
     /// <summary>
     /// 计算张量的范数。
@@ -351,12 +397,28 @@ public class Tensor
     /// <returns>张量的范数。</returns>
     public float Norm()
     {
-        float sumOfSquares = 0;
-        for (int i = 0; i < _values.Length; i++)
+        int vectorSize = System.Numerics.Vector<float>.Count;
+        int i = 0;
+        var sumOfSquares = System.Numerics.Vector<float>.Zero;
+
+        for (; i <= _values.Length - vectorSize; i += vectorSize)
         {
-            sumOfSquares += _values[i] * _values[i];
+            var v = new System.Numerics.Vector<float>(_values, i);
+            sumOfSquares += v * v;
         }
-        return MathF.Sqrt(sumOfSquares);
+
+        float result = 0;
+        for (int j = 0; j < vectorSize; j++)
+        {
+            result += sumOfSquares[j];
+        }
+
+        for (; i < _values.Length; i++)
+        {
+            result += _values[i] * _values[i];
+        }
+
+        return MathF.Sqrt(result);
     }
 
     /// <summary>
