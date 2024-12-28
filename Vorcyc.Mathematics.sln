@@ -15,8 +15,6 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Numerics", "shared projects
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SignalProcessing", "shared projects\SignalProcessing\SignalProcessing.shproj", "{B2C3419E-250A-487D-BC7C-0C89640B96AE}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Statistics", "shared projects\Statistics\Statistics.shproj", "{8116AE5E-9C08-4C27-9EB9-E9E50D69BA0B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "targets", "targets", "{E0B00A4A-8D98-4AD3-AA39-F39CFCFCBC4F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotNET8_Portable", "targets\dotNET8_Portable\dotNET8_Portable.csproj", "{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76}"
@@ -93,7 +91,6 @@ Global
 		{D8A93FFC-AB0F-400A-95E7-F1ED6B0B812F} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{7EE17963-00E5-412C-A6DE-FB94C21E4F57} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{B2C3419E-250A-487D-BC7C-0C89640B96AE} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
-		{8116AE5E-9C08-4C27-9EB9-E9E50D69BA0B} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{BB96F4DF-3F0A-4AC3-ACCD-9A80EF1D5C76} = {E0B00A4A-8D98-4AD3-AA39-F39CFCFCBC4F}
 		{2B689EB0-E9AA-487E-84A6-2750AA6896D8} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 		{05C9CE82-9814-4A38-A874-444151D41DAA} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
@@ -113,7 +110,6 @@ Global
 		shared projects\Statistics_class\Statistics_class.projitems*{0b0fefde-c426-4203-b897-55e2d9da98bb}*SharedItemsImports = 13
 		shared projects\Core\Core.projitems*{61cdf5ae-6d99-4a3e-a3cd-30293c143fe6}*SharedItemsImports = 13
 		shared projects\Numerics\Numerics.projitems*{7ee17963-00e5-412c-a6de-fb94c21e4f57}*SharedItemsImports = 13
-		shared projects\Statistics\Statistics.projitems*{8116ae5e-9c08-4c27-9eb9-e9e50d69ba0b}*SharedItemsImports = 13
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b2c3419e-250a-487d-bc7c-0c89640b96ae}*SharedItemsImports = 13
 		shared projects\ComputingContext\ComputingContext.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Core\Core.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
