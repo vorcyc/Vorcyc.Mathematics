@@ -67,6 +67,15 @@ public static partial class VMath
         return MathF.Log(x + MathF.Sqrt(x * x + 1));
     }
 
+    /// <summary>
+    /// Computes Inverse Sinh of <paramref name="x"/>.
+    /// </summary>
+    public static T Asinh<T>(T x)
+        where T : struct, IFloatingPointIeee754<T>
+    {
+        return T.Log(x + T.Sqrt(x * x + T.One));
+    }
+
     ///// <summary>
     ///// Computes factorial <paramref name="n"/>!.
     ///// </summary>

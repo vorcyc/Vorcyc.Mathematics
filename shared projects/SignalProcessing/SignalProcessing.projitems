@@ -186,6 +186,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Tsm\TsmAlgorithm.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Tsm\Wsola.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\WaveShaper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scale.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Scale_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Builders\AdsrBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Builders\AwgnBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Builders\Base\ISampleGenerator.cs" />

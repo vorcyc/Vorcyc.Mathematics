@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Vorcyc.Mathematics;
+﻿namespace Vorcyc.Mathematics.SignalProcessing;
 
 /// <summary>
 /// Provides methods for 
@@ -27,7 +23,7 @@ namespace Vorcyc.Mathematics;
 /// </list>
 /// </para>
 /// </summary>
-public static class Scale
+public static partial class Scale
 {
     /// <summary>
     /// Converts magnitude value to dB level.
@@ -134,8 +130,8 @@ public static class Scale
     public static double PitchToFreq(int pitch)
     {
         return 440 * Math.Pow(2, (pitch - 69) / 12.0);
-    }
-
+    }  
+    
     /// <summary>
     /// Converts frequency to MIDI pitch.
     /// </summary>
@@ -176,7 +172,7 @@ public static class Scale
     /// Converts frequency in Hz to note (in tuple format ("G", 3), ("E", 5), etc.).
     /// </summary>
     /// <param name="freq">Frequency in Hz</param>
-    public static (string, int) FreqToNote(double freq)
+    public static (string note, int octave) FreqToNote(double freq)
     {
         var pitch = FreqToPitch(freq);
 

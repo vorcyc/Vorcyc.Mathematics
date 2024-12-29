@@ -47,5 +47,11 @@ internal enum DeviceDependency
     /// <summary>
     /// Tensor Processing Unit.
     /// </summary>
-    TPU
+    TPU,
+
+
+    /// <summary>
+    /// Neural Processing Unit.
+    /// </summary>
+    NPU
 }

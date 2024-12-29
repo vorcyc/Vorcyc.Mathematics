@@ -1,5 +1,9 @@
 ﻿namespace Vorcyc.Mathematics.LanguageExtension;
 
+
+/// <summary>
+/// Provides extension methods for various language-related operations.
+/// </summary>
 public static class LanguageExtension
 {
     /// <summary>
@@ -46,31 +50,35 @@ public static class LanguageExtension
         }
     }
 
+    #region ToBool (C/C++ language bridge)
+
     /// <summary>
-    /// Converts an integer to a boolean value.
+    /// Converts an integer to a boolean value. This method is a C/C++ language bridge.
     /// </summary>
     /// <param name="x">The integer to convert.</param>
-    /// <returns>True if the integer is not zero, otherwise false.</returns>
+    /// <returns>True if the integer is non-zero; otherwise, false.</returns>
     public static bool ToBool(this int x) => x != 0;
 
     /// <summary>
-    /// Converts an unsigned integer to a boolean value.
+    /// Converts an unsigned integer to a boolean value. This method is a C/C++ language bridge.
     /// </summary>
     /// <param name="x">The unsigned integer to convert.</param>
-    /// <returns>True if the unsigned integer is not zero, otherwise false.</returns>
+    /// <returns>True if the unsigned integer is non-zero; otherwise, false.</returns>
     public static bool ToBool(this uint x) => x != 0;
 
     /// <summary>
-    /// Converts a long integer to a boolean value.
+    /// Converts a long integer to a boolean value. This method is a C/C++ language bridge.
     /// </summary>
     /// <param name="x">The long integer to convert.</param>
-    /// <returns>True if the long integer is not zero, otherwise false.</returns>
+    /// <returns>True if the long integer is non-zero; otherwise, false.</returns>
     public static bool ToBool(this long x) => x != 0;
 
     /// <summary>
-    /// Converts an unsigned long integer to a boolean value.
+    /// Converts an unsigned long integer to a boolean value. This method is a C/C++ language bridge.
     /// </summary>
     /// <param name="x">The unsigned long integer to convert.</param>
-    /// <returns>True if the unsigned long integer is not zero, otherwise false.</returns>
+    /// <returns>True if the unsigned long integer is non-zero; otherwise, false.</returns>
     public static bool ToBool(this ulong x) => x != 0;
+
+    #endregion
 }

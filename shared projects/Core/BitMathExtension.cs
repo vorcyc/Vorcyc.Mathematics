@@ -1,5 +1,9 @@
 ﻿namespace Vorcyc.Mathematics;
 
+
+/// <summary>
+/// Provides extension methods for various bitwise operations.
+/// </summary>
 public static class BitMathExtension
 {
 
@@ -650,37 +654,6 @@ public static class BitMathExtension
     #endregion
 
 
-    #region ToBool (C/C++ language bridge)
-
-    /// <summary>
-    /// Converts an integer to bool .This method is C/C++ language bridge.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    public static bool ToBool(this int x) => x != 0;
-
-    /// <summary>
-    /// Converts an integer to bool .This method is C/C++ language bridge.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    public static bool ToBool(this uint x) => x != 0;
-
-    /// <summary>
-    /// Converts an integer to bool .This method is C/C++ language bridge.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    public static bool ToBool(this long x) => x != 0;
-
-    /// <summary>
-    /// Converts an integer to bool .This method is C/C++ language bridge.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    public static bool ToBool(this ulong x) => x != 0;
-
-    #endregion
 
 
 
