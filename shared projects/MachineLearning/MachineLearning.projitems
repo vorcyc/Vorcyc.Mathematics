@@ -11,7 +11,11 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)another_SimpleLinearRegression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\DBSCAN.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\EMBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\ExpectationMaximization.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\GMM.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\KMeansClusterer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\VectorQuantization.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DecisionTree.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\TSNE.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distances\Angular.cs" />

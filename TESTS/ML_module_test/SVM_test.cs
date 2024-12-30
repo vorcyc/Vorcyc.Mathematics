@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using Vorcyc.Mathematics.LanguageExtension;
+using Vorcyc.Mathematics.Utilities;
 using Vorcyc.Mathematics.MachineLearning;
 
 namespace ML_module_test;

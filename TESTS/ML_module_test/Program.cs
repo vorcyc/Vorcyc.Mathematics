@@ -8,5 +8,4 @@ using Vorcyc.Mathematics;
 
 
 
-DecisionTree_test.BuildTree_ShouldBuildCorrectTree();
-DecisionTree_test.Predict_ShouldReturnCorrectLabel();
+GMM_test.go();

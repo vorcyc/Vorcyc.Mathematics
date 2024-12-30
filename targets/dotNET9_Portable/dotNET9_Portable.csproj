@@ -13,8 +13,8 @@
 	  <Company>Vorcyc</Company>
 	  <Description>A pure dotNET and high performance math library.</Description>
 	  <Copyright>Vorcyc® Mathematics</Copyright>
-	  <Version>0.4.3.0</Version>
-	  <AssemblyVersion>0.4.3.0</AssemblyVersion>
+	  <Version>0.4.5.0</Version>
+	  <AssemblyVersion>0.4.5.0</AssemblyVersion>
 	  <Title>Vorcy.Mathematics</Title>
 	  <PackageIcon>logo1.png</PackageIcon>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
