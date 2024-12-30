@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics.LanguageExtension;
+﻿namespace Vorcyc.Mathematics.Utilities;
 
 /// <summary>
 /// 提供用于打印各种类型对象的扩展方法。

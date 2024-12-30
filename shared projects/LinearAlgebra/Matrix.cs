@@ -222,6 +222,18 @@ public class Matrix : ICloneable<Matrix>
     public float[] this[int i] => _matrix[i];
 
     /// <summary>
+    /// 获取或设置指定位置的元素。
+    /// </summary>
+    /// <param name="row">行索引。</param>
+    /// <param name="col">列索引。</param>
+    /// <returns>指定位置的元素。</returns>
+    public float this[int row, int col]
+    {
+        get { return _matrix[row][col]; }
+        set { _matrix[row][col] = value; }
+    }
+
+    /// <summary>
     /// Calculates the determinant of the matrix.
     /// </summary>
     public float Determinant()
@@ -459,6 +471,41 @@ public class Matrix : ICloneable<Matrix>
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Cholesky decomposition.
+    /// </summary>
+    /// <returns>Lower triangular matrix.</returns>
+    public Matrix CholeskyDecomposition()
+    {
+        if (Rows != Columns)
+            throw new InvalidOperationException("Matrix must be square for Cholesky decomposition.");
+
+        Matrix L = new(Rows, Columns);
+
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j <= i; j++)
+            {
+                float sum = 0;
+                for (int k = 0; k < j; k++)
+                {
+                    sum += L[i][k] * L[j][k];
+                }
+
+                if (i == j)
+                {
+                    L[i][j] = MathF.Sqrt(_matrix[i][i] - sum);
+                }
+                else
+                {
+                    L[i][j] = (_matrix[i][j] - sum) / L[j][j];
+                }
+            }
+        }
+
+        return L;
     }
 
     /// <summary>

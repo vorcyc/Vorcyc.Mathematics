@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vorcyc.Mathematics;
-using Vorcyc.Mathematics.LanguageExtension;
+﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Utilities;
 
 namespace core_module_test;
 

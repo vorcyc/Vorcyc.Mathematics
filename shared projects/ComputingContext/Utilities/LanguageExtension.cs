@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics.LanguageExtension;
+﻿namespace Vorcyc.Mathematics.Utilities;
 
 
 /// <summary>

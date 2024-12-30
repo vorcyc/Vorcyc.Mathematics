@@ -9,8 +9,10 @@
     <Import_RootNamespace>Vorcyc.Mathematics.LinearAlgebra</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BasisTransformation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Combinatorics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DimensionMismatchException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LinearEquationSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Matrix.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixOperations.cs" />

@@ -14,11 +14,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComputingBackend.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShellExtension\LanguageExtension.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ShellExtension\PrintHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\LanguageExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\PrintHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)ShellExtension\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Utilities\" />
   </ItemGroup>
 </Project>

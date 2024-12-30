@@ -164,6 +164,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return result;
     }
 
+
+
     /// <summary>
     /// 矩阵转置。
     /// </summary>
@@ -363,6 +365,41 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Cholesky分解。
+    /// </summary>
+    /// <returns>下三角矩阵。</returns>
+    public Matrix<T> CholeskyDecomposition()
+    {
+        if (Rows != Columns)
+            throw new InvalidOperationException("Matrix must be square for Cholesky decomposition.");
+
+        Matrix<T> L = new(Rows, Columns);
+
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j <= i; j++)
+            {
+                T sum = T.Zero;
+                for (int k = 0; k < j; k++)
+                {
+                    sum += L[i, k] * L[j, k];
+                }
+
+                if (i == j)
+                {
+                    L[i, j] = Sqrt(_data[i, i] - sum);
+                }
+                else
+                {
+                    L[i, j] = (_data[i, j] - sum) / L[j, j];
+                }
+            }
+        }
+
+        return L;
     }
 
     private static T Sqrt(T value)

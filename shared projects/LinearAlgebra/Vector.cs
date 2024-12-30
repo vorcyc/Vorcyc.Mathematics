@@ -222,4 +222,29 @@ public class Vector
     /// <returns>The dot product of the two vectors.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float operator *(Vector v1, Vector v2) => DotProduct(v1, v2);
+
+
+    /// <summary>
+    /// 矩阵与向量乘法运算符。
+    /// </summary>
+    /// <param name="matrix">矩阵。</param>
+    /// <param name="vector">向量。</param>
+    /// <returns>矩阵与向量的乘积。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Vector operator *(Matrix matrix, Vector vector)
+    {
+        if (matrix.Columns != vector.Dimension)
+            throw new ArgumentException("Matrix columns must match vector dimension for multiplication.");
+
+        float[] result = new float[matrix.Rows];
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+            result[i] = 0f;
+            for (int j = 0; j < matrix.Columns; j++)
+            {
+                result[i] += matrix[i, j] * vector.Elements[j];
+            }
+        }
+        return new Vector(result);
+    }
 }
