@@ -2,10 +2,12 @@
 
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Vorcyc.Mathematics.LanguageExtension;
+
 /*
- *  我原来的 C++ 版本是
- *  从 https://stackoverflow.com/questions/2682725/int24-24-bit-integral-datatype 找的
- */
+*  我原来的 C++ 版本是
+*  从 https://stackoverflow.com/questions/2682725/int24-24-bit-integral-datatype 找的
+*/
 
 /// <summary>Represents a 3-byte, 24-bit signed integer.</summary>
 /// <remarks>
