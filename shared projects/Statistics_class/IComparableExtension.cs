@@ -28,8 +28,9 @@ public static partial class IComparableExtension
     /// </summary>
     /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns><c>true</c> if the first value is less than the second value; otherwise, <c>false</c>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool LessThan<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
     {
@@ -41,8 +42,9 @@ public static partial class IComparableExtension
     /// </summary>
     /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns><c>true</c> if the first value is less than or equal to the second value; otherwise, <c>false</c>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool LessThanOrEqual<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
     {
@@ -54,8 +56,9 @@ public static partial class IComparableExtension
     /// </summary>
     /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns><c>true</c> if the first value is greater than the second value; otherwise, <c>false</c>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool GreaterThan<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
     {
@@ -67,8 +70,9 @@ public static partial class IComparableExtension
     /// </summary>
     /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns><c>true</c> if the first value is greater than or equal to the second value; otherwise, <c>false</c>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool GreaterThanOrEqual<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
     {
@@ -80,8 +84,9 @@ public static partial class IComparableExtension
     /// </summary>
     /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns><c>true</c> if the first value is equal to the second value; otherwise, <c>false</c>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool Equal<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
     {
@@ -91,15 +96,14 @@ public static partial class IComparableExtension
     /// <summary>
     /// Determines whether the first value is not equal to the second value.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns><c>true</c> if the first value is not equal to the second value; otherwise, <c>false</c>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool NotEqual<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
         => value1.CompareTo(value2) != 0;
-
-
 
     #endregion
 
@@ -111,8 +115,9 @@ public static partial class IComparableExtension
     /// </summary>
     /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns>The maximum of the two values.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T CompareMax<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
         => value1.CompareTo(value2) == 1 ? value1 : value2;
@@ -120,14 +125,14 @@ public static partial class IComparableExtension
     /// <summary>
     /// Returns the minimum of two values.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="value1">The first value.</param>
-    /// <param name="value2">The second value.</param>
+    /// <param name="value2">The second value。</param>
     /// <returns>The minimum of the two values.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T CompareMin<T>(this T value1, T value2)
         where T : IComparable, IComparable<T>
         => value1.CompareTo(value2) == 1 ? value2 : value1;
-
 
     #endregion
 
@@ -137,9 +142,10 @@ public static partial class IComparableExtension
     /// <summary>
     /// Returns the maximum value in an array.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="values">The array of values.</param>
     /// <returns>The maximum value in the array.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T CompareMax<T>(this T[] values)
         where T : IComparable, IComparable<T>
     {
@@ -152,12 +158,10 @@ public static partial class IComparableExtension
         return result;
     }
 
-
-
     /// <summary>
     /// Returns the maximum value in a specified range of an array.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="values">The array of values.</param>
     /// <param name="start">The starting index of the range.</param>
     /// <param name="length">The length of the range.</param>
@@ -178,9 +182,10 @@ public static partial class IComparableExtension
     /// <summary>
     /// Returns the maximum value in a span.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="span">The span of values.</param>
     /// <returns>The maximum value in the span.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T CompareMax<T>(this Span<T> span)
         where T : IComparable, IComparable<T>
     {
@@ -193,11 +198,10 @@ public static partial class IComparableExtension
         return result;
     }
 
-
     /// <summary>
     /// Returns the minimum value in an array.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="values">The array of values.</param>
     /// <returns>The minimum value in the array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -213,11 +217,10 @@ public static partial class IComparableExtension
         return result;
     }
 
-
     /// <summary>
     /// Returns the minimum value in a specified range of an array.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="values">The array of values.</param>
     /// <param name="start">The starting index of the range.</param>
     /// <param name="length">The length of the range.</param>
@@ -235,14 +238,13 @@ public static partial class IComparableExtension
         return result;
     }
 
-
-
     /// <summary>
     /// Returns the minimum value in a span.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="span">The span of values.</param>
     /// <returns>The minimum value in the span.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T CompareMin<T>(this Span<T> span)
         where T : IComparable, IComparable<T>
     {
@@ -263,9 +265,10 @@ public static partial class IComparableExtension
     /// <summary>
     /// Returns the maximum and minimum values in an array.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="values">The array of values.</param>
     /// <returns>A tuple containing the maximum and minimum values in the array.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (T max, T min) CompareMaxMin<T>(this T[] values)
         where T : IComparable, IComparable<T>
     {
@@ -280,11 +283,10 @@ public static partial class IComparableExtension
         return (max, min);
     }
 
-
     /// <summary>
     /// Returns the maximum and minimum values in a specified range of an array.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="values">The array of values.</param>
     /// <param name="start">The starting index of the range.</param>
     /// <param name="length">The length of the range.</param>
@@ -304,13 +306,13 @@ public static partial class IComparableExtension
         return (max, min);
     }
 
-
     /// <summary>
     /// Returns the maximum and minimum values in a span.
     /// </summary>
-    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>.</typeparam>
+    /// <typeparam name="T">The type of the values. Must implement <see cref="IComparable{T}"/>。</typeparam>
     /// <param name="span">The span of values.</param>
     /// <returns>A tuple containing the maximum and minimum values in the span.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (T max, T min) CompareMaxMin<T>(this Span<T> span)
         where T : IComparable, IComparable<T>
     {

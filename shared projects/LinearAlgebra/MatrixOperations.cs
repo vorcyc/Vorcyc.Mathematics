@@ -2,9 +2,11 @@
 
 namespace Vorcyc.Mathematics.LinearAlgebra;
 
-public static  class MatrixOperations
+/// <summary>
+/// Provides static methods for performing matrix operations.
+/// </summary>
+public static class MatrixOperations
 {
-
     /// <summary>
     /// Multiplies two matrices.
     /// </summary>
@@ -12,6 +14,8 @@ public static  class MatrixOperations
     /// <param name="a">The first matrix.</param>
     /// <param name="b">The second matrix.</param>
     /// <returns>The product of the two matrices.</returns>
+    /// <exception cref="ArgumentException">Thrown when the matrices have incompatible dimensions for multiplication.</exception>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[,] Multiply<T>(T[,] a, T[,] b) where T : INumber<T>
     {
         int aRows = a.GetLength(0);
@@ -44,6 +48,8 @@ public static  class MatrixOperations
     /// <param name="a">The first matrix.</param>
     /// <param name="b">The second matrix.</param>
     /// <returns>The product of the two matrices.</returns>
+    /// <exception cref="ArgumentException">Thrown when the matrices have incompatible dimensions for multiplication.</exception>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[][] Multiply(float[][] a, float[][] b)
     {
         int aRows = a.Length;

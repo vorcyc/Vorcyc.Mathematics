@@ -10,6 +10,7 @@ public class Tensor : ICloneable<Tensor>
     ///<param name="w">宽度。</param>
     ///<param name="h">高度。</param>
     ///<param name="d">深度。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(int w, int h, int d)
     {
         if (w <= 0 || h <= 0 || d <= 0)
@@ -28,6 +29,7 @@ public class Tensor : ICloneable<Tensor>
     ///<param name="h">高度。</param>
     ///<param name="d">深度。</param>
     ///<param name="initialValue">所有元素的初始值。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(int w, int h, int d, float initialValue) : this(w, h, d)
     {
         for (int i = 0; i < _values.Length; i++)
@@ -38,6 +40,7 @@ public class Tensor : ICloneable<Tensor>
 
     ///<summary>从三维数组初始化张量。</summary>
     ///<param name="array">用于初始化张量的三维数组。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(float[,,] array)
     {
         this.Width = array.GetLength(0);
@@ -78,11 +81,13 @@ public class Tensor : ICloneable<Tensor>
     /// <returns>指定坐标的值。</returns>
     public float this[int x, int y, int z]
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             ValidateIndices(x, y, z);
             return this._values[((this.Width * y) + x) * this.Depth + z];
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         set
         {
             ValidateIndices(x, y, z);
@@ -96,6 +101,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="x">X 坐标（宽度）。</param>
     /// <param name="y">Y 坐标（高度）。</param>
     /// <param name="z">Z 坐标（深度）。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ValidateIndices(int x, int y, int z)
     {
         if (x < 0 || x >= Width || y < 0 || y >= Height || z < 0 || z >= Depth)
@@ -108,6 +114,7 @@ public class Tensor : ICloneable<Tensor>
     /// 用指定的值填充张量。
     /// </summary>
     /// <param name="value">用于填充张量的值。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Fill(float value)
     {
         for (int i = 0; i < _values.Length; i++)
@@ -118,6 +125,7 @@ public class Tensor : ICloneable<Tensor>
 
     #region operators inline
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Tensor other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -141,6 +149,8 @@ public class Tensor : ICloneable<Tensor>
         }
     }
 
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Subtract(Tensor other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -164,6 +174,8 @@ public class Tensor : ICloneable<Tensor>
         }
     }
 
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Multiply(float scalar)
     {
         int vectorSize = System.Numerics.Vector<float>.Count;
@@ -188,6 +200,7 @@ public class Tensor : ICloneable<Tensor>
     /// 克隆张量。
     /// </summary>
     /// <returns>一个新的张量，它是当前张量的副本。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor Clone()
     {
         Tensor clone = new(Width, Height, Depth);
@@ -199,6 +212,7 @@ public class Tensor : ICloneable<Tensor>
     /// 返回张量的字符串表示形式。
     /// </summary>
     /// <returns>张量的字符串表示形式。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
         return $"Tensor<float> [Width={Width}, Height={Height}, Depth={Depth}]";
@@ -212,6 +226,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="a">第一个张量。</param>
     /// <param name="b">第二个张量。</param>
     /// <returns>两个张量相加的结果。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor operator +(Tensor a, Tensor b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
@@ -233,6 +248,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="a">第一个张量。</param>
     /// <param name="b">第二个张量。</param>
     /// <returns>从第一个张量中减去第二个张量的结果。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor operator -(Tensor a, Tensor b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
@@ -254,6 +270,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="tensor">张量。</param>
     /// <param name="scalar">标量值。</param>
     /// <returns>张量乘以标量值的结果。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor operator *(Tensor tensor, float scalar)
     {
         Tensor result = new Tensor(tensor.Width, tensor.Height, tensor.Depth);
@@ -270,6 +287,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="scalar">标量值。</param>
     /// <param name="tensor">张量。</param>
     /// <returns>张量乘以标量值的结果。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor operator *(float scalar, Tensor tensor)
     {
         return tensor * scalar;
@@ -283,6 +301,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="axis1">第一个轴。</param>
     /// <param name="axis2">第二个轴。</param>
     /// <returns>转置后的新张量。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor Transpose(int axis1, int axis2)
     {
         if (axis1 < 0 || axis1 > 2 || axis2 < 0 || axis2 > 2 || axis1 == axis2)
@@ -316,6 +335,7 @@ public class Tensor : ICloneable<Tensor>
     /// 计算张量中所有元素的和。
     /// </summary>
     /// <returns>张量中所有元素的和。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Sum()
     {
         float sum = 0;
@@ -331,6 +351,7 @@ public class Tensor : ICloneable<Tensor>
     /// </summary>
     /// <param name="other">另一个张量。</param>
     /// <returns>两个张量的点积。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Dot(Tensor other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
@@ -366,6 +387,7 @@ public class Tensor : ICloneable<Tensor>
     /// <summary>
     /// 归一化张量。
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Normalize()
     {
         float norm = Norm();
@@ -395,6 +417,7 @@ public class Tensor : ICloneable<Tensor>
     /// 计算张量的范数。
     /// </summary>
     /// <returns>张量的范数。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Norm()
     {
         int vectorSize = System.Numerics.Vector<float>.Count;
@@ -427,6 +450,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="axis">要切片的轴。</param>
     /// <param name="index">切片的索引。</param>
     /// <returns>切片后的新张量。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor Slice(int axis, int index)
     {
         if (axis < 0 || axis > 2)
@@ -468,6 +492,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="a">第一个张量。</param>
     /// <param name="b">第二个张量。</param>
     /// <returns>如果张量相等，则为 true，否则为 false。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Tensor a, Tensor b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
@@ -491,6 +516,7 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="a">第一个张量。</param>
     /// <param name="b">第二个张量。</param>
     /// <returns>如果张量不相等，则为 true，否则为 false。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Tensor a, Tensor b)
     {
         return !(a == b);
@@ -501,6 +527,7 @@ public class Tensor : ICloneable<Tensor>
     /// </summary>
     /// <param name="obj">要与当前对象进行比较的对象。</param>
     /// <returns>如果指定对象等于当前对象，则为 true，否则为 false。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
         if (obj is Tensor other)
@@ -514,6 +541,7 @@ public class Tensor : ICloneable<Tensor>
     /// 作为默认的哈希函数。
     /// </summary>
     /// <returns>当前对象的哈希代码。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
         int hash = 17;

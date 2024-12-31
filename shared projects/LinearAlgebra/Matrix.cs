@@ -22,6 +22,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Constructs <see cref="Matrix"/> with given number of <paramref name="rows"/> and <paramref name="columns"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix(int rows, int columns = 0)
     {
         if (columns == 0) columns = rows;
@@ -43,6 +44,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Constructs <see cref="Matrix"/> from a 2D array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix(float[][] data)
     {
         Rows = data.Length;
@@ -61,6 +63,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Gets reference to underlying 2D array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float[][] As2dArray() => _matrix;
 
     /// <summary>
@@ -68,6 +71,7 @@ public class Matrix : ICloneable<Matrix>
     /// </summary>
     public Matrix T
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             var transposed = new Matrix(Columns, Rows);
@@ -88,6 +92,7 @@ public class Matrix : ICloneable<Matrix>
     /// Returns companion matrix.
     /// </summary>
     /// <param name="a">Input array</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix Companion(float[] a)
     {
         if (a.Length < 2)
@@ -120,6 +125,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Returns identity matrix of given <paramref name="size"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix Eye(int size)
     {
         var eye = new Matrix(size);
@@ -135,6 +141,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Returns sum of matrices <paramref name="m1"/> and <paramref name="m2"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix operator +(Matrix m1, Matrix m2)
     {
         Guard.AgainstInequality(m1.Rows, m2.Rows, "Number of rows in first matrix", "number of rows in second matrix");
@@ -156,6 +163,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Subtracts matrix <paramref name="m2"/> from matrix <paramref name="m1"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix operator -(Matrix m1, Matrix m2)
     {
         Guard.AgainstInequality(m1.Rows, m2.Rows, "Number of rows in first matrix", "number of rows in second matrix");
@@ -177,6 +185,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Multiplies matrix <paramref name="m1"/> by matrix <paramref name="m2"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix operator *(Matrix m1, Matrix m2)
     {
         Guard.AgainstInequality(m1.Columns, m2.Rows, "Number of columns in first matrix", "number of rows in second matrix");
@@ -200,6 +209,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Multiplies matrix <paramref name="m"/> by scalar <paramref name="scalar"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix operator *(Matrix m, float scalar)
     {
         var result = new Matrix(m.Rows, m.Columns);
@@ -236,6 +246,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Calculates the determinant of the matrix.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Determinant()
     {
         if (Rows != Columns)
@@ -246,6 +257,8 @@ public class Matrix : ICloneable<Matrix>
         return CalculateDeterminant(_matrix);
     }
 
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private float CalculateDeterminant(float[][] matrix)
     {
         int n = matrix.Length;
@@ -296,6 +309,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Calculates the inverse of the matrix.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix Inverse()
     {
         if (Rows != Columns)
@@ -324,6 +338,7 @@ public class Matrix : ICloneable<Matrix>
         return inverse;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private float[][] Adjoint(float[][] matrix)
     {
         int n = matrix.Length;
@@ -388,6 +403,7 @@ public class Matrix : ICloneable<Matrix>
     /// </summary>
     /// <param name="L">Output lower triangular matrix.</param>
     /// <param name="U">Output upper triangular matrix.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LUDecomposition(out Matrix L, out Matrix U)
     {
         int n = Rows;
@@ -433,6 +449,7 @@ public class Matrix : ICloneable<Matrix>
     /// </summary>
     /// <param name="Q">Output orthogonal matrix.</param>
     /// <param name="R">Output upper triangular matrix.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void QRDecomposition(out Matrix Q, out Matrix R)
     {
         int m = Rows;
@@ -477,6 +494,7 @@ public class Matrix : ICloneable<Matrix>
     /// Cholesky decomposition.
     /// </summary>
     /// <returns>Lower triangular matrix.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix CholeskyDecomposition()
     {
         if (Rows != Columns)
@@ -511,6 +529,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Creates a deep copy of the matrix.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix Clone()
     {
         Matrix clone = new Matrix(Rows, Columns);
@@ -529,6 +548,7 @@ public class Matrix : ICloneable<Matrix>
     /// <summary>
     /// Returns a string representation of the matrix.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
         StringBuilder sb = new();
@@ -537,7 +557,7 @@ public class Matrix : ICloneable<Matrix>
         {
             for (int j = 0; j < Columns; j++)
             {
-                sb.Append(_matrix[i][j].ToString("F2")).Append(" ");
+                sb.Append(_matrix[i][j].ToString("F2")).Append(' ');
             }
 
             sb.AppendLine();

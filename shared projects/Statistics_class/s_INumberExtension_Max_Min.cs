@@ -53,6 +53,7 @@ public static partial class Statistics
     /// <typeparam name="T"></typeparam>
     /// <param name="span"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Max<T>(this Span<T> span)
            where T : struct, INumber<T>
     {

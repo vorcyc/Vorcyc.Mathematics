@@ -29,6 +29,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// </summary>
     /// <param name="rows">行数。</param>
     /// <param name="columns">列数。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix(int rows, int columns)
     {
         Guard.AgainstNonPositive(rows, "Number of rows");
@@ -43,6 +44,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 使用 T[,] 数据构造一个矩阵。
     /// </summary>
     /// <param name="data">二维数组形式的数据。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix(T[,] data)
     {
         Rows = data.GetLength(0);
@@ -73,6 +75,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 隐式转换为 T[,]。
     /// </summary>
     /// <param name="matrix">要转换的矩阵。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator T[,](Matrix<T> matrix)
     {
         T[,] result = new T[matrix.Rows, matrix.Columns];
@@ -92,6 +95,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <param name="a">第一个矩阵。</param>
     /// <param name="b">第二个矩阵。</param>
     /// <returns>两个矩阵的和。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix<T> operator +(Matrix<T> a, Matrix<T> b)
     {
         if (a.Rows != b.Rows || a.Columns != b.Columns)
@@ -114,6 +118,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <param name="a">第一个矩阵。</param>
     /// <param name="b">第二个矩阵。</param>
     /// <returns>两个矩阵的差。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix<T> operator -(Matrix<T> a, Matrix<T> b)
     {
         if (a.Rows != b.Rows || a.Columns != b.Columns)
@@ -136,6 +141,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <param name="a">第一个矩阵。</param>
     /// <param name="b">第二个矩阵。</param>
     /// <returns>两个矩阵的乘积。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix<T> operator *(Matrix<T> a, Matrix<T> b)
     {
         if (a.Columns != b.Rows)
@@ -151,6 +157,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <param name="matrix">矩阵。</param>
     /// <param name="scalar">标量。</param>
     /// <returns>矩阵与标量的乘积。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix<T> operator *(Matrix<T> matrix, T scalar)
     {
         Matrix<T> result = new(matrix.Rows, matrix.Columns);
@@ -170,6 +177,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 矩阵转置。
     /// </summary>
     /// <returns>转置后的矩阵。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix<T> Transpose()
     {
         Matrix<T> result = new(Columns, Rows);
@@ -187,6 +195,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 计算矩阵的行列式。
     /// </summary>
     /// <returns>矩阵的行列式。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Determinant()
     {
         if (Rows != Columns)
@@ -195,6 +204,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return CalculateDeterminant(_data);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private T CalculateDeterminant(T[,] matrix)
     {
         int n = matrix.GetLength(0);
@@ -226,6 +236,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 计算矩阵的逆矩阵。
     /// </summary>
     /// <returns>矩阵的逆矩阵。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix<T> Inverse()
     {
         if (Rows != Columns)
@@ -248,6 +259,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private T[,] Adjoint(T[,] matrix)
     {
         int n = matrix.GetLength(0);
@@ -281,6 +293,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// </summary>
     /// <param name="L">输出的下三角矩阵。</param>
     /// <param name="U">输出的上三角矩阵。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void LUDecomposition(out Matrix<T> L, out Matrix<T> U)
     {
         int n = Rows;
@@ -326,6 +339,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// </summary>
     /// <param name="Q">输出的正交矩阵。</param>
     /// <param name="R">输出的上三角矩阵。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void QRDecomposition(out Matrix<T> Q, out Matrix<T> R)
     {
         int m = Rows;
@@ -371,6 +385,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// Cholesky分解。
     /// </summary>
     /// <returns>下三角矩阵。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix<T> CholeskyDecomposition()
     {
         if (Rows != Columns)
@@ -402,6 +417,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return L;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static T Sqrt(T value)
     {
         if (typeof(T) == typeof(float))
@@ -438,6 +454,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 创建矩阵的深拷贝。
     /// </summary>
     /// <returns>矩阵的深拷贝。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix<T> Clone()
     {
         Matrix<T> clone = new(Rows, Columns);
@@ -449,6 +466,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 返回矩阵的字符串表示形式。
     /// </summary>
     /// <returns>矩阵的字符串表示形式。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
         StringBuilder sb = new();
