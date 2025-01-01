@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Vorcyc.Mathematics.LinearAlgebra.Matrix&lt;T&gt;">
+    <Position X="9" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAQQAAAAIAAFCEaAcAACAEUAQAACUAAAAAAggAADA=</HashCode>
+      <FileName>E:\cyclone projects\Mathematics\Vorcyc.Mathematics\shared projects\LinearAlgebra\Matrix_g.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

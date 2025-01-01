@@ -6,110 +6,97 @@ namespace Vorcyc.Mathematics.LinearAlgebra;
 /// <summary>
 /// 表示一个二维矩阵。
 /// </summary>
-/// <typeparam name="T">数值类型，必须实现 INumber 接口。</typeparam>
-public class Matrix<T> : ICloneable<Matrix<T>>
-    where T : struct, INumber<T>
+public class Matrix : ICloneable<Matrix>
 {
-    private T[] _values;
+
+    private Memory<float> _values;
     private int _rows;
     private int _columns;
 
     /// <summary>
-    /// 获取矩阵的行数。
+    /// Gets the number of rows in the matrix.
     /// </summary>
     public int Rows => _rows;
 
     /// <summary>
-    /// 获取矩阵的列数。
+    /// Gets the number of columns in the matrix.
     /// </summary>
     public int Columns => _columns;
 
     /// <summary>
-    /// 使用指定的行数和列数构造一个矩阵。
+    /// Constructs a matrix with the specified number of rows and columns.
     /// </summary>
-    /// <param name="rows">行数。</param>
-    /// <param name="columns">列数。</param>
+    /// <param name="rows">Number of rows.</param>
+    /// <param name="columns">Number of columns.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix(int rows, int columns)
     {
-        Guard.AgainstNonPositive(rows, "Rows and columns must be positive integers.");
-        Guard.AgainstNonPositive(columns, "Rows and columns must be positive integers.");
+        if (rows <= 0 || columns <= 0)
+            throw new ArgumentException("Rows and columns must be positive integers.");
 
         _rows = rows;
         _columns = columns;
-        _values = new T[rows * columns];
-    }
-
-
-    /// <summary>
-    /// 使用指定的大小构造一个方阵。
-    /// </summary>
-    /// <param name="size">矩阵的大小（行数和列数）。</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix(int size)
-    {
-        Guard.AgainstNonPositive(size, "Rows and columns must be positive integers.");
-
-        _rows = size;
-        _columns = size;
-        _values = new T[size * size];
+        _values = new Memory<float>(new float[rows * columns]);
     }
 
     /// <summary>
-    /// 使用 T[,] 数据构造一个矩阵。
+    /// Constructs a square matrix with the specified size.
     /// </summary>
-    /// <param name="initialValues">二维数组形式的数据。</param>
+    /// <param name="size">Size of the matrix (number of rows and columns).</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix(T[,] initialValues)
+    public Matrix(int size) : this(size, size) { }
+
+    /// <summary>
+    /// Constructs a matrix from a 2D array.
+    /// </summary>
+    /// <param name="initialValues">2D array of initial values.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Matrix(float[,] initialValues)
     {
         _rows = initialValues.GetLength(0);
         _columns = initialValues.GetLength(1);
-        _values = new T[_rows * _columns];
+        _values = new Memory<float>(new float[_rows * _columns]);
 
         for (int i = 0; i < _rows; i++)
         {
             for (int j = 0; j < _columns; j++)
             {
-                _values[i * _columns + j] = initialValues[i, j];
+                _values.Span[i * _columns + j] = initialValues[i, j];
             }
         }
     }
 
-
     #region Indexer
 
     /// <summary>
-    /// 获取或设置指定位置的元素。
+    /// Gets or sets the element at the specified position.
     /// </summary>
-    /// <param name="row">行索引。</param>
-    /// <param name="column">列索引。</param>
-    /// <returns>指定位置的元素。</returns>   
-    public ref T this[int row, int column]
+    /// <param name="row">Row index.</param>
+    /// <param name="column">Column index.</param>
+    /// <returns>The element at the specified position.</returns>
+    public ref float this[int row, int column]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             if (row < 0 || row >= _rows || column < 0 || column >= _columns)
-            {
                 throw new IndexOutOfRangeException("Row or column is out of range.");
-            }
-            return ref _values[row * _columns + column];
+            return ref _values.Span[row * _columns + column];
         }
     }
 
     #endregion
 
-
-    #region 隐式转换
+    #region Implicit Conversions
 
     /// <summary>
-    /// 隐式转换为 T[,](二维数组)。
+    /// Implicitly converts the matrix to a 2D array.
     /// </summary>
-    /// <param name="matrix">要转换的矩阵。</param>
+    /// <param name="matrix">The matrix to convert.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator T[,](Matrix<T> matrix)
+    public static implicit operator float[,](Matrix matrix)
     {
-        T[,] result = new T[matrix.Rows, matrix.Columns];
+        float[,] result = new float[matrix.Rows, matrix.Columns];
         for (int i = 0; i < matrix.Rows; i++)
         {
             for (int j = 0; j < matrix.Columns; j++)
@@ -121,16 +108,16 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     }
 
     /// <summary>
-    /// 隐式转换为 T[][]（交错数组）。
+    /// Implicitly converts the matrix to a jagged array.
     /// </summary>
-    /// <param name="matrix"></param>
+    /// <param name="matrix">The matrix to convert.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator T[][](Matrix<T> matrix)
+    public static implicit operator float[][](Matrix matrix)
     {
-        T[][] result = new T[matrix.Rows][];
+        float[][] result = new float[matrix.Rows][];
         for (int i = 0; i < matrix.Rows; i++)
         {
-            result[i] = new T[matrix.Columns];
+            result[i] = new float[matrix.Columns];
             for (int j = 0; j < matrix.Columns; j++)
             {
                 result[i][j] = matrix[i, j];
@@ -139,18 +126,16 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return result;
     }
 
-
-
     /// <summary>
-    /// 隐式转换交错数组为矩阵。
+    /// Implicitly converts a jagged array to a matrix.
     /// </summary>
-    /// <param name="values">交错数组。</param>
+    /// <param name="values">The jagged array to convert.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Matrix<T>(T[][] values)
+    public static implicit operator Matrix(float[][] values)
     {
         int rows = values.Length;
         int columns = values[0].Length;
-        T[,] array = new T[rows, columns];
+        float[,] array = new float[rows, columns];
 
         for (int i = 0; i < rows; i++)
         {
@@ -160,109 +145,107 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             }
         }
 
-        return new Matrix<T>(array);
+        return new Matrix(array);
     }
 
     /// <summary>
-    /// 隐式转换二维数组为矩阵。
+    /// Implicitly converts a 2D array to a matrix.
     /// </summary>
-    /// <param name="values">二维数组。</param>
+    /// <param name="values">The 2D array to convert.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Matrix<T>(T[,] values)
+    public static implicit operator Matrix(float[,] values)
     {
-        return new Matrix<T>(values);
+        return new Matrix(values);
     }
-
 
     #endregion
 
-
-    #region operators
+    #region Operators
 
     /// <summary>
-    /// 矩阵加法运算符。
+    /// Matrix addition operator.
     /// </summary>
-    /// <param name="a">第一个矩阵。</param>
-    /// <param name="b">第二个矩阵。</param>
-    /// <returns>两个矩阵的和。</returns>
+    /// <param name="a">The first matrix.</param>
+    /// <param name="b">The second matrix.</param>
+    /// <returns>The sum of the two matrices.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> operator +(Matrix<T> a, Matrix<T> b)
+    public static Matrix operator +(Matrix a, Matrix b)
     {
         if (a.Rows != b.Rows || a.Columns != b.Columns)
             throw new ArgumentException("Matrices must have the same dimensions for addition.");
 
-        Matrix<T> result = new(a.Rows, a.Columns);
+        Matrix result = new(a.Rows, a.Columns);
         int length = a._values.Length;
-        int vectorSize = System.Numerics.Vector<T>.Count;
+        int vectorSize = System.Numerics.Vector<float>.Count;
 
         int i;
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var va = new System.Numerics.Vector<T>(a._values, i);
-            var vb = new System.Numerics.Vector<T>(b._values, i);
+            var va = new System.Numerics.Vector<float>(a._values.Span.Slice(i, vectorSize));
+            var vb = new System.Numerics.Vector<float>(b._values.Span.Slice(i, vectorSize));
             var vr = va + vb;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = a._values[i] + b._values[i];
+            result._values.Span[i] = a._values.Span[i] + b._values.Span[i];
         }
 
         return result;
     }
 
     /// <summary>
-    /// 矩阵减法运算符。
+    /// Matrix subtraction operator.
     /// </summary>
-    /// <param name="a">第一个矩阵。</param>
-    /// <param name="b">第二个矩阵。</param>
-    /// <returns>两个矩阵的差。</returns>
+    /// <param name="a">The first matrix.</param>
+    /// <param name="b">The second matrix.</param>
+    /// <returns>The difference of the two matrices.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> operator -(Matrix<T> a, Matrix<T> b)
+    public static Matrix operator -(Matrix a, Matrix b)
     {
         if (a.Rows != b.Rows || a.Columns != b.Columns)
             throw new ArgumentException("Matrices must have the same dimensions for subtraction.");
 
-        Matrix<T> result = new(a.Rows, a.Columns);
+        Matrix result = new(a.Rows, a.Columns);
         int length = a._values.Length;
-        int vectorSize = System.Numerics.Vector<T>.Count;
+        int vectorSize = System.Numerics.Vector<float>.Count;
 
         int i;
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var va = new System.Numerics.Vector<T>(a._values, i);
-            var vb = new System.Numerics.Vector<T>(b._values, i);
+            var va = new System.Numerics.Vector<float>(a._values.Span.Slice(i, vectorSize));
+            var vb = new System.Numerics.Vector<float>(b._values.Span.Slice(i, vectorSize));
             var vr = va - vb;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = a._values[i] - b._values[i];
+            result._values.Span[i] = a._values.Span[i] - b._values.Span[i];
         }
 
         return result;
     }
 
     /// <summary>
-    /// 矩阵乘法运算符。
+    /// Matrix multiplication operator.
     /// </summary>
-    /// <param name="a">第一个矩阵。</param>
-    /// <param name="b">第二个矩阵。</param>
-    /// <returns>两个矩阵的乘积。</returns>
+    /// <param name="a">The first matrix.</param>
+    /// <param name="b">The second matrix.</param>
+    /// <returns>The product of the two matrices.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> operator *(Matrix<T> a, Matrix<T> b)
+    public static Matrix operator *(Matrix a, Matrix b)
     {
         if (a.Columns != b.Rows)
             throw new ArgumentException("Matrices must have compatible dimensions for multiplication.");
 
-        Matrix<T> result = new(a.Rows, b.Columns);
+        Matrix result = new(a.Rows, b.Columns);
         for (int i = 0; i < a.Rows; i++)
         {
             for (int j = 0; j < b.Columns; j++)
             {
-                T sum = T.Zero;
+                float sum = 0;
                 for (int k = 0; k < a.Columns; k++)
                 {
                     sum += a[i, k] * b[k, j];
@@ -274,127 +257,114 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     }
 
     /// <summary>
-    /// 矩阵乘法运算符，矩阵乘以标量。
+    /// Matrix-scalar multiplication operator.
     /// </summary>
-    /// <param name="matrix">矩阵。</param>
-    /// <param name="scalar">标量。</param>
-    /// <returns>矩阵与标量的乘积。</returns>
+    /// <param name="matrix">The matrix.</param>
+    /// <param name="scalar">The scalar.</param>
+    /// <returns>The product of the matrix and the scalar.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> operator *(Matrix<T> matrix, T scalar)
+    public static Matrix operator *(Matrix matrix, float scalar)
     {
-        Matrix<T> result = new(matrix.Rows, matrix.Columns);
+        Matrix result = new(matrix.Rows, matrix.Columns);
         int length = matrix._values.Length;
-        int vectorSize = System.Numerics.Vector<T>.Count;
+        int vectorSize = System.Numerics.Vector<float>.Count;
 
         int i;
-        var vScalar = new System.Numerics.Vector<T>(scalar);
+        var vScalar = new System.Numerics.Vector<float>(scalar);
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var vm = new System.Numerics.Vector<T>(matrix._values, i);
+            var vm = new System.Numerics.Vector<float>(matrix._values.Span.Slice(i, vectorSize));
             var vr = vm * vScalar;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = matrix._values[i] * scalar;
+            result._values.Span[i] = matrix._values.Span[i] * scalar;
         }
 
         return result;
     }
 
     /// <summary>
-    /// 矩阵除法运算符，矩阵除以标量。
+    /// Matrix-scalar division operator.
     /// </summary>
-    /// <param name="matrix">矩阵。</param>
-    /// <param name="scalar">标量。</param>
-    /// <returns>矩阵与标量的商。</returns>
+    /// <param name="matrix">The matrix.</param>
+    /// <param name="scalar">The scalar.</param>
+    /// <returns>The quotient of the matrix and the scalar.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> operator /(Matrix<T> matrix, T scalar)
+    public static Matrix operator /(Matrix matrix, float scalar)
     {
-        Matrix<T> result = new(matrix.Rows, matrix.Columns);
+        Matrix result = new(matrix.Rows, matrix.Columns);
         int length = matrix._values.Length;
-        int vectorSize = System.Numerics.Vector<T>.Count;
+        int vectorSize = System.Numerics.Vector<float>.Count;
 
         int i;
-        var vScalar = new System.Numerics.Vector<T>(scalar);
+        var vScalar = new System.Numerics.Vector<float>(scalar);
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var vm = new System.Numerics.Vector<T>(matrix._values, i);
+            var vm = new System.Numerics.Vector<float>(matrix._values.Span.Slice(i, vectorSize));
             var vr = vm / vScalar;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = matrix._values[i] / scalar;
+            result._values.Span[i] = matrix._values.Span[i] / scalar;
         }
 
         return result;
     }
 
     #endregion
-
 
     #region GetRow or GetColumn
 
     /// <summary>
-    /// 获取指定行的元素。
+    /// Gets the elements of the specified row.
     /// </summary>
-    /// <param name="rowIndex">行索引。</param>
-    /// <returns>指定行的元素的 Span。</returns>
-    /// <remarks>
-    /// 在 GetRow 方法中，直接使用 <see cref="Span{T}"/> 构造函数创建对原数组的切片，这样返回的 <see cref="Span{T}"/> 可以引用到原数组中的元素。
-    /// </remarks>
+    /// <param name="rowIndex">Row index.</param>
+    /// <returns>A span of the elements in the specified row.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Span<T> GetRow(int rowIndex)
+    public Span<float> GetRow(int rowIndex)
     {
         if (rowIndex < 0 || rowIndex >= _rows)
-        {
             throw new IndexOutOfRangeException("Row index is out of range.");
-        }
 
-        return new Span<T>(_values, rowIndex * _columns, _columns);
+        return _values.Span.Slice(rowIndex * _columns, _columns);
     }
 
     /// <summary>
-    /// 获取指定列的元素。
+    /// Gets the elements of the specified column.
     /// </summary>
-    /// <param name="columnIndex">列索引。</param>
-    /// <returns>指定列的元素的 ReadOnlySpan。</returns>
-    /// <remarks>
-    /// 在 GetColumn 方法中，由于列在内存中不是连续的，所以需要创建一个新的数组来存储列元素，然后返回这个数组的 <see cref="ReadOnlySpan{T}"/>。这样可以确保返回的列数据是只读的。
-    /// </remarks>
+    /// <param name="columnIndex">Column index.</param>
+    /// <returns>A read-only span of the elements in the specified column.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ReadOnlySpan<T> GetColumn(int columnIndex)
+    public ReadOnlySpan<float> GetColumn(int columnIndex)
     {
         if (columnIndex < 0 || columnIndex >= _columns)
-        {
             throw new IndexOutOfRangeException("Column index is out of range.");
-        }
 
-        T[] column = new T[_rows];
+        float[] column = new float[_rows];
         for (int i = 0; i < _rows; i++)
         {
             column[i] = this[i, columnIndex];
         }
-        return new ReadOnlySpan<T>(column);
+        return new ReadOnlySpan<float>(column);
     }
 
     #endregion
 
-
-    #region 矩阵操作
-
+    #region Matrix Operations
 
     /// <summary>
-    /// 矩阵转置。
+    /// Transposes the matrix.
     /// </summary>
-    /// <returns>转置后的矩阵。</returns>
+    /// <returns>The transposed matrix.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix<T> Transpose()
+    public Matrix Transpose()
     {
-        Matrix<T> result = new(_columns, _rows);
+        Matrix result = new(_columns, _rows);
         for (int i = 0; i < _rows; i++)
         {
             for (int j = 0; j < _columns; j++)
@@ -406,28 +376,28 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     }
 
     /// <summary>
-    /// 计算矩阵的行列式。
+    /// Calculates the determinant of the matrix.
     /// </summary>
-    /// <returns>矩阵的行列式。</returns>
+    /// <returns>The determinant of the matrix.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T Determinant()
+    public float Determinant()
     {
         if (_rows != _columns)
             throw new InvalidOperationException("Matrix must be square to calculate determinant.");
 
-        return CalculateDeterminant(_values, _rows);
+        return CalculateDeterminant(_values.Span, _rows);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private T CalculateDeterminant(T[] values, int n)
+    private float CalculateDeterminant(Span<float> values, int n)
     {
         if (n == 1)
             return values[0];
         if (n == 2)
             return values[0] * values[3] - values[1] * values[2];
 
-        T det = T.Zero;
-        T[] subMatrix = new T[(n - 1) * (n - 1)];
+        float det = 0;
+        float[] subMatrix = new float[(n - 1) * (n - 1)];
         for (int p = 0; p < n; p++)
         {
             int subIndex = 0;
@@ -439,28 +409,28 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                     subMatrix[subIndex++] = values[i * n + j];
                 }
             }
-            det += values[p] * CalculateDeterminant(subMatrix, n - 1) * (p % 2 == 0 ? T.One : -T.One);
+            det += values[p] * CalculateDeterminant(subMatrix, n - 1) * (p % 2 == 0 ? 1 : -1);
         }
         return det;
     }
 
     /// <summary>
-    /// 计算矩阵的逆矩阵。
+    /// Calculates the inverse of the matrix.
     /// </summary>
-    /// <returns>矩阵的逆矩阵。</returns>
+    /// <returns>The inverse of the matrix.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix<T> Inverse()
+    public Matrix Inverse()
     {
         if (_rows != _columns)
             throw new InvalidOperationException("Matrix must be square to calculate inverse.");
 
-        T det = Determinant();
+        float det = Determinant();
 
-        if (T.Abs(det) < T.CreateChecked(1e-10))
+        if (Math.Abs(det) < 1e-10)
             throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
 
-        Matrix<T> result = new(_rows, _columns);
-        T[] adjoint = Adjoint(_values, _rows);
+        Matrix result = new(_rows, _columns);
+        float[] adjoint = Adjoint(_values.Span, _rows);
         for (int i = 0; i < _rows; i++)
         {
             for (int j = 0; j < _columns; j++)
@@ -472,10 +442,10 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private T[] Adjoint(T[] values, int n)
+    private float[] Adjoint(Span<float> values, int n)
     {
-        T[] adjoint = new T[n * n];
-        T[] subMatrix = new T[(n - 1) * (n - 1)];
+        float[] adjoint = new float[n * n];
+        float[] subMatrix = new float[(n - 1) * (n - 1)];
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
@@ -490,7 +460,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                         subMatrix[subIndex++] = values[row * n + col];
                     }
                 }
-                adjoint[j * n + i] = CalculateDeterminant(subMatrix, n - 1) * ((i + j) % 2 == 0 ? T.One : -T.One);
+                adjoint[j * n + i] = CalculateDeterminant(subMatrix, n - 1) * ((i + j) % 2 == 0 ? 1 : -1);
             }
         }
         return adjoint;
@@ -501,18 +471,17 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
     #region Decomposition
 
-
     /// <summary>
-    /// LU分解。
+    /// LU decomposition.
     /// </summary>
-    /// <param name="L">输出的下三角矩阵。</param>
-    /// <param name="U">输出的上三角矩阵。</param>
+    /// <param name="L">Output lower triangular matrix.</param>
+    /// <param name="U">Output upper triangular matrix.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void LUDecomposition(out Matrix<T> L, out Matrix<T> U)
+    public void LUDecomposition(out Matrix L, out Matrix U)
     {
         int n = _rows;
-        L = new Matrix<T>(n, n);
-        U = new Matrix<T>(n, n);
+        L = new Matrix(n, n);
+        U = new Matrix(n, n);
 
         for (int i = 0; i < n; i++)
         {
@@ -520,58 +489,58 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             {
                 if (i <= j)
                 {
-                    U[i, j] = _values[i * n + j];
+                    U[i, j] = _values.Span[i * n + j];
                     for (int k = 0; k < i; k++)
                     {
                         U[i, j] -= L[i, k] * U[k, j];
                     }
                     if (i == j)
                     {
-                        L[i, j] = T.One;
+                        L[i, j] = 1;
                     }
                     else
                     {
-                        L[i, j] = T.Zero;
+                        L[i, j] = 0;
                     }
                 }
                 else
                 {
-                    L[i, j] = _values[i * n + j];
+                    L[i, j] = _values.Span[i * n + j];
                     for (int k = 0; k < j; k++)
                     {
                         L[i, j] -= L[i, k] * U[k, j];
                     }
                     L[i, j] /= U[j, j];
-                    U[i, j] = T.Zero;
+                    U[i, j] = 0;
                 }
             }
         }
     }
 
     /// <summary>
-    /// QR分解。
+    /// QR decomposition.
     /// </summary>
-    /// <param name="Q">输出的正交矩阵。</param>
-    /// <param name="R">输出的上三角矩阵。</param>
+    /// <param name="Q">Output orthogonal matrix.</param>
+    /// <param name="R">Output upper triangular matrix.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void QRDecomposition(out Matrix<T> Q, out Matrix<T> R)
+    public void QRDecomposition(out Matrix Q, out Matrix R)
     {
         int m = _rows;
         int n = _columns;
-        Q = new Matrix<T>(m, m);
-        R = new Matrix<T>(m, n);
+        Q = new Matrix(m, m);
+        R = new Matrix(m, n);
 
-        T[] A = (T[])_values.Clone();
+        float[] A = _values.ToArray();
 
         for (int k = 0; k < n; k++)
         {
-            T norm = T.Zero;
+            float norm = 0;
             for (int i = 0; i < m; i++)
             {
                 norm += A[i * n + k] * A[i * n + k];
             }
 
-            norm = Sqrt(norm);
+            norm = MathF.Sqrt(norm);
 
             R[k, k] = norm;
             for (int i = 0; i < m; i++)
@@ -581,7 +550,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
             for (int j = k + 1; j < n; j++)
             {
-                T dotProduct = T.Zero;
+                float dotProduct = 0;
                 for (int i = 0; i < m; i++)
                 {
                     dotProduct += Q[i, k] * A[i * n + j];
@@ -596,22 +565,22 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     }
 
     /// <summary>
-    /// Cholesky分解。
+    /// Cholesky decomposition.
     /// </summary>
-    /// <returns>下三角矩阵。</returns>
+    /// <returns>Lower triangular matrix.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix<T> CholeskyDecomposition()
+    public Matrix CholeskyDecomposition()
     {
         if (_rows != _columns)
             throw new InvalidOperationException("Matrix must be square for Cholesky decomposition.");
 
-        Matrix<T> L = new(_rows, _columns);
+        Matrix L = new(_rows, _columns);
 
         for (int i = 0; i < _rows; i++)
         {
             for (int j = 0; j <= i; j++)
             {
-                T sum = T.Zero;
+                float sum = 0f;
                 for (int k = 0; k < j; k++)
                 {
                     sum += L[i, k] * L[j, k];
@@ -619,11 +588,11 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
                 if (i == j)
                 {
-                    L[i, j] = Sqrt(_values[i * _columns + i] - sum);
+                    L[i, j] = MathF.Sqrt(_values.Span[i * _columns + i] - sum);
                 }
                 else
                 {
-                    L[i, j] = (_values[i * _columns + j] - sum) / L[j, j];
+                    L[i, j] = (_values.Span[i * _columns + j] - sum) / L[j, j];
                 }
             }
         }
@@ -631,77 +600,28 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return L;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static T Sqrt(T value)
-    {
-        if (typeof(T) == typeof(float))
-        {
-            return (T)(object)MathF.Sqrt((float)(object)value);
-        }
-        else if (typeof(T) == typeof(double))
-        {
-            return (T)(object)Math.Sqrt((double)(object)value);
-        }
-        else if (typeof(T) == typeof(decimal))
-        {
-            return (T)(object)Math.Sqrt((double)(object)value);
-        }
-        else if (typeof(T) == typeof(int))
-        {
-            return (T)(object)(int)Math.Sqrt((int)(object)value);
-        }
-        else if (typeof(T) == typeof(long))
-        {
-            return (T)(object)(long)Math.Sqrt((long)(object)value);
-        }
-        else if (typeof(T) == typeof(short))
-        {
-            return (T)(object)(short)Math.Sqrt((short)(object)value);
-        }
-        else
-        {
-            throw new NotSupportedException($"Sqrt is not supported for type {typeof(T)}.");
-        }
-    }
-
     #endregion
 
 
+    #region Utility Methods
 
     /// <summary>
-    /// 创建一个单位矩阵。
+    /// Creates an identity matrix of the specified size.
     /// </summary>
-    /// <param name="size">矩阵的大小（行数和列数）。</param>
-    /// <returns>单位矩阵。</returns>
+    /// <param name="size">The size of the matrix (number of rows and columns).</param>
+    /// <returns>The identity matrix.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> Eye(int size)
+    public static Matrix Eye(int size)
     {
-        var eye = new Matrix<T>(size);
+        var eye = new Matrix(size);
 
         for (var i = 0; i < size; i++)
         {
-            eye[i, i] = T.One;
+            eye[i, i] = 1;
         }
 
         return eye;
     }
-
-
-
-
-    /// <summary>
-    /// 用随机数填充矩阵。
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void FillRandom()
-    {
-        for (int i = 0; i < _values.Length; i++)
-        {
-            _values[i] = T.CreateTruncating(Random.Shared.NextDouble());
-        }
-    }
-
-
 
     /// <summary>
     /// 创建一个伴随矩阵。
@@ -710,21 +630,21 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <returns>伴随矩阵。</returns>
     /// <exception cref="ArgumentException">当输入数组的长度小于2或第一个系数为零时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> Companion(T[] a)
+    public static Matrix Companion(float[] a)
     {
         if (a.Length < 2)
         {
             throw new ArgumentException("The size of input array must be at least 2!");
         }
 
-        if (T.Abs(a[0]) < T.CreateSaturating( 1e-30))
+        if (Math.Abs(a[0]) < 1e-30)
         {
             throw new ArgumentException("The first coefficient must not be zero!");
         }
 
         var size = a.Length - 1;
 
-        var companion = new Matrix<T>(size);
+        var companion = new Matrix(size);
 
         for (var i = 0; i < size; i++)
         {
@@ -733,33 +653,40 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
         for (var i = 1; i < size; i++)
         {
-            companion.GetRow(i)[i - 1] = T.One;
+            companion.GetRow(i)[i - 1] = 1;
         }
 
         return companion;
     }
 
-
+    /// <summary>
+    /// Fills the matrix with random values.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void FillRandom()
+    {
+        for (int i = 0; i < _values.Length; i++)
+        {
+            _values.Span[i] = Random.Shared.NextSingle();
+        }
+    }
 
     /// <summary>
-    /// 创建矩阵的深拷贝。
+    /// Creates a deep copy of the matrix.
     /// </summary>
-    /// <returns>矩阵的深拷贝。</returns>
+    /// <returns>A deep copy of the matrix.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Matrix<T> Clone()
+    public Matrix Clone()
     {
-        Matrix<T> clone = new(_rows, _columns);
-        Array.Copy(_values, clone._values, _values.Length);
+        Matrix clone = new(_rows, _columns);
+        _values.CopyTo(clone._values);
         return clone;
     }
 
-
-
-
     /// <summary>
-    /// 返回矩阵的字符串表示形式。
+    /// Returns a string representation of the matrix.
     /// </summary>
-    /// <returns>矩阵的字符串表示形式。</returns>
+    /// <returns>A string representation of the matrix.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
@@ -778,4 +705,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
         return sb.ToString();
     }
+
+    #endregion
+
+
 }

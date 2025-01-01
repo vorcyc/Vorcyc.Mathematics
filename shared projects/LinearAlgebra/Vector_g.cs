@@ -7,7 +7,7 @@ namespace Vorcyc.Mathematics.LinearAlgebra;
 /// </summary>
 /// <typeparam name="T">The type of the elements in the vector, which must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
 public class Vector<T>
-    where T : IFloatingPointIeee754<T>
+    where T : struct, IFloatingPointIeee754<T>
 {
     /// <summary>
     /// Gets the elements of the vector.

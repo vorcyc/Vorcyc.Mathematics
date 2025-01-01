@@ -8,7 +8,7 @@ namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 /// </summary>
 /// <typeparam name="T">数值类型，必须实现 IFloatingPointIeee754 接口。</typeparam>
 public class TSNE<T>
-    where T : IFloatingPointIeee754<T>
+    where T : struct, IFloatingPointIeee754<T>
 {
     private int _perplexity;
     private int _maxIter;

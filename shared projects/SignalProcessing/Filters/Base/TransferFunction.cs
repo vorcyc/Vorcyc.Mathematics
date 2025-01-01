@@ -164,7 +164,7 @@ public class TransferFunction
             {
                 return new StateSpace
                 {
-                    A = new Matrix(1).As2dArray(),
+                    A = new Matrix(1),
                     B = new float[M],
                     C = new float[M],
                     D = new float[1] { Numerator[0] / a0 }
@@ -182,11 +182,11 @@ public class TransferFunction
             var a = new Matrix(K - 1);
             for (var i = 0; i < K - 1; i++)
             {
-                a[0][i] = -Denominator[i + 1] / a0;
+                a.GetRow(0)[i] = -Denominator[i + 1] / a0;
             }
             for (var i = 1; i < K - 1; i++)
             {
-                a[i][i - 1] = 1;
+                a.GetRow(i)[i - 1] = 1;
             }
 
             var b = new float[K - 1];
@@ -202,7 +202,7 @@ public class TransferFunction
 
             return new StateSpace
             {
-                A = a.As2dArray(),
+                A = a,
                 B = b,
                 C = c,
                 D = d
@@ -234,13 +234,13 @@ public class TransferFunction
                 B[i - 1] = b[i] - a[i] * b[0];
             }
 
-            Matrix m = Matrix.Eye(size - 1) - Matrix.Companion(a).T;
+            Matrix m = Matrix.Eye(size - 1) - Matrix.Companion(a).Transpose();
 
             var sum = 0.0f;
 
             for (var i = 0; i < size - 1; i++)
             {
-                sum += m[i][0];
+                sum += m.GetRow(i)[0];
             }
 
             var zi = new float[size];

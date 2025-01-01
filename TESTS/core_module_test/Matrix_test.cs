@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
+using Vorcyc.Mathematics.Utilities;
 
 namespace core_module_test;
 
@@ -13,36 +14,49 @@ internal class Matrix_test
     {
 
 
-     
+        var m1 = new Matrix(4, 3);
+        for (int i = 0; i < m1.Rows; i++)
+        {
+            for (int j = 0; j < m1.Columns; j++)
+            {
+                m1[i, j] = i * 3 + j;
+            }
+        }
+
+        Console.WriteLine(m1);
 
 
-        var nm = new NewMatrix<double>(4,3);
-        nm.FillRandom();
+        m1.QRDecomposition(out var q1, out var r1);
 
-        Console.WriteLine(  nm);
-
-
-        nm[0,0] = 1;
-
-        Console.WriteLine(nm);
-
-        Console.WriteLine(nm[0,0]);
+        Console.WriteLine(q1);
+        Console.WriteLine(r1);
 
 
-        //m.QRDecomposition(out var q, out var r);
 
-        //Console.WriteLine(q);
-        //Console.WriteLine(r);
+        new string('-', 20).PrintLine( ConsoleColor.Red);
+
+        var m = new Matrix<double>(4, 3);
+        for (int i = 0; i < m.Rows; i++)
+        {
+            for (int j = 0; j < m.Columns; j++)
+            {
+                m[i, j] = i * 3 + j;
+            }
+        }
+
+        Console.WriteLine(m);
+
+
+        m.QRDecomposition(out var q, out var r);
+
+        Console.WriteLine(q);
+        Console.WriteLine(r);
+
+
+
     }
 
 
-    public static double Add(double a, double b)
-    {
-        var x = 1;
-        var y = new float[100];
-
-        return a + b;
-    }
 
 
 }

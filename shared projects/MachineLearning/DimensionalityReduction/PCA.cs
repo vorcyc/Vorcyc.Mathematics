@@ -49,7 +49,7 @@ namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 /// 主成分分析 (PCA) 类，用于降维和特征提取。
 /// </summary>
 public class PCA<TSelf> : IMachineLearning
-    where TSelf : IFloatingPointIeee754<TSelf>
+    where TSelf : struct, IFloatingPointIeee754<TSelf>
 {
     private readonly Matrix<TSelf> _data;
     private TSelf[] _means;
