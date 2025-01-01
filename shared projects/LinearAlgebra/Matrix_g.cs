@@ -10,7 +10,7 @@ namespace Vorcyc.Mathematics.LinearAlgebra;
 public class Matrix<T> : ICloneable<Matrix<T>>
     where T : struct, INumber<T>
 {
-    private T[] _values;
+    private Memory<T> _values;
     private int _rows;
     private int _columns;
 
@@ -23,6 +23,9 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// 获取矩阵的列数。
     /// </summary>
     public int Columns => _columns;
+
+
+    #region 构造器
 
     /// <summary>
     /// 使用指定的行数和列数构造一个矩阵。
@@ -37,9 +40,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
         _rows = rows;
         _columns = columns;
-        _values = new T[rows * columns];
+        _values = new Memory<T>(new T[rows * columns]);
     }
-
 
     /// <summary>
     /// 使用指定的大小构造一个方阵。
@@ -52,7 +54,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
         _rows = size;
         _columns = size;
-        _values = new T[size * size];
+        _values = new Memory<T>(new T[size * size]);
     }
 
     /// <summary>
@@ -64,16 +66,18 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     {
         _rows = initialValues.GetLength(0);
         _columns = initialValues.GetLength(1);
-        _values = new T[_rows * _columns];
+        _values = new Memory<T>(new T[_rows * _columns]);
 
         for (int i = 0; i < _rows; i++)
         {
             for (int j = 0; j < _columns; j++)
             {
-                _values[i * _columns + j] = initialValues[i, j];
+                _values.Span[i * _columns + j] = initialValues[i, j];
             }
         }
     }
+
+    #endregion
 
 
     #region Indexer
@@ -93,7 +97,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             {
                 throw new IndexOutOfRangeException("Row or column is out of range.");
             }
-            return ref _values[row * _columns + column];
+            return ref _values.Span[row * _columns + column];
         }
     }
 
@@ -139,8 +143,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return result;
     }
 
-
-
     /// <summary>
     /// 隐式转换交错数组为矩阵。
     /// </summary>
@@ -173,7 +175,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return new Matrix<T>(values);
     }
 
-
     #endregion
 
 
@@ -198,15 +199,15 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         int i;
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var va = new System.Numerics.Vector<T>(a._values, i);
-            var vb = new System.Numerics.Vector<T>(b._values, i);
+            var va = new System.Numerics.Vector<T>(a._values.Span.Slice(i, vectorSize));
+            var vb = new System.Numerics.Vector<T>(b._values.Span.Slice(i, vectorSize));
             var vr = va + vb;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = a._values[i] + b._values[i];
+            result._values.Span[i] = a._values.Span[i] + b._values.Span[i];
         }
 
         return result;
@@ -231,15 +232,15 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         int i;
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var va = new System.Numerics.Vector<T>(a._values, i);
-            var vb = new System.Numerics.Vector<T>(b._values, i);
+            var va = new System.Numerics.Vector<T>(a._values.Span.Slice(i, vectorSize));
+            var vb = new System.Numerics.Vector<T>(b._values.Span.Slice(i, vectorSize));
             var vr = va - vb;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = a._values[i] - b._values[i];
+            result._values.Span[i] = a._values.Span[i] - b._values.Span[i];
         }
 
         return result;
@@ -290,14 +291,14 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         var vScalar = new System.Numerics.Vector<T>(scalar);
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var vm = new System.Numerics.Vector<T>(matrix._values, i);
+            var vm = new System.Numerics.Vector<T>(matrix._values.Span.Slice(i, vectorSize));
             var vr = vm * vScalar;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = matrix._values[i] * scalar;
+            result._values.Span[i] = matrix._values.Span[i] * scalar;
         }
 
         return result;
@@ -320,14 +321,14 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         var vScalar = new System.Numerics.Vector<T>(scalar);
         for (i = 0; i <= length - vectorSize; i += vectorSize)
         {
-            var vm = new System.Numerics.Vector<T>(matrix._values, i);
+            var vm = new System.Numerics.Vector<T>(matrix._values.Span.Slice(i, vectorSize));
             var vr = vm / vScalar;
-            vr.CopyTo(result._values, i);
+            vr.CopyTo(result._values.Span.Slice(i, vectorSize));
         }
 
         for (; i < length; i++)
         {
-            result._values[i] = matrix._values[i] / scalar;
+            result._values.Span[i] = matrix._values.Span[i] / scalar;
         }
 
         return result;
@@ -354,7 +355,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             throw new IndexOutOfRangeException("Row index is out of range.");
         }
 
-        return new Span<T>(_values, rowIndex * _columns, _columns);
+        return _values.Span.Slice(rowIndex * _columns, _columns);
     }
 
     /// <summary>
@@ -386,7 +387,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
     #region 矩阵操作
 
-
     /// <summary>
     /// 矩阵转置。
     /// </summary>
@@ -415,11 +415,11 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         if (_rows != _columns)
             throw new InvalidOperationException("Matrix must be square to calculate determinant.");
 
-        return CalculateDeterminant(_values, _rows);
+        return CalculateDeterminant(_values.Span, _rows);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private T CalculateDeterminant(T[] values, int n)
+    private T CalculateDeterminant(Span<T> values, int n)
     {
         if (n == 1)
             return values[0];
@@ -460,7 +460,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             throw new InvalidOperationException("Matrix is singular and cannot be inverted.");
 
         Matrix<T> result = new(_rows, _columns);
-        T[] adjoint = Adjoint(_values, _rows);
+        T[] adjoint = Adjoint(_values.Span, _rows);
         for (int i = 0; i < _rows; i++)
         {
             for (int j = 0; j < _columns; j++)
@@ -472,7 +472,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private T[] Adjoint(T[] values, int n)
+    private T[] Adjoint(Span<T> values, int n)
     {
         T[] adjoint = new T[n * n];
         T[] subMatrix = new T[(n - 1) * (n - 1)];
@@ -501,7 +501,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
     #region Decomposition
 
-
     /// <summary>
     /// LU分解。
     /// </summary>
@@ -520,7 +519,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             {
                 if (i <= j)
                 {
-                    U[i, j] = _values[i * n + j];
+                    U[i, j] = _values.Span[i * n + j];
                     for (int k = 0; k < i; k++)
                     {
                         U[i, j] -= L[i, k] * U[k, j];
@@ -536,7 +535,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                 }
                 else
                 {
-                    L[i, j] = _values[i * n + j];
+                    L[i, j] = _values.Span[i * n + j];
                     for (int k = 0; k < j; k++)
                     {
                         L[i, j] -= L[i, k] * U[k, j];
@@ -561,7 +560,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         Q = new Matrix<T>(m, m);
         R = new Matrix<T>(m, n);
 
-        T[] A = (T[])_values.Clone();
+        T[] A = _values.ToArray();
 
         for (int k = 0; k < n; k++)
         {
@@ -619,11 +618,11 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
                 if (i == j)
                 {
-                    L[i, j] = Sqrt(_values[i * _columns + i] - sum);
+                    L[i, j] = Sqrt(_values.Span[i * _columns + i] - sum);
                 }
                 else
                 {
-                    L[i, j] = (_values[i * _columns + j] - sum) / L[j, j];
+                    L[i, j] = (_values.Span[i * _columns + j] - sum) / L[j, j];
                 }
             }
         }
@@ -667,6 +666,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     #endregion
 
 
+    #region Utility Methods
+
 
     /// <summary>
     /// 创建一个单位矩阵。
@@ -686,22 +687,18 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return eye;
     }
 
-
-
-
     /// <summary>
     /// 用随机数填充矩阵。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void FillRandom()
     {
-        for (int i = 0; i < _values.Length; i++)
+        var span = _values.Span;
+        for (int i = 0; i < span.Length; i++)
         {
-            _values[i] = T.CreateTruncating(Random.Shared.NextDouble());
+            span[i] = T.CreateTruncating(Random.Shared.NextDouble());
         }
     }
-
-
 
     /// <summary>
     /// 创建一个伴随矩阵。
@@ -717,7 +714,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             throw new ArgumentException("The size of input array must be at least 2!");
         }
 
-        if (T.Abs(a[0]) < T.CreateSaturating( 1e-30))
+        if (T.Abs(a[0]) < T.CreateSaturating(1e-30))
         {
             throw new ArgumentException("The first coefficient must not be zero!");
         }
@@ -739,8 +736,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         return companion;
     }
 
-
-
     /// <summary>
     /// 创建矩阵的深拷贝。
     /// </summary>
@@ -749,12 +744,9 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     public Matrix<T> Clone()
     {
         Matrix<T> clone = new(_rows, _columns);
-        Array.Copy(_values, clone._values, _values.Length);
+        _values.CopyTo(clone._values);
         return clone;
     }
-
-
-
 
     /// <summary>
     /// 返回矩阵的字符串表示形式。
@@ -778,4 +770,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
         return sb.ToString();
     }
+
+    #endregion
+
 }
+

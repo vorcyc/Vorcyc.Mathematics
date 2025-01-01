@@ -35,4 +35,11 @@ using Vorcyc.Mathematics.LinearAlgebra;
 //Console.WriteLine(s3);
 
 
-Matrix_test.go();
+//Matrix_test.go();
+
+
+Tensor<float> t1 = new(3, 3, 3);
+t1[1, 1, 1] = 1;
+var t = t1[1, 1, 1];
+
+Console.WriteLine(t1);

@@ -23,6 +23,9 @@ public class Matrix : ICloneable<Matrix>
     /// </summary>
     public int Columns => _columns;
 
+
+    #region 构造器
+
     /// <summary>
     /// Constructs a matrix with the specified number of rows and columns.
     /// </summary>
@@ -65,6 +68,9 @@ public class Matrix : ICloneable<Matrix>
             }
         }
     }
+    
+    #endregion
+
 
     #region Indexer
 
@@ -86,6 +92,7 @@ public class Matrix : ICloneable<Matrix>
     }
 
     #endregion
+
 
     #region Implicit Conversions
 
@@ -159,6 +166,7 @@ public class Matrix : ICloneable<Matrix>
     }
 
     #endregion
+
 
     #region Operators
 
@@ -318,6 +326,7 @@ public class Matrix : ICloneable<Matrix>
 
     #endregion
 
+
     #region GetRow or GetColumn
 
     /// <summary>
@@ -354,6 +363,7 @@ public class Matrix : ICloneable<Matrix>
     }
 
     #endregion
+
 
     #region Matrix Operations
 

@@ -1,20 +1,23 @@
 ﻿namespace Vorcyc.Mathematics.LinearAlgebra;
 
-
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-
-///<summary>3-dimensional tensor of <see cref="IBinaryFloatingPointIeee754{TSelf}"/> data type.</summary>
-public class Tensor<T> :ICloneable<Tensor<T>>
+/// <summary>
+/// 3维张量，数据类型为 <see cref="IBinaryFloatingPointIeee754{TSelf}"/>。
+/// </summary>
+public class Tensor<T> : ICloneable<Tensor<T>>
     where T : IBinaryFloatingPointIeee754<T>
 {
-    private readonly T[] _values;
+    private readonly Memory<T> _values;
 
-    ///<summary>Initializes the Tensor with specified size.</summary>
-    ///<param name="w">Width.</param>
-    ///<param name="h">Height.</param>
-    ///<param name="d">Depth.</param>
+    /// <summary>
+    /// 使用指定的大小初始化张量。
+    /// </summary>
+    /// <param name="w">宽度。</param>
+    /// <param name="h">高度。</param>
+    /// <param name="d">深度。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(int w, int h, int d)
     {
@@ -29,22 +32,27 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         this.Depth = d;
     }
 
-    ///<summary>Initializes the Tensor with specified size and initial value.</summary>
-    ///<param name="w">Width.</param>
-    ///<param name="h">Height.</param>
-    ///<param name="d">Depth.</param>
-    ///<param name="initialValue">Initial value for all elements.</param>
+    /// <summary>
+    /// 使用指定的大小和初始值初始化张量。
+    /// </summary>
+    /// <param name="w">宽度。</param>
+    /// <param name="h">高度。</param>
+    /// <param name="d">深度。</param>
+    /// <param name="initialValue">所有元素的初始值。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(int w, int h, int d, T initialValue) : this(w, h, d)
     {
-        for (int i = 0; i < _values.Length; i++)
+        var span = _values.Span;
+        for (int i = 0; i < span.Length; i++)
         {
-            _values[i] = initialValue;
+            span[i] = initialValue;
         }
     }
 
-    ///<summary>Initializes the Tensor from a 3D array.</summary>
-    ///<param name="array">3D array to initialize the tensor.</param>
+    /// <summary>
+    /// 从三维数组初始化张量。
+    /// </summary>
+    /// <param name="array">用于初始化张量的三维数组。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(T[,,] array)
     {
@@ -53,6 +61,7 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         this.Depth = array.GetLength(2);
         this._values = new T[Width * Height * Depth];
 
+        var span = _values.Span;
         for (int x = 0; x < Width; x++)
         {
             for (int y = 0; y < Height; y++)
@@ -65,47 +74,73 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         }
     }
 
-    ///<summary>Values.</summary>
-    public T[] Values => _values;
-
-    ///<summary>Width.</summary>
-    public int Width { get; }
-
-    ///<summary>Height.</summary>
-    public int Height { get; }
-
-    ///<summary>Depth.</summary>
-    public int Depth { get; }
+    /// <summary>
+    /// 获取张量的值。
+    /// </summary>
+    public Span<T> Values => _values.Span;
 
     /// <summary>
-    /// Gets or sets the value at the specified coordinates.
+    /// 获取张量的宽度。
     /// </summary>
-    /// <param name="x">X coordinate (Width).</param>
-    /// <param name="y">Y coordinate (Height).</param>
-    /// <param name="z">Z coordinate (Depth).</param>
-    /// <returns>The value at the specified coordinates.</returns>
-    public T this[int x, int y, int z]
+    public int Width { get; }
+
+    /// <summary>
+    /// 获取张量的高度。
+    /// </summary>
+    public int Height { get; }
+
+    /// <summary>
+    /// 获取张量的深度。
+    /// </summary>
+    public int Depth { get; }
+
+    ///// <summary>
+    ///// 获取或设置指定坐标的值。
+    ///// </summary>
+    ///// <param name="x">X 坐标（宽度）。</param>
+    ///// <param name="y">Y 坐标（高度）。</param>
+    ///// <param name="z">Z 坐标（深度）。</param>
+    ///// <returns>指定坐标的值。</returns>
+    //public T this[int x, int y, int z]
+    //{
+    //    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //    get
+    //    {
+    //        ValidateIndices(x, y, z);
+    //        return _values.Span[((this.Width * y) + x) * this.Depth + z];
+    //    }
+    //    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //    set
+    //    {
+    //        ValidateIndices(x, y, z);
+    //        _values.Span[((this.Width * y) + x) * this.Depth + z] = value;
+    //    }
+    //}
+
+    /// <summary>
+    /// 获取或设置指定坐标的值。
+    /// </summary>
+    /// <param name="x">X 坐标（宽度）。</param>
+    /// <param name="y">Y 坐标（高度）。</param>
+    /// <param name="z">Z 坐标（深度）。</param>
+    /// <returns>指定坐标的值。</returns>
+    public ref T this[int x, int y, int z]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             ValidateIndices(x, y, z);
-            return this._values[((this.Width * y) + x) * this.Depth + z];
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        set
-        {
-            ValidateIndices(x, y, z);
-            this._values[((this.Width * y) + x) * this.Depth + z] = value;
+            return ref _values.Span[((this.Width * y) + x) * this.Depth + z];
         }
     }
 
+
     /// <summary>
-    /// Validates the provided indices.
+    /// 验证提供的索引。
     /// </summary>
-    /// <param name="x">X coordinate (Width).</param>
-    /// <param name="y">Y coordinate (Height).</param>
-    /// <param name="z">Z coordinate (Depth).</param>
+    /// <param name="x">X 坐标（宽度）。</param>
+    /// <param name="y">Y 坐标（高度）。</param>
+    /// <param name="z">Z 坐标（深度）。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ValidateIndices(int x, int y, int z)
     {
@@ -116,36 +151,38 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Fills the tensor with the specified value.
+    /// 用指定的值填充张量。
     /// </summary>
-    /// <param name="value">The value to fill the tensor with。</param>
+    /// <param name="value">用于填充张量的值。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Fill(T value)
     {
+        var span = _values.Span;
         int simdLength = System.Numerics.Vector<T>.Count;
         int i = 0;
 
         // SIMD部分
         var simdValue = new System.Numerics.Vector<T>(value);
-        for (; i <= _values.Length - simdLength; i += simdLength)
+        for (; i <= span.Length - simdLength; i += simdLength)
         {
-            simdValue.CopyTo(_values, i);
+            simdValue.CopyTo(span.Slice(i));
         }
 
         // 处理剩余部分
-        for (; i < _values.Length; i++)
+        for (; i < span.Length; i++)
         {
-            _values[i] = value;
+            span[i] = value;
         }
     }
+
 
 
     #region operators inline
 
     /// <summary>
-    /// Adds another tensor to this tensor.
+    /// 将另一个张量加到此张量。
     /// </summary>
-    /// <param name="other">The tensor to add。</param>
+    /// <param name="other">要加的张量。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Tensor<T> other)
     {
@@ -154,28 +191,30 @@ public class Tensor<T> :ICloneable<Tensor<T>>
             throw new ArgumentException("Tensor dimensions must match.");
         }
 
+        var span = _values.Span;
+        var otherSpan = other._values.Span;
         int simdLength = System.Numerics.Vector<T>.Count;
         int i = 0;
 
         // SIMD部分
-        for (; i <= _values.Length - simdLength; i += simdLength)
+        for (; i <= span.Length - simdLength; i += simdLength)
         {
-            var vec1 = new System.Numerics.Vector<T>(_values, i);
-            var vec2 = new System.Numerics.Vector<T>(other._values, i);
-            (vec1 + vec2).CopyTo(_values, i);
+            var vec1 = new System.Numerics.Vector<T>(span.Slice(i));
+            var vec2 = new System.Numerics.Vector<T>(otherSpan.Slice(i));
+            (vec1 + vec2).CopyTo(span.Slice(i));
         }
 
         // 处理剩余部分
-        for (; i < _values.Length; i++)
+        for (; i < span.Length; i++)
         {
-            _values[i] += other._values[i];
+            span[i] += otherSpan[i];
         }
     }
 
     /// <summary>
-    /// Subtracts another tensor from this tensor.
+    /// 从此张量中减去另一个张量。
     /// </summary>
-    /// <param name="other">The tensor to subtract。</param>
+    /// <param name="other">要减去的张量。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Subtract(Tensor<T> other)
     {
@@ -184,81 +223,62 @@ public class Tensor<T> :ICloneable<Tensor<T>>
             throw new ArgumentException("Tensor dimensions must match.");
         }
 
+        var span = _values.Span;
+        var otherSpan = other._values.Span;
         int simdLength = System.Numerics.Vector<T>.Count;
         int i = 0;
 
         // SIMD部分
-        for (; i <= _values.Length - simdLength; i += simdLength)
+        for (; i <= span.Length - simdLength; i += simdLength)
         {
-            var vec1 = new System.Numerics.Vector<T>(_values, i);
-            var vec2 = new System.Numerics.Vector<T>(other._values, i);
-            (vec1 - vec2).CopyTo(_values, i);
+            var vec1 = new System.Numerics.Vector<T>(span.Slice(i));
+            var vec2 = new System.Numerics.Vector<T>(otherSpan.Slice(i));
+            (vec1 - vec2).CopyTo(span.Slice(i));
         }
 
         // 处理剩余部分
-        for (; i < _values.Length; i++)
+        for (; i < span.Length; i++)
         {
-            _values[i] -= other._values[i];
+            span[i] -= otherSpan[i];
         }
     }
 
     /// <summary>
-    /// Multiplies this tensor by a scalar value.
+    /// 将此张量乘以一个标量值。
     /// </summary>
-    /// <param name="scalar">The scalar value to multiply by。</param>
+    /// <param name="scalar">要乘以的标量值。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Multiply(T scalar)
     {
+        var span = _values.Span;
         int simdLength = System.Numerics.Vector<T>.Count;
         int i = 0;
 
         // SIMD部分
         var simdScalar = new System.Numerics.Vector<T>(scalar);
-        for (; i <= _values.Length - simdLength; i += simdLength)
+        for (; i <= span.Length - simdLength; i += simdLength)
         {
-            var vec = new System.Numerics.Vector<T>(_values, i);
-            (vec * simdScalar).CopyTo(_values, i);
+            var vec = new System.Numerics.Vector<T>(span.Slice(i));
+            (vec * simdScalar).CopyTo(span.Slice(i));
         }
 
         // 处理剩余部分
-        for (; i < _values.Length; i++)
+        for (; i < span.Length; i++)
         {
-            _values[i] *= scalar;
+            span[i] *= scalar;
         }
     }
 
     #endregion
 
-    /// <summary>
-    /// Clones the tensor.
-    /// </summary>
-    /// <returns>A new tensor that is a copy of this tensor.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor<T> Clone()
-    {
-        Tensor<T> clone = new Tensor<T>(Width, Height, Depth);
-        Array.Copy(_values, clone._values, _values.Length);
-        return clone;
-    }
-
-    /// <summary>
-    /// Returns a string representation of the tensor.
-    /// </summary>
-    /// <returns>A string representation of the tensor.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-    {
-        return $"Tensor<{typeof(T).Name}> [Width={Width}, Height={Height}, Depth={Depth}]";
-    }
-
     #region operators
 
     /// <summary>
-    /// Adds two tensors.
+    /// 将两个张量相加。
     /// </summary>
-    /// <param name="a">The first tensor.</param>
-    /// <param name="b">The second tensor.</param>
-    /// <returns>The result of adding the two tensors.</returns>
+    /// <param name="a">第一个张量。</param>
+    /// <param name="b">第二个张量。</param>
+    /// <returns>两个张量相加的结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator +(Tensor<T> a, Tensor<T> b)
     {
@@ -268,19 +288,22 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         }
 
         Tensor<T> result = new Tensor<T>(a.Width, a.Height, a.Depth);
-        for (int i = 0; i < a._values.Length; i++)
+        var resultSpan = result._values.Span;
+        var aSpan = a._values.Span;
+        var bSpan = b._values.Span;
+        for (int i = 0; i < aSpan.Length; i++)
         {
-            result._values[i] = a._values[i] + b._values[i];
+            resultSpan[i] = aSpan[i] + bSpan[i];
         }
         return result;
     }
 
     /// <summary>
-    /// Subtracts one tensor from another.
+    /// 将一个张量从另一个张量中减去。
     /// </summary>
-    /// <param name="a">The first tensor.</param>
-    /// <param name="b">The second tensor.</param>
-    /// <returns>The result of subtracting the second tensor from the first tensor.</returns>
+    /// <param name="a">第一个张量。</param>
+    /// <param name="b">第二个张量。</param>
+    /// <returns>两个张量相减的结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator -(Tensor<T> a, Tensor<T> b)
     {
@@ -290,36 +313,41 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         }
 
         Tensor<T> result = new Tensor<T>(a.Width, a.Height, a.Depth);
-        for (int i = 0; i < a._values.Length; i++)
+        var resultSpan = result._values.Span;
+        var aSpan = a._values.Span;
+        var bSpan = b._values.Span;
+        for (int i = 0; i < aSpan.Length; i++)
         {
-            result._values[i] = a._values[i] - b._values[i];
+            resultSpan[i] = aSpan[i] - bSpan[i];
         }
         return result;
     }
 
     /// <summary>
-    /// Multiplies a tensor by a scalar value.
+    /// 将张量乘以一个标量值。
     /// </summary>
-    /// <param name="tensor">The tensor.</param>
-    /// <param name="scalar">The scalar value.</param>
-    /// <returns>The result of multiplying the tensor by the scalar value.</returns>
+    /// <param name="tensor">张量。</param>
+    /// <param name="scalar">标量值。</param>
+    /// <returns>张量乘以标量值的结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator *(Tensor<T> tensor, T scalar)
     {
         Tensor<T> result = new Tensor<T>(tensor.Width, tensor.Height, tensor.Depth);
-        for (int i = 0; i < tensor._values.Length; i++)
+        var resultSpan = result._values.Span;
+        var tensorSpan = tensor._values.Span;
+        for (int i = 0; i < tensorSpan.Length; i++)
         {
-            result._values[i] = tensor._values[i] * scalar;
+            resultSpan[i] = tensorSpan[i] * scalar;
         }
         return result;
     }
 
     /// <summary>
-    /// Multiplies a tensor by a scalar value.
+    /// 将张量乘以一个标量值。
     /// </summary>
-    /// <param name="scalar">The scalar value.</param>
-    /// <param name="tensor">The tensor.</param>
-    /// <returns>The result of multiplying the tensor by the scalar value.</returns>
+    /// <param name="scalar">标量值。</param>
+    /// <param name="tensor">张量。</param>
+    /// <returns>张量乘以标量值的结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<T> operator *(T scalar, Tensor<T> tensor)
     {
@@ -328,12 +356,19 @@ public class Tensor<T> :ICloneable<Tensor<T>>
 
     #endregion
 
+
+    public static implicit operator Span<T>(Tensor<T> tensor)
+    {
+        return tensor._values.Span;
+    }
+
+
     /// <summary>
-    /// Transposes the tensor along the specified axes.
+    /// 沿指定轴转置张量。
     /// </summary>
-    /// <param name="axis1">The first axis to transpose.</param>
-    /// <param name="axis2">The second axis to transpose.</param>
-    /// <returns>A new tensor that is the transpose of this tensor.</returns>
+    /// <param name="axis1">第一个轴。</param>
+    /// <param name="axis2">第二个轴。</param>
+    /// <returns>转置后的新张量。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor<T> Transpose(int axis1, int axis2)
     {
@@ -365,20 +400,20 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Computes the sum of all elements in the tensor.
+    /// 计算张量中所有元素的和。
     /// </summary>
-    /// <returns>The sum of all elements in the tensor.</returns>
+    /// <returns>张量中所有元素的和。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Sum()
     {
-        return Statistics.Sum(_values.AsSpan());
+        return Statistics.Sum(_values.Span);
     }
 
     /// <summary>
-    /// Computes the dot product of two tensors.
+    /// 计算两个张量的点积。
     /// </summary>
-    /// <param name="other">The other tensor。</param>
-    /// <returns>The dot product of the two tensors。</returns>
+    /// <param name="other">另一个张量。</param>
+    /// <returns>两个张量的点积。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Dot(Tensor<T> other)
     {
@@ -388,22 +423,24 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         }
 
         T dotProduct = T.Zero;
+        var span = _values.Span;
+        var otherSpan = other._values.Span;
         int simdLength = System.Numerics.Vector<T>.Count;
         int i = 0;
 
         // SIMD部分
         var simdDotProduct = new System.Numerics.Vector<T>(T.Zero);
-        for (; i <= _values.Length - simdLength; i += simdLength)
+        for (; i <= span.Length - simdLength; i += simdLength)
         {
-            var vec1 = new System.Numerics.Vector<T>(_values, i);
-            var vec2 = new System.Numerics.Vector<T>(other._values, i);
+            var vec1 = new System.Numerics.Vector<T>(span.Slice(i));
+            var vec2 = new System.Numerics.Vector<T>(otherSpan.Slice(i));
             simdDotProduct += vec1 * vec2;
         }
 
         // 处理剩余部分
-        for (; i < _values.Length; i++)
+        for (; i < span.Length; i++)
         {
-            dotProduct += _values[i] * other._values[i];
+            dotProduct += span[i] * otherSpan[i];
         }
 
         // 汇总SIMD结果
@@ -416,7 +453,7 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Normalizes the tensor.
+    /// 归一化张量。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Normalize()
@@ -427,47 +464,49 @@ public class Tensor<T> :ICloneable<Tensor<T>>
             throw new InvalidOperationException("Cannot normalize a tensor with zero norm.");
         }
 
+        var span = _values.Span;
         int simdLength = System.Numerics.Vector<T>.Count;
         int i = 0;
 
         // SIMD部分
         var simdNorm = new System.Numerics.Vector<T>(norm);
-        for (; i <= _values.Length - simdLength; i += simdLength)
+        for (; i <= span.Length - simdLength; i += simdLength)
         {
-            var vec = new System.Numerics.Vector<T>(_values, i);
-            (vec / simdNorm).CopyTo(_values, i);
+            var vec = new System.Numerics.Vector<T>(span.Slice(i));
+            (vec / simdNorm).CopyTo(span.Slice(i));
         }
 
         // 处理剩余部分
-        for (; i < _values.Length; i++)
+        for (; i < span.Length; i++)
         {
-            _values[i] /= norm;
+            span[i] /= norm;
         }
     }
 
     /// <summary>
-    /// Computes the norm of the tensor.
+    /// 计算张量的范数。
     /// </summary>
-    /// <returns>The norm of the tensor。</returns>
+    /// <returns>张量的范数。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Norm()
     {
         T sumOfSquares = T.Zero;
+        var span = _values.Span;
         int simdLength = System.Numerics.Vector<T>.Count;
         int i = 0;
 
         // SIMD部分
         var simdResult = new System.Numerics.Vector<T>(T.Zero);
-        for (; i <= _values.Length - simdLength; i += simdLength)
+        for (; i <= span.Length - simdLength; i += simdLength)
         {
-            var vec = new System.Numerics.Vector<T>(_values, i);
+            var vec = new System.Numerics.Vector<T>(span.Slice(i));
             simdResult += vec * vec;
         }
 
         // 处理剩余部分
-        for (; i < _values.Length; i++)
+        for (; i < span.Length; i++)
         {
-            sumOfSquares += _values[i] * _values[i];
+            sumOfSquares += span[i] * span[i];
         }
 
         // 汇总SIMD结果
@@ -480,11 +519,11 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Slices the tensor along the specified axis.
+    /// 沿指定轴切片张量。
     /// </summary>
-    /// <param name="axis">The axis to slice along.</param>
-    /// <param name="index">The index at which to slice.</param>
-    /// <returns>A new tensor that is a slice of this tensor.</returns>
+    /// <param name="axis">要切片的轴。</param>
+    /// <param name="index">切片的索引。</param>
+    /// <returns>切片后的新张量。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor<T> Slice(int axis, int index)
     {
@@ -522,11 +561,11 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Checks if two tensors are equal.
+    /// 检查两个张量是否相等。
     /// </summary>
-    /// <param name="a">The first tensor.</param>
-    /// <param name="b">The second tensor.</param>
-    /// <returns>True if the tensors are equal, otherwise false.</returns>
+    /// <param name="a">第一个张量。</param>
+    /// <param name="b">第二个张量。</param>
+    /// <returns>如果两个张量相等，则为 true，否则为 false。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Tensor<T> a, Tensor<T> b)
     {
@@ -535,9 +574,11 @@ public class Tensor<T> :ICloneable<Tensor<T>>
             return false;
         }
 
-        for (int i = 0; i < a._values.Length; i++)
+        var aSpan = a._values.Span;
+        var bSpan = b._values.Span;
+        for (int i = 0; i < aSpan.Length; i++)
         {
-            if (!a._values[i].Equals(b._values[i]))
+            if (!aSpan[i].Equals(bSpan[i]))
             {
                 return false;
             }
@@ -546,11 +587,11 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Checks if two tensors are not equal.
+    /// 检查两个张量是否不相等。
     /// </summary>
-    /// <param name="a">The first tensor.</param>
-    /// <param name="b">The second tensor.</param>
-    /// <returns>True if the tensors are not equal, otherwise false.</returns>
+    /// <param name="a">第一个张量。</param>
+    /// <param name="b">第二个张量。</param>
+    /// <returns>如果两个张量不相等，则为 true，否则为 false。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Tensor<T> a, Tensor<T> b)
     {
@@ -558,10 +599,10 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Determines whether the specified object is equal to the current object.
+    /// 确定指定对象是否等于当前对象。
     /// </summary>
-    /// <param name="obj">The object to compare with the current object.</param>
-    /// <returns>True if the specified object is equal to the current object, otherwise false.</returns>
+    /// <param name="obj">要与当前对象进行比较的对象。</param>
+    /// <returns>如果指定对象等于当前对象，则为 true，否则为 false。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
@@ -573,9 +614,9 @@ public class Tensor<T> :ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// Serves as the default hash function.
+    /// 作为默认的哈希函数。
     /// </summary>
-    /// <returns>A hash code for the current object.</returns>
+    /// <returns>当前对象的哈希代码。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {
@@ -583,10 +624,45 @@ public class Tensor<T> :ICloneable<Tensor<T>>
         hash = hash * 31 + Width.GetHashCode();
         hash = hash * 31 + Height.GetHashCode();
         hash = hash * 31 + Depth.GetHashCode();
-        foreach (var value in _values)
+        foreach (var value in _values.Span)
         {
             hash = hash * 31 + value.GetHashCode();
         }
         return hash;
+    }
+
+    /// <summary>
+    /// 克隆张量。
+    /// </summary>
+    /// <returns>一个新的张量，它是当前张量的副本。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Tensor<T> Clone()
+    {
+        Tensor<T> clone = new Tensor<T>(Width, Height, Depth);
+        _values.CopyTo(clone._values);
+        return clone;
+    }
+
+
+    /// <summary>
+    /// 返回张量的字符串表示形式。
+    /// </summary>
+    /// <returns>张量的字符串表示形式。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override string ToString()
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"Tensor<{typeof(T).Name}> [Width={Width}, Height={Height}, Depth={Depth}]");
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                for (int z = 0; z < Depth; z++)
+                {
+                    sb.AppendLine($"[{x}, {y}, {z}] = {this[x, y, z]}");
+                }
+            }
+        }
+        return sb.ToString();
     }
 }
