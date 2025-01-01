@@ -1,4 +1,7 @@
-﻿using Vorcyc.Mathematics.LinearAlgebra;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Numerics;
+using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace core_module_test;
 
@@ -10,20 +13,41 @@ internal class Matrix_test
     {
 
 
-        Matrix<int> m = new Matrix<int>(3, 3);
-        for (int x = 0; x < m.Rows; x++)
-        {
-            for (int y = 0; y < m.Columns; y++)
-            {
-                m[x, y] = x + y;
-            }
-        }
+     
 
 
-        m.QRDecomposition(out var q, out var r);
+        var nm = new NewMatrix<double>(4,3);
+        nm.FillRandom();
 
-        Console.WriteLine(q);
-        Console.WriteLine(r);
+        Console.WriteLine(  nm);
+
+
+        nm[0,0] = 1;
+
+        Console.WriteLine(nm);
+
+        Console.WriteLine(nm[0,0]);
+
+
+        //m.QRDecomposition(out var q, out var r);
+
+        //Console.WriteLine(q);
+        //Console.WriteLine(r);
     }
 
+
+    public static double Add(double a, double b)
+    {
+        var x = 1;
+        var y = new float[100];
+
+        return a + b;
+    }
+
+
 }
+
+
+// 类 、 结构体 、 接口 、 枚举 、 委托
+//值类型 ：结构体、枚举
+//引用类型：类、接口、委托
