@@ -29,7 +29,7 @@ public static partial class Layers
             {
                 for (int x = 0; x < input.Width; x++)
                 {
-                    normalized[x, y, d] = (input[x, y, d] - mean.Values[d]) /   T.Sqrt(v + variance.Values[d]) * scale.Values[d] + shift.Values[d];
+                    normalized[x, y, d] = (input[x, y, d] - mean.Values[d]) / T.Sqrt(v + variance.Values[d]) * scale.Values[d] + shift.Values[d];
                 }
             }
         });
@@ -56,7 +56,7 @@ public static partial class Layers
             {
                 for (int x = 0; x < input.Width; x++)
                 {
-                    normalized[x, y, d] = (input[x, y, d] - mean.Values[d]) /   MathF.Sqrt(v + variance.Values[d]) * scale.Values[d] + shift.Values[d];
+                    normalized[x, y, d] = (input[x, y, d] - mean.Values[d]) / MathF.Sqrt(v + variance.Values[d]) * scale.Values[d] + shift.Values[d];
                 }
             }
         });

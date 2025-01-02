@@ -55,6 +55,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DeepLearning", "shared proj
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Statistics_class", "shared projects\Statistics_class\Statistics_class.shproj", "{0B0FEFDE-C426-4203-B897-55E2D9DA98BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DL_module_test", "TESTS\DL_module_test\DL_module_test.csproj", "{DB1080E4-87CE-4166-8E8B-D98E9B654337}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{DBA1F647-6010-49E8-A3AD-A039494FEAF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBA1F647-6010-49E8-A3AD-A039494FEAF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBA1F647-6010-49E8-A3AD-A039494FEAF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB1080E4-87CE-4166-8E8B-D98E9B654337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB1080E4-87CE-4166-8E8B-D98E9B654337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB1080E4-87CE-4166-8E8B-D98E9B654337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB1080E4-87CE-4166-8E8B-D98E9B654337}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +107,7 @@ Global
 		{DBA1F647-6010-49E8-A3AD-A039494FEAF3} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 		{EAC6A8F4-E78E-4DA0-AA05-A6C1A9B1C6AF} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{0B0FEFDE-C426-4203-B897-55E2D9DA98BB} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{DB1080E4-87CE-4166-8E8B-D98E9B654337} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}
