@@ -10,7 +10,37 @@ using System.Runtime.CompilerServices;
 public class Tensor<T> : ICloneable<Tensor<T>>
     where T : IBinaryFloatingPointIeee754<T>
 {
+    #region 字段
+
     private readonly Memory<T> _values;
+
+    #endregion
+
+    #region 属性
+
+    /// <summary>
+    /// 获取张量的值。
+    /// </summary>
+    public Span<T> Values => _values.Span;
+
+    /// <summary>
+    /// 获取张量的宽度。
+    /// </summary>
+    public int Width { get; }
+
+    /// <summary>
+    /// 获取张量的高度。
+    /// </summary>
+    public int Height { get; }
+
+    /// <summary>
+    /// 获取张量的深度。
+    /// </summary>
+    public int Depth { get; }
+
+    #endregion
+
+    #region 构造函数
 
     /// <summary>
     /// 使用指定的大小初始化张量。
@@ -26,10 +56,10 @@ public class Tensor<T> : ICloneable<Tensor<T>>
             throw new ArgumentException("Dimensions must be positive non-zero values.");
         }
 
-        this._values = new T[w * h * d];
-        this.Width = w;
-        this.Height = h;
-        this.Depth = d;
+        _values = new T[w * h * d];
+        Width = w;
+        Height = h;
+        Depth = d;
     }
 
     /// <summary>
@@ -56,10 +86,10 @@ public class Tensor<T> : ICloneable<Tensor<T>>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Tensor(T[,,] array)
     {
-        this.Width = array.GetLength(0);
-        this.Height = array.GetLength(1);
-        this.Depth = array.GetLength(2);
-        this._values = new T[Width * Height * Depth];
+        Width = array.GetLength(0);
+        Height = array.GetLength(1);
+        Depth = array.GetLength(2);
+        _values = new T[Width * Height * Depth];
 
         var span = _values.Span;
         for (int x = 0; x < Width; x++)
@@ -74,48 +104,9 @@ public class Tensor<T> : ICloneable<Tensor<T>>
         }
     }
 
-    /// <summary>
-    /// 获取张量的值。
-    /// </summary>
-    public Span<T> Values => _values.Span;
+    #endregion
 
-    /// <summary>
-    /// 获取张量的宽度。
-    /// </summary>
-    public int Width { get; }
-
-    /// <summary>
-    /// 获取张量的高度。
-    /// </summary>
-    public int Height { get; }
-
-    /// <summary>
-    /// 获取张量的深度。
-    /// </summary>
-    public int Depth { get; }
-
-    ///// <summary>
-    ///// 获取或设置指定坐标的值。
-    ///// </summary>
-    ///// <param name="x">X 坐标（宽度）。</param>
-    ///// <param name="y">Y 坐标（高度）。</param>
-    ///// <param name="z">Z 坐标（深度）。</param>
-    ///// <returns>指定坐标的值。</returns>
-    //public T this[int x, int y, int z]
-    //{
-    //    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //    get
-    //    {
-    //        ValidateIndices(x, y, z);
-    //        return _values.Span[((this.Width * y) + x) * this.Depth + z];
-    //    }
-    //    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    //    set
-    //    {
-    //        ValidateIndices(x, y, z);
-    //        _values.Span[((this.Width * y) + x) * this.Depth + z] = value;
-    //    }
-    //}
+    #region 索引器
 
     /// <summary>
     /// 获取或设置指定坐标的值。
@@ -130,10 +121,13 @@ public class Tensor<T> : ICloneable<Tensor<T>>
         get
         {
             ValidateIndices(x, y, z);
-            return ref _values.Span[((this.Width * y) + x) * this.Depth + z];
+            return ref _values.Span[((Width * y) + x) * Depth + z];
         }
     }
 
+    #endregion
+
+    #region 方法
 
     /// <summary>
     /// 验证提供的索引。
@@ -175,9 +169,9 @@ public class Tensor<T> : ICloneable<Tensor<T>>
         }
     }
 
+    #endregion
 
-
-    #region operators inline
+    #region 操作方法
 
     /// <summary>
     /// 将另一个张量加到此张量。
@@ -186,7 +180,7 @@ public class Tensor<T> : ICloneable<Tensor<T>>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(Tensor<T> other)
     {
-        if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
+        if (Width != other.Width || Height != other.Height || Depth != other.Depth)
         {
             throw new ArgumentException("Tensor dimensions must match.");
         }
@@ -218,7 +212,7 @@ public class Tensor<T> : ICloneable<Tensor<T>>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Subtract(Tensor<T> other)
     {
-        if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
+        if (Width != other.Width || Height != other.Height || Depth != other.Depth)
         {
             throw new ArgumentException("Tensor dimensions must match.");
         }
@@ -271,7 +265,7 @@ public class Tensor<T> : ICloneable<Tensor<T>>
 
     #endregion
 
-    #region operators
+    #region 运算符重载
 
     /// <summary>
     /// 将两个张量相加。
@@ -354,14 +348,60 @@ public class Tensor<T> : ICloneable<Tensor<T>>
         return tensor * scalar;
     }
 
+    /// <summary>
+    /// 检查两个张量是否相等。
+    /// </summary>
+    /// <param name="a">第一个张量。</param>
+    /// <param name="b">第二个张量。</param>
+    /// <returns>如果两个张量相等，则为 true，否则为 false。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(Tensor<T> a, Tensor<T> b)
+    {
+        if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
+        {
+            return false;
+        }
+
+        var aSpan = a._values.Span;
+        var bSpan = b._values.Span;
+        for (int i = 0; i < aSpan.Length; i++)
+        {
+            if (!aSpan[i].Equals(bSpan[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 检查两个张量是否不相等。
+    /// </summary>
+    /// <param name="a">第一个张量。</param>
+    /// <param name="b">第二个张量。</param>
+    /// <returns>如果两个张量不相等，则为 true，否则为 false。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(Tensor<T> a, Tensor<T> b)
+    {
+        return !(a == b);
+    }
+
     #endregion
 
+    #region 隐式转换
 
+    /// <summary>
+    /// 将张量隐式转换为 <see cref="Span{T}"/>。
+    /// </summary>
+    /// <param name="tensor">要转换的张量。</param>
     public static implicit operator Span<T>(Tensor<T> tensor)
     {
         return tensor._values.Span;
     }
 
+    #endregion
+
+    #region 其他方法
 
     /// <summary>
     /// 沿指定轴转置张量。
@@ -417,7 +457,7 @@ public class Tensor<T> : ICloneable<Tensor<T>>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Dot(Tensor<T> other)
     {
-        if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
+        if (Width != other.Width || Height != other.Height || Depth != other.Depth)
         {
             throw new ArgumentException("Tensor dimensions must match.");
         }
@@ -560,43 +600,9 @@ public class Tensor<T> : ICloneable<Tensor<T>>
         return result;
     }
 
-    /// <summary>
-    /// 检查两个张量是否相等。
-    /// </summary>
-    /// <param name="a">第一个张量。</param>
-    /// <param name="b">第二个张量。</param>
-    /// <returns>如果两个张量相等，则为 true，否则为 false。</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Tensor<T> a, Tensor<T> b)
-    {
-        if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
-        {
-            return false;
-        }
+    #endregion
 
-        var aSpan = a._values.Span;
-        var bSpan = b._values.Span;
-        for (int i = 0; i < aSpan.Length; i++)
-        {
-            if (!aSpan[i].Equals(bSpan[i]))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// 检查两个张量是否不相等。
-    /// </summary>
-    /// <param name="a">第一个张量。</param>
-    /// <param name="b">第二个张量。</param>
-    /// <returns>如果两个张量不相等，则为 true，否则为 false。</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Tensor<T> a, Tensor<T> b)
-    {
-        return !(a == b);
-    }
+    #region 重写方法
 
     /// <summary>
     /// 确定指定对象是否等于当前对象。
@@ -632,19 +638,6 @@ public class Tensor<T> : ICloneable<Tensor<T>>
     }
 
     /// <summary>
-    /// 克隆张量。
-    /// </summary>
-    /// <returns>一个新的张量，它是当前张量的副本。</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor<T> Clone()
-    {
-        Tensor<T> clone = new Tensor<T>(Width, Height, Depth);
-        _values.CopyTo(clone._values);
-        return clone;
-    }
-
-
-    /// <summary>
     /// 返回张量的字符串表示形式。
     /// </summary>
     /// <returns>张量的字符串表示形式。</returns>
@@ -665,4 +658,22 @@ public class Tensor<T> : ICloneable<Tensor<T>>
         }
         return sb.ToString();
     }
+
+    #endregion
+
+    #region 接口实现
+
+    /// <summary>
+    /// 克隆张量。
+    /// </summary>
+    /// <returns>一个新的张量，它是当前张量的副本。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Tensor<T> Clone()
+    {
+        Tensor<T> clone = new Tensor<T>(Width, Height, Depth);
+        _values.CopyTo(clone._values);
+        return clone;
+    }
+
+    #endregion
 }
