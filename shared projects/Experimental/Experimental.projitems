@@ -9,6 +9,7 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Experimental</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\KalmanFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\FrequencyDomain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\IFrequencyDomain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ITimeDomainSignal.cs" />
