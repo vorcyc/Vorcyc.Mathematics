@@ -79,19 +79,13 @@ public class Tensor : ICloneable<Tensor>
     /// <param name="y">Y 坐标（高度）。</param>
     /// <param name="z">Z 坐标（深度）。</param>
     /// <returns>指定坐标的值。</returns>
-    public float this[int x, int y, int z]
+    public ref float this[int x, int y, int z]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
             ValidateIndices(x, y, z);
-            return this._values[((this.Width * y) + x) * this.Depth + z];
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        set
-        {
-            ValidateIndices(x, y, z);
-            this._values[((this.Width * y) + x) * this.Depth + z] = value;
+            return ref this._values[((this.Width * y) + x) * this.Depth + z];
         }
     }
 
