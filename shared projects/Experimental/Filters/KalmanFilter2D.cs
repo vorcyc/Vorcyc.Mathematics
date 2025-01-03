@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.Framework;
 using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace Vorcyc.Mathematics.Experimental.Filters;
@@ -36,7 +37,8 @@ namespace Vorcyc.Mathematics.Experimental.Filters;
 /// var updatedState = kf.Update(z);
 /// </code>
 /// </remarks>
-public class KalmanFilter<T> where T : struct, INumber<T>
+[Filter(design: FilterDesign.Kalman, structure: FilterStructure.Kalman, description: "二维卡尔曼滤波器")]
+public class KalmanFilter2D<T> where T : struct, INumber<T>
 {
     private Matrix<T> A; // 状态转移矩阵
     private Matrix<T> B; // 控制输入矩阵
@@ -56,7 +58,7 @@ public class KalmanFilter<T> where T : struct, INumber<T>
     /// <param name="R">测量噪声协方差。</param>
     /// <param name="initialState">初始状态估计。</param>
     /// <param name="initialP">初始估计误差协方差。</param>
-    public KalmanFilter(Matrix<T> A, Matrix<T> B, Matrix<T> H, Matrix<T> Q, Matrix<T> R, Matrix<T> initialState, Matrix<T> initialP)
+    public KalmanFilter2D(Matrix<T> A, Matrix<T> B, Matrix<T> H, Matrix<T> Q, Matrix<T> R, Matrix<T> initialState, Matrix<T> initialP)
     {
         this.A = A;
         this.B = B;

@@ -6,6 +6,10 @@
 public enum FilterType
 {
     /// <summary>
+    /// 无类型。
+    /// </summary>
+    None,
+    /// <summary>
     /// 低通滤波器。
     /// </summary>
     LowPass,
@@ -48,6 +52,10 @@ public enum FilterType
 /// </summary>
 public enum FilterDesign
 {
+    /// <summary>
+    /// 无设计。
+    /// </summary>
+    None,
     /// <summary>
     /// 切比雪夫滤波器。
     /// </summary>
@@ -95,7 +103,11 @@ public enum FilterDesign
     /// <summary>
     /// 升余弦滤波器。
     /// </summary>
-    RaisedCosine
+    RaisedCosine,
+    /// <summary>
+    /// 卡尔曼滤波器。
+    /// </summary>
+    Kalman
 }
 
 /// <summary>
@@ -103,6 +115,10 @@ public enum FilterDesign
 /// </summary>
 public enum FilterStructure
 {
+    /// <summary>
+    /// 无结构。
+    /// </summary>
+    None,
     /// <summary>
     /// 直接形式I滤波器。
     /// </summary>
@@ -130,7 +146,11 @@ public enum FilterStructure
     /// <summary>
     /// 并联滤波器。
     /// </summary>
-    Parallel
+    Parallel,
+    /// <summary>
+    /// 卡尔曼滤波器。
+    /// </summary>
+    Kalman
 }
 
 /// <summary>
@@ -166,7 +186,7 @@ public class FilterAttribute : Attribute
     /// <param name="design">滤波器的设计类型。</param>
     /// <param name="structure">滤波器的结构类型。</param>
     /// <param name="description">滤波器的描述。</param>
-    public FilterAttribute(FilterType type, FilterDesign design, FilterStructure structure, string description = "")
+    public FilterAttribute(FilterType type = FilterType.None, FilterDesign design = FilterDesign.None, FilterStructure structure = FilterStructure.None, string description = "")
     {
         Type = type;
         Design = design;
