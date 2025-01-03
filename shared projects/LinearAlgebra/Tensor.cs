@@ -1,5 +1,6 @@
 ﻿namespace Vorcyc.Mathematics.LinearAlgebra;
 
+using Vorcyc.Mathematics.Framework;
 
 ///<summary>3维张量，数据类型为 <see cref="float"/>。</summary>
 public class Tensor : ICloneable<Tensor>

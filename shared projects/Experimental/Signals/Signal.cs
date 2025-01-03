@@ -1,10 +1,13 @@
-﻿using System.Runtime.CompilerServices;
+﻿
+namespace Vorcyc.Mathematics.Experimental.Signals;
+
+using System.Runtime.CompilerServices;
 using Vorcyc.Mathematics.Helpers;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
+using Vorcyc.Mathematics.Framework;
 
-namespace Vorcyc.Mathematics.Experimental.Signals;
 
 /// <summary>
 /// 表示一个信号类，包含信号样本和采样率，并提供计算信号属性的方法。

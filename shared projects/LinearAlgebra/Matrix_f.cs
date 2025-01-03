@@ -1,7 +1,8 @@
-﻿using System.Numerics;
-using System.Text;
-
+﻿
 namespace Vorcyc.Mathematics.LinearAlgebra;
+
+using System.Text;
+using Vorcyc.Mathematics.Framework;
 
 /// <summary>
 /// 表示一个二维矩阵。

@@ -2,7 +2,7 @@
 
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Vorcyc.Mathematics.Utilities;
+using Vorcyc.Mathematics.Framework.Utilities;
 
 /*
 *  我原来的 C++ 版本是

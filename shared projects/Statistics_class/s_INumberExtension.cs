@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
+using Vorcyc.Mathematics.Framework;
 
 namespace Vorcyc.Mathematics;
 

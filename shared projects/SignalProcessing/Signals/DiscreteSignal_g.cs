@@ -1,5 +1,7 @@
 ﻿namespace Vorcyc.Mathematics.SignalProcessing.Signals;
 
+using Vorcyc.Mathematics.Framework;
+
 /*
  * 与原版本的不同处：
  * 1. Samples 使用 PinnableArray<float> 替换原来的 float[] ，同时实现 IDispose 接口。

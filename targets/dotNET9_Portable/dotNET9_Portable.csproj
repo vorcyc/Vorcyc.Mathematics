@@ -13,8 +13,8 @@
 	  <Company>Vorcyc</Company>
 	  <Description>A pure dotNET and high performance math library.</Description>
 	  <Copyright>Vorcyc® Mathematics</Copyright>
-	  <Version>0.5.0.0</Version>
-	  <AssemblyVersion>0.5.0.0</AssemblyVersion>
+	  <Version>0.5.1.0</Version>
+	  <AssemblyVersion>0.5.1.0</AssemblyVersion>
 	  <Title>Vorcy.Mathematics</Title>
 	  <PackageIcon>logo1.png</PackageIcon>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -63,10 +63,10 @@
 
   <Import Project="..\..\shared projects\Core\Core.projitems" Label="Shared" />
 
-  <Import Project="..\..\shared projects\ComputingContext\ComputingContext.projitems" Label="Shared" />
-
   <Import Project="..\..\shared projects\DeepLearning\DeepLearning.projitems" Label="Shared" />
 
   <Import Project="..\..\shared projects\Statistics_class\Statistics_class.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Framework\Framework.projitems" Label="Shared" />
 
 </Project>

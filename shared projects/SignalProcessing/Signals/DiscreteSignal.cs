@@ -1,5 +1,6 @@
 ﻿namespace Vorcyc.Mathematics.SignalProcessing.Signals;
 
+using Vorcyc.Mathematics.Framework;
 
 /*
  * 与原版本的不同处：

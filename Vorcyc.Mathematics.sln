@@ -5,8 +5,6 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared projects", "shared projects", "{0B7B090A-F8B5-46A1-A425-BBB95BBB1746}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ComputingContext", "shared projects\ComputingContext\ComputingContext.shproj", "{EDC9AD20-9DB1-43E7-8512-BA9156A87172}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core", "shared projects\Core\Core.shproj", "{61CDF5AE-6D99-4A3E-A3CD-30293C143FE6}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LinearAlgebra", "shared projects\LinearAlgebra\LinearAlgebra.shproj", "{D8A93FFC-AB0F-400A-95E7-F1ED6B0B812F}"
@@ -55,6 +53,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Statistics_class", "shared 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DL_module_test", "TESTS\DL_module_test\DL_module_test.csproj", "{DB1080E4-87CE-4166-8E8B-D98E9B654337}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Framework", "shared projects\Framework\Framework.shproj", "{FE21B649-02D8-49FA-8A58-48A206F3D8AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,7 +86,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{EDC9AD20-9DB1-43E7-8512-BA9156A87172} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{61CDF5AE-6D99-4A3E-A3CD-30293C143FE6} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{D8A93FFC-AB0F-400A-95E7-F1ED6B0B812F} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{7EE17963-00E5-412C-A6DE-FB94C21E4F57} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
@@ -101,6 +100,7 @@ Global
 		{EAC6A8F4-E78E-4DA0-AA05-A6C1A9B1C6AF} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{0B0FEFDE-C426-4203-B897-55E2D9DA98BB} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{DB1080E4-87CE-4166-8E8B-D98E9B654337} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
+		{FE21B649-02D8-49FA-8A58-48A206F3D8AB} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}
@@ -111,10 +111,10 @@ Global
 		shared projects\Core\Core.projitems*{61cdf5ae-6d99-4a3e-a3cd-30293c143fe6}*SharedItemsImports = 13
 		shared projects\Numerics\Numerics.projitems*{7ee17963-00e5-412c-a6de-fb94c21e4f57}*SharedItemsImports = 13
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b2c3419e-250a-487d-bc7c-0c89640b96ae}*SharedItemsImports = 13
-		shared projects\ComputingContext\ComputingContext.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Core\Core.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\DeepLearning\DeepLearning.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Experimental\Experimental.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
+		shared projects\Framework\Framework.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\LinearAlgebra\LinearAlgebra.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\MachineLearning\MachineLearning.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Numerics\Numerics.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
@@ -123,6 +123,6 @@ Global
 		shared projects\Experimental\Experimental.projitems*{c60535f6-5504-48a9-934a-53d6b572d846}*SharedItemsImports = 13
 		shared projects\LinearAlgebra\LinearAlgebra.projitems*{d8a93ffc-ab0f-400a-95e7-f1ed6b0b812f}*SharedItemsImports = 13
 		shared projects\DeepLearning\DeepLearning.projitems*{eac6a8f4-e78e-4da0-aa05-a6c1a9b1c6af}*SharedItemsImports = 13
-		shared projects\ComputingContext\ComputingContext.projitems*{edc9ad20-9db1-43e7-8512-ba9156a87172}*SharedItemsImports = 13
+		shared projects\Framework\Framework.projitems*{fe21b649-02d8-49fa-8a58-48a206f3d8ab}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

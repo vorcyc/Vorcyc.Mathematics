@@ -3,6 +3,7 @@
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Vorcyc.Mathematics.Framework;
 
 /// <summary>
 /// 3维张量，数据类型为 <see cref="IBinaryFloatingPointIeee754{TSelf}"/>。
