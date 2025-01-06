@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComputingContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\LanguageExtension.cs" />

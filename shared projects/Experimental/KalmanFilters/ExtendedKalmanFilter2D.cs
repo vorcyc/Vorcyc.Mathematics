@@ -1,22 +1,22 @@
-﻿using System.Numerics;
-using Vorcyc.Mathematics.Framework;
+﻿namespace Vorcyc.Mathematics.Experimental.KalmanFilters;
+
+using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
 
-namespace Vorcyc.Mathematics.Experimental.Filters;
 
 /// <summary>
-/// 表示一个卡尔曼滤波器。
+/// 表示一个二维扩展卡尔曼滤波器。
 /// </summary>
 /// <typeparam name="T">数值类型，必须实现 INumber 接口。</typeparam>
 /// <remarks>
-/// 卡尔曼滤波器是一种递归算法，用于通过结合系统的数学模型和测量数据来估计动态系统的状态。它在许多领域中都有广泛应用，包括导航、控制系统、信号处理和经济学等。
+/// 扩展卡尔曼滤波器是一种递归算法，用于通过结合非线性系统的数学模型和测量数据来估计动态系统的状态。它在许多领域中都有广泛应用，包括导航、控制系统、信号处理和经济学等。
 /// 
-/// 卡尔曼滤波器的基本思想是利用系统的先验知识（预测）和测量数据（观测）来更新系统状态的估计。它包括两个主要步骤：
+/// 扩展卡尔曼滤波器的基本思想是利用系统的先验知识（预测）和测量数据（观测）来更新系统状态的估计。它包括两个主要步骤：
 /// 
-/// 1. 预测步骤：根据系统的数学模型，预测当前时刻的系统状态和误差协方差。
+/// 1. 预测步骤：根据系统的非线性数学模型，预测当前时刻的系统状态和误差协方差。
 /// 2. 更新步骤：利用当前时刻的测量数据，更新系统状态的估计和误差协方差。
 /// 
-/// 卡尔曼滤波器的优点在于它能够在噪声环境中提供对系统状态的最佳估计，并且计算效率高，适合实时应用。
+/// 扩展卡尔曼滤波器的优点在于它能够在噪声环境中提供对系统状态的最佳估计，并且计算效率高，适合实时应用。
 /// 
 /// 示例代码：
 /// <code>
@@ -28,17 +28,16 @@ namespace Vorcyc.Mathematics.Experimental.Filters;
 /// var initialState = new Matrix&lt;float&gt;(new float[,] { { 0 }, { 0 } });
 /// var initialP = new Matrix&lt;float&gt;(new float[,] { { 1, 0 }, { 0, 1 } });
 /// 
-/// var kf = new KalmanFilter&lt;float&gt;(A, B, H, Q, R, initialState, initialP);
+/// var ekf = new ExtendedKalmanFilter2D&lt;float&gt;(A, B, H, Q, R, initialState, initialP);
 /// 
 /// var u = new Matrix&lt;float&gt;(new float[,] { { 1 } });
 /// var z = new Matrix&lt;float&gt;(new float[,] { { 1 }, { 1 } });
 /// 
-/// var predictedState = kf.Predict(u);
-/// var updatedState = kf.Update(z);
+/// var predictedState = ekf.Predict(u, NonlinearStateTransitionFunction);
+/// var updatedState = ekf.Update(z, NonlinearMeasurementFunction);
 /// </code>
 /// </remarks>
-[Filter(design: FilterDesign.Kalman, structure: FilterStructure.Kalman, description: "二维卡尔曼滤波器")]
-public class KalmanFilter2D<T> where T : struct, INumber<T>
+public class ExtendedKalmanFilter2D<T> where T : struct, INumber<T>
 {
     private Matrix<T> A; // 状态转移矩阵
     private Matrix<T> B; // 控制输入矩阵
@@ -49,7 +48,7 @@ public class KalmanFilter2D<T> where T : struct, INumber<T>
     private Matrix<T> x; // 状态估计
 
     /// <summary>
-    /// 初始化卡尔曼滤波器的实例。
+    /// 初始化扩展卡尔曼滤波器的实例。
     /// </summary>
     /// <param name="A">状态转移矩阵。</param>
     /// <param name="B">控制输入矩阵。</param>
@@ -58,7 +57,7 @@ public class KalmanFilter2D<T> where T : struct, INumber<T>
     /// <param name="R">测量噪声协方差。</param>
     /// <param name="initialState">初始状态估计。</param>
     /// <param name="initialP">初始估计误差协方差。</param>
-    public KalmanFilter2D(Matrix<T> A, Matrix<T> B, Matrix<T> H, Matrix<T> Q, Matrix<T> R, Matrix<T> initialState, Matrix<T> initialP)
+    public ExtendedKalmanFilter2D(Matrix<T> A, Matrix<T> B, Matrix<T> H, Matrix<T> Q, Matrix<T> R, Matrix<T> initialState, Matrix<T> initialP)
     {
         this.A = A;
         this.B = B;
@@ -73,11 +72,12 @@ public class KalmanFilter2D<T> where T : struct, INumber<T>
     /// 执行预测步骤。
     /// </summary>
     /// <param name="u">控制输入。</param>
+    /// <param name="stateTransitionFunc">状态转移函数。</param>
     /// <returns>预测的状态估计。</returns>
-    public Matrix<T> Predict(Matrix<T> u)
+    public Matrix<T> Predict(Matrix<T> u, Func<Matrix<T>, Matrix<T>, Matrix<T>> stateTransitionFunc)
     {
-        // x = A * x + B * u
-        x = A * x + B * u;
+        // x = f(x, u)
+        x = stateTransitionFunc(x, u);
 
         // P = A * P * A^T + Q
         P = A * P * A.Transpose() + Q;
@@ -89,16 +89,21 @@ public class KalmanFilter2D<T> where T : struct, INumber<T>
     /// 执行更新步骤。
     /// </summary>
     /// <param name="z">测量值。</param>
+    /// <param name="measurementFunc">观测函数。</param>
     /// <returns>更新后的状态估计。</returns>
-    public Matrix<T> Update(Matrix<T> z)
+    public Matrix<T> Update(Matrix<T> z, Func<Matrix<T>, Matrix<T>> measurementFunc)
     {
-        // K = P * H^T * (H * P * H^T + R)^-1
+        // Ht = H^T
         var Ht = H.Transpose();
+
+        // S = H * P * H^T + R
         var S = H * P * Ht + R;
+
+        // K = P * H^T * S^-1
         var K = P * Ht * S.Inverse();
 
-        // x = x + K * (z - H * x)
-        x = x + K * (z - H * x);
+        // x = x + K * (z - h(x))
+        x = x + K * (z - measurementFunc(x));
 
         // P = (I - K * H) * P
         var I = Matrix<T>.Eye(P.Rows);

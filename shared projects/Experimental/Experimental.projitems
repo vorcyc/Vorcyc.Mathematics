@@ -9,13 +9,22 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Experimental</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Filters\KalmanFilter1D.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Filters\KalmanFilter2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\ExtendedKalmanFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\ExtendedKalmanFilter2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\InformationFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\ParticleFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\SquareRootKalmanFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\StandardKalmanFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\StandardKalmanFilter2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\UnscentedKalmanFilter1D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\FrequencyDomain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\IFrequencyDomain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ITimeDomainSignal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Signal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalSegment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)KalmanFilters\kalman.md" />
   </ItemGroup>
 </Project>
