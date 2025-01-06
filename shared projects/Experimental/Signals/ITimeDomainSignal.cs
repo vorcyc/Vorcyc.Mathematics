@@ -176,7 +176,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
 
     #region Operators
 
-    
+
     #region 老叫我去实现接口，用类的不行
 
 
@@ -325,12 +325,14 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
             WindowType? windowingType = null
         )
     {
-        var tempSamples = new float[desiredLen];
+        float[] tempSamples = new float[desiredLen];
 
         Array.Copy(samples, offset, tempSamples, 0, actualLen);
 
+        //if (windowingType is not null)
+        //    Vorcyc.Mathematics.SignalProcessing.Windowing.WindowApplier.Apply(tempSamples.AsSpan(), 0, desiredLen, windowingType.Value);  
         if (windowingType is not null)
-            Windowing.Apply(tempSamples, 0, desiredLen, windowingType.Value);
+            WindowApplier.Apply(tempSamples.AsSpan(), windowingType.Value);
 
         return tempSamples;
     }

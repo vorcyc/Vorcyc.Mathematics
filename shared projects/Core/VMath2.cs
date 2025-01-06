@@ -29,7 +29,7 @@ public static partial class VMath
     /// Returns Sinc of <paramref name="x"/>.
     /// </summary>
     public static T Sinc<T>(T x)
-        where T : unmanaged, INumberBase<T>, IFloatingPointIeee754<T>
+        where T : IFloatingPointIeee754<T>
     {
         return T.Abs(x) > T.CreateTruncating(1e-20) ? T.Sin(T.Pi * x) / (T.Pi * x) : T.One;
     }
@@ -430,7 +430,7 @@ public static partial class VMath
     /// (using Taylor series, not very precise method).
     /// </summary>
     public static T I0<T>(T x)
-        where T : unmanaged, INumberBase<T>, IFloatingPointIeee754<T>
+        where T : IFloatingPointIeee754<T>
     {
         var y = T.One;// 1.0f;
         var prev = T.One;// 1.0f;

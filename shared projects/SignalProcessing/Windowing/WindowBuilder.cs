@@ -10,9 +10,10 @@ public static class WindowBuilder
     /// <summary>
     /// Generates window coefficients of given <paramref name="type"/> and <paramref name="length"/>.
     /// </summary>
-    /// <param name="type">Window type</param>
-    /// <param name="length">Window length</param>
-    /// <param name="parameters">Additional optional parameters</param>
+    /// <param name="type">Window type.</param>
+    /// <param name="length">Window length.</param>
+    /// <param name="parameters">Additional optional parameters.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] OfType(WindowType type, int length, params object[] parameters)
     {
         switch (type)
@@ -64,6 +65,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates rectangular window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Rectangular(int length)
     {
         return Enumerable.Repeat(1.0f, length).ToArray();
@@ -72,6 +75,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates triangular window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Triangular(int length)
     {
         var n = length - 1;
@@ -83,6 +88,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates Hamming window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Hamming(int length)
     {
         var n = 2 * Math.PI / (length - 1);
@@ -94,6 +101,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates Blackman window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Blackman(int length)
     {
         var n = 2 * Math.PI / (length - 1);
@@ -105,6 +114,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates Hann window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Hann(int length)
     {
         var n = 2 * Math.PI / (length - 1);
@@ -116,6 +127,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates Gaussian window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Gaussian(int length)
     {
         var n = (length - 1) / 2;
@@ -125,8 +138,11 @@ public static class WindowBuilder
     }
 
     /// <summary>
-    /// Generates Kaiser window of given <paramref name="length"/>.
+    /// Generates Kaiser window of given <paramref name="length"/> and <paramref name="alpha"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <param name="alpha">Alpha parameter.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Kaiser(int length, double alpha = 12.0)
     {
         var n = 2.0 / (length - 1);
@@ -136,8 +152,11 @@ public static class WindowBuilder
     }
 
     /// <summary>
-    /// Generates Kaiser-Bessel Derived window of given <paramref name="length"/>.
+    /// Generates Kaiser-Bessel Derived window of given <paramref name="length"/> and <paramref name="alpha"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <param name="alpha">Alpha parameter.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Kbd(int length, double alpha = 4.0)
     {
         var kbd = new float[length];
@@ -163,6 +182,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates Bartlett-Hann window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] BartlettHann(int length)
     {
         var n = 1.0 / (length - 1);
@@ -174,6 +195,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates Lanczos window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Lanczos(int length)
     {
         var n = 2.0 / (length - 1);
@@ -183,8 +206,11 @@ public static class WindowBuilder
     }
 
     /// <summary>
-    /// Generates Sin-beta window of given <paramref name="length"/>.
+    /// Generates Sin-beta window of given <paramref name="length"/> and <paramref name="alpha"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <param name="alpha">Alpha parameter.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] PowerOfSine(int length, double alpha = 1.5)
     {
         var n = Math.PI / length;
@@ -196,6 +222,8 @@ public static class WindowBuilder
     /// <summary>
     /// Generates Flat-top window of given <paramref name="length"/>.
     /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Flattop(int length)
     {
         var n = 2 * Math.PI / (length - 1);
@@ -207,8 +235,9 @@ public static class WindowBuilder
     /// <summary>
     /// Generates coefficients for cepstrum liftering.
     /// </summary>
-    /// <param name="length">Length of the window</param>
-    /// <param name="l">Denominator in liftering formula</param>
+    /// <param name="length">Length of the window.</param>
+    /// <param name="l">Denominator in liftering formula.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Liftering(int length, int l = 22)
     {
         if (l <= 0)
@@ -221,20 +250,21 @@ public static class WindowBuilder
                          .ToFloats();
     }
 
-
-
+    /// <summary>
+    /// Generates Blackman-Harris window of given <paramref name="length"/>.
+    /// </summary>
+    /// <param name="length">Window length.</param>
+    /// <returns>Array of window coefficients.</returns>
     public static float[] Blackman_Harris(int length)
     {
         float factor = ConstantsFp32.TWO_PI / length;
 
         return Enumerable.Range(0, length)
-                            .Select(i =>
-                                0.35875 -
-                                0.48829 * Math.Cos(factor * i) +
-                                0.14128 * Math.Cos(2 * factor * i) -
-                                0.01168 * Math.Cos(3 * factor * i))
-                            .ToFloats();
-
+                         .Select(i =>
+                             0.35875 -
+                             0.48829 * Math.Cos(factor * i) +
+                             0.14128 * Math.Cos(2 * factor * i) -
+                             0.01168 * Math.Cos(3 * factor * i))
+                         .ToFloats();
     }
-
 }

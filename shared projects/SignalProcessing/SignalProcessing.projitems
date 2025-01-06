@@ -248,10 +248,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Transforms\Wavelets\WaveletFamily.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowBuilderExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Windowing\Windowing_ComplexFP322.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Windowing\Windowing_Complex_g.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Windowing\Windowing_FP32.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Windowing\Windowing_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_ComplexFP322.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_complex_f.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_Complex_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_complex_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_FP32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_real_f.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_real_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowType.cs" />
   </ItemGroup>
 </Project>

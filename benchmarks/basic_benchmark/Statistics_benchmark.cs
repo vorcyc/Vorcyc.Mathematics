@@ -1,11 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Microsoft.Diagnostics.Tracing.StackSources;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vorcyc.Mathematics.Statistics;
+using Vorcyc.Mathematics;
 
 namespace basic_benchmark;
 
