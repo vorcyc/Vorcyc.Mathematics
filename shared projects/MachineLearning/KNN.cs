@@ -3,7 +3,7 @@
 namespace Vorcyc.Mathematics.MachineLearning;
 
 /// <summary>
-/// 表示用于分类和回归的K近邻算法。
+/// 表示用于分类和回归的K最近邻算法。
 /// </summary>
 /// <typeparam name="T">坐标的数值类型。</typeparam>
 public class KNN<T> :IMachineLearning
