@@ -4,7 +4,7 @@ using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.Experimental.Signals;
 using Vorcyc.Mathematics.Numerics;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
-using Vorcyc.Mathematics.Utilities;
+using Vorcyc.Mathematics.Framework.Utilities;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
 using Vorcyc.Mathematics.Helpers;
@@ -38,8 +38,12 @@ using Vorcyc.Mathematics.LinearAlgebra;
 //Matrix_test.go();
 
 
-Tensor<float> t1 = new(3, 3, 3);
-t1[1, 1, 1] = 1;
-var t = t1[1, 1, 1];
+//Tensor<float> t1 = new(3, 3, 3);
+//t1[1, 1, 1] = 1;
+//var t = t1[1, 1, 1];
 
-Console.WriteLine(t1);
+//Console.WriteLine(t1);
+
+
+
+Rational_test.go();

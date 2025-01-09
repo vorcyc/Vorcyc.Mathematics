@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics.Utilities;
+﻿using Vorcyc.Mathematics.Framework.Utilities;
 using Vorcyc.Mathematics.Numerics;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 

@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Point_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointFP32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Range_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rational.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RectangleFP32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SizeFP32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Size_g.cs" />

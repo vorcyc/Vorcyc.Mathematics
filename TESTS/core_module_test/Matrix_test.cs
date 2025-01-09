@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
-using Vorcyc.Mathematics.Utilities;
+using Vorcyc.Mathematics.Framework.Utilities;
 
 namespace core_module_test;
 

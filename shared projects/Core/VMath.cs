@@ -1,5 +1,6 @@
 ﻿namespace Vorcyc.Mathematics;
 
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 /// <summary>
@@ -20,7 +21,7 @@ public static partial class VMath
 
 
 
-    #region 最大公约数
+    #region 最大公约数 或 最小公倍数
 
 
     /// <summary>
@@ -41,6 +42,24 @@ public static partial class VMath
         return n;
     }
 
+
+    /// <summary>
+    /// 使用欧几里得算法计算两个泛型整数的最大公约数（GCD）。
+    /// </summary>
+    /// <typeparam name="T">必须实现 <see cref="IBinaryInteger{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="a">第一个整数。</param>
+    /// <param name="b">第二个整数。</param>
+    /// <returns>两个整数的最大公约数。</returns>
+    public static T Gcd<T>(this T a, T b) where T : IBinaryInteger<T>
+    {
+        while (b != T.Zero)
+        {
+            T temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
 
     /// <summary>
     /// 计算两个整数的最大公约数（HCF），使用递归方法。
@@ -117,7 +136,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="numerator"></param>
     /// <param name="denominator"></param>
-    public static (int Numerator, int Denominator) SimplestIntegerRatioOfFraction(int numerator, int denominator)
+    public static (int numerator, int denominator) SimplestIntegerRatioOfFraction(int numerator, int denominator)
     {
         var hcf = Hcf(numerator, denominator);
         return (numerator / hcf, denominator / hcf);

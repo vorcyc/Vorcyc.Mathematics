@@ -1,5 +1,5 @@
 ﻿using Vorcyc.Mathematics;
-using Vorcyc.Mathematics.Utilities;
+using Vorcyc.Mathematics.Framework.Utilities;
 
 namespace core_module_test;
 
