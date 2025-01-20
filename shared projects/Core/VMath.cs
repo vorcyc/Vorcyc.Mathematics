@@ -331,6 +331,33 @@ public static partial class VMath
     }
 
     /// <summary>
+    ///   Gets the maximum value among three values.
+    /// </summary>
+    /// 
+    /// <param name="a">The first value <c>a</c>.</param>
+    /// <param name="b">The second value <c>b</c>.</param>
+    /// <param name="c">The third value <c>c</c>.</param>
+    /// 
+    /// <returns>The maximum value among <paramref name="a"/>, 
+    ///   <paramref name="b"/> and <paramref name="c"/>.</returns>
+    /// 
+    public static double Max(double a, double b, double c)
+    {
+        if (a > b)
+        {
+            if (c > a)
+                return c;
+            return a;
+        }
+        else
+        {
+            if (c > b)
+                return c;
+            return b;
+        }
+    }   
+
+    /// <summary>
     ///   Gets the minimum value among three values.
     /// </summary>
     /// 
@@ -356,6 +383,33 @@ public static partial class VMath
             return b;
         }
     }
+
+    /// <summary>
+    ///   Gets the minimum value among three values.
+    /// </summary>
+    /// 
+    /// <param name="a">The first value <c>a</c>.</param>
+    /// <param name="b">The second value <c>b</c>.</param>
+    /// <param name="c">The third value <c>c</c>.</param>
+    /// 
+    /// <returns>The minimum value among <paramref name="a"/>, 
+    ///   <paramref name="b"/> and <paramref name="c"/>.</returns>
+    /// 
+    public static double Min(double a, double b, double c)
+    {
+        if (a < b)
+        {
+            if (c < a)
+                return c;
+            return a;
+        }
+        else
+        {
+            if (c < b)
+                return c;
+            return b;
+        }
+    }   
 
     /// <summary>
     /// Calculates power of 2.
