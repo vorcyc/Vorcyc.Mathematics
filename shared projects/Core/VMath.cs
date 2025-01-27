@@ -30,6 +30,7 @@ public static partial class VMath
     /// <param name="n">第一个整数。</param>
     /// <param name="m">第二个整数。</param>
     /// <returns>两个整数的最大公约数。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Gcd(int n, int m)
     {
         // 继续循环直到余数为零
@@ -50,6 +51,7 @@ public static partial class VMath
     /// <param name="a">第一个整数。</param>
     /// <param name="b">第二个整数。</param>
     /// <returns>两个整数的最大公约数。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Gcd<T>(this T a, T b) where T : IBinaryInteger<T>
     {
         while (b != T.Zero)
@@ -67,6 +69,7 @@ public static partial class VMath
     /// <param name="a">第一个整数。</param>
     /// <param name="b">第二个整数。</param>
     /// <returns>两个整数的最大公约数。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Hcf(int a, int b)
     {
         // 如果两个数相等，返回其中一个数
@@ -125,6 +128,7 @@ public static partial class VMath
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Lcm(int a, int b)
     {
         return a * b / Hcf(a, b);
@@ -136,6 +140,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="numerator"></param>
     /// <param name="denominator"></param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (int numerator, int denominator) SimplestIntegerRatioOfFraction(int numerator, int denominator)
     {
         var hcf = Hcf(numerator, denominator);
@@ -152,12 +157,10 @@ public static partial class VMath
     /// 算三角形斜边
     ///   Hypotenuse calculus without overflow/underflow
     /// </summary>
-    /// 
     /// <param name="a">First value</param>
     /// <param name="b">Second value</param>
-    /// 
     /// <returns>The hypotenuse Sqrt(a^2 + b^2)</returns>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Hypotenuse(double a, double b)
     {
         double r = 0.0;
@@ -183,12 +186,10 @@ public static partial class VMath
     /// <summary>
     ///   Hypotenuse calculus without overflow/underflow
     /// </summary>
-    /// 
     /// <param name="a">first value</param>
     /// <param name="b">second value</param>
-    /// 
     /// <returns>The hypotenuse Sqrt(a^2 + b^2)</returns>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Hypotenuse(float a, float b)
     {
         float r = 0f;
@@ -213,7 +214,7 @@ public static partial class VMath
     ///   Gets the proper modulus operation for
     ///   an integer value x and modulo m.
     /// </summary>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Mod(int x, int m)
     {
         if (m < 0)
@@ -228,7 +229,7 @@ public static partial class VMath
     ///   Gets the proper modulus operation for
     ///   a real value x and modulo m.
     /// </summary>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Mod(double x, double m)
     {
         if (m < 0)
@@ -244,7 +245,7 @@ public static partial class VMath
     ///   Gets the proper modulus operation for
     ///   a real value x and modulo m.
     /// </summary>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Mod(float x, float m)
     {
         if (m < 0)
@@ -261,7 +262,7 @@ public static partial class VMath
     /// <summary>
     ///   Returns the factorial falling power of the specified value.
     /// </summary>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int FactorialPower(int value, int degree)
     {
         int t = value;
@@ -273,7 +274,7 @@ public static partial class VMath
     /// <summary>
     ///   Truncated power function.
     /// </summary>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double TruncatedPower(double value, double degree)
     {
         double x = System.Math.Pow(value, degree);
@@ -285,7 +286,6 @@ public static partial class VMath
     /// <summary>
     ///   Fast inverse floating-point square root.
     /// </summary>
-    ///
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float InvSqrt(float f)
     {
@@ -313,7 +313,7 @@ public static partial class VMath
     /// 
     /// <returns>The maximum value among <paramref name="a"/>, 
     ///   <paramref name="b"/> and <paramref name="c"/>.</returns>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Max(float a, float b, float c)
     {
         if (a > b)
@@ -339,8 +339,8 @@ public static partial class VMath
     /// <param name="c">The third value <c>c</c>.</param>
     /// 
     /// <returns>The maximum value among <paramref name="a"/>, 
-    ///   <paramref name="b"/> and <paramref name="c"/>.</returns>
-    /// 
+    /// <paramref name="b"/> and <paramref name="c"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Max(double a, double b, double c)
     {
         if (a > b)
@@ -355,7 +355,7 @@ public static partial class VMath
                 return c;
             return b;
         }
-    }   
+    }
 
     /// <summary>
     ///   Gets the minimum value among three values.
@@ -366,8 +366,8 @@ public static partial class VMath
     /// <param name="c">The third value <c>c</c>.</param>
     /// 
     /// <returns>The minimum value among <paramref name="a"/>, 
-    ///   <paramref name="b"/> and <paramref name="c"/>.</returns>
-    /// 
+    /// <paramref name="b"/> and <paramref name="c"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Min(float a, float b, float c)
     {
         if (a < b)
@@ -394,7 +394,7 @@ public static partial class VMath
     /// 
     /// <returns>The minimum value among <paramref name="a"/>, 
     ///   <paramref name="b"/> and <paramref name="c"/>.</returns>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Min(double a, double b, double c)
     {
         if (a < b)
@@ -409,7 +409,7 @@ public static partial class VMath
                 return c;
             return b;
         }
-    }   
+    }
 
     /// <summary>
     /// Calculates power of 2.
@@ -419,7 +419,7 @@ public static partial class VMath
     /// 
     /// <returns>Returns specified power of 2 in the case if power is in the range of
     /// [0, 30]. Otherwise returns 0.</returns>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Pow2(int power)
     {
         return ((power >= 0) && (power <= 30)) ? (1 << power) : 0;
@@ -439,6 +439,7 @@ public static partial class VMath
     /// <item><description><para><em> 第二个(移位)版本耗时 ：00:00:02.1504855 </em></para></description></item>
     /// </list>
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Log2(int x)
     {
         if (x <= 65536)
@@ -547,6 +548,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Log2_2(int x)
     {
         // Validate parameters
@@ -570,6 +572,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="n"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Factorial(int n)
     {
         int num = n;
@@ -586,7 +589,7 @@ public static partial class VMath
     /// <summary>
     ///   Returns the square root of the specified <see cref="decimal"/> number.
     /// </summary>
-    /// 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static decimal Sqrt(decimal x, decimal epsilon = 0.0M)
     {
         if (x < 0)
@@ -607,11 +610,16 @@ public static partial class VMath
 
 
     /// <summary>
-    /// 代码定义了一个名为“Ulp”的静态方法，该方法以double值作为输入并返回double值作为输出。该方法计算输入值的最后一位单位（ULP），即相邻两个浮点数之间可能的最小差异。
-    /// 该方法首先使用BitConverter.DoubleToInt64Bits方法将输入值转换为长整型整数。然后将1添加到整数值以获取下一个相邻的整数值，并使用BitConverter.Int64BitsToDouble方法将其转换回double。然后计算下一个值与输入值之间的差异，并将其作为输入值的ULP返回。
+    /// 计算输入值的最后一位单位（ULP），即相邻两个浮点数之间可能的最小差异。
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <param name="value">要计算ULP的双精度浮点数。</param>
+    /// <returns>输入值的最后一位单位（ULP）。</returns>
+    /// <remarks>
+    /// 该方法首先使用 <see cref="BitConverter.DoubleToInt64Bits(double)"/> 方法将输入值转换为长整型整数。
+    /// 然后将1添加到整数值以获取下一个相邻的整数值，并使用 <see cref="BitConverter.Int64BitsToDouble(long)"/> 方法将其转换回双精度浮点数。
+    /// 最后计算下一个值与输入值之间的差异，并将其作为输入值的ULP返回。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Ulp(double value)
     {
         var bits = BitConverter.DoubleToInt64Bits(value);
@@ -621,4 +629,43 @@ public static partial class VMath
         return result;
     }
 
+    /// <summary>
+    /// 计算输入值的最后一位单位（ULP），即相邻两个浮点数之间可能的最小差异。
+    /// </summary>
+    /// <param name="value">要计算ULP的单精度浮点数。</param>
+    /// <returns>输入值的最后一位单位（ULP）。</returns>
+    /// <remarks>
+    /// 该方法首先使用 <see cref="BitConverter.SingleToInt32Bits(float)"/> 方法将输入值转换为整型整数。
+    /// 然后将1添加到整数值以获取下一个相邻的整数值，并使用 <see cref="BitConverter.Int32BitsToSingle(int)"/> 方法将其转换回单精度浮点数。
+    /// 最后计算下一个值与输入值之间的差异，并将其作为输入值的ULP返回。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float Ulp(float value)
+    {
+        var bits = BitConverter.SingleToInt32Bits(value);
+        var nextValue = BitConverter.Int32BitsToSingle(bits + 1);
+        var result = nextValue - value;
+
+        return result;
+    }
+
+    /// <summary>
+    /// 计算输入值的最后一位单位（ULP），即相邻两个半精度浮点数之间可能的最小差异。
+    /// </summary>
+    /// <param name="value">要计算ULP的半精度浮点数。</param>
+    /// <returns>输入值的最后一位单位（ULP）。</returns>
+    /// <remarks>
+    /// 该方法首先使用 <see cref="BitConverter.HalfToInt16Bits(Half)"/> 方法将输入值转换为短整型整数。
+    /// 然后将1添加到整数值以获取下一个相邻的整数值，并使用 <see cref="BitConverter.Int16BitsToHalf(short)"/> 方法将其转换回半精度浮点数。
+    /// 最后计算下一个值与输入值之间的差异，并将其作为输入值的ULP返回。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Half Ulp(Half value)
+    {
+        var bits = BitConverter.HalfToInt16Bits(value);
+        var nextValue = BitConverter.Int16BitsToHalf((short)(bits + 1));
+        var result = nextValue - value;
+
+        return result;
+    }
 }

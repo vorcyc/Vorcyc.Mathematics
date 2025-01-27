@@ -10,6 +10,7 @@ public static partial class VMath
     /// <summary>
     /// Returns Sinc of <paramref name="x"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Sinc(double x)
     {
         return Math.Abs(x) > 1e-20 ? Math.Sin(Math.PI * x) / (Math.PI * x) : 1.0;
@@ -19,6 +20,7 @@ public static partial class VMath
     /// <summary>
     /// Returns Sinc of <paramref name="x"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Sinc(float x)
     {
         return MathF.Abs(x) > 1e-20 ? MathF.Sin(ConstantsFp32.PI * x) / (ConstantsFp32.PI * x) : 1.0f;
@@ -28,6 +30,7 @@ public static partial class VMath
     /// <summary>
     /// Returns Sinc of <paramref name="x"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Sinc<T>(T x)
         where T : IFloatingPointIeee754<T>
     {
@@ -53,6 +56,7 @@ public static partial class VMath
     /// <summary>
     /// Computes Inverse Sinh of <paramref name="x"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Asinh(double x)
     {
         return Math.Log(x + Math.Sqrt(x * x + 1));
@@ -62,6 +66,7 @@ public static partial class VMath
     /// <summary>
     /// Computes Inverse Sinh of <paramref name="x"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Asinh(float x)
     {
         return MathF.Log(x + MathF.Sqrt(x * x + 1));
@@ -70,6 +75,7 @@ public static partial class VMath
     /// <summary>
     /// Computes Inverse Sinh of <paramref name="x"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Asinh<T>(T x)
         where T : struct, IFloatingPointIeee754<T>
     {
@@ -91,6 +97,7 @@ public static partial class VMath
     /// <summary>
     /// Evaluates Binomial coefficient.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float BinomialCoefficient(int k, int n)
     {
         return Factorial(n) / (Factorial(k) * Factorial(n - k));
@@ -101,6 +108,7 @@ public static partial class VMath
     /// <summary>
     /// Evaluate discrete difference of <paramref name="samples"/> (array of the 1st order derivatives).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Diff(float[] samples, float[] diff)
     {
         diff[0] = samples[0];
@@ -114,6 +122,7 @@ public static partial class VMath
     /// <summary>
     /// Does linear interpolation (as numpy.interp).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InterpolateLinear(float[] x, float[] y, float[] arg, float[] interp)
     {
         var left = 0;
@@ -136,6 +145,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="re">Real parts of complex values</param>
     /// <param name="im">Imaginary parts of complex values</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void BilinearTransform(double[] re, double[] im)
     {
         for (var k = 0; k < re.Length; k++)
@@ -164,6 +174,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="re">Real parts of complex values</param>
     /// <param name="im">Imaginary parts of complex values</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void BilinearTransform(float[] re, float[] im)
     {
         for (var k = 0; k < re.Length; k++)
@@ -191,6 +202,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="phase">Phase array</param>
     /// <param name="tolerance">Jump size</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] Unwrap(double[] phase, double tolerance = Math.PI)
     {
         var unwrapped = phase.FastCopy();
@@ -221,6 +233,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="phase">Phase array</param>
     /// <param name="tolerance">Jump size</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] Unwrap(float[] phase, float tolerance = ConstantsFp32.PI)
     {
         var unwrapped = phase.FastCopy();
@@ -251,6 +264,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="phase">Phase array</param>
     /// <param name="tolerance">Jump size, the default value is PI</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Unwrap<T>(T[] phase, T? tolerance = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
@@ -285,6 +299,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="phase">Phase array</param>
     /// <param name="tolerance">Jump size</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] Wrap(double[] phase, double tolerance = Math.PI)
     {
         var wrapped = phase.FastCopy();
@@ -314,6 +329,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="phase">Phase array</param>
     /// <param name="tolerance">Jump size</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] Wrap(float[] phase, float tolerance = ConstantsFp32.PI)
     {
         var wrapped = phase.FastCopy();
@@ -339,8 +355,17 @@ public static partial class VMath
 
 
     /// <summary>
-    /// Finds <paramref name="n"/>-th order statistics (n-th smallest value in array <paramref name="a"/>).
+    /// Finds the n-th order statistic (n-th smallest value) in the array <paramref name="a"/>.
     /// </summary>
+    /// <param name="a">The array to search.</param>
+    /// <param name="n">The order of the statistic to find (0-based index).</param>
+    /// <param name="start">The starting index of the range to search.</param>
+    /// <param name="end">The ending index of the range to search.</param>
+    /// <returns>The n-th smallest value in the array <paramref name="a"/>.</returns>
+    /// <remarks>
+    /// This method uses a partitioning approach similar to the quickselect algorithm to find the n-th smallest value.
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float FindNth(float[] a, int n, int start, int end)
     {
         while (true)
@@ -380,9 +405,65 @@ public static partial class VMath
     }
 
     /// <summary>
+    /// Finds the n-th order statistic (n-th smallest value) in the array <paramref name="a"/>.
+    /// </summary>
+    /// <param name="a">The array to search.</param>
+    /// <param name="n">The order of the statistic to find (0-based index).</param>
+    /// <param name="start">The starting index of the range to search.</param>
+    /// <param name="end">The ending index of the range to search.</param>
+    /// <returns>The n-th smallest value in the array <paramref name="a"/>.</returns>
+    /// <remarks>
+    /// This method uses a partitioning approach similar to the quickselect algorithm to find the n-th smallest value.
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T FindNth<T>(Span<T> values, int n)
+        where T : INumber<T>
+    {
+        int start = 0;
+        int end = values.Length - 1;
+
+        while (true)
+        {
+            // ============== Partitioning =============
+            var pivotElem = values[end];
+            var pivot = start - 1;
+            for (var i = start; i < end; i++)
+            {
+                if (values[i] <= pivotElem)
+                {
+                    pivot++;
+                    var temp = values[i];
+                    values[i] = values[pivot];
+                    values[pivot] = temp;
+                }
+            }
+            pivot++;
+            var tmp = values[end];
+            values[end] = values[pivot];
+            values[pivot] = tmp;
+            // ========================================
+
+            if (pivot == n)
+            {
+                return values[pivot];
+            }
+            if (n < pivot)
+            {
+                end = pivot - 1;
+            }
+            else
+            {
+                start = pivot + 1;
+            }
+        }
+    }
+
+
+    /// <summary>
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double I0(double x)
     {
         var y = 1.0;
@@ -406,6 +487,7 @@ public static partial class VMath
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float I0(float x)
     {
         var y = 1.0f;
@@ -429,6 +511,7 @@ public static partial class VMath
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T I0<T>(T x)
         where T : IFloatingPointIeee754<T>
     {
@@ -453,6 +536,7 @@ public static partial class VMath
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Complex<T> I0<T>(Complex<T> x)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
@@ -486,7 +570,8 @@ public static partial class VMath
     /// </summary>
     /// <param name="a">Polynomial coefficients</param>
     /// <param name="maxIterations">Max number of iterations</param>
-    public static Complex[] PolynomialRoots(double[] a, int maxIterations = PolyRootsIterations)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Complex[]? PolynomialRoots(double[] a, int maxIterations = PolyRootsIterations)
     {
         var n = a.Length;
         if (n <= 1)
@@ -542,7 +627,8 @@ public static partial class VMath
     /// </summary>
     /// <param name="a">Polynomial coefficients</param>
     /// <param name="maxIterations">Max number of iterations</param>
-    public static ComplexFp32[] PolynomialRoots(float[] a, int maxIterations = PolyRootsIterations)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ComplexFp32[]? PolynomialRoots(float[] a, int maxIterations = PolyRootsIterations)
     {
         var n = a.Length;
         if (n <= 1)
@@ -595,6 +681,7 @@ public static partial class VMath
     /// <summary>
     /// Checks if two arrays of complex numbers are essentially identical.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool ArraysAreEqual(Complex[] a, Complex[] b, double tolerance = 1e-16)
     {
         for (var i = 0; i < a.Length; i++)
@@ -612,6 +699,7 @@ public static partial class VMath
     /// <summary>
     /// Checks if two arrays of complex numbers are essentially identical.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool ArraysAreEqual(ComplexFp32[] a, ComplexFp32[] b, float tolerance = 1e-16f)
     {
         for (var i = 0; i < a.Length; i++)
@@ -630,6 +718,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="a">Polynomial coefficients</param>
     /// <param name="x">Argument</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Complex EvaluatePolynomial(double[] a, Complex x)
     {
         var res = new Complex(a[0], 0);
@@ -649,6 +738,7 @@ public static partial class VMath
     /// </summary>
     /// <param name="a">Polynomial coefficients</param>
     /// <param name="x">Argument</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ComplexFp32 EvaluatePolynomial(float[] a, ComplexFp32 x)
     {
         var res = new ComplexFp32(a[0], 0);
@@ -666,6 +756,7 @@ public static partial class VMath
     /// <summary>
     /// Multiplies polynomials.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Complex[] MultiplyPolynomials(Complex[] poly1, Complex[] poly2)
     {
         var length = poly1.Length + poly2.Length - 1;
@@ -686,6 +777,7 @@ public static partial class VMath
     /// <summary>
     /// Multiplies polynomials.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ComplexFp32[] MultiplyPolynomials(ComplexFp32[] poly1, ComplexFp32[] poly2)
     {
         var length = poly1.Length + poly2.Length - 1;
@@ -705,6 +797,7 @@ public static partial class VMath
     /// <summary>
     /// Divides polynomials.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Complex[][] DividePolynomial(Complex[] dividend, Complex[] divisor)
     {
         var output = (Complex[])dividend.Clone();
@@ -732,13 +825,14 @@ public static partial class VMath
         Array.Copy(output, 0, q, 0, separator);
         Array.Copy(output, separator, r, 0, output.Length - separator);
 
-        return new[] { q, r };
+        return [q, r];
     }
 
 
     /// <summary>
     /// Divides polynomials.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ComplexFp32[][] DividePolynomial(ComplexFp32[] dividend, ComplexFp32[] divisor)
     {
         var output = (ComplexFp32[])dividend.Clone();
