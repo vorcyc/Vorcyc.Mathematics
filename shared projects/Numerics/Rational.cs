@@ -339,7 +339,7 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     /// </summary>
     /// <typeparam name="TFloatingNumber">要转换的浮点数类型。</typeparam>
     /// <returns>当前有理数的浮点数表示形式。</returns>
-    public TFloatingNumber ToFloatingNumber<TFloatingNumber>()
+    public TFloatingNumber ToFloatingPointNumber<TFloatingNumber>()
         where TFloatingNumber : IFloatingPointIeee754<TFloatingNumber>
     {
         return TFloatingNumber.CreateChecked(Numerator) / TFloatingNumber.CreateChecked(Denominator);

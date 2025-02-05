@@ -9,30 +9,30 @@ using Vorcyc.Mathematics.Framework.Utilities;
 *  从 https://stackoverflow.com/questions/2682725/int24-24-bit-integral-datatype 找的
 */
 
-/// <summary>Represents a 3-byte, 24-bit signed integer.</summary>
+/// <summary>
+/// 表示一个3字节、24位的有符号整数。
+/// </summary>
 /// <remarks>
 /// <para>
-/// This class behaves like most other intrinsic signed integers but allows a 3-byte, 24-bit integer implementation
-/// that is often found in many digital-signal processing arenas and different kinds of protocol parsing.  A signed
-/// 24-bit integer is typically used to save storage space on disk where its value range of -8388608 to 8388607 is
-/// sufficient, but the signed Int16 value range of -32768 to 32767 is too small.
+/// 该类的行为类似于大多数其他内置的有符号整数，但允许实现一个3字节、24位的整数，
+/// 这种实现通常在许多数字信号处理领域和不同类型的协议解析中使用。一个有符号的24位整数
+/// 通常用于在磁盘上节省存储空间，其值范围为-8388608到8388607，但有符号的Int16值范围
+/// 为-32768到32767太小。
 /// </para>
 /// <para>
-/// This structure uses an Int32 internally for storage and most other common expected integer functionality, so using
-/// a 24-bit integer will not save memory.  However, if the 24-bit signed integer range (-8388608 to 8388607) suits your
-/// data needs you can save disk space by only storing the three bytes that this integer actually consumes.  You can do
-/// this by calling the Int24.GetBytes function to return a three byte binary array that can be serialized to the desired
-/// destination and then calling the Int24.GetValue function to restore the Int24 value from those three bytes.
+/// 该结构内部使用Int32进行存储和大多数其他常见的预期整数功能，因此使用24位整数不会节省内存。
+/// 但是，如果24位有符号整数范围（-8388608到8388607）适合您的数据需求，您可以通过仅存储
+/// 该整数实际消耗的三个字节来节省磁盘空间。您可以调用Int24.GetBytes函数返回一个可以序列化
+/// 到所需目标的三字节二进制数组，然后调用Int24.GetValue函数从这三个字节中恢复Int24值。
 /// </para>
 /// <para>
-/// All the standard operators for the Int24 have been fully defined for use with both Int24 and Int32 signed integers;
-/// you should find that without the exception Int24 can be compared and numerically calculated with an Int24 or Int32.
-/// Necessary casting should be minimal and typical use should be very simple - just as if you are using any other native
-/// signed integer.
+/// Int24的所有标准运算符都已完全定义，可与Int24和Int32有符号整数一起使用；您会发现，
+/// 除了例外，Int24可以与Int24或Int32进行比较和数值计算。必要的类型转换应尽量减少，
+/// 典型的使用应非常简单 - 就像使用任何其他本机有符号整数一样。
 /// </para>
 /// </remarks>
 [StructLayout(LayoutKind.Explicit)]
-public struct Int24
+public readonly struct Int24
     : IMinMaxValue<Int24>
     , IAdditionOperators<Int24, Int24, Int24>
     , ISubtractionOperators<Int24, Int24, Int24>
@@ -43,23 +43,22 @@ public struct Int24
     , IComparable, IComparable<Int24>
     , IFormattable
 {
-
-
     [FieldOffset(2)]
-    private byte _upper;
-
+    private readonly byte _upper;
     [FieldOffset(1)]
-    private byte _middle;
-
+    private readonly byte _middle;
     [FieldOffset(0)]
-    private byte _low;
-
+    private readonly byte _low;
 
     private const int MaxValue_Int32 = 8388607;
-
     private const int MinValue_Int32 = -8388608;
 
-
+    /// <summary>
+    /// 使用指定的高、中、低字节初始化 <see cref="Int24"/> 结构的新实例。
+    /// </summary>
+    /// <param name="upper">高8位。</param>
+    /// <param name="middle">中间8位。</param>
+    /// <param name="low">低8位。</param>
     public Int24(byte upper, byte middle, byte low)
     {
         _upper = upper;
@@ -67,113 +66,167 @@ public struct Int24
         _low = low;
     }
 
+    /// <summary>
+    /// 使用指定的整数值初始化 <see cref="Int24"/> 结构的新实例。
+    /// </summary>
+    /// <param name="value">要存储的整数值。</param>
+    /// <exception cref="ArgumentOutOfRangeException">当值超出 <see cref="Int24"/> 的范围时引发。</exception>
     public Int24(int value)
     {
         if (value < MinValue_Int32 || value > MaxValue_Int32)
-            throw new ArgumentOutOfRangeException($"The value must >={MinValue_Int32} and <={MaxValue_Int32}");
+            throw new ArgumentOutOfRangeException(nameof(value), $"The value must be >= {MinValue_Int32} and <= {MaxValue_Int32}");
 
         _low = (byte)value;
         _middle = (byte)(value >> 8);
         _upper = (byte)(value >> 16);
     }
 
-    //public static Int24_new MaxValue => new(127, 255, 255);
+    /// <summary>
+    /// 获取 <see cref="Int24"/> 的最大值。
+    /// </summary>
     public static Int24 MaxValue => new(0b_0111_1111, 0b_1111_1111, 0b_1111_1111);
 
-    //23.11.7 最小值不对，修改了这个bug
-    //public static Int24 MinValue => new(128, 0, 0);
+    /// <summary>
+    /// 获取 <see cref="Int24"/> 的最小值。
+    /// </summary>
     public static Int24 MinValue => new(0b_1000_0000, 0b_0000_0000, 0b_0000_0000);
 
+    /// <summary>
+    /// 获取表示零的 <see cref="Int24"/> 值。
+    /// </summary>
     public static Int24 Zero => new(0, 0, 0);
 
-
+    /// <summary>
+    /// 获取 <see cref="Int24"/> 的加法单位元。
+    /// </summary>
     public static Int24 AdditiveIdentity => default;
 
-    #region type conversion
+    #region 类型转换
 
+    /// <summary>
+    /// 将 <see cref="Int24"/> 转换为 <see cref="int"/>。
+    /// </summary>
+    /// <param name="value">要转换的 <see cref="Int24"/> 值。</param>
     public static implicit operator int(Int24 value)
     {
-        //if ((value._upper & 0x80).ToBool()) //! Is this a negative?  Then we need to siingn extend.
-        //也就是高位 >= 128 就是负
-        // 现在也可以用 Convert.ToBoolean() 替代
-        if ((value._upper & 0b_1000_0000).ToBool()) //! Is this a negative?  Then we need to siingn extend.
-            return (0xff << 24) | value._upper << 16 | value._middle << 8 | value._low << 0;
+        if ((value._upper & 0b_1000_0000) != 0) // Is this a negative? Then we need to sign extend.
+            return (0xff << 24) | value._upper << 16 | value._middle << 8 | value._low;
         else
-            return value._low << 0 | (value._middle << 8) | (value._upper << 16);
+            return value._low | (value._middle << 8) | (value._upper << 16);
     }
 
+    /// <summary>
+    /// 将 <see cref="Int24"/> 转换为 <see cref="float"/>。
+    /// </summary>
+    /// <param name="value">要转换的 <see cref="Int24"/> 值。</param>
     public static implicit operator float(Int24 value)
     {
         return (int)value;
     }
 
+    /// <summary>
+    /// 将 <see cref="int"/> 转换为 <see cref="Int24"/>。
+    /// </summary>
+    /// <param name="value">要转换的 <see cref="int"/> 值。</param>
     public static implicit operator Int24(int value)
     {
-        var result = new Int24();
-        if (BitConverter.IsLittleEndian)
-        {
-            result._upper = (byte)(value >> 16); //high是数组索引的0
-            result._middle = (byte)(value >> 8);
-            result._low = (byte)(value);
-        }
-        else
-        {
-            result._low = (byte)(value >> 16);
-            result._middle = (byte)(value >> 8);
-            result._upper = (byte)(value);
-        }
-        return result;
+        if (value < MinValue_Int32 || value > MaxValue_Int32)
+            throw new ArgumentOutOfRangeException(nameof(value), $"The value must be >= {MinValue_Int32} and <= {MaxValue_Int32}");
+
+        return new Int24((byte)(value >> 16), (byte)(value >> 8), (byte)value);
     }
 
     #endregion
 
-
+    /// <summary>
+    /// 实现两个 <see cref="Int24"/> 实例的加法运算。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="Int24"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="Int24"/> 实例。</param>
+    /// <returns>两个 <see cref="Int24"/> 实例的和。</returns>
+    /// <exception cref="OverflowException">当结果超出 <see cref="Int24"/> 的范围时引发。</exception>
     public static Int24 operator +(Int24 left, Int24 right)
     {
-        int intValue = (int)left + (int)right;
+        int intValue = checked((int)left + (int)right);
         if (intValue > MaxValue_Int32 || intValue < MinValue_Int32)
             throw new OverflowException();
         return intValue;
     }
 
+    /// <summary>
+    /// 实现两个 <see cref="Int24"/> 实例的减法运算。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="Int24"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="Int24"/> 实例。</param>
+    /// <returns>两个 <see cref="Int24"/> 实例的差。</returns>
+    /// <exception cref="OverflowException">当结果超出 <see cref="Int24"/> 的范围时引发。</exception>
     public static Int24 operator -(Int24 left, Int24 right)
     {
-        int intValue = (int)left - (int)right;
+        int intValue = checked((int)left - (int)right);
         if (intValue > MaxValue_Int32 || intValue < MinValue_Int32)
             throw new OverflowException();
         return intValue;
     }
 
+    /// <summary>
+    /// 实现两个 <see cref="Int24"/> 实例的乘法运算。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="Int24"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="Int24"/> 实例。</param>
+    /// <returns>两个 <see cref="Int24"/> 实例的积。</returns>
+    /// <exception cref="OverflowException">当结果超出 <see cref="Int24"/> 的范围时引发。</exception>
     public static Int24 operator *(Int24 left, Int24 right)
     {
-        int intValue = (int)left * (int)right;
+        int intValue = checked((int)left * (int)right);
         if (intValue > MaxValue_Int32 || intValue < MinValue_Int32)
             throw new OverflowException();
         return intValue;
     }
 
+    /// <summary>
+    /// 实现两个 <see cref="Int24"/> 实例的除法运算。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="Int24"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="Int24"/> 实例。</param>
+    /// <returns>两个 <see cref="Int24"/> 实例的商。</returns>
+    /// <exception cref="OverflowException">当结果超出 <see cref="Int24"/> 的范围时引发。</exception>
     public static Int24 operator /(Int24 left, Int24 right)
     {
-        int intValue = (int)left / (int)right;
+        int intValue = checked((int)left / (int)right);
         if (intValue > MaxValue_Int32 || intValue < MinValue_Int32)
             throw new OverflowException();
         return intValue;
     }
 
+    /// <summary>
+    /// 实现 <see cref="Int24"/> 和 <see cref="float"/> 实例的除法运算。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="Int24"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="float"/> 实例。</param>
+    /// <returns><see cref="Int24"/> 和 <see cref="float"/> 实例的商。</returns>
     public static float operator /(Int24 left, float right)
     {
         return (float)left / right;
     }
 
+    #region IComparable, IComparable<Int24>
 
-    #region IComparable  , ICompareable<T>
-
-
+    /// <summary>
+    /// 比较当前实例与另一个 <see cref="Int24"/> 实例。
+    /// </summary>
+    /// <param name="other">另一个 <see cref="Int24"/> 实例。</param>
+    /// <returns>一个值，指示当前实例是否小于、等于或大于另一个实例。</returns>
     public int CompareTo(Int24 other)
     {
         return CompareTo((int)other);
     }
 
+    /// <summary>
+    /// 比较当前实例与另一个对象。
+    /// </summary>
+    /// <param name="obj">要比较的对象。</param>
+    /// <returns>一个值，指示当前实例是否小于、等于或大于另一个对象。</returns>
+    /// <exception cref="ArgumentException">当对象不是 <see cref="int"/> 或 <see cref="Int24"/> 时引发。</exception>
     public int CompareTo(object? obj)
     {
         if (obj is null)
@@ -184,26 +237,32 @@ public struct Int24
 
         int num = (int)obj;
         int t = (int)this;
-        return (t < num ? -1 : (t > num ? 1 : 0));
+        return t.CompareTo(num);
     }
-
-
 
     #endregion
 
-
     #region IFormattable
 
+    /// <summary>
+    /// 返回当前实例的字符串表示形式。
+    /// </summary>
+    /// <returns>当前实例的字符串表示形式。</returns>
     public override string ToString()
     {
         return ((int)this).ToString();
     }
 
+    /// <summary>
+    /// 返回当前实例的字符串表示形式。
+    /// </summary>
+    /// <param name="format">格式字符串。</param>
+    /// <param name="formatProvider">格式提供程序。</param>
+    /// <returns>当前实例的字符串表示形式。</returns>
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
         return ((int)this).ToString(format, formatProvider);
     }
 
     #endregion
-
 }

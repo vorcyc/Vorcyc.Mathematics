@@ -1,320 +1,296 @@
-﻿using System.ComponentModel;
-using System.Drawing;
+﻿namespace Vorcyc.Mathematics.Numerics;
+
+using System.ComponentModel;
 using System.Globalization;
 
-namespace Vorcyc.Mathematics.Numerics;
-
+/// <summary>
+/// 表示一个具有浮点数坐标和尺寸的矩形结构体。
+/// </summary>
 public struct RectangleFP32
 {
-    public readonly static RectangleFP32 Empty;
+    /// <summary>
+    /// 表示一个空的 <see cref="RectangleFP32"/> 结构体。
+    /// </summary>
+    public readonly static RectangleFP32 Empty = new RectangleFP32(0, 0, 0, 0);
 
-    private float x;
+    /// <summary>
+    /// 获取或设置矩形的 X 坐标。
+    /// </summary>
+    public float X { get; set; }
 
-    private float y;
+    /// <summary>
+    /// 获取或设置矩形的 Y 坐标。
+    /// </summary>
+    public float Y { get; set; }
 
-    private float width;
+    /// <summary>
+    /// 获取或设置矩形的宽度。
+    /// </summary>
+    public float Width { get; set; }
 
-    private float height;
+    /// <summary>
+    /// 获取或设置矩形的高度。
+    /// </summary>
+    public float Height { get; set; }
 
+    /// <summary>
+    /// 获取矩形的底部坐标。
+    /// </summary>
     [Browsable(false)]
-    public float Bottom
-    {
-        get
-        {
-            return this.Y + this.Height;
-        }
-    }
+    public float Bottom => Y + Height;
 
-    public float Height
+    /// <summary>
+    /// 获取一个值，该值指示矩形是否为空。
+    /// </summary>
+    [Browsable(false)]
+    public bool IsEmpty => Width <= 0f || Height <= 0f;
+
+    /// <summary>
+    /// 获取矩形的左侧坐标。
+    /// </summary>
+    [Browsable(false)]
+    public float Left => X;
+
+    /// <summary>
+    /// 获取或设置矩形的位置。
+    /// </summary>
+    [Browsable(false)]
+    public PointFp32 Location
     {
-        get
-        {
-            return this.height;
-        }
+        get => new(X, Y);
         set
         {
-            this.height = value;
+            X = value.X;
+            Y = value.Y;
         }
     }
 
+    /// <summary>
+    /// 获取矩形的右侧坐标。
+    /// </summary>
     [Browsable(false)]
-    public bool IsEmpty
-    {
-        get
-        {
-            if (this.Width <= 0f)
-            {
-                return true;
-            }
-            return this.Height <= 0f;
-        }
-    }
+    public float Right => X + Width;
 
+    /// <summary>
+    /// 获取或设置矩形的大小。
+    /// </summary>
     [Browsable(false)]
-    public float Left
+    public SizeFp32 Size
     {
-        get
-        {
-            return this.X;
-        }
-    }
-
-    [Browsable(false)]
-    public PointF Location
-    {
-        get
-        {
-            return new PointF(this.X, this.Y);
-        }
+        get => new SizeFp32(Width, Height);
         set
         {
-            this.X = value.X;
-            this.Y = value.Y;
+            Width = value.Width;
+            Height = value.Height;
         }
     }
 
+    /// <summary>
+    /// 获取矩形的顶部坐标。
+    /// </summary>
     [Browsable(false)]
-    public float Right
-    {
-        get
-        {
-            return this.X + this.Width;
-        }
-    }
+    public float Top => Y;
 
-    [Browsable(false)]
-    public SizeF Size
-    {
-        get
-        {
-            return new SizeF(this.Width, this.Height);
-        }
-        set
-        {
-            this.Width = value.Width;
-            this.Height = value.Height;
-        }
-    }
-
-    [Browsable(false)]
-    public float Top
-    {
-        get
-        {
-            return this.Y;
-        }
-    }
-
-    public float Width
-    {
-        get
-        {
-            return this.width;
-        }
-        set
-        {
-            this.width = value;
-        }
-    }
-
-    public float X
-    {
-        get
-        {
-            return this.x;
-        }
-        set
-        {
-            this.x = value;
-        }
-    }
-
-    public float Y
-    {
-        get
-        {
-            return this.y;
-        }
-        set
-        {
-            this.y = value;
-        }
-    }
-
-    static RectangleFP32()
-    {
-    }
-
+    /// <summary>
+    /// 初始化 <see cref="RectangleFP32"/> 结构体的新实例，该实例具有指定的坐标和尺寸。
+    /// </summary>
+    /// <param name="x">X 坐标。</param>
+    /// <param name="y">Y 坐标。</param>
+    /// <param name="width">宽度。</param>
+    /// <param name="height">高度。</param>
     public RectangleFP32(float x, float y, float width, float height)
     {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        X = x;
+        Y = y;
+        Width = width;
+        Height = height;
     }
 
-    public RectangleFP32(PointF location, SizeF size)
+    /// <summary>
+    /// 初始化 <see cref="RectangleFP32"/> 结构体的新实例，该实例具有指定的位置和大小。
+    /// </summary>
+    /// <param name="location">位置。</param>
+    /// <param name="size">大小。</param>
+    public RectangleFP32(PointFp32 location, SizeFp32 size)
     {
-        this.x = location.X;
-        this.y = location.Y;
-        this.width = size.Width;
-        this.height = size.Height;
+        X = location.X;
+        Y = location.Y;
+        Width = size.Width;
+        Height = size.Height;
     }
 
-    public bool Contains(float x, float y)
-    {
-        if (this.X > x || x >= this.X + this.Width || this.Y > y)
-        {
-            return false;
-        }
-        return y < this.Y + this.Height;
-    }
+    /// <summary>
+    /// 检查指定的点是否在矩形内。
+    /// </summary>
+    /// <param name="x">点的 X 坐标。</param>
+    /// <param name="y">点的 Y 坐标。</param>
+    /// <returns>如果点在矩形内，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    public bool Contains(float x, float y) => X <= x && x < X + Width && Y <= y && y < Y + Height;
 
-    public bool Contains(PointF pt)
-    {
-        return this.Contains(pt.X, pt.Y);
-    }
+    /// <summary>
+    /// 检查指定的点是否在矩形内。
+    /// </summary>
+    /// <param name="pt">点。</param>
+    /// <returns>如果点在矩形内，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    public bool Contains(PointFp32 pt) => Contains(pt.X, pt.Y);
 
-    public bool Contains(RectangleFP32 rect)
-    {
-        if (this.X > rect.X || rect.X + rect.Width > this.X + this.Width || this.Y > rect.Y)
-        {
-            return false;
-        }
-        return rect.Y + rect.Height <= this.Y + this.Height;
-    }
+    /// <summary>
+    /// 检查指定的矩形是否在当前矩形内。
+    /// </summary>
+    /// <param name="rect">矩形。</param>
+    /// <returns>如果矩形在当前矩形内，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    public bool Contains(RectangleFP32 rect) => X <= rect.X && rect.X + rect.Width <= X + Width && Y <= rect.Y && rect.Y + rect.Height <= Y + Height;
 
-    public override bool Equals(object obj)
-    {
-        if (!(obj is RectangleFP32))
-        {
-            return false;
-        }
-        RectangleFP32 rectangleF = (RectangleFP32)obj;
-        if (rectangleF.X != this.X || rectangleF.Y != this.Y || rectangleF.Width != this.Width)
-        {
-            return false;
-        }
-        return rectangleF.Height == this.Height;
-    }
+    /// <summary>
+    /// 确定指定对象是否等于当前对象。
+    /// </summary>
+    /// <param name="obj">要与当前对象进行比较的对象。</param>
+    /// <returns>如果指定对象等于当前对象，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    public override bool Equals(object obj) => obj is RectangleFP32 rectangle && this == rectangle;
 
-    public static RectangleFP32 FromLTRB(float left, float top, float right, float bottom)
-    {
-        return new RectangleFP32(left, top, right - left, bottom - top);
-    }
+    /// <summary>
+    /// 返回两个 <see cref="RectangleFP32"/> 结构体的和。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="RectangleFP32"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="RectangleFP32"/> 实例。</param>
+    /// <returns>两个 <see cref="RectangleFP32"/> 结构体的和。</returns>
+    public static RectangleFP32 FromLTRB(float left, float top, float right, float bottom) => new RectangleFP32(left, top, right - left, bottom - top);
 
-    public override int GetHashCode()
-    {
-        return (int)((uint)this.X ^ ((uint)this.Y << 13 | (uint)this.Y >> 19) ^ ((uint)this.Width << 26 | (uint)this.Width >> 6) ^ ((uint)this.Height << 7 | (uint)this.Height >> 25));
-    }
+    /// <summary>
+    /// 返回此实例的哈希代码。
+    /// </summary>
+    /// <returns>此实例的哈希代码。</returns>
+    public override int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
 
+    /// <summary>
+    /// 按指定的量扩展矩形。
+    /// </summary>
+    /// <param name="x">扩展的 X 量。</param>
+    /// <param name="y">扩展的 Y 量。</param>
     public void Inflate(float x, float y)
     {
-        this.X = this.X - x;
-        this.Y = this.Y - y;
-        this.Width = this.Width + 2f * x;
-        this.Height = this.Height + 2f * y;
+        X -= x;
+        Y -= y;
+        Width += 2 * x;
+        Height += 2 * y;
     }
 
-    public void Inflate(SizeF size)
-    {
-        this.Inflate(size.Width, size.Height);
-    }
+    /// <summary>
+    /// 按指定的大小扩展矩形。
+    /// </summary>
+    /// <param name="size">扩展的大小。</param>
+    public void Inflate(SizeFp32 size) => Inflate(size.Width, size.Height);
 
+    /// <summary>
+    /// 返回按指定的量扩展的矩形。
+    /// </summary>
+    /// <param name="rect">要扩展的矩形。</param>
+    /// <param name="x">扩展的 X 量。</param>
+    /// <param name="y">扩展的 Y 量。</param>
+    /// <returns>扩展后的矩形。</returns>
     public static RectangleFP32 Inflate(RectangleFP32 rect, float x, float y)
     {
-        RectangleFP32 rectangleF = rect;
-        rectangleF.Inflate(x, y);
-        return rectangleF;
+        var rectangle = rect;
+        rectangle.Inflate(x, y);
+        return rectangle;
     }
 
+    /// <summary>
+    /// 计算当前矩形与指定矩形的交集。
+    /// </summary>
+    /// <param name="rect">要计算交集的矩形。</param>
     public void Intersect(RectangleFP32 rect)
     {
-        RectangleFP32 rectangleF = RectangleFP32.Intersect(rect, this);
-        this.X = rectangleF.X;
-        this.Y = rectangleF.Y;
-        this.Width = rectangleF.Width;
-        this.Height = rectangleF.Height;
+        var rectangle = Intersect(this, rect);
+        X = rectangle.X;
+        Y = rectangle.Y;
+        Width = rectangle.Width;
+        Height = rectangle.Height;
     }
 
+    /// <summary>
+    /// 返回两个矩形的交集。
+    /// </summary>
+    /// <param name="a">第一个矩形。</param>
+    /// <param name="b">第二个矩形。</param>
+    /// <returns>两个矩形的交集。</returns>
     public static RectangleFP32 Intersect(RectangleFP32 a, RectangleFP32 b)
     {
-        float single = Math.Max(a.X, b.X);
-        float single1 = Math.Min(a.X + a.Width, b.X + b.Width);
-        float single2 = Math.Max(a.Y, b.Y);
-        float single3 = Math.Min(a.Y + a.Height, b.Y + b.Height);
-        if (single1 < single || single3 < single2)
+        var x1 = Math.Max(a.X, b.X);
+        var x2 = Math.Min(a.X + a.Width, b.X + b.Width);
+        var y1 = Math.Max(a.Y, b.Y);
+        var y2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
+        if (x2 < x1 || y2 < y1)
         {
-            return RectangleFP32.Empty;
+            return Empty;
         }
-        return new RectangleFP32(single, single2, single1 - single, single3 - single2);
+        return new RectangleFP32(x1, y1, x2 - x1, y2 - y1);
     }
 
-    public bool IntersectsWith(RectangleFP32 rect)
-    {
-        if (rect.X >= this.X + this.Width || this.X >= rect.X + rect.Width || rect.Y >= this.Y + this.Height)
-        {
-            return false;
-        }
-        return this.Y < rect.Y + rect.Height;
-    }
+    /// <summary>
+    /// 检查当前矩形是否与指定矩形相交。
+    /// </summary>
+    /// <param name="rect">要检查的矩形。</param>
+    /// <returns>如果矩形相交，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    public bool IntersectsWith(RectangleFP32 rect) => rect.X < X + Width && X < rect.X + rect.Width && rect.Y < Y + Height && Y < rect.Y + rect.Height;
 
-    public void Offset(PointF pos)
-    {
-        this.Offset(pos.X, pos.Y);
-    }
+    /// <summary>
+    /// 按指定的量偏移矩形。
+    /// </summary>
+    /// <param name="pos">偏移量。</param>
+    public void Offset(PointFp32 pos) => Offset(pos.X, pos.Y);
 
+    /// <summary>
+    /// 按指定的量偏移矩形。
+    /// </summary>
+    /// <param name="x">X 方向的偏移量。</param>
+    /// <param name="y">Y 方向的偏移量。</param>
     public void Offset(float x, float y)
     {
-        this.X = this.X + x;
-        this.Y = this.Y + y;
+        X += x;
+        Y += y;
     }
 
-    public static bool operator ==(RectangleFP32 left, RectangleFP32 right)
-    {
-        if (left.X != right.X || left.Y != right.Y || left.Width != right.Width)
-        {
-            return false;
-        }
-        return left.Height == right.Height;
-    }
+    /// <summary>
+    /// 确定两个 <see cref="RectangleFP32"/> 实例是否相等。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="RectangleFP32"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="RectangleFP32"/> 实例。</param>
+    /// <returns>如果两个实例相等，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    public static bool operator ==(RectangleFP32 left, RectangleFP32 right) => left.X == right.X && left.Y == right.Y && left.Width == right.Width && left.Height == right.Height;
 
-    public static implicit operator RectangleFP32(Rectangle r)
-    {
-        return new RectangleFP32((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
-    }
+    /// <summary>
+    /// 将 <see cref="System.Drawing.Rectangle"/> 隐式转换为 <see cref="RectangleFP32"/>。
+    /// </summary>
+    /// <param name="r">要转换的 <see cref="Rectangle"/> 实例。</param>
+    public static implicit operator RectangleFP32(System.Drawing.Rectangle r) => new RectangleFP32(r.X, r.Y, r.Width, r.Height);
 
-    public static bool operator !=(RectangleFP32 left, RectangleFP32 right)
-    {
-        return !(left == right);
-    }
+    /// <summary>
+    /// 确定两个 <see cref="RectangleFP32"/> 实例是否不相等。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="RectangleFP32"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="RectangleFP32"/> 实例。</param>
+    /// <returns>如果两个实例不相等，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    public static bool operator !=(RectangleFP32 left, RectangleFP32 right) => !(left == right);
 
+    /// <summary>
+    /// 返回表示当前对象的字符串。
+    /// </summary>
+    /// <returns>表示当前对象的字符串。</returns>
+    public override string ToString() => $"{{X={X.ToString(CultureInfo.CurrentCulture)}, Y={Y.ToString(CultureInfo.CurrentCulture)}, Width={Width.ToString(CultureInfo.CurrentCulture)}, Height={Height.ToString(CultureInfo.CurrentCulture)}}}";
 
-
-    public override string ToString()
-    {
-        string[] str = new string[] { "{X=", null, null, null, null, null, null, null, null };
-        float x = this.X;
-        str[1] = x.ToString(CultureInfo.CurrentCulture);
-        str[2] = ",Y=";
-        x = this.Y;
-        str[3] = x.ToString(CultureInfo.CurrentCulture);
-        str[4] = ",Width=";
-        x = this.Width;
-        str[5] = x.ToString(CultureInfo.CurrentCulture);
-        str[6] = ",Height=";
-        x = this.Height;
-        str[7] = x.ToString(CultureInfo.CurrentCulture);
-        str[8] = "}";
-        return string.Concat(str);
-    }
-
+    /// <summary>
+    /// 返回两个矩形的并集。
+    /// </summary>
+    /// <param name="a">第一个矩形。</param>
+    /// <param name="b">第二个矩形。</param>
+    /// <returns>两个矩形的并集。</returns>
     public static RectangleFP32 Union(RectangleFP32 a, RectangleFP32 b)
     {
-        float single = Math.Min(a.X, b.X);
-        float single1 = Math.Max(a.X + a.Width, b.X + b.Width);
-        float single2 = Math.Min(a.Y, b.Y);
-        float single3 = Math.Max(a.Y + a.Height, b.Y + b.Height);
-        return new RectangleFP32(single, single2, single1 - single, single3 - single2);
+        var x1 = Math.Min(a.X, b.X);
+        var x2 = Math.Max(a.X + a.Width, b.X + b.Width);
+        var y1 = Math.Min(a.Y, b.Y);
+        var y2 = Math.Max(a.Y + a.Height, b.Y + b.Height);
+        return new RectangleFP32(x1, y1, x2 - x1, y2 - y1);
     }
 }

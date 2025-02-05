@@ -4,136 +4,182 @@ using System.Globalization;
 
 namespace Vorcyc.Mathematics.Numerics;
 
-public struct PointFP32
+/// <summary>
+/// 表示一个具有浮点数坐标的二维点结构体。
+/// </summary>
+public readonly struct PointFp32
 {
-    public readonly static PointFP32 Empty;
+    /// <summary>
+    /// 表示一个坐标均为零的 <see cref="PointFp32"/> 结构体。
+    /// </summary>
+    public readonly static PointFp32 Empty = new PointFp32(0, 0);
 
-    private float x;
+    /// <summary>
+    /// 获取 X 坐标。
+    /// </summary>
+    public float X { get; }
 
-    private float y;
+    /// <summary>
+    /// 获取 Y 坐标。
+    /// </summary>
+    public float Y { get; }
 
+    /// <summary>
+    /// 获取一个值，该值指示此 <see cref="PointFp32"/> 是否为空。
+    /// </summary>
     [Browsable(false)]
-    public bool IsEmpty
+    public bool IsEmpty => X == 0f && Y == 0f;
+
+    /// <summary>
+    /// 初始化 <see cref="PointFp32"/> 结构体的新实例，该实例具有指定的坐标。
+    /// </summary>
+    /// <param name="x">X 坐标。</param>
+    /// <param name="y">Y 坐标。</param>
+    public PointFp32(float x, float y)
     {
-        get
-        {
-            if (this.x != 0f)
-            {
-                return false;
-            }
-            return this.y == 0f;
-        }
+        X = x;
+        Y = y;
     }
 
-    public float X
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的和。
+    /// </summary>
+    /// <param name="pt">要加的点。</param>
+    /// <param name="sz">要加的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 Add(PointFp32 pt, Size sz)
     {
-        get
-        {
-            return this.x;
-        }
-        set
-        {
-            this.x = value;
-        }
+        return new PointFp32(pt.X + sz.Width, pt.Y + sz.Height);
     }
 
-    public float Y
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的和。
+    /// </summary>
+    /// <param name="pt">要加的点。</param>
+    /// <param name="sz">要加的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 Add(PointFp32 pt, SizeFp32 sz)
     {
-        get
-        {
-            return this.y;
-        }
-        set
-        {
-            this.y = value;
-        }
+        return new PointFp32(pt.X + sz.Width, pt.Y + sz.Height);
     }
 
-    static PointFP32()
-    {
-    }
-
-    public PointFP32(float x, float y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-
-    public static PointFP32 Add(PointFP32 pt, Size sz)
-    {
-        return new PointFP32(pt.X + (float)sz.Width, pt.Y + (float)sz.Height);
-    }
-
-    public static PointFP32 Add(PointFP32 pt, SizeFP32 sz)
-    {
-        return new PointFP32(pt.X + sz.Width, pt.Y + sz.Height);
-    }
-
+    /// <summary>
+    /// 确定指定对象是否等于当前对象。
+    /// </summary>
+    /// <param name="obj">要与当前对象进行比较的对象。</param>
+    /// <returns>如果指定对象等于当前对象，则为 true；否则为 false。</returns>
     public override bool Equals(object obj)
     {
-        if (!(obj is PointFP32))
+        if (obj is PointFp32 pointF)
         {
-            return false;
+            return X == pointF.X && Y == pointF.Y;
         }
-        PointFP32 pointF = (PointFP32)obj;
-        if (pointF.X != this.X || pointF.Y != this.Y)
-        {
-            return false;
-        }
-        return pointF.GetType().Equals(this.GetType());
+        return false;
     }
 
+    /// <summary>
+    /// 用作特定类型的哈希函数。
+    /// </summary>
+    /// <returns>当前对象的哈希代码。</returns>
     public override int GetHashCode()
     {
-        return this.GetHashCode();
+        return HashCode.Combine(X, Y);
     }
 
-    public static PointFP32 operator +(PointFP32 pt, Size sz)
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的和。
+    /// </summary>
+    /// <param name="pt">要加的点。</param>
+    /// <param name="sz">要加的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 operator +(PointFp32 pt, Size sz)
     {
-        return PointFP32.Add(pt, sz);
+        return Add(pt, sz);
     }
 
-    public static PointFP32 operator +(PointFP32 pt, SizeFP32 sz)
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的和。
+    /// </summary>
+    /// <param name="pt">要加的点。</param>
+    /// <param name="sz">要加的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 operator +(PointFp32 pt, SizeFp32 sz)
     {
-        return PointFP32.Add(pt, sz);
+        return Add(pt, sz);
     }
 
-    public static bool operator ==(PointFP32 left, PointFP32 right)
+    /// <summary>
+    /// 确定两个 <see cref="PointFp32"/> 实例是否相等。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="PointFp32"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="PointFp32"/> 实例。</param>
+    /// <returns>如果两个实例相等，则为 true；否则为 false。</returns>
+    public static bool operator ==(PointFp32 left, PointFp32 right)
     {
-        if (left.X != right.X)
-        {
-            return false;
-        }
-        return left.Y == right.Y;
+        return left.X == right.X && left.Y == right.Y;
     }
 
-    public static bool operator !=(PointFP32 left, PointFP32 right)
+    /// <summary>
+    /// 确定两个 <see cref="PointFp32"/> 实例是否不相等。
+    /// </summary>
+    /// <param name="left">第一个 <see cref="PointFp32"/> 实例。</param>
+    /// <param name="right">第二个 <see cref="PointFp32"/> 实例。</param>
+    /// <returns>如果两个实例不相等，则为 true；否则为 false。</returns>
+    public static bool operator !=(PointFp32 left, PointFp32 right)
     {
         return !(left == right);
     }
 
-    public static PointFP32 operator -(PointFP32 pt, Size sz)
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的差。
+    /// </summary>
+    /// <param name="pt">要减的点。</param>
+    /// <param name="sz">要减的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 operator -(PointFp32 pt, Size sz)
     {
-        return PointFP32.Subtract(pt, sz);
+        return Subtract(pt, sz);
     }
 
-    public static PointFP32 operator -(PointFP32 pt, SizeFP32 sz)
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的差。
+    /// </summary>
+    /// <param name="pt">要减的点。</param>
+    /// <param name="sz">要减的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 operator -(PointFp32 pt, SizeFp32 sz)
     {
-        return PointFP32.Subtract(pt, sz);
+        return Subtract(pt, sz);
     }
 
-    public static PointFP32 Subtract(PointFP32 pt, Size sz)
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的差。
+    /// </summary>
+    /// <param name="pt">要减的点。</param>
+    /// <param name="sz">要减的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 Subtract(PointFp32 pt, Size sz)
     {
-        return new PointFP32(pt.X - (float)sz.Width, pt.Y - (float)sz.Height);
+        return new PointFp32(pt.X - sz.Width, pt.Y - sz.Height);
     }
 
-    public static PointFP32 Subtract(PointFP32 pt, SizeFP32 sz)
+    /// <summary>
+    /// 返回一个新的 <see cref="PointFp32"/>，它是指定点和尺寸的差。
+    /// </summary>
+    /// <param name="pt">要减的点。</param>
+    /// <param name="sz">要减的尺寸。</param>
+    /// <returns>新的 <see cref="PointFp32"/> 实例。</returns>
+    public static PointFp32 Subtract(PointFp32 pt, SizeFp32 sz)
     {
-        return new PointFP32(pt.X - sz.Width, pt.Y - sz.Height);
+        return new PointFp32(pt.X - sz.Width, pt.Y - sz.Height);
     }
 
+    /// <summary>
+    /// 返回表示当前对象的字符串。
+    /// </summary>
+    /// <returns>表示当前对象的字符串。</returns>
     public override string ToString()
     {
-        return string.Format(CultureInfo.CurrentCulture, "{{X={0}, Y={1}}}", new object[] { this.x, this.y });
+        return string.Format(CultureInfo.CurrentCulture, "{{X={0}, Y={1}}}", X, Y);
     }
 }
