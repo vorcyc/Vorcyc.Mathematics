@@ -3,8 +3,8 @@
 
 Vorcyc.Mathematics.Statistics类是一个全面的工具类，用于对数值数据进行统计分析，支持多种数据结构和数值类型。它包括查找极值、计算总和、平均值、方差，以及识别最大值和最小值及其索引的方法。该类在可能的情况下利用硬件加速以优化性能。
 
-## 1. FindExtremeValue
-### 重载：
+### 1. FindExtremeValue
+#### 重载：
 - `(float[] array, int start, int length)`
 - `(T[] array, int start, int length) where T : INumber<T>`
 - `(float[] array)`
@@ -12,8 +12,8 @@ Vorcyc.Mathematics.Statistics类是一个全面的工具类，用于对数值数
 - `(ArraySegment<float> arraySegment)`
 - `(ArraySegment<T> arraySegment) where T : INumber<T>`
 - `(Span<T> span) where T : unmanaged, INumber<T>`
-### 描述：在数组、数组段和跨度中查找最大值和最小值。
-### 示例：
+#### 描述：在数组、数组段和跨度中查找最大值和最小值。
+#### 示例：
 ```csharp
    float[] data = { 1.2f, 3.4f, 5.6f, 7.8f };
    var (max, min) = data.FindExtremeValue();
