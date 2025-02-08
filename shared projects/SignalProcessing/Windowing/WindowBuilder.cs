@@ -1,6 +1,7 @@
 ﻿namespace Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 using static Vorcyc.Mathematics.VMath;
+using static Vorcyc.Mathematics.TrigonometryHelper;
 
 /// <summary>
 /// Generates window coefficients of various types.

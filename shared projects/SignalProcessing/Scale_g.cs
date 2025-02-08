@@ -142,7 +142,7 @@ public static partial class Scale
     public static T HerzToBarkSlaney<T>(T herz)
         where T : struct, IFloatingPointIeee754<T>
     {
-        return T.CreateChecked(6) * VMath.Asinh(herz / T.CreateChecked(600));
+        return T.CreateChecked(6) * TrigonometryHelper.Asinh(herz / T.CreateChecked(600));
     }
 
     /// <summary>

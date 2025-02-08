@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
+﻿using Vorcyc.Mathematics.Framework;
+using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 

@@ -55,7 +55,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Signals.Builders
         {
             // y[n] = A * sinc(f / fs * n)
 
-            var sample = (float)(_low + (_high - _low) * VMath.Sinc(_n * _frequency / SamplingRate));
+            var sample = (float)(_low + (_high - _low) * TrigonometryHelper.Sinc(_n * _frequency / SamplingRate));
             _n++;
             return sample;
         }

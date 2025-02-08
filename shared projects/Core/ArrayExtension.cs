@@ -1,6 +1,5 @@
 ﻿namespace Vorcyc.Mathematics;
 
-using System.ComponentModel.Design;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -15,6 +14,7 @@ public static partial class ArrayExtension
     /// <typeparam name="T">数组元素的类型。</typeparam>
     /// <param name="source">源数组。</param>
     /// <returns>返回复制后的新数组。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Copy<T>(this T[] source)
     {
         var result = new T[source.Length];
@@ -29,6 +29,7 @@ public static partial class ArrayExtension
     /// <param name="source">源数组。</param>
     /// <param name="length">要复制的长度。</param>
     /// <returns>返回复制后的新数组。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Copy<T>(this T[] source, int length)
     {
         var result = new T[length];
@@ -43,6 +44,7 @@ public static partial class ArrayExtension
     /// <param name="length">数组的长度。</param>
     /// <param name="initialValue">初始值。</param>
     /// <returns>返回初始化后的数组。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[]? InitializeArray<T>(int length, T initialValue = default)
     {
         if (length < 0)
@@ -64,6 +66,7 @@ public static partial class ArrayExtension
     /// <typeparam name="T">数组元素的类型。</typeparam>
     /// <param name="array">要填充的数组。</param>
     /// <param name="value">填充的值。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] array, T value)
     {
         for (int i = 0; i < array.Length; i++)
@@ -82,6 +85,7 @@ public static partial class ArrayExtension
     /// <param name="value">填充的值。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">当起始或结束索引超出范围时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] array, int start, int end, T value)
     {
         if (array == null)
@@ -108,6 +112,7 @@ public static partial class ArrayExtension
     /// <param name="value">填充的值。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">当范围超出数组边界时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this Span<T> array, Range range, T value)
     {
         if (array.IsEmpty) throw new ArgumentNullException(nameof(array));
@@ -124,6 +129,7 @@ public static partial class ArrayExtension
     /// </summary>
     /// <param name="span">要填充的数组。</param>
     /// <exception cref="ArgumentOutOfRangeException">当数组长度小于1时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this Span<float> span)
     {
         if (span.Length < 1)
@@ -141,6 +147,7 @@ public static partial class ArrayExtension
     /// <typeparam name="T">数组元素的类型，必须实现 IFloatingPointIeee754 接口。</typeparam>
     /// <param name="array">要填充的数组。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber<T>(this T[] array)
         where T : IFloatingPointIeee754<T>
     {
@@ -158,6 +165,7 @@ public static partial class ArrayExtension
     /// <param name="range">要填充的范围。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">当范围超出数组边界时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber<T>(this T[] array, Range range)
         where T : IFloatingPointIeee754<T>
     {
@@ -174,6 +182,7 @@ public static partial class ArrayExtension
     /// <param name="array">要填充的数组。</param>
     /// <param name="limit">随机数的范围。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this int[] array, (int max, int min)? limit = null)
     {
         ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
@@ -191,6 +200,7 @@ public static partial class ArrayExtension
     /// <param name="array">要填充的数组。</param>
     /// <param name="range">要填充的范围。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this int[] array, Range range)
     {
         ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
@@ -204,6 +214,7 @@ public static partial class ArrayExtension
     /// </summary>
     /// <param name="array">要填充的数组。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this long[] array)
     {
         ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
@@ -217,6 +228,7 @@ public static partial class ArrayExtension
     /// <param name="array">要填充的数组。</param>
     /// <param name="range">要填充的范围。</param>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this long[] array, Range range)
     {
         ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
@@ -232,6 +244,7 @@ public static partial class ArrayExtension
     /// <param name="array">要填充的数组。</param>
     /// <param name="startValue">起始值。</param>
     /// <param name="step">步长。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] array, T startValue, T step)
         where T : INumber<T>
     {
@@ -250,6 +263,7 @@ public static partial class ArrayExtension
     /// <param name="span">要填充的数组。</param>
     /// <param name="startValue">起始值。</param>
     /// <param name="step">步长。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this Span<T> span, T startValue, T step)
         where T : INumber<T>
     {
@@ -275,6 +289,7 @@ public static partial class ArrayExtension
     /// <returns>返回内部片段的迭代集。</returns>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">当起始索引或长度超出范围时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<T> GetInner<T>(this T[] array, int start, int length)
     {
         if (array is null)
@@ -303,6 +318,7 @@ public static partial class ArrayExtension
     /// <returns>返回内部片段的数组。</returns>
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">当起始索引或长度超出范围时抛出。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] GetInnerArray<T>(this T[] array, int start, int length)
     {
         if (array == null)
@@ -327,6 +343,7 @@ public static partial class ArrayExtension
     /// <param name="start">待移出部分的起始索引。</param>
     /// <param name="length">待移出部分的长度。</param>
     /// <returns>返回移出指定段后的数组。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] RemoveSegment<T>(this T[] array, int start, int length)
     {
         var result = new T[array.Length - length];
@@ -342,6 +359,7 @@ public static partial class ArrayExtension
     /// <param name="leading">前置数组。</param>
     /// <param name="following">后置数组。</param>
     /// <returns>返回联接后的新数组。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Merge<T>(this T[] leading, T[] following)
     {
         var result = new T[leading.Length + following.Length];
@@ -356,6 +374,7 @@ public static partial class ArrayExtension
     /// <typeparam name="T">集合元素的类型。</typeparam>
     /// <param name="collection">要转换的集合。</param>
     /// <returns>返回表示集合的字符串。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ToString<T>(this IEnumerable<T> collection)
     {
         return "[" + string.Join(",", collection) + "]";
@@ -370,6 +389,7 @@ public static partial class ArrayExtension
     /// <param name="sourceOffset">源数组的偏移量。</param>
     /// <param name="destinationOffset">目标数组的偏移量。</param>
     /// <returns>返回复制后的新数组。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] FastCopyFragment<T>(this T[] source, int size, int sourceOffset = 0, int destinationOffset = 0)
         where T : unmanaged
     {
@@ -388,6 +408,7 @@ public static partial class ArrayExtension
     /// <param name="size">要复制的大小。</param>
     /// <param name="sourceOffset">源数组的偏移量。</param>
     /// <param name="destinationOffset">目标数组的偏移量。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FastCopyTo<T>(this T[] source, T[] destination, int size, int sourceOffset = 0, int destinationOffset = 0)
     {
         Array.Copy(source, sourceOffset, destination, destinationOffset, size);
@@ -400,6 +421,7 @@ public static partial class ArrayExtension
     /// <param name="source">源数组。</param>
     /// <param name="n">重复次数。</param>
     /// <returns>返回重复后的新数组。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Repeat<T>(this T[] source, int n)
     {
         var repeated = new T[source.Length * n];
@@ -421,6 +443,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates array of single-precision values from enumerable of double-precision values.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] ToFloats(this IEnumerable<double> values)
     {
         return values.Select(v => (float)v).ToArray();
@@ -429,6 +452,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates array of double-precision values from enumerable of single-precision values.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] ToDoubles(this IEnumerable<float> values)
     {
         return values.Select(v => (double)v).ToArray();
@@ -444,6 +468,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates fast copy of array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] FastCopy(this float[] source)
     {
         var destination = new float[source.Length];
@@ -459,6 +484,7 @@ public static partial class ArrayExtension
     /// <param name="size">Number of elements to copy</param>
     /// <param name="sourceOffset">Offset in source array</param>
     /// <param name="destinationOffset">Offset in destination array</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FastCopyTo(this float[] source, float[] destination, int size, int sourceOffset = 0, int destinationOffset = 0)
     {
         Buffer.BlockCopy(source, sourceOffset * _32Bits, destination, destinationOffset * _32Bits, size * _32Bits);
@@ -471,6 +497,7 @@ public static partial class ArrayExtension
     /// <param name="size">Number of elements to copy</param>
     /// <param name="sourceOffset">Offset in source array</param>
     /// <param name="destinationOffset">Offset in destination array</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] FastCopyFragment(this float[] source, int size, int sourceOffset = 0, int destinationOffset = 0)
     {
         var totalSize = size + destinationOffset;
@@ -482,6 +509,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Performs fast merging of array with <paramref name="another"/> array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] Merge(this float[] source, float[] another)
     {
         var merged = new float[source.Length + another.Length];
@@ -493,6 +521,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates new array containing given array repeated <paramref name="n"/> times.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] Repeat(this float[] source, int n)
     {
         var repeated = new float[source.Length * n];
@@ -512,6 +541,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates new zero-padded array of given <paramref name="size"/> from given array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float[] PadZeros(this float[] source, int size)
     {
         var zeroPadded = new float[size];
@@ -520,8 +550,10 @@ public static partial class ArrayExtension
     }
 
 
+    /// <summary>
     /// Creates new zero-padded array of given <paramref name="size"/> from given array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] PadZeros<T>(this T[] source, int size)
     {
         var zeroPadded = new T[size];
@@ -540,6 +572,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates fast copy of array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] FastCopy(this double[] source)
     {
         var destination = new double[source.Length];
@@ -555,6 +588,7 @@ public static partial class ArrayExtension
     /// <param name="size">Number of elements to copy</param>
     /// <param name="sourceOffset">Offset in source array</param>
     /// <param name="destinationOffset">Offset in destination array</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FastCopyTo(this double[] source, double[] destination, int size, int sourceOffset = 0, int destinationOffset = 0)
     {
         Buffer.BlockCopy(source, sourceOffset * _64Bits, destination, destinationOffset * _64Bits, size * _64Bits);
@@ -567,6 +601,7 @@ public static partial class ArrayExtension
     /// <param name="size">Number of elements to copy</param>
     /// <param name="sourceOffset">Offset in source array</param>
     /// <param name="destinationOffset">Offset in destination array</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] FastCopyFragment(this double[] source, int size, int sourceOffset = 0, int destinationOffset = 0)
     {
         var totalSize = size + destinationOffset;
@@ -578,6 +613,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Performs fast merging of array with <paramref name="another"/> array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] Merge(this double[] source, double[] another)
     {
         var merged = new double[source.Length + another.Length];
@@ -589,6 +625,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates new array containing given array repeated <paramref name="n"/> times.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] Repeat(this double[] source, int n)
     {
         var repeated = new double[source.Length * n];
@@ -606,6 +643,7 @@ public static partial class ArrayExtension
     /// <summary>
     /// Creates new zero-padded array of given <paramref name="size"/> from given array.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double[] PadZeros(this double[] source, int size)
     {
         var zeroPadded = new double[size];
@@ -618,12 +656,22 @@ public static partial class ArrayExtension
     #endregion
 
 
-
-
+    /// <summary>
+    /// Gets the last element of the array.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="array"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Last<T>(this T[] array) => array[array.Length - 1];// array[^1];
 
-
-
+    /// <summary>
+    /// Gets the first element of the array.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="array"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T First<T>(this T[] array) => array[0];
 
 

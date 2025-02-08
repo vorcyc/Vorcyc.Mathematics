@@ -13,9 +13,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComputingBackend.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComputingContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Direction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Guard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\LanguageExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\PrintHelper.cs" />

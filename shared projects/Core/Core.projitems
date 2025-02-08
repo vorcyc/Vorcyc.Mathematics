@@ -15,14 +15,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)BitMathExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Constants_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstantsFp32.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Direction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\SpanMathExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NumberMapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PinnableArrayOption.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleRNG.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Trigonometry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TrigonometryHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VMath.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Guard.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PinnableArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VMath2.cs" />
   </ItemGroup>

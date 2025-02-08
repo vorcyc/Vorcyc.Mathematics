@@ -2,6 +2,7 @@
 
 using static System.MathF;
 using static Vorcyc.Mathematics.VMath;
+using static Vorcyc.Mathematics.TrigonometryHelper;
 
 public static partial class WindowApplier
 {

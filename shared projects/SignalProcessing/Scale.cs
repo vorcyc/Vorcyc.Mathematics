@@ -318,7 +318,7 @@ public static partial class Scale
     /// </summary>
     public static double HerzToBarkSlaney(double herz)
     {
-        return 6 * VMath.Asinh(herz / 600);
+        return 6 * TrigonometryHelper.Asinh(herz / 600);
     }
 
 
@@ -328,7 +328,7 @@ public static partial class Scale
     /// </summary>
     public static float HerzToBarkSlaney(float herz)
     {
-        return 6 * VMath.Asinh(herz / 600);
+        return 6 * TrigonometryHelper.Asinh(herz / 600);
     }
 
     /// <summary>

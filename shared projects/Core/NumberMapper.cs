@@ -1,7 +1,6 @@
-﻿using System.Numerics;
-using System.Runtime.CompilerServices;
+﻿namespace Vorcyc.Mathematics;
 
-namespace Vorcyc.Mathematics;
+using System.Numerics;
 
 /// <summary>
 /// Map a value from one range to another range.

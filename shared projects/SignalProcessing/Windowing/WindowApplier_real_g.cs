@@ -8,6 +8,7 @@
 
 using System.Numerics;
 using static Vorcyc.Mathematics.VMath;
+using static Vorcyc.Mathematics.TrigonometryHelper;
 
 /// <summary>
 /// Provides methods to apply various window functions to data.

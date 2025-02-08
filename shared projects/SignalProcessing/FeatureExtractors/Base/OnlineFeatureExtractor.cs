@@ -1,4 +1,6 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Base;
+﻿using Vorcyc.Mathematics.Framework;
+
+namespace Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Base;
 
 /// <summary>
 /// <see cref="FeatureExtractor"/> adapter for online feature extraction.

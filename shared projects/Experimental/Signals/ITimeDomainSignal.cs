@@ -405,7 +405,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
 
                 var t = x - j;
                 float w = 0.5f * (1.0f + MathF.Cos(t / order * ConstantsFp32.PI));    // Hann window
-                float sinc = VMath.Sinc(t);                             // Sinc function
+                float sinc = TrigonometryHelper.Sinc(t);                             // Sinc function
                 output[n] += w * sinc * input[j];
             }
         }

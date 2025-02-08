@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics;
+﻿namespace Vorcyc.Mathematics.Framework;
 
 using System;
 using System.Diagnostics;

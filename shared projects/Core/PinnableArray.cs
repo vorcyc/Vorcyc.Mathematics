@@ -16,13 +16,12 @@ using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Framework;
 
 //https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags#list
 
@@ -273,11 +272,12 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index]
-    {
-        get => _array[index];
-        set => _array[index] = value;
-    }
+    //public T this[int index]
+    //{
+    //    get => _array[index];
+    //    set => _array[index] = value;
+    //}
+    public ref T this[int index] => ref _array[index];
 
     //public T[] this[int startPos, int endPos]
     //{

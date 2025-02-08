@@ -8,7 +8,6 @@ public static class BitMathExtension
 {
 
 
-
     #region is power of 2
 
     /// <summary>
@@ -16,23 +15,22 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="x">Number to check</param>
     /// <returns>true if number is a power two (i.e.:1,2,4,8,16,...)</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsPowerOf2(this uint x)
     {
         return ((x != 0) && (x & (x - 1)) == 0);
     }
-
 
     /// <summary>
     /// Verifies a number is a power of two
     /// </summary>
     /// <param name="x">Number to check</param>
     /// <returns>true if number is a power two (i.e.:1,2,4,8,16,...)</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsPowerOf2(this ulong x)
     {
         return ((x != 0) && (x & (x - 1)) == 0);
     }
-
-
 
     /// <summary>
     /// Verifies a number is a power of two
@@ -40,6 +38,7 @@ public static class BitMathExtension
     /// <param name="x">Number to check</param>
     /// <returns>true if number is a power two (i.e.:1,2,4,8,16,...)</returns>
     /// <exception cref="ArgumentOutOfRangeException">If <see href="x"/> is less than zero</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsPowerOf2(this int x)
     {
         if (x < 0)
@@ -47,13 +46,13 @@ public static class BitMathExtension
         return IsPowerOf2((uint)x);
     }
 
-
     /// <summary>
     /// Verifies a number is a power of two
     /// </summary>
     /// <param name="x">Number to check</param>
     /// <returns>true if number is a power two (i.e.:1,2,4,8,16,...)</returns>
     /// <exception cref="ArgumentOutOfRangeException">If <see pref="x"/> is less than zero</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsPowerOf2(this long x)
     {
         if (x < 0)
@@ -61,9 +60,7 @@ public static class BitMathExtension
         return IsPowerOf2((ulong)x);
     }
 
-
     #endregion
-
 
     #region Next Power Of 2
 
@@ -73,6 +70,7 @@ public static class BitMathExtension
     /// <param name="x">Number to check</param>
     /// <returns>A power of two number</returns>
     /// <exception cref="ArgumentOutOfRangeException">Threows if x is less than zero</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int NextPowerOf2(this int x)
     {
         if (x < 0)
@@ -90,9 +88,6 @@ public static class BitMathExtension
         return x + 1;
     }
 
-
-
-
     /// <summary>
     /// Rounds a number up to the nearest power of 2.
     /// If the value is a power of two, the same value is returned.
@@ -104,6 +99,7 @@ public static class BitMathExtension
     /// Method based on a method found at: http://graphics.stanford.edu/~seander/bithacks.htm
     /// Subtitle: Round up to the next highest power of 2 
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ulong NextPowerOf2(this ulong value)
     {
         if (value == 0)
@@ -121,7 +117,6 @@ public static class BitMathExtension
         return value;
     }
 
-
     /// <summary>
     /// Rounds a number up to the nearest power of 2.
     /// If the value is a power of two, the same value is returned.
@@ -133,6 +128,7 @@ public static class BitMathExtension
     /// Method based on a method found at: http://graphics.stanford.edu/~seander/bithacks.htm
     /// Subtitle: Round up to the next highest power of 2 
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint NextPowerOf2(this uint value)
     {
         if (value == 0)
@@ -149,29 +145,23 @@ public static class BitMathExtension
         return value;
     }
 
-
-
     #endregion
 
-
-    #region  previous power of 2 
+    #region previous power of 2 
 
     /// <summary>
-    ///   Returns the previous power of 2 after the input value x.
+    /// Returns the previous power of 2 after the input value x.
     /// </summary>
-    /// 
     /// <param name="x">Input value x.</param>
-    /// 
     /// <returns>Returns the previous power of 2 after the input value x.</returns>
     /// <remarks>
     /// 来自于Accord.net framework
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int PreviousPowerOf2(this int x)
     {
         return NextPowerOf2(x + 1) / 2;
     }
-
-
 
     /// <summary>
     /// Rounds a number down to the nearest power of 2.
@@ -180,6 +170,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ulong PreviousPowerOf2(this ulong value)
     {
         if (value == 0ul)
@@ -194,6 +185,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint PreviousPowerOf2(this uint value)
     {
         if (value == 0u)
@@ -203,7 +195,6 @@ public static class BitMathExtension
 
     #endregion
 
-
     #region [ Count Bits ]
 
     /// <summary>
@@ -211,6 +202,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountBitsSet(this uint value)
     {
         uint count;
@@ -226,6 +218,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountBitsSet(this ulong value)
     {
         ulong count;
@@ -241,6 +234,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountBitsCleared(this uint value)
     {
         return CountBitsSet(~value);
@@ -251,6 +245,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountBitsCleared(this ulong value)
     {
         return CountBitsSet(~value);
@@ -258,20 +253,18 @@ public static class BitMathExtension
 
     #endregion
 
-
-
     /// <summary>
     /// Creates a bit mask for a number with the given number of bits.
     /// </summary>
     /// <param name="bitCount"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ulong CreateBitMask(this int bitCount)
     {
         if (bitCount == 0)
             return 0;
         return ulong.MaxValue >> (64 - bitCount);
     }
-
 
     #region [ Count Leading/Trailing Zeros ]
 
@@ -282,6 +275,7 @@ public static class BitMathExtension
     /// Unfortunately, c# cannot call the cpu instruction ctz
     /// Example from http://en.wikipedia.org/wiki/Find_first_set
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountTrailingZeros(this uint value)
     {
         if (value == 0)
@@ -321,6 +315,7 @@ public static class BitMathExtension
     /// Unfortunately, c# cannot call the cpu instruction ctz
     /// Example from http://en.wikipedia.org/wiki/Find_first_set
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountTrailingZeros(this ulong value)
     {
         if (value == 0)
@@ -367,6 +362,7 @@ public static class BitMathExtension
     /// Unfortunately, c# cannot call the cpu instruction clz
     /// Example from http://en.wikipedia.org/wiki/Find_first_set
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountLeadingZeros(this uint value)
     {
         if (value == 0ul)
@@ -406,6 +402,7 @@ public static class BitMathExtension
     /// Unfortunately, c# cannot call the cpu instruction clz
     /// Example from http://en.wikipedia.org/wiki/Find_first_set
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountLeadingZeros(this ulong value)
     {
         if (value == 0ul)
@@ -445,13 +442,12 @@ public static class BitMathExtension
 
     #endregion
 
-
-
     #region [ Count Leading/Trailing Ones ]
 
     /// <summary>
     /// Counts the number of consecutive 1's starting from the lowest bit working up.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountTrailingOnes(this uint value)
     {
         return CountTrailingZeros(~value);
@@ -460,6 +456,7 @@ public static class BitMathExtension
     /// <summary>
     /// Counts the number of consecutive 1's starting from the lowest bit working up.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountTrailingOnes(this ulong value)
     {
         return CountTrailingZeros(~value);
@@ -468,6 +465,7 @@ public static class BitMathExtension
     /// <summary>
     /// Counts the number of consecutive 1's starting from the highest bit working down.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountLeadingOnes(this uint value)
     {
         return CountLeadingZeros(~value);
@@ -476,6 +474,7 @@ public static class BitMathExtension
     /// <summary>
     /// Counts the number of consecutive 1's starting from the highest bit working down.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CountLeadingOnes(this ulong value)
     {
         return CountLeadingZeros(~value);
@@ -483,14 +482,13 @@ public static class BitMathExtension
 
     #endregion
 
-
-
     /// <summary>
     /// Returns the bit position for every bit that is set in the provided value.
     /// Bit positions are defined as 0-63;
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<int> GetSetBitPositions(this ulong value)
     {
         // Once value becomes zero, the remainder of the loop can be short-cut
@@ -507,6 +505,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<int> GetSetBitPositions(this uint value)
     {
         // Once value becomes zero, the remainder of the loop can be short-cut
@@ -523,17 +522,18 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<int> GetClearedBitPositions(this uint value)
     {
         return GetSetBitPositions(~value);
     }
-
     /// <summary>
     /// Returns the bit position for every bit that is cleared in the provided value.
     /// Bit positions are defined as 0-63;
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<int> GetClearedBitPositions(this ulong value)
     {
         return GetSetBitPositions(~value);
@@ -545,6 +545,7 @@ public static class BitMathExtension
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this long value)
     {
         //vb: (value And 1) = 1
@@ -554,6 +555,7 @@ public static class BitMathExtension
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this ulong value)
     {
         //vb: (value And 1) = 1
@@ -563,6 +565,7 @@ public static class BitMathExtension
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this int value)
     {
         //vb: (value And 1) = 1
@@ -573,6 +576,7 @@ public static class BitMathExtension
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this uint value)
     {
         //vb: (value And 1) = 1
@@ -586,6 +590,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEven(this long value)
     {
         //vb: Not (value And 1) = 1
@@ -603,6 +608,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEven(this ulong value)
     {
         //vb: Not (value And 1) = 1
@@ -620,6 +626,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEven(this int value)
     {
         //vb: Not (value And 1) = 1
@@ -637,6 +644,7 @@ public static class BitMathExtension
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEven(this uint value)
     {
         //vb: Not (value And 1) = 1

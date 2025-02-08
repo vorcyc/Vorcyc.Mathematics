@@ -64,6 +64,7 @@ public static class BaseConverter
     /// <param name="baseNumber">进制数。要求大于或等于2，小于或等于94</param>
     /// <returns>字符串形式的进制数</returns>
     /// <exception cref="ArgumentOutOfRangeException"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ToBaseString<TSelf>(this TSelf integer, TSelf baseNumber)
         where TSelf : IBinaryInteger<TSelf>
     {
@@ -103,6 +104,7 @@ public static class BaseConverter
     /// <param name="baseNumber">进制数。要求大于或等于2，小于或等于94</param>
     /// <returns>转换后的整数</returns>
     /// <exception cref="ArgumentOutOfRangeException"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TSelf FromBaseString<TSelf>(this string value, TSelf baseNumber)
         where TSelf : IBinaryInteger<TSelf>
     {

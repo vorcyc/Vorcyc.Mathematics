@@ -7,35 +7,6 @@ using Vorcyc.Mathematics.Numerics;
 public static partial class VMath
 {
 
-    /// <summary>
-    /// Returns Sinc of <paramref name="x"/>.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double Sinc(double x)
-    {
-        return Math.Abs(x) > 1e-20 ? Math.Sin(Math.PI * x) / (Math.PI * x) : 1.0;
-    }
-
-
-    /// <summary>
-    /// Returns Sinc of <paramref name="x"/>.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Sinc(float x)
-    {
-        return MathF.Abs(x) > 1e-20 ? MathF.Sin(ConstantsFp32.PI * x) / (ConstantsFp32.PI * x) : 1.0f;
-    }
-
-
-    /// <summary>
-    /// Returns Sinc of <paramref name="x"/>.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Sinc<T>(T x)
-        where T : IFloatingPointIeee754<T>
-    {
-        return T.Abs(x) > T.CreateTruncating(1e-20) ? T.Sin(T.Pi * x) / (T.Pi * x) : T.One;
-    }
 
     ///// <summary>
     ///// Returns next power of 2 closest to the given number <paramref name="n"/>.
@@ -53,34 +24,7 @@ public static partial class VMath
     //    return ((a % b) + b) % b;
     //}
 
-    /// <summary>
-    /// Computes Inverse Sinh of <paramref name="x"/>.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static double Asinh(double x)
-    {
-        return Math.Log(x + Math.Sqrt(x * x + 1));
-    }
-
-
-    /// <summary>
-    /// Computes Inverse Sinh of <paramref name="x"/>.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Asinh(float x)
-    {
-        return MathF.Log(x + MathF.Sqrt(x * x + 1));
-    }
-
-    /// <summary>
-    /// Computes Inverse Sinh of <paramref name="x"/>.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T Asinh<T>(T x)
-        where T : struct, IFloatingPointIeee754<T>
-    {
-        return T.Log(x + T.Sqrt(x * x + T.One));
-    }
+   
 
     ///// <summary>
     ///// Computes factorial <paramref name="n"/>!.

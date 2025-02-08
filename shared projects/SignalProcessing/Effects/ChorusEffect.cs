@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
+﻿using Vorcyc.Mathematics.Framework;
+using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects;

@@ -160,7 +160,7 @@ public static partial class DesignFilter
 
         for (var i = 0; i < order; i++)
         {
-            kernel[i] = VMath.Sinc(i - delay - middle);
+            kernel[i] = TrigonometryHelper.Sinc(i - delay - middle);
         }
 
         kernel.ApplyWindow(window);

@@ -13,7 +13,7 @@ public static class PrototypeChebyshevI
     public static ComplexFp32[] Poles(int order, float ripple = 0.1f)
     {
         var eps = MathF.Sqrt(MathF.Pow(10, ripple / 10) - 1);
-        var s = VMath.Asinh(1 / eps) / order;
+        var s = TrigonometryHelper.Asinh(1 / eps) / order;
         var sinh = MathF.Sinh(s);
         var cosh = MathF.Cosh(s);
 
