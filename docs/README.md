@@ -39,14 +39,14 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 ---
 
 **核心模块**：包含基本的数学运算和常用函数。  
-**Core Module**: Contains basic mathematical operations and common functions.
-[手册](Module_Core.md)
+**Core Module**: Contains basic mathematical operations and common functions.  
+:blue_book:[手册](Module_Core.md)
 
 ***深度学习模块***：提供深度学习相关的函数和运算。   
 ***Deep Learning Module***: Provides functions and operations related to deep learning.
 
 
-***实验性模块***：包含一些实验性的功能，可能会在未来版本中更改或删除。
+***实验性模块***：包含一些实验性的功能，可能会在未来版本中更改或删除。  
 ***Experimental Module***: Contains some experimental features that may change or be removed in future versions.
 
 
@@ -61,14 +61,14 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 **Signal Processing Module**: Used for filtering, Fourier transform, etc.
 
 
-***数值模块***：提供多个常见的数值类型 
+***数值模块***：提供多个常见的数值类型   
 ***Numerics Module***: Provides several common numeric types  
-[手册](Module_Numerics.md)
+:blue_book:[手册](Module_Numerics.md)
 
 
 **统计模块**：包括概率分布、统计分析等。  
-**Statistics Module**: Includes probability distributions, statistical analysis, etc.
-[手册](Module_Statistics.md)
+**Statistics Module**: Includes probability distributions, statistical analysis, etc.  
+:blue_book:[手册](Module_Statistics.md)
 
 
 ---
