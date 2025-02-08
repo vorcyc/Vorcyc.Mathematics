@@ -41,7 +41,7 @@
   <ItemGroup>
 	  <PackageReference Include="ILGPU" Version="1.5.1" />
 	  <PackageReference Include="ILGPU.Algorithms" Version="1.5.1" />
-	  <PackageReference Include="System.Numerics.Tensors" Version="9.0.0" />
+	  <PackageReference Include="System.Numerics.Tensors" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,8 +57,6 @@
 
   <Import Project="..\..\shared projects\MachineLearning\MachineLearning.projitems" Label="Shared" />
 
-  <Import Project="..\..\shared projects\LinearAlgebra\LinearAlgebra.projitems" Label="Shared" />
-
   <Import Project="..\..\shared projects\Experimental\Experimental.projitems" Label="Shared" />
 
   <Import Project="..\..\shared projects\Core\Core.projitems" Label="Shared" />
@@ -68,5 +66,7 @@
   <Import Project="..\..\shared projects\Statistics_class\Statistics_class.projitems" Label="Shared" />
 
   <Import Project="..\..\shared projects\Framework\Framework.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\LinearAlgebra\LinearAlgebra.projitems" Label="Shared" />
 
 </Project>

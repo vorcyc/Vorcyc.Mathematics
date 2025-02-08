@@ -3,7 +3,7 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>d8a93ffc-ab0f-400a-95e7-f1ed6b0b812f</SharedGUID>
+    <SharedGUID>4fbd3895-5ee5-4e7b-a6b6-6be2ef5faed8</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Vorcyc.Mathematics.LinearAlgebra</Import_RootNamespace>

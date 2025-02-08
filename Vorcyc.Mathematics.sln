@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared projects", "shared p
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core", "shared projects\Core\Core.shproj", "{61CDF5AE-6D99-4A3E-A3CD-30293C143FE6}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LinearAlgebra", "shared projects\LinearAlgebra\LinearAlgebra.shproj", "{D8A93FFC-AB0F-400A-95E7-F1ED6B0B812F}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Numerics", "shared projects\Numerics\Numerics.shproj", "{7EE17963-00E5-412C-A6DE-FB94C21E4F57}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SignalProcessing", "shared projects\SignalProcessing\SignalProcessing.shproj", "{B2C3419E-250A-487D-BC7C-0C89640B96AE}"
@@ -57,6 +55,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Framework", "shared project
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSP_module_test", "TESTS\DSP_module_test\DSP_module_test.csproj", "{AC068117-F346-41D1-9C94-4156DCCABB3D}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LinearAlgebra", "shared projects\LinearAlgebra\LinearAlgebra.shproj", "{4FBD3895-5EE5-4E7B-A6B6-6BE2EF5FAED8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,7 +93,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{61CDF5AE-6D99-4A3E-A3CD-30293C143FE6} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
-		{D8A93FFC-AB0F-400A-95E7-F1ED6B0B812F} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{7EE17963-00E5-412C-A6DE-FB94C21E4F57} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{B2C3419E-250A-487D-BC7C-0C89640B96AE} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{2B689EB0-E9AA-487E-84A6-2750AA6896D8} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
@@ -108,6 +107,7 @@ Global
 		{DB1080E4-87CE-4166-8E8B-D98E9B654337} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 		{FE21B649-02D8-49FA-8A58-48A206F3D8AB} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{AC068117-F346-41D1-9C94-4156DCCABB3D} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
+		{4FBD3895-5EE5-4E7B-A6B6-6BE2EF5FAED8} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}
@@ -115,6 +115,7 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		shared projects\MachineLearning\MachineLearning.projitems*{05c9ce82-9814-4a38-a874-444151d41daa}*SharedItemsImports = 13
 		shared projects\Statistics_class\Statistics_class.projitems*{0b0fefde-c426-4203-b897-55e2d9da98bb}*SharedItemsImports = 13
+		shared projects\LinearAlgebra\LinearAlgebra.projitems*{4fbd3895-5ee5-4e7b-a6b6-6be2ef5faed8}*SharedItemsImports = 13
 		shared projects\Core\Core.projitems*{61cdf5ae-6d99-4a3e-a3cd-30293c143fe6}*SharedItemsImports = 13
 		shared projects\Numerics\Numerics.projitems*{7ee17963-00e5-412c-a6de-fb94c21e4f57}*SharedItemsImports = 13
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b2c3419e-250a-487d-bc7c-0c89640b96ae}*SharedItemsImports = 13
@@ -128,7 +129,6 @@ Global
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Statistics_class\Statistics_class.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Experimental\Experimental.projitems*{c60535f6-5504-48a9-934a-53d6b572d846}*SharedItemsImports = 13
-		shared projects\LinearAlgebra\LinearAlgebra.projitems*{d8a93ffc-ab0f-400a-95e7-f1ed6b0b812f}*SharedItemsImports = 13
 		shared projects\DeepLearning\DeepLearning.projitems*{eac6a8f4-e78e-4da0-aa05-a6c1a9b1c6af}*SharedItemsImports = 13
 		shared projects\Framework\Framework.projitems*{fe21b649-02d8-49fa-8a58-48a206f3d8ab}*SharedItemsImports = 13
 	EndGlobalSection
