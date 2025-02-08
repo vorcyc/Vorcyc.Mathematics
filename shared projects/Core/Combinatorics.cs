@@ -25,12 +25,11 @@
 //
 
 
-namespace Vorcyc.Mathematics.LinearAlgebra;
+namespace Vorcyc.Mathematics;
 
 /// <summary>
 ///   Static class for combinatorics functions.
 /// </summary>
-/// 
 public static class Combinatorics
 {
     /// <summary>

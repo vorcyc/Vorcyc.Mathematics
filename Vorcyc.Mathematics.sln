@@ -28,6 +28,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C288D331-8806-4DEA-8CD9-2FD047BFA947}"
 	ProjectSection(SolutionItems) = preProject
 		docs\License.txt = docs\License.txt
+		docs\Module_Core.md = docs\Module_Core.md
+		docs\Module_Numerics.md = docs\Module_Numerics.md
+		docs\Module_Statistics.md = docs\Module_Statistics.md
 		docs\README.md = docs\README.md
 		docs\VMath 1.0.docx = docs\VMath 1.0.docx
 	EndProjectSection

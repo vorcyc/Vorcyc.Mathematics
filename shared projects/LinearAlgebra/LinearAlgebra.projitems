@@ -10,7 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BasisTransformation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Combinatorics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DimensionMismatchException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinearEquationSolver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Matrix.cs" />

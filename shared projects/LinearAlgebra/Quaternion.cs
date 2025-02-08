@@ -6,7 +6,7 @@ namespace Vorcyc.Mathematics.LinearAlgebra;
 /// Represents a quaternion with components of type <typeparamref name="T"/>.
 /// </summary>
 /// <typeparam name="T">The numeric type of the quaternion components.</typeparam>
-public struct Quaternion<T>
+public readonly struct Quaternion<T>
     where T : IBinaryFloatingPointIeee754<T>
 {
     /// <summary>
@@ -138,4 +138,22 @@ public struct Quaternion<T>
     /// <returns>A hash code for the current quaternion.</returns>
     public override int GetHashCode() =>
         HashCode.Combine(W, X, Y, Z);
+
+    /// <summary>
+    /// Determines whether two quaternions are equal.
+    /// </summary>
+    /// <param name="left">The first quaternion.</param>
+    /// <param name="right">The second quaternion.</param>
+    /// <returns>true if the quaternions are equal; otherwise, false.</returns>
+    public static bool operator ==(Quaternion<T> left, Quaternion<T> right) =>
+        left.Equals(right);
+
+    /// <summary>
+    /// Determines whether two quaternions are not equal.
+    /// </summary>
+    /// <param name="left">The first quaternion.</param>
+    /// <param name="right">The second quaternion.</param>
+    /// <returns>true if the quaternions are not equal; otherwise, false.</returns>
+    public static bool operator !=(Quaternion<T> left, Quaternion<T> right) =>
+        !(left == right);
 }
