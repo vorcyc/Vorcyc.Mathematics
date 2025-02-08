@@ -113,14 +113,30 @@ public static partial class ArrayExtension
     /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
     /// <exception cref="ArgumentOutOfRangeException">当范围超出数组边界时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Fill<T>(this Span<T> array, Range range, T value)
+    public static void Fill<T>(this T[] array, Range range, T value)
     {
-        if (array.IsEmpty) throw new ArgumentNullException(nameof(array));
+        if (array is null) throw new ArgumentNullException(nameof(array));
 
         var (offset, length) = range.GetOffsetAndLength(array.Length);
         for (int i = offset; i < offset + length; i++)
         {
             array[i] = value;
+        }
+    }
+
+
+    /// <summary>
+    /// 用指定值填充数组的指定范围。
+    /// </summary>
+    /// <typeparam name="T">数组元素的类型。</typeparam>
+    /// <param name="values">指定的<see cref="Span{T}"/></param>
+    /// <param name="value">填充的值。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Fill<T>(this Span<T> values, T value)
+    {
+        for (int i = 0; i < values.Length; i++)
+        {
+            values[i] = value;
         }
     }
 
