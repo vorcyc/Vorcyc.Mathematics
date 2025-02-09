@@ -1184,7 +1184,7 @@ Vorcyc.Mathematics.VMath ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÊıÑ§º¯ÊıºÍ²Ù×÷¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Ò
 ¼ÆËã 2 µÄÃİ¡£
 #### 25.	Log2
 `public static int Log2(int x)`  
-`public static int Log2_2(int x)`  
+`public static T Log2<T>(int x) where T : IBinaryInteger<T>`  
 »ñÈ¡¶ş½øÖÆ¶ÔÊıµÄ»ùÊı¡£
 #### 26.	Factorial
 `public static int Factorial(int n)`  

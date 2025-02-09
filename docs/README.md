@@ -51,8 +51,8 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 
 
 **线性代数模块**：提供矩阵和向量运算、矩阵分解等功能。   
-***Linear Algebra Module***: Provides matrix and vector operations, matrix decomposition, etc.
-
+***Linear Algebra Module***: Provides matrix and vector operations, matrix decomposition, etc.  
+:blue_book:[手册](Module_LinearAlgebra.md)
 
 ***机器学习模块***: 提供机器学习相关的函数和运算。  
 ***Machine Learning Module***: Provides functions and operations related to machine learning.

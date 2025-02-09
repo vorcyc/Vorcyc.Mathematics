@@ -543,25 +543,53 @@ public static partial class VMath
 
 
 
-    /// <summary>  
-    /// 快速整数版本的以2为底的对数
+    ///// <summary>  
+    ///// 快速整数版本的以2为底的对数
+    ///// </summary>
+    ///// <param name="x"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static int Log2_2(int x)
+    //{
+    //    // Validate parameters
+    //    if (x <= 0)
+    //    {
+    //        // Cannot have the log of 0
+    //        throw new Exception("Log2 of zero.");
+    //    }
+
+    //    // Get the max index --- x - 1
+    //    x--;
+    //    int i = 0;
+    //    for (i = 0; x != 0; i++)
+    //        x >>= 1;
+    //    return i;
+    //}
+
+    /* 被注释的版本不要了，只要最快的int那个版本，另外再提供一个泛型版本的 */
+
+    /// <summary>
+    /// 计算泛型整数的以2为底的对数。
     /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
+    /// <typeparam name="T">必须实现 <see cref="IBinaryInteger{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="x">要计算对数的整数。</param>
+    /// <returns>输入值的以2为底的对数。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当输入值小于或等于零时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int Log2_2(int x)
-    {
+    public static T Log2<T>(T x)
+        where T : IBinaryInteger<T>
+    {  
         // Validate parameters
-        if (x <= 0)
-        {
+        if (x <= T.Zero)
+        {      
             // Cannot have the log of 0
-            throw new Exception("Log2 of zero.");
+            throw new ArgumentOutOfRangeException("Log2 of zero.");
         }
 
         // Get the max index --- x - 1
         x--;
-        int i = 0;
-        for (i = 0; x != 0; i++)
+        T i = T.Zero;
+        for (i = T.Zero; x != T.Zero; i++)
             x >>= 1;
         return i;
     }
