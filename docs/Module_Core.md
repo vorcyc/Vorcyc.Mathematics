@@ -1,10 +1,18 @@
 # 核心模块 - Core Module
 
-> Vorcyc. Mathematics 命名空间
+> 基命名空间：Vorcyc.Mathematics
 
 :ledger:目录  
-- [ :bookmark: Vorcyc.Mathematics.ArrayExtension 类](#vorcyc.mathematics.arrayextension-类)  
-- [ :bookmark: Vorcyc.Mathematics.BaseConverter 类](#vorcyc.mathematics.baseconverter-类)
+- :bookmark: [Vorcyc.Mathematics.ArrayExtension 类](#vorcycmathematicsarrayextension-类)  
+- :bookmark: [Vorcyc.Mathematics.BaseConverter 类](#vorcyc.mathematics.baseconverter-类)
+- :bookmark: [Vorcyc.Mathematics.BitMathExtension 类](#Vorcyc.Mathematics.BitMathExtension-类)
+- :bookmark: [Vorcyc.Mathematics.Combinatorics 类](#Vorcyc.Mathematics.Combinatorics-类)
+- :bookmark: [Vorcyc.Mathematics.ConstantsFp32 类](#Vorcyc.Mathematics.ConstantsFp32-类)
+- :bookmark: [Vorcyc.Mathematics.NumberMapper 类](#Vorcyc.Mathematics.NumberMapper-类)
+- :bookmark: [Vorcyc.Mathematics.PinnableArray 类](#Vorcyc.Mathematics.PinnableArray-类)
+- :bookmark: [SimpleRNG_Fp32 和 SimpleRNG_Fp64 类](#SimpleRNG_Fp32-和-SimpleRNG_Fp64-类)
+- :bookmark: [Vorcyc.Mathematics.TrigonometryHelper 类](#Vorcyc.Mathematics.TrigonometryHelper-类)
+- :bookmark: [VMath 类](#VMath-类)
 
 
 
