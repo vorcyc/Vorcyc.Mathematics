@@ -120,7 +120,7 @@
 - `public static T First<T>(this T[] array)`  
 获取数组的第一个元素。
 
-代码示例
+#### 代码示例
 ```csharp
 using System;
 using System.Linq;
@@ -223,7 +223,7 @@ Vorcyc.Mathematics.BaseConverter 是一个静态类，提供了将任意实现了 IBinaryInteger
 	- 异常:
 		1. ArgumentOutOfRangeException: 当进制数不在2到94之间或字符串包含无效字符时抛出。
 		
-- 代码示例
+#### 代码示例
 ```csharp
 using System;
 using Vorcyc.Mathematics;
@@ -317,7 +317,8 @@ Vorcyc.Mathematics.BitMathExtension 是一个静态类，提供了多种用于位运算的扩展方法
 - public static bool IsEven(this int value)
 - public static bool IsEven(this uint value)
 - 判断是否是偶数。
-代码示例
+
+#### 代码示例
 以下是一个使用 BitMathExtension 类中多个方法的示例，并在示例中加入了注释：
 
 ```csharp
@@ -373,4 +374,441 @@ public class BitMathExtensionExample
 	}
 }
 
+```
+
+
+
+## Vorcyc.Mathematics.Combinatorics 类
+
+Vorcyc.Mathematics.Combinatorics 是一个静态类，提供了多种组合数学函数。该类包含以下主要功能：
+方法清单及说明
+### 1.	TruthTable
+- public static int[][] TruthTable(int length)
+- public static int[][] TruthTable(int symbols, int length)
+- public static int[][] TruthTable(this int[] symbols)
+- 生成所有可能的有序排列，允许重复（真值表）。
+### 2.	Sequences
+- public static IEnumerable<int[]> Sequences(int length, bool inPlace = false)
+- public static IEnumerable<int[]> Sequences(int symbols, int length, bool inPlace = false)
+- public static IEnumerable<int[]> Sequences(this int[] symbols, bool inPlace = false)
+- 提供一种方法来枚举所有可能的有序排列，允许重复（真值表），而不使用大量内存分配。
+### 3.	Combinations
+- public static IEnumerable<T[]> Combinations<T>(this T[] values, bool inPlace = false)
+- public static IEnumerable<T[]> Combinations<T>(this T[] values, int k, bool inPlace = false)
+- 枚举给定数组的所有可能值组合。
+### 4.	Subsets
+- public static IEnumerable<SortedSet<T>> Subsets<T>(this ISet<T> set, bool inPlace = false)
+- public static IEnumerable<SortedSet<T>> Subsets<T>(this ISet<T> set, int k, bool inPlace = false)
+- 生成给定集合的所有可能子集。
+
+#### 代码示例
+以下是一个使用 Combinatorics 类中多个方法的示例，并在示例中加入了注释：
+```csharp
+using System;
+using System.Collections.Generic;
+using Vorcyc.Mathematics;
+
+public class CombinatoricsExample
+{
+	public static void Main()
+	{
+		// 生成真值表
+		int length = 3;
+		int[][] truthTable = Combinatorics.TruthTable(length);
+		Console.WriteLine("Truth Table:");
+		foreach (var row in truthTable)
+		{
+			Console.WriteLine(string.Join(", ", row));
+		}
+
+		// 枚举所有可能的有序排列
+		Console.WriteLine("\nSequences:");
+		foreach (var sequence in Combinatorics.Sequences(length))
+		{
+			Console.WriteLine(string.Join(", ", sequence));
+		}
+
+		// 枚举给定数组的所有可能值组合
+		int[] values = { 1, 2, 3 };
+		Console.WriteLine("\nCombinations:");
+		foreach (var combination in Combinatorics.Combinations(values))
+		{
+			Console.WriteLine(string.Join(", ", combination));
+		}
+
+		// 生成给定集合的所有可能子集
+		ISet<int> set = new HashSet<int> { 1, 2, 3 };
+		Console.WriteLine("\nSubsets:");
+		foreach (var subset in Combinatorics.Subsets(set))
+		{
+			Console.WriteLine(string.Join(", ", subset));
+		}
+	}
+}
+
+```
+
+## Vorcyc.Mathematics.ConstantsFp32 类
+
+Vorcyc.Mathematics.ConstantsFp32 是一个静态类，定义了一组常用的单精度浮点数常量。这些常量在数学计算中非常有用。以下是每个常量的详细说明：
+常量清单及说明
+### 1.	E
+- public const float E = 2.71828182845904523536f;
+- 自然对数的底数 e。
+### 2.	LOG2E
+- public const float LOG2E = 1.44269504088896340736f;
+- 以 2 为底的 e 的对数。
+### 3.	LOG10E
+- public const float LOG10E = 0.434294481903251827651f;
+- 以 10 为底的 e 的对数。
+### 4.	LN2
+- public const float LN2 = 0.693147180559945309417f;
+- 2 的自然对数。
+### 5.	LN10
+- public const float LN10 = 2.30258509299404568402f;
+- 10 的自然对数。
+### 6.	PI
+- public const float PI = 3.1415926535897932384626433832795f;
+- 圆周率 π。
+### 7.	PI_2
+- public const float PI_2 = 1.57079632679489661923f;
+- π 的一半。
+### 8.	PI_4
+- public const float PI_4 = 0.785398163397448309616f;
+- π 的四分之一。
+### 9.	_1_PI
+- public const float _1_PI = 0.318309886183790671538f;
+- 1 除以 π。
+### 10.	_2_PI
+- public const float _2_PI = 0.636619772367581343076f;
+- 2 除以 π。
+### 11.	_2_SQRT_PI
+- public const float _2_SQRT_PI = 1.12837916709551257390f;
+- 2 除以 π 的平方根。
+### 12.	_SQRT2
+- public const float _SQRT2 = 1.41421356237309504880f;
+- 2 的平方根。
+### 13.	_SQRT1_2
+- public const float _SQRT1_2 = 0.707106781186547524401f;
+- 1 除以 2 的平方根。
+### 14.	TWO_PI
+- public const float TWO_PI = 6.28318530717958647692f;
+- 2 倍的 π。
+### 15.	TOLERANCE
+- public const float TOLERANCE = 1E-09f;
+- 公差，用于比较浮点数的精度。
+### 16.	RADIANS_PER_DEGREE
+- public const float RADIANS_PER_DEGREE = 0.01745329f;
+- 每度的弧度数。
+### 17.	DEGREES_PER_RADIAN
+- public const float DEGREES_PER_RADIAN = 57.29578f;
+- 每弧度的度数。
+### 18.	EPSILON
+- public const float EPSILON = 0.001f;
+- 用于浮点数比较的极小值。
+#### 代码示例
+以下是一个使用 ConstantsFp32 类中常量的示例，并在示例中加入了注释：
+```csharp
+using System;
+using Vorcyc.Mathematics;
+
+public class ConstantsFp32Example
+{
+	public static void Main()
+	{
+		// 使用自然对数的底数 e
+		float e = ConstantsFp32.E;
+		Console.WriteLine($"e: {e}");
+
+		// 使用圆周率 π
+		float pi = ConstantsFp32.PI;
+		Console.WriteLine($"π: {pi}");
+
+		// 使用每度的弧度数
+		float radiansPerDegree = ConstantsFp32.RADIANS_PER_DEGREE;
+		Console.WriteLine($"Radians per degree: {radiansPerDegree}");
+
+		// 使用每弧度的度数
+		float degreesPerRadian = ConstantsFp32.DEGREES_PER_RADIAN;
+		Console.WriteLine($"Degrees per radian: {degreesPerRadian}");
+
+		// 使用公差
+		float tolerance = ConstantsFp32.TOLERANCE;
+		Console.WriteLine($"Tolerance: {tolerance}");
+
+		// 使用 epsilon
+		float epsilon = ConstantsFp32.EPSILON;
+		Console.WriteLine($"Epsilon: {epsilon}");
+	}
+}
+```
+
+
+
+## Vorcyc.Mathematics.NumberMapper 类
+Vorcyc.Mathematics.NumberMapper 是一个静态类，提供了将一个值从一个范围映射到另一个范围的方法。该类包含以下主要功能：
+方法清单及说明
+### 1.	Map
+- 将输入值从一个范围映射到另一个范围。
+- `public static TNumber Map<TNumber>(this TNumber number, TNumber inMin, TNumber inMax, TNumber outMin, TNumber outMax, InputValueOutOfRangeHandleBehavior handleBehavior = InputValueOutOfRangeHandleBehavior.Saturating) where TNumber : unmanaged, INumber<TNumber>`
+	-   参数:
+		1.	number: 要映射的输入值。
+		2.	inMin: 输入范围的最小值。
+		3.	inMax: 输入范围的最大值。
+		4.	outMin: 输出范围的最小值。
+		5.	outMax: 输出范围的最大值。
+		6.	handleBehavior: 指定当输入值超出范围时的处理行为。默认值为 InputValueOutOfRangeHandleBehavior.Saturating。
+	-	返回值: 映射到输出范围的值。
+	-	异常:
+		1.	ArgumentOutOfRangeException: 当 inMin 大于或等于 inMax，或 outMin 大于或等于 outMax 时抛出。
+		2.	ArgumentException: 当 number 超出输入范围且 handleBehavior 为 InputValueOutOfRangeHandleBehavior.ThrowException 时抛出。
+### 2.	Map
+- 将浮点数从一个范围映射到另一个范围，并返回一个布尔值指示是否成功。
+- `public static bool Map<TFloatingNumber>(TFloatingNumber input, TFloatingNumber inputMin, TFloatingNumber inputMax, TFloatingNumber outputMin, TFloatingNumber outputMax, out TFloatingNumber result) where TFloatingNumber : unmanaged, IFloatingPointIeee754<TFloatingNumber>`
+	-	参数:
+		1.	input: 要映射的浮点数。
+		2.	inputMin: 输入范围的最小值。
+		3.	inputMax: 输入范围的最大值。
+		4.	outputMin: 输出范围的最小值。
+		5.	outputMax: 输出范围的最大值。
+		6.	result: 如果映射成功，则为映射后的浮点数；否则为 NaN。
+	-	返回值: 如果映射成功，则为 true；否则为 false。
+### 3. 枚举
+	- InputValueOutOfRangeHandleBehavior
+	- 定义当输入值超出指定范围时的处理行为。	值:
+		1.	Saturating: 将输入值夹紧到最近的边界值。
+		2.	ThrowException: 当输入值超出范围时抛出异常。
+			
+#### 代码示例
+以下是一个使用 NumberMapper 类中方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics;
+
+public class NumberMapperExample
+{
+	public static void Main()
+	{
+		// 将整数从一个范围映射到另一个范围
+		int number = 5;
+		int inMin = 0;
+		int inMax = 10;
+		int outMin = 0;
+		int outMax = 100;
+		int mappedValue = number.Map(inMin, inMax, outMin, outMax);
+		Console.WriteLine($"Mapped value: {mappedValue}");
+
+		// 将浮点数从一个范围映射到另一个范围，并返回一个布尔值指示是否成功
+		float input = 0.5f;
+		float inputMin = 0.0f;
+		float inputMax = 1.0f;
+		float outputMin = 0.0f;
+		float outputMax = 100.0f;
+		bool success = NumberMapper.Map(input, inputMin, inputMax, outputMin, outputMax, out float result);
+		Console.WriteLine($"Mapping successful: {success}, Mapped value: {result}");
+	}
+}
+
+```
+
+
+## Vorcyc.Mathematics.PinnableArray 类
+
+Vorcyc.Mathematics.PinnableArray 是一个泛型类，表示一个可固定内存的一维数组，用以提供高性能内存访问机制和数组的操作。该类提供了多种方法和属性来操作数组，并且可以将数组固定在内存中，以便与非托管代码进行交互。该类包含以下主要功能：
+#### 方法清单及说明
+### 1.	构造函数
+- `public PinnableArray(ArraySegment<T> segment, bool pin = false)`
+	使用 ArraySegment&lt;T> 初始化 PinnableArray 实例。
+- `public PinnableArray(Span<T> span, bool pin = false)`
+	使用 Span&lt;T> 初始化 PinnableArray 实例。
+- `public PinnableArray(T[] array, bool pin = false)`
+	使用数组初始化 PinnableArray 实例。
+- `public PinnableArray(T[] array, int offset, int count, bool pin = false)`
+	使用数组的部分内容初始化 PinnableArray 实例。
+- `public PinnableArray(int count, bool pin = false)`
+	使用指定长度初始化 PinnableArray 实例。
+### 2.	Pin
+-	`public void Pin()`
+	将 PinnableArray 固定在内存中，以便与非托管代码进行交互。
+### 3.	Unpin
+-	`public void Unpin()`
+	取消固定 PinnableArray，使其可以被垃圾回收。
+### 4.	AsSpan
+-	`public Span<T> AsSpan()`
+	返回表示当前数组的 Span&lt;T>。
+-	`public Span<T> AsSpan(int start, int length)`
+	返回表示当前数组部分内容的 Span&lt;T>。
+-	`public Span<T> AsSpan(int start)`
+	返回表示当前数组从指定位置开始的 Span&lt;T>。
+-	`public Span<T> AsSpan(System.Index startIndex)`
+	返回表示当前数组从指定索引开始的 Span&lt;T>。
+-	`public Span<T> AsSpan(Range range)`
+	返回表示当前数组指定范围的 Span&lt;T>。
+### 5.	Fill
+-	`public void Fill(T value)`
+	用指定值填充整个数组。
+-	`public void Fill(T startValue, T step)`
+	用指定的起始值和步长填充数组。
+-   `public void FillWith<TNumber>(TNumber number) where TNumber : unmanaged`
+	用另一个非托管类型的值填充数组。
+-   `public void FillWithRandomNumber()`
+	用随机数填充数组。
+### 6.	Each
+-   `public void Each(Func<int, T, T> func)`
+	使用指定的函数遍历数组的每个元素。
+-   `public void Each(Func<int, T?, T, T?, T> func, Direction direction = Direction.Forward)`
+	使用指定的函数遍历数组的每个元素，并指定遍历方向。
+### 7.	Max
+-   `public T Max()`
+	返回数组中的最大值。
+-   `public T Max(int start, int length)`
+	返回数组指定范围内的最大值。
+-   `public async Task<T> MaxAsync(int? numberOfWorkers = null, bool useTPL = false)`
+	异步返回数组中的最大值。
+-   `public async Task<T> MaxAsync(int start, int length, int? numberOfWorkers = null, bool useTPL = false)`
+	异步返回数组指定范围内的最大值。
+### 8.	Min
+-   `public T Min()`
+	返回数组中的最小值。
+-   `public T Min(int start, int length)`
+	返回数组指定范围内的最小值。
+- 	`public async Task<T> MinAsync(int? numberOfWorkers = null, bool useTPL = false)`
+	异步返回数组中的最小值。该方法通过并行执行，针对大规模规矩效果更佳。
+-   `public async Task<T> MinAsync(int start, int length, int? numberOfWorkers = null, bool useTPL = false)`
+	异步返回数组指定范围内的最小值。该方法通过并行执行，针对大规模规矩效果更佳。
+### 9.	Map
+-    `public void MapIn(T fromMin, T fromMax, T toMin, T toMax)`
+	将数组中的值从一个范围映射到另一个范围。
+-   `public void MapIn(T toMin, T toMax)`
+	将数组中的值从当前范围映射到指定范围。
+-    `public PinnableArray<T> Map(T fromMin, T fromMax, T toMin, T toMax)`
+	返回一个新的 PinnableArray，其中的值从一个范围映射到另一个范围。
+-    `public PinnableArray<T> Map(T toMin, T toMax)`
+	返回一个新的 PinnableArray，其中的值从当前范围映射到指定范围。
+### 10.	Dot
+-    `public T Dot(PinnableArray<T> another)`
+	计算当前数组与另一个 PinnableArray 的点积。
+### 11.	Dispose
+-    `public void Dispose()`
+	释放 PinnableArray 占用的资源。
+#### 枚举
+### 12.	`Direction`
+-    定义遍历数组的方向。
+-    值:
+	1.	`Forward`: 从前向后遍历。
+	2.	`Inverse`: 从后向前遍历。
+	
+#### 属性  
+### 13.	IsPinned
+-    `public bool IsPinned { get; }`
+	获取当前数组是否已固定在内存中。
+### 14.	Length
+-    `public int Length { get; }`
+	获取当前数组的长度。
+### 15.	Values
+-    `public T[] Values { get; }`
+	获取当前数组的普通数组形式。
+#### 操作符重载
+### 16.	 +
+-    `public static PinnableArray<T> operator +(PinnableArray<T> left, PinnableArray<T> right)`
+-    `public static PinnableArray<T> operator +(PinnableArray<T> left, T right)`
+-    `public static PinnableArray<T> operator +(T left, PinnableArray<T> right)`
+### 17.	-
+-    `public static PinnableArray<T> operator -(PinnableArray<T> left, PinnableArray<T> right)`
+-    `public static PinnableArray<T> operator -(PinnableArray<T> left, T right)`
+-    `public static PinnableArray<T> operator -(T left, PinnableArray<T> right)`
+### 18.	*
+-    `public static PinnableArray<T> operator *(PinnableArray<T> left, PinnableArray<T> right)`
+-    `public static PinnableArray<T> operator *(PinnableArray<T> left, T right)`
+-    `public static PinnableArray<T> operator *(T left, PinnableArray<T> right)`
+### 19.	/
+-    `public static PinnableArray<T> operator /(PinnableArray<T> left, PinnableArray<T> right)`
+-    `public static PinnableArray<T> operator /(PinnableArray<T> left, T right)`
+-    `public static PinnableArray<T> operator /(T left, PinnableArray<T> right)`
+
+#### 代码示例
+以下是一个使用 PinnableArray 类中多个方法的示例，并在示例中加入了注释：
+```csharp
+using System;
+using System.Threading.Tasks;
+using Vorcyc.Mathematics;
+
+public class PinnableArrayExample
+{
+	public static async Task Main()
+	{
+		// 使用数组初始化 PinnableArray 实例
+		int[] array = { 1, 2, 3, 4, 5 };
+		PinnableArray<int> pinnableArray = new PinnableArray<int>(array);
+
+		// 将数组固定在内存中
+		pinnableArray.Pin();
+		Console.WriteLine($"IsPinned: {pinnableArray.IsPinned}");
+
+		// 获取数组的长度
+		int length = pinnableArray.Length;
+		Console.WriteLine($"Length: {length}");
+
+		// 获取数组的普通数组形式
+		int[] values = pinnableArray;
+		Console.WriteLine($"Values: {string.Join(", ", values)}");
+
+		// 用指定值填充整个数组
+		pinnableArray.Fill(10);
+		Console.WriteLine($"Filled Values: {string.Join(", ", pinnableArray.Values)}");
+
+		// 用指定的起始值和步长填充数组
+		pinnableArray.Fill(1, 2);
+		Console.WriteLine($"Filled with step Values: {string.Join(", ", pinnableArray.Values)}");
+
+		// 用随机数填充数组
+		pinnableArray.FillWithRandomNumber();
+		Console.WriteLine($"Filled with random numbers: {string.Join(", ", pinnableArray.Values)}");
+
+		// 遍历数组的每个元素并进行操作
+		pinnableArray.Each((index, value) => value * 2);
+		Console.WriteLine($"Each element multiplied by 2: {string.Join(", ", pinnableArray.Values)}");
+
+		// 获取数组中的最大值
+		int maxValue = pinnableArray.Max();
+		Console.WriteLine($"Max value: {maxValue}");
+
+		// 获取数组中的最小值
+		int minValue = pinnableArray.Min();
+		Console.WriteLine($"Min value: {minValue}");
+
+		// 异步获取数组中的最大值
+		int maxAsyncValue = await pinnableArray.MaxAsync();
+		Console.WriteLine($"Max async value: {maxAsyncValue}");
+
+		// 异步获取数组中的最小值
+		int minAsyncValue = await pinnableArray.MinAsync();
+		Console.WriteLine($"Min async value: {minAsyncValue}");
+
+		// 将数组中的值从一个范围映射到另一个范围
+		pinnableArray.MapIn(0, 1, 0, 100);
+		Console.WriteLine($"Mapped values: {string.Join(", ", pinnableArray.Values)}");
+
+		// 计算当前数组与另一个 PinnableArray 的点积
+		PinnableArray<int> anotherArray = new PinnableArray<int>(new int[] { 1, 2, 3, 4, 5 });
+		int dotProduct = pinnableArray.Dot(anotherArray);
+		Console.WriteLine($"Dot product: {dotProduct}");
+
+		// 使用索引器访问和修改数组元素
+		pinnableArray[0] = 42;
+		Console.WriteLine($"First element after modification: {pinnableArray[0]}");
+
+		// 获取数组的 Span 表示
+		Span<int> span = pinnableArray.AsSpan();
+		Console.WriteLine($"Span values: {string.Join(", ", span.ToArray())}");
+
+		// 取消固定数组
+		pinnableArray.Unpin();
+		Console.WriteLine($"IsPinned: {pinnableArray.IsPinned}");
+
+		// 释放资源
+		pinnableArray.Dispose();
+	}
+}
 ```
