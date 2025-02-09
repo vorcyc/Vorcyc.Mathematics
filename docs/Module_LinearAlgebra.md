@@ -1,5 +1,5 @@
 ﻿# 线性代数模块 - Linear Algebra Module
-> 基命名空间 ：Vorcyc.Mathematics.LinearAlgebra
+> 以下所有类型都位于命名空间 ：Vorcyc.Mathematics.LinearAlgebra
 
 
 :ledger:目录  

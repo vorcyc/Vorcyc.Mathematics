@@ -1,5 +1,29 @@
 ﻿# 机器学习模块 - Machine Learning Module
 
+> 以下所有类型都位于命名空间 : Vorcyc.Mathematics.MachineLearning
+
+:ledger:目录  
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.DecisionTree 类](vorcycmathematicsmachinelearningdecisiontree-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.KNN&lt;T> 类](vorcycmathematicsmachinelearningknnt-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.MultipleLinearRegression&lt;T> 类](vorcycmathematicsmachinelearningmultiplelinearregressiont-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.RandomForest 类](vorcycmathematicsmachinelearningrandomforest-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.SimpleLinearRegression&lt;T> 类](vorcycmathematicsmachinelearningsimplelinearregressiont-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.SupportVectorMachine&lt;TSelf> 类](vorcycmathematicsmachinelearningsupportvectormachinetself-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.Classfication.NaiveBayes 类](vorcycmathematicsmachinelearningclassficationnaivebayes-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.Clustering.DBSCAN&lt;T> 类](vorcycmathematicsmachinelearningclusteringdbscant-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.Clustering.ExpectationMaximization&lt;T> 类](vorcycmathematicsmachinelearningclusteringexpectationmaximizationt-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.Clustering.GMM&lt;T> 类](vorcycmathematicsmachinelearningclusteringgmmt-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.Clustering.HierarchicalClustering&lt;T> 类](vorcycmathematicsmachinelearningclusteringhierarchicalclusteringt-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.Clustering.KMeansClusterer&lt;T> 类](vorcycmathematicsmachinelearningclusteringkmeansclusterert-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.Clustering.VectorQuantization&lt;T> 类](vorcycmathematicsmachinelearningclusteringvectorquantizationt-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.FactorAnalysis&lt;T> 类](vorcycmathematicsmachinelearningdimensionalityreductionfactoranalysist-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.PCA&lt;TSelf> 类](vorcycmathematicsmachinelearningdimensionalityreductionpcatself-类)
+- :bookmark: [Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.TSNE&lt;T> 类](vorcycmathematicsmachinelearningdimensionalityreductiontsnet-类)
+- :bookmark: [距离度量类](#机器学习模块-距离度量)
+
+
+---
+
 ## Vorcyc.Mathematics.MachineLearning.DecisionTree 类
 
 Vorcyc.Mathematics.MachineLearning.DecisionTree 是一个用于构建和预测决策树模型的类。
@@ -1169,7 +1193,7 @@ public class VectorQuantizationExample
 ```
 
 
-## Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.FactorAnalysis<T> 类
+## Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.FactorAnalysis&lt;T> 类
 
 Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.FactorAnalysis&lt;T> 是一个用于执行因子分析的类。
 
@@ -1408,7 +1432,7 @@ public class TSNEExample
 }
 ```
 
-# 机器学习模块 - 距离类
+# 机器学习模块 - 距离度量
 
 ## Vorcyc.Mathematics.MachineLearning.Distances.Angular&lt;TSelf> 类
 

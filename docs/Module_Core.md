@@ -1,6 +1,6 @@
 # 核心模块 - Core Module
 
-> 基命名空间：Vorcyc.Mathematics
+> 以下所有类型都位于命名空间 ：Vorcyc.Mathematics
 
 :ledger:目录  
 - :bookmark: [Vorcyc.Mathematics.ArrayExtension 类](#vorcycmathematicsarrayextension-类)  
@@ -14,7 +14,7 @@
 - :bookmark: [Vorcyc.Mathematics.TrigonometryHelper 类](#vorcycmathematicstrigonometryhelper-类)
 - :bookmark: [Vorcyc.Mathematics.VMath 类](#vmath-类)
 
-- 
+
 ---
 
 ## Vorcyc.Mathematics.ArrayExtension 类
