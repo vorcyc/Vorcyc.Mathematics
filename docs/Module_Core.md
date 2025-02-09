@@ -4,15 +4,15 @@
 
 :ledger:目录  
 - :bookmark: [Vorcyc.Mathematics.ArrayExtension 类](#vorcycmathematicsarrayextension-类)  
-- :bookmark: [Vorcyc.Mathematics.BaseConverter 类](#vorcyc.mathematics.baseconverter-类)
-- :bookmark: [Vorcyc.Mathematics.BitMathExtension 类](#Vorcyc.Mathematics.BitMathExtension-类)
-- :bookmark: [Vorcyc.Mathematics.Combinatorics 类](#Vorcyc.Mathematics.Combinatorics-类)
-- :bookmark: [Vorcyc.Mathematics.ConstantsFp32 类](#Vorcyc.Mathematics.ConstantsFp32-类)
-- :bookmark: [Vorcyc.Mathematics.NumberMapper 类](#Vorcyc.Mathematics.NumberMapper-类)
-- :bookmark: [Vorcyc.Mathematics.PinnableArray 类](#Vorcyc.Mathematics.PinnableArray-类)
-- :bookmark: [SimpleRNG_Fp32 和 SimpleRNG_Fp64 类](#SimpleRNG_Fp32-和-SimpleRNG_Fp64-类)
-- :bookmark: [Vorcyc.Mathematics.TrigonometryHelper 类](#Vorcyc.Mathematics.TrigonometryHelper-类)
-- :bookmark: [VMath 类](#VMath-类)
+- :bookmark: [Vorcyc.Mathematics.BaseConverter 类](#vorcycmathematicsbaseconverter-类)
+- :bookmark: [Vorcyc.Mathematics.BitMathExtension 类](#vorcycmathematicsbitmathextension-类)
+- :bookmark: [Vorcyc.Mathematics.Combinatorics 类](#VorcycMathematicsCombinatorics-类)
+- :bookmark: [Vorcyc.Mathematics.ConstantsFp32 类](#vorcycmathematicsconstantsfp32-类)
+- :bookmark: [Vorcyc.Mathematics.NumberMapper 类](#vorcycmathematicsnumbermapper-类)
+- :bookmark: [Vorcyc.Mathematics.PinnableArray 类](#vorcycmathematicspinnablearray-类)
+- :bookmark: [Vorcyc.Mathematics.SimpleRNG_Fp32 和 Vorcyc.Mathematics.SimpleRNG_Fp64 类](#simplerng_fp32-和-simplerng_fp64-类)
+- :bookmark: [Vorcyc.Mathematics.TrigonometryHelper 类](#vorcycmathematicstrigonometryhelper-类)
+- :bookmark: [Vorcyc.Mathematics.VMath 类](#vmath-类)
 
 
 
