@@ -3,8 +3,8 @@
 > Vorcyc. Mathematics 命名空间
 
 :ledger:目录  
-- [ :bookmark: Vorcyc.Mathematics.ArrayExtension 类](#Vorcyc.Mathematics.ArrayExtension-类)  
-- [ :bookmark: Vorcyc.Mathematics.BaseConverter 类](#Vorcyc.Mathematics.BaseConverter-类)
+- [ :bookmark: Vorcyc.Mathematics.ArrayExtension 类](#vorcyc.mathematics.arrayextension-类)  
+- [ :bookmark: Vorcyc.Mathematics.BaseConverter 类](#vorcyc.mathematics.baseconverter-类)
 
 
 
