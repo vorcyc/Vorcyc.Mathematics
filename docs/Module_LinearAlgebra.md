@@ -1,5 +1,18 @@
 ﻿# 线性代数模块 - Linear Algebra Module
-> Vorcyc.Mathematics.LinearAlgebra 命名空间。
+> 基命名空间 ：Vorcyc.Mathematics.LinearAlgebra
+
+
+:ledger:目录  
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.BasisTransformation 类](#vorcycmathematicslinearalgebrabasistransformation-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.LinearEquationSolver 类](#vorcycmathematicslinearalgebralinearequationsolver-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Matrix 类](#vorcycmathematicslinearalgebramatrix-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Matrix&lt;T> 类](#vorcycmathematicslinearalgebramatrix&lt;t>-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.MatrixHelper 类](#vorcyc.athematicslinearalgebramatrixhelper-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.MatrixOperations 类](#vorcycmathematicslinearalgebramatrixoperations-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Quaternion 结构](#vorcycmathematicslinearalgebraquaternion-结构)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Tensor 类](#vorcycmathematicslinearalgebratensor-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Tensor&lt;T> 类](#vorcycmathematicslinearalgebratensor&lt;t>-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Vector&lt;T> 类](#vorcycmathematicslinearalgebravector&lt;t>-类)
 
 ## Vorcyc.Mathematics.LinearAlgebra.BasisTransformation 类
 
@@ -392,9 +405,9 @@ public class MatrixExample
 }
 ```
 
-## Vorcyc.Mathematics.LinearAlgebra.Matrix<T> 类
+## Vorcyc.Mathematics.LinearAlgebra.Matrix&lt;T> 类
 
-Vorcyc.Mathematics.LinearAlgebra.Matrix<T> 是一个表示二维矩阵的泛型类，提供了矩阵的基本操作和运算方法。
+Vorcyc.Mathematics.LinearAlgebra.Matrix&lt;T> 是一个表示二维矩阵的泛型类，提供了矩阵的基本操作和运算方法。
 
 ### 属性
 
@@ -585,7 +598,7 @@ Vorcyc.Mathematics.LinearAlgebra.Matrix<T> 是一个表示二维矩阵的泛型�
   - 返回值: 矩阵的字符串表示形式。
 
 ### 代码示例
-以下是一个使用 Matrix<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 Matrix&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
 ```csharp
 using System; 
@@ -1930,9 +1943,9 @@ public class TensorExample
 ```
 
 
-## Vorcyc.Mathematics.LinearAlgebra.Vector<T> 类
+## Vorcyc.Mathematics.LinearAlgebra.Vector&lt;T> 类
 
-Vorcyc.Mathematics.LinearAlgebra.Vector<T> 是一个表示数学向量的泛型类，提供了向量的基本操作和运算方法。
+Vorcyc.Mathematics.LinearAlgebra.Vector&lt;T> 是一个表示数学向量的泛型类，提供了向量的基本操作和运算方法。
 
 ### 属性
 
