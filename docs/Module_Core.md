@@ -197,3 +197,180 @@ public class ArrayExtensionExample
 }
 
 ```
+
+
+## Vorcyc.Mathematics.BaseConverter 类
+
+Vorcyc.Mathematics.BaseConverter 是一个静态类，提供了将任意实现了 IBinaryInteger<TSelf> 接口的整数类型转换为指定进制的字符串表示和从指定进制的字符串表示转换为整数的方法。该类包含以下主要功能：
+方法清单及说明
+1.	`ToBaseString`
+	- public static string ToBaseString<TSelf>(this TSelf integer, TSelf baseNumber) where TSelf : IBinaryInteger<TSelf>  
+	将任意实现了 IBinaryInteger<TSelf> 接口的整数类型转换为指定进制的字符串表示。进制的范围在2到94之间。  
+	- 参数:
+		- integer: 要转换的整数。
+		- baseNumber: 进制数。要求大于或等于2，小于或等于94。
+	-	返回值: 字符串形式的进制数。
+	-	异常:
+		1.	ArgumentOutOfRangeException: 当整数为负数或进制数不在2到94之间时抛出。
+
+2. `FromBaseString`
+	- public static TSelf FromBaseString<TSelf>(this string value, TSelf baseNumber) where TSelf : IBinaryInteger<TSelf>
+	- 将指定进制的字符串表示转换为任意实现了 IBinaryInteger<TSelf> 接口的整数类型。进制的范围在2到94之间。
+	- 参数:
+		1.	value: 要转换的字符串。
+		2.	baseNumber: 进制数。要求大于或等于2，小于或等于94。
+	- 返回值: 转换后的整数。
+	- 异常:
+		1. ArgumentOutOfRangeException: 当进制数不在2到94之间或字符串包含无效字符时抛出。
+		
+- 代码示例
+```csharp
+using System;
+using Vorcyc.Mathematics;
+
+public class BaseConverterExample
+{
+	public static void Main()
+	{
+		// 将整数转换为指定进制的字符串表示
+		int number = 100;
+		int baseNumber = 16;
+		// 使用 ToBaseString 方法将整数 100 转换为 16 进制的字符串表示
+		string baseString = number.ToBaseString(baseNumber);
+		Console.WriteLine($"Number {number} in base {baseNumber} is: {baseString}");
+
+		// 将指定进制的字符串表示转换为整数
+		string value = "64";
+		// 使用 FromBaseString 方法将 16 进制的字符串 "64" 转换为整数
+		int convertedNumber = value.FromBaseString(baseNumber);
+		Console.WriteLine($"String {value} in base {baseNumber} is: {convertedNumber}");
+	}
+}
+```
+
+
+
+## Vorcyc.Mathematics.BitMathExtension 类
+
+Vorcyc.Mathematics.BitMathExtension 是一个静态类，提供了多种用于位运算的扩展方法。该类包含以下主要功能：
+方法清单及说明
+### 1.	IsPowerOf2
+- public static bool IsPowerOf2(this uint x)
+- public static bool IsPowerOf2(this ulong x)
+- public static bool IsPowerOf2(this int x)
+- public static bool IsPowerOf2(this long x)
+- 验证一个数是否是2的幂。
+### 2.	NextPowerOf2
+- public static int NextPowerOf2(this int x)
+- public static ulong NextPowerOf2(this ulong value)
+- public static uint NextPowerOf2(this uint value)
+- 获取下一个2的幂。
+### 3.	PreviousPowerOf2
+- public static int PreviousPowerOf2(this int x)
+- public static ulong PreviousPowerOf2(this ulong value)
+- public static uint PreviousPowerOf2(this uint value)
+- 获取上一个2的幂。
+### 4.	CountBitsSet
+- public static int CountBitsSet(this uint value)
+- public static int CountBitsSet(this ulong value)
+- 计算设置的位数。
+### 5.	CountBitsCleared
+- public static int CountBitsCleared(this uint value)
+- public static int CountBitsCleared(this ulong value)
+- 计算未设置的位数。
+### 6.	CreateBitMask
+- public static ulong CreateBitMask(this int bitCount)
+- 创建一个具有给定位数的位掩码。
+### 7.	CountTrailingZeros
+- public static int CountTrailingZeros(this uint value)
+- public static int CountTrailingZeros(this ulong value)
+- 计算从最低位开始的连续0的个数。
+### 8.	CountLeadingZeros
+- public static int CountLeadingZeros(this uint value)
+- public static int CountLeadingZeros(this ulong value)
+- 计算从最高位开始的连续0的个数。
+### 9.	CountTrailingOnes
+- public static int CountTrailingOnes(this uint value)
+- public static int CountTrailingOnes(this ulong value)
+- 计算从最低位开始的连续1的个数。
+### 10.	CountLeadingOnes
+- public static int CountLeadingOnes(this uint value)
+- public static int CountLeadingOnes(this ulong value)
+- 计算从最高位开始的连续1的个数。
+### 11.	GetSetBitPositions
+- public static IEnumerable<int> GetSetBitPositions(this ulong value)
+- public static IEnumerable<int> GetSetBitPositions(this uint value)
+- 返回设置位的位置。
+### 12.	GetClearedBitPositions
+- public static IEnumerable<int> GetClearedBitPositions(this uint value)
+- public static IEnumerable<int> GetClearedBitPositions(this ulong value)
+- 返回未设置位的位置。
+### 13.	IsOdd
+- public static bool IsOdd(this long value)
+- public static bool IsOdd(this ulong value)
+- public static bool IsOdd(this int value)
+- public static bool IsOdd(this uint value)
+- 判断是否是奇数。
+### 14.	IsEven
+- public static bool IsEven(this long value)
+- public static bool IsEven(this ulong value)
+- public static bool IsEven(this int value)
+- public static bool IsEven(this uint value)
+- 判断是否是偶数。
+代码示例
+以下是一个使用 BitMathExtension 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics;
+
+public class BitMathExtensionExample
+{
+	public static void Main()
+	{
+		// 验证一个数是否是2的幂
+		int number = 16;
+		bool isPowerOf2 = number.IsPowerOf2();
+		Console.WriteLine($"{number} is power of 2: {isPowerOf2}");
+
+		// 获取下一个2的幂
+		int nextPowerOf2 = number.NextPowerOf2();
+		Console.WriteLine($"Next power of 2 after {number} is: {nextPowerOf2}");
+
+		// 获取上一个2的幂
+		int previousPowerOf2 = number.PreviousPowerOf2();
+		Console.WriteLine($"Previous power of 2 before {number} is: {previousPowerOf2}");
+
+		// 计算设置的位数
+		uint value = 29;
+		int bitsSet = value.CountBitsSet();
+		Console.WriteLine($"Number of bits set in {value} is: {bitsSet}");
+
+		// 计算未设置的位数
+		int bitsCleared = value.CountBitsCleared();
+		Console.WriteLine($"Number of bits cleared in {value} is: {bitsCleared}");
+
+		// 创建一个具有给定位数的位掩码
+		int bitCount = 5;
+		ulong bitMask = bitCount.CreateBitMask();
+		Console.WriteLine($"Bit mask with {bitCount} bits is: {bitMask}");
+
+		// 计算从最低位开始的连续0的个数
+		int trailingZeros = value.CountTrailingZeros();
+		Console.WriteLine($"Number of trailing zeros in {value} is: {trailingZeros}");
+
+		// 计算从最高位开始的连续0的个数
+		int leadingZeros = value.CountLeadingZeros();
+		Console.WriteLine($"Number of leading zeros in {value} is: {leadingZeros}");
+
+		// 判断是否是奇数
+		bool isOdd = number.IsOdd();
+		Console.WriteLine($"{number} is odd: {isOdd}");
+
+		// 判断是否是偶数
+		bool isEven = number.IsEven();
+		Console.WriteLine($"{number} is even: {isEven}");
+	}
+}
+
+```
