@@ -5,16 +5,16 @@
 ## Vorcyc.Mathematics.ArrayExtension Àà
 
 ·½·¨Çåµ¥¼°ËµÃ÷  
-## Í¨ÓÃ·½·¨
-### 1.	Copy
+### Í¨ÓÃ·½·¨
+#### 1.	Copy
 - `public static T[] Copy<T>(this T[] source)`  
 ¸´ÖÆÕû¸öÊı×é¡£
 - `public static T[] Copy<T>(this T[] source, int length)`  
 ¸´ÖÆÊı×éµÄÖ¸¶¨³¤¶È¡£
-### 2.	InitializeArray
+#### 2.	InitializeArray
 - `public static T[]? InitializeArray<T>(int length, T initialValue = default)`  
 ³õÊ¼»¯Ò»¸öÖ¸¶¨³¤¶ÈµÄÊı×é£¬²¢ÓÃ³õÊ¼ÖµÌî³ä¡£
-### 3.	Fill
+#### 3.	Fill
 - `public static void Fill<T>(this T[] array, T value)`  
 ÓÃÖ¸¶¨ÖµÌî³äÕû¸öÊı×é¡£
 - `public static void Fill<T>(this T[] array, int start, int end, T value)`  
@@ -23,7 +23,7 @@
 ÓÃÖ¸¶¨ÖµÌî³äÊı×éµÄÖ¸¶¨·¶Î§¡£
 - `public static void Fill<T>(this Span<T> values, T value)`  
 ÓÃÖ¸¶¨ÖµÌî³äSpan&lt;T&gt;¡£
-### 4.	FillWithRandomNumber
+#### 4.	FillWithRandomNumber
 - `public static void FillWithRandomNumber(this Span<float> span)`  
 ÓÃËæ»ú¸¡µãÊıÌî³äÊı×é¡£
 - `public static void FillWithRandomNumber<T>(this T[] array) where T : IFloatingPointIeee754<T>`  
@@ -38,89 +38,89 @@
 ÓÃËæ»úÊıÌî³äÊı×é¡£
 - `public static void FillWithRandomNumber(this long[] array, Range range)`  
 ÓÃËæ»úÊıÌî³äÊı×éµÄÖ¸¶¨·¶Î§¡£
-### 5. GetInner
+#### 5. GetInner
 - `public static IEnumerable<T> GetInner<T>(this T[] array, int start, int length)`
 »ñÈ¡Êı×éµÄÄÚ²¿Æ¬¶Î£¬·µ»ØÒ»¸ö¿ÉÃ¶¾Ù¶ÔÏó¡£
-### 6. GetInnerArray
+#### 6. GetInnerArray
 - `public static T[] GetInnerArray<T>(this T[] array, int start, int length)`
 »ñÈ¡Êı×éµÄÄÚ²¿Æ¬¶Î£¬·µ»ØÒ»¸öĞÂµÄÊı×é¡£
-### 7. RemoveSegment
+#### 7. RemoveSegment
 - `public static T[] RemoveSegment<T>(this T[] array, int start, int length)`
 ÒÆ³ıÊı×éÖĞµÄÒ»²¿·Ö£¬²¢·µ»ØÒÆ³ıºóµÄĞÂÊı×é¡£
-### 8. Merge
+#### 8. Merge
 - `public static T[] Merge<T>(this T[] leading, T[] following)`
 ºÏ²¢Á½¸öÊı×é£¬·µ»ØºÏ²¢ºóµÄĞÂÊı×é¡£
-### 9. ToString
+#### 9. ToString
 - `public static string ToString<T>(this IEnumerable<T> collection)`
 ½«¼¯ºÏ×ª»»Îª×Ö·û´®±íÊ¾¡£
-### 10. FastCopyFragment
+#### 10. FastCopyFragment
 - `public static T[] FastCopyFragment<T>(this T[] source, int size, int sourceOffset = 0, int destinationOffset = 0) where T : unmanaged`  
 ¿ìËÙ¸´ÖÆÊı×éµÄÆ¬¶Îµ½Ò»¸öĞÂÊı×é¡£
-### 11.	FastCopyTo
+#### 11.	FastCopyTo
 - `public static void FastCopyTo<T>(this T[] source, T[] destination, int size, int sourceOffset = 0, int destinationOffset = 0)`  
 ¿ìËÙ¸´ÖÆÊı×éµÄÔªËØµ½ÁíÒ»¸öÊı×é¡£
-### 12.	Repeat
+#### 12.	Repeat
 - `public static T[] Repeat<T>(this T[] source, int n)`  
 ´´½¨Ò»¸ö°üº¬Ô´Êı×éÖØ¸´Ö¸¶¨´ÎÊıµÄĞÂÊı×é¡£
 
 
-## µ¥¾«¶È·½·¨
-### 13.	FastCopy
+### µ¥¾«¶È·½·¨
+#### 13.	FastCopy
 - `public static float[] FastCopy(this float[] source)`
 ´´½¨Ò»¸öµ¥¾«¶È¸¡µãÊı×éµÄ¿ìËÙ¸±±¾¡£
-### 14.	FastCopyTo
+#### 14.	FastCopyTo
 - `public static void FastCopyTo(this float[] source, float[] destination, int size, int sourceOffset = 0, int destinationOffset = 0)`  
 ¿ìËÙ¸´ÖÆµ¥¾«¶È¸¡µãÊı×éµÄÔªËØµ½ÁíÒ»¸öÊı×é¡£
-### 15.	FastCopyFragment
+#### 15.	FastCopyFragment
 - `public static float[] FastCopyFragment(this float[] source, int size, int sourceOffset = 0, int destinationOffset = 0)`  
 ¿ìËÙ¸´ÖÆµ¥¾«¶È¸¡µãÊı×éµÄÆ¬¶Îµ½Ò»¸öĞÂÊı×é¡£
-### 16.	Merge
+#### 16.	Merge
 - `public static float[] Merge(this float[] source, float[] another)`  
 ºÏ²¢Á½¸öµ¥¾«¶È¸¡µãÊı×é£¬·µ»ØºÏ²¢ºóµÄĞÂÊı×é¡£
-### 17.	Repeat
+#### 17.	Repeat
 `public static float[] Repeat(this float[] source, int n)`
 ´´½¨Ò»¸ö°üº¬Ô´µ¥¾«¶È¸¡µãÊı×éÖØ¸´Ö¸¶¨´ÎÊıµÄĞÂÊı×é¡£
-### 18.	PadZeros
+#### 18.	PadZeros
 - `public static float[] PadZeros(this float[] source, int size)`  
 ÔÚÔ­Êı×éµÄ»ù´¡ÉÏ½«Êı×é²¹0ÖÁÄ¿±ê³¤¶È£¬ÒÔ´´½¨Ò»¸öÖ¸¶¨´óĞ¡µÄÁãÌî³äµ¥¾«¶È¸¡µãÊı×é¡£
 - `public static T[] PadZeros<T>(this T[] source, int size)`  
 ÔÚÔ­Êı×éµÄ»ù´¡ÉÏ½«Êı×é²¹0ÖÁÄ¿±ê³¤¶È£¬ÒÔ´´½¨Ò»¸öÖ¸¶¨´óĞ¡µÄÁãÌî³äÊı×é¡£
 
-## Ë«¾«¶È·½·¨
-### 19.	FastCopy
+### Ë«¾«¶È·½·¨
+#### 19.	FastCopy
 - `public static double[] FastCopy(this double[] source)`  
 ´´½¨Ò»¸öË«¾«¶È¸¡µãÊı×éµÄ¿ìËÙ¸±±¾¡£
-### 20.	FastCopyTo
+#### 20.	FastCopyTo
 - `public static void FastCopyTo(this double[] source, double[] destination, int size, int sourceOffset = 0, int destinationOffset = 0)`  
 ¿ìËÙ¸´ÖÆË«¾«¶È¸¡µãÊı×éµÄÔªËØµ½ÁíÒ»¸öÊı×é¡£
-### 21.	FastCopyFragment
+#### 21.	FastCopyFragment
 - `public static double[] FastCopyFragment(this double[] source, int size, int sourceOffset = 0, int destinationOffset = 0)`  
 ¿ìËÙ¸´ÖÆË«¾«¶È¸¡µãÊı×éµÄÆ¬¶Îµ½Ò»¸öĞÂÊı×é¡£
-### 22.	Merge
+#### 22.	Merge
 - `public static double[] Merge(this double[] source, double[] another)`  
 ºÏ²¢Á½¸öË«¾«¶È¸¡µãÊı×é£¬·µ»ØºÏ²¢ºóµÄĞÂÊı×é¡£
-### 23.	Repeat
+#### 23.	Repeat
 - `public static double[] Repeat(this double[] source, int n)`  
 ´´½¨Ò»¸ö°üº¬Ô´Ë«¾«¶È¸¡µãÊı×éÖØ¸´Ö¸¶¨´ÎÊıµÄĞÂÊı×é¡£
-### 24.	PadZeros
+#### 24.	PadZeros
 - `public static double[] PadZeros(this double[] source, int size)`  
 ´´½¨Ò»¸öÖ¸¶¨´óĞ¡µÄÁãÌî³äË«¾«¶È¸¡µãÊı×é¡£
 
-## ÆäËû·½·¨
-### 25.	ToFloats
+### ÆäËû·½·¨
+#### 25.	ToFloats
 - `public static float[] ToFloats(this IEnumerable<double> values)`  
 ½«Ë«¾«¶ÈÖµµÄ¿ÉÃ¶¾Ù¶ÔÏó×ª»»Îªµ¥¾«¶ÈÊı×é¡£
-### 26.	ToDoubles
+#### 26.	ToDoubles
 - `public static double[] ToDoubles(this IEnumerable<float> values)`  
 ½«µ¥¾«¶ÈÖµµÄ¿ÉÃ¶¾Ù¶ÔÏó×ª»»ÎªË«¾«¶ÈÊı×é¡£
-### 27.	Last
+#### 27.	Last
 - `public static T Last<T>(this T[] array)`  
 »ñÈ¡Êı×éµÄ×îºóÒ»¸öÔªËØ¡£
-### 28.	First
+#### 28.	First
 - `public static T First<T>(this T[] array)`  
 »ñÈ¡Êı×éµÄµÚÒ»¸öÔªËØ¡£
 
-#### ´úÂëÊ¾Àı
+### ´úÂëÊ¾Àı
 ```csharp
 using System;
 using System.Linq;
@@ -203,27 +203,27 @@ public class ArrayExtensionExample
 
 Vorcyc.Mathematics.BaseConverter ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË½«ÈÎÒâÊµÏÖÁË IBinaryInteger<TSelf> ½Ó¿ÚµÄÕûÊıÀàĞÍ×ª»»ÎªÖ¸¶¨½øÖÆµÄ×Ö·û´®±íÊ¾ºÍ´ÓÖ¸¶¨½øÖÆµÄ×Ö·û´®±íÊ¾×ª»»ÎªÕûÊıµÄ·½·¨¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
 ·½·¨Çåµ¥¼°ËµÃ÷
-1.	`ToBaseString`
-	- public static string ToBaseString<TSelf>(this TSelf integer, TSelf baseNumber) where TSelf : IBinaryInteger<TSelf>  
-	½«ÈÎÒâÊµÏÖÁË IBinaryInteger<TSelf> ½Ó¿ÚµÄÕûÊıÀàĞÍ×ª»»ÎªÖ¸¶¨½øÖÆµÄ×Ö·û´®±íÊ¾¡£½øÖÆµÄ·¶Î§ÔÚ2µ½94Ö®¼ä¡£  
-	- ²ÎÊı:
-		- integer: Òª×ª»»µÄÕûÊı¡£
-		- baseNumber: ½øÖÆÊı¡£ÒªÇó´óÓÚ»òµÈÓÚ2£¬Ğ¡ÓÚ»òµÈÓÚ94¡£
-	-	·µ»ØÖµ: ×Ö·û´®ĞÎÊ½µÄ½øÖÆÊı¡£
-	-	Òì³£:
-		1.	ArgumentOutOfRangeException: µ±ÕûÊıÎª¸ºÊı»ò½øÖÆÊı²»ÔÚ2µ½94Ö®¼äÊ±Å×³ö¡£
+#### 1.	ToBaseString
+- `public static string ToBaseString<TSelf>(this TSelf integer, TSelf baseNumber) where TSelf : IBinaryInteger<TSelf>`
+½«ÈÎÒâÊµÏÖÁË IBinaryInteger<TSelf> ½Ó¿ÚµÄÕûÊıÀàĞÍ×ª»»ÎªÖ¸¶¨½øÖÆµÄ×Ö·û´®±íÊ¾¡£½øÖÆµÄ·¶Î§ÔÚ2µ½94Ö®¼ä¡£  
+- ²ÎÊı:
+	- integer: Òª×ª»»µÄÕûÊı¡£
+	- baseNumber: ½øÖÆÊı¡£ÒªÇó´óÓÚ»òµÈÓÚ2£¬Ğ¡ÓÚ»òµÈÓÚ94¡£
+-	·µ»ØÖµ: ×Ö·û´®ĞÎÊ½µÄ½øÖÆÊı¡£
+-	Òì³£:
+	1.	ArgumentOutOfRangeException: µ±ÕûÊıÎª¸ºÊı»ò½øÖÆÊı²»ÔÚ2µ½94Ö®¼äÊ±Å×³ö¡£
 
-2. `FromBaseString`
-	- public static TSelf FromBaseString<TSelf>(this string value, TSelf baseNumber) where TSelf : IBinaryInteger<TSelf>
-	- ½«Ö¸¶¨½øÖÆµÄ×Ö·û´®±íÊ¾×ª»»ÎªÈÎÒâÊµÏÖÁË IBinaryInteger<TSelf> ½Ó¿ÚµÄÕûÊıÀàĞÍ¡£½øÖÆµÄ·¶Î§ÔÚ2µ½94Ö®¼ä¡£
-	- ²ÎÊı:
-		1.	value: Òª×ª»»µÄ×Ö·û´®¡£
-		2.	baseNumber: ½øÖÆÊı¡£ÒªÇó´óÓÚ»òµÈÓÚ2£¬Ğ¡ÓÚ»òµÈÓÚ94¡£
-	- ·µ»ØÖµ: ×ª»»ºóµÄÕûÊı¡£
-	- Òì³£:
-		1. ArgumentOutOfRangeException: µ±½øÖÆÊı²»ÔÚ2µ½94Ö®¼ä»ò×Ö·û´®°üº¬ÎŞĞ§×Ö·ûÊ±Å×³ö¡£
+#### 2. FromBaseString
+- `public static TSelf FromBaseString<TSelf>(this string value, TSelf baseNumber) where TSelf : IBinaryInteger<TSelf>`
+- ½«Ö¸¶¨½øÖÆµÄ×Ö·û´®±íÊ¾×ª»»ÎªÈÎÒâÊµÏÖÁË IBinaryInteger<TSelf> ½Ó¿ÚµÄÕûÊıÀàĞÍ¡£½øÖÆµÄ·¶Î§ÔÚ2µ½94Ö®¼ä¡£
+- ²ÎÊı:
+	1.	value: Òª×ª»»µÄ×Ö·û´®¡£
+	2.	baseNumber: ½øÖÆÊı¡£ÒªÇó´óÓÚ»òµÈÓÚ2£¬Ğ¡ÓÚ»òµÈÓÚ94¡£
+- ·µ»ØÖµ: ×ª»»ºóµÄÕûÊı¡£
+- Òì³£:
+	1. ArgumentOutOfRangeException: µ±½øÖÆÊı²»ÔÚ2µ½94Ö®¼ä»ò×Ö·û´®°üº¬ÎŞĞ§×Ö·ûÊ±Å×³ö¡£
 		
-#### ´úÂëÊ¾Àı
+### ´úÂëÊ¾Àı
 ```csharp
 using System;
 using Vorcyc.Mathematics;
@@ -253,72 +253,72 @@ public class BaseConverterExample
 ## Vorcyc.Mathematics.BitMathExtension Àà
 
 Vorcyc.Mathematics.BitMathExtension ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÓÃÓÚÎ»ÔËËãµÄÀ©Õ¹·½·¨¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
-·½·¨Çåµ¥¼°ËµÃ÷
-### 1.	IsPowerOf2
+### ·½·¨Çåµ¥¼°ËµÃ÷
+#### 1.	IsPowerOf2
 - public static bool IsPowerOf2(this uint x)
 - public static bool IsPowerOf2(this ulong x)
 - public static bool IsPowerOf2(this int x)
 - public static bool IsPowerOf2(this long x)
 - ÑéÖ¤Ò»¸öÊıÊÇ·ñÊÇ2µÄÃİ¡£
-### 2.	NextPowerOf2
+#### 2.	NextPowerOf2
 - public static int NextPowerOf2(this int x)
 - public static ulong NextPowerOf2(this ulong value)
 - public static uint NextPowerOf2(this uint value)
 - »ñÈ¡ÏÂÒ»¸ö2µÄÃİ¡£
-### 3.	PreviousPowerOf2
+#### 3.	PreviousPowerOf2
 - public static int PreviousPowerOf2(this int x)
 - public static ulong PreviousPowerOf2(this ulong value)
 - public static uint PreviousPowerOf2(this uint value)
 - »ñÈ¡ÉÏÒ»¸ö2µÄÃİ¡£
-### 4.	CountBitsSet
+#### 4.	CountBitsSet
 - public static int CountBitsSet(this uint value)
 - public static int CountBitsSet(this ulong value)
 - ¼ÆËãÉèÖÃµÄÎ»Êı¡£
-### 5.	CountBitsCleared
+#### 5.	CountBitsCleared
 - public static int CountBitsCleared(this uint value)
 - public static int CountBitsCleared(this ulong value)
 - ¼ÆËãÎ´ÉèÖÃµÄÎ»Êı¡£
-### 6.	CreateBitMask
+#### 6.	CreateBitMask
 - public static ulong CreateBitMask(this int bitCount)
 - ´´½¨Ò»¸ö¾ßÓĞ¸ø¶¨Î»ÊıµÄÎ»ÑÚÂë¡£
-### 7.	CountTrailingZeros
+#### 7.	CountTrailingZeros
 - public static int CountTrailingZeros(this uint value)
 - public static int CountTrailingZeros(this ulong value)
 - ¼ÆËã´Ó×îµÍÎ»¿ªÊ¼µÄÁ¬Ğø0µÄ¸öÊı¡£
-### 8.	CountLeadingZeros
+#### 8.	CountLeadingZeros
 - public static int CountLeadingZeros(this uint value)
 - public static int CountLeadingZeros(this ulong value)
 - ¼ÆËã´Ó×î¸ßÎ»¿ªÊ¼µÄÁ¬Ğø0µÄ¸öÊı¡£
-### 9.	CountTrailingOnes
+#### 9.	CountTrailingOnes
 - public static int CountTrailingOnes(this uint value)
 - public static int CountTrailingOnes(this ulong value)
 - ¼ÆËã´Ó×îµÍÎ»¿ªÊ¼µÄÁ¬Ğø1µÄ¸öÊı¡£
-### 10.	CountLeadingOnes
+#### 10.	CountLeadingOnes
 - public static int CountLeadingOnes(this uint value)
 - public static int CountLeadingOnes(this ulong value)
 - ¼ÆËã´Ó×î¸ßÎ»¿ªÊ¼µÄÁ¬Ğø1µÄ¸öÊı¡£
-### 11.	GetSetBitPositions
+#### 11.	GetSetBitPositions
 - public static IEnumerable<int> GetSetBitPositions(this ulong value)
 - public static IEnumerable<int> GetSetBitPositions(this uint value)
 - ·µ»ØÉèÖÃÎ»µÄÎ»ÖÃ¡£
-### 12.	GetClearedBitPositions
+#### 12.	GetClearedBitPositions
 - public static IEnumerable<int> GetClearedBitPositions(this uint value)
 - public static IEnumerable<int> GetClearedBitPositions(this ulong value)
 - ·µ»ØÎ´ÉèÖÃÎ»µÄÎ»ÖÃ¡£
-### 13.	IsOdd
+#### 13.	IsOdd
 - public static bool IsOdd(this long value)
 - public static bool IsOdd(this ulong value)
 - public static bool IsOdd(this int value)
 - public static bool IsOdd(this uint value)
 - ÅĞ¶ÏÊÇ·ñÊÇÆæÊı¡£
-### 14.	IsEven
+#### 14.	IsEven
 - public static bool IsEven(this long value)
 - public static bool IsEven(this ulong value)
 - public static bool IsEven(this int value)
 - public static bool IsEven(this uint value)
 - ÅĞ¶ÏÊÇ·ñÊÇÅ¼Êı¡£
 
-#### ´úÂëÊ¾Àı
+### ´úÂëÊ¾Àı
 ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ BitMathExtension ÀàÖĞ¶à¸ö·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
 
 ```csharp
@@ -381,27 +381,27 @@ public class BitMathExtensionExample
 ## Vorcyc.Mathematics.Combinatorics Àà
 
 Vorcyc.Mathematics.Combinatorics ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖ×éºÏÊıÑ§º¯Êı¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
-·½·¨Çåµ¥¼°ËµÃ÷
-### 1.	TruthTable
+### ·½·¨Çåµ¥¼°ËµÃ÷
+#### 1.	TruthTable
 - public static int[][] TruthTable(int length)
 - public static int[][] TruthTable(int symbols, int length)
 - public static int[][] TruthTable(this int[] symbols)
 - Éú³ÉËùÓĞ¿ÉÄÜµÄÓĞĞòÅÅÁĞ£¬ÔÊĞíÖØ¸´£¨ÕæÖµ±í£©¡£
-### 2.	Sequences
+#### 2.	Sequences
 - public static IEnumerable<int[]> Sequences(int length, bool inPlace = false)
 - public static IEnumerable<int[]> Sequences(int symbols, int length, bool inPlace = false)
 - public static IEnumerable<int[]> Sequences(this int[] symbols, bool inPlace = false)
 - Ìá¹©Ò»ÖÖ·½·¨À´Ã¶¾ÙËùÓĞ¿ÉÄÜµÄÓĞĞòÅÅÁĞ£¬ÔÊĞíÖØ¸´£¨ÕæÖµ±í£©£¬¶ø²»Ê¹ÓÃ´óÁ¿ÄÚ´æ·ÖÅä¡£
-### 3.	Combinations
+#### 3.	Combinations
 - public static IEnumerable<T[]> Combinations<T>(this T[] values, bool inPlace = false)
 - public static IEnumerable<T[]> Combinations<T>(this T[] values, int k, bool inPlace = false)
 - Ã¶¾Ù¸ø¶¨Êı×éµÄËùÓĞ¿ÉÄÜÖµ×éºÏ¡£
-### 4.	Subsets
+#### 4.	Subsets
 - public static IEnumerable<SortedSet<T>> Subsets<T>(this ISet<T> set, bool inPlace = false)
 - public static IEnumerable<SortedSet<T>> Subsets<T>(this ISet<T> set, int k, bool inPlace = false)
 - Éú³É¸ø¶¨¼¯ºÏµÄËùÓĞ¿ÉÄÜ×Ó¼¯¡£
 
-#### ´úÂëÊ¾Àı
+### ´úÂëÊ¾Àı
 ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ Combinatorics ÀàÖĞ¶à¸ö·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
 ```csharp
 using System;
@@ -452,61 +452,61 @@ public class CombinatoricsExample
 
 Vorcyc.Mathematics.ConstantsFp32 ÊÇÒ»¸ö¾²Ì¬Àà£¬¶¨ÒåÁËÒ»×é³£ÓÃµÄµ¥¾«¶È¸¡µãÊı³£Á¿¡£ÕâĞ©³£Á¿ÔÚÊıÑ§¼ÆËãÖĞ·Ç³£ÓĞÓÃ¡£ÒÔÏÂÊÇÃ¿¸ö³£Á¿µÄÏêÏ¸ËµÃ÷£º
 ³£Á¿Çåµ¥¼°ËµÃ÷
-### 1.	E
+#### 1.	E
 - public const float E = 2.71828182845904523536f;
 - ×ÔÈ»¶ÔÊıµÄµ×Êı e¡£
-### 2.	LOG2E
+#### 2.	LOG2E
 - public const float LOG2E = 1.44269504088896340736f;
 - ÒÔ 2 Îªµ×µÄ e µÄ¶ÔÊı¡£
-### 3.	LOG10E
+#### 3.	LOG10E
 - public const float LOG10E = 0.434294481903251827651f;
 - ÒÔ 10 Îªµ×µÄ e µÄ¶ÔÊı¡£
-### 4.	LN2
+#### 4.	LN2
 - public const float LN2 = 0.693147180559945309417f;
 - 2 µÄ×ÔÈ»¶ÔÊı¡£
-### 5.	LN10
+#### 5.	LN10
 - public const float LN10 = 2.30258509299404568402f;
 - 10 µÄ×ÔÈ»¶ÔÊı¡£
-### 6.	PI
+#### 6.	PI
 - public const float PI = 3.1415926535897932384626433832795f;
 - Ô²ÖÜÂÊ ¦Ğ¡£
-### 7.	PI_2
+#### 7.	PI_2
 - public const float PI_2 = 1.57079632679489661923f;
 - ¦Ğ µÄÒ»°ë¡£
-### 8.	PI_4
+#### 8.	PI_4
 - public const float PI_4 = 0.785398163397448309616f;
 - ¦Ğ µÄËÄ·ÖÖ®Ò»¡£
-### 9.	_1_PI
+#### 9.	_1_PI
 - public const float _1_PI = 0.318309886183790671538f;
 - 1 ³ıÒÔ ¦Ğ¡£
-### 10.	_2_PI
+#### 10.	_2_PI
 - public const float _2_PI = 0.636619772367581343076f;
 - 2 ³ıÒÔ ¦Ğ¡£
-### 11.	_2_SQRT_PI
+#### 11.	_2_SQRT_PI
 - public const float _2_SQRT_PI = 1.12837916709551257390f;
 - 2 ³ıÒÔ ¦Ğ µÄÆ½·½¸ù¡£
-### 12.	_SQRT2
+#### 12.	_SQRT2
 - public const float _SQRT2 = 1.41421356237309504880f;
 - 2 µÄÆ½·½¸ù¡£
-### 13.	_SQRT1_2
+#### 13.	_SQRT1_2
 - public const float _SQRT1_2 = 0.707106781186547524401f;
 - 1 ³ıÒÔ 2 µÄÆ½·½¸ù¡£
-### 14.	TWO_PI
+#### 14.	TWO_PI
 - public const float TWO_PI = 6.28318530717958647692f;
 - 2 ±¶µÄ ¦Ğ¡£
-### 15.	TOLERANCE
+#### 15.	TOLERANCE
 - public const float TOLERANCE = 1E-09f;
 - ¹«²î£¬ÓÃÓÚ±È½Ï¸¡µãÊıµÄ¾«¶È¡£
-### 16.	RADIANS_PER_DEGREE
+#### 16.	RADIANS_PER_DEGREE
 - public const float RADIANS_PER_DEGREE = 0.01745329f;
 - Ã¿¶ÈµÄ»¡¶ÈÊı¡£
-### 17.	DEGREES_PER_RADIAN
+#### 17.	DEGREES_PER_RADIAN
 - public const float DEGREES_PER_RADIAN = 57.29578f;
 - Ã¿»¡¶ÈµÄ¶ÈÊı¡£
-### 18.	EPSILON
+#### 18.	EPSILON
 - public const float EPSILON = 0.001f;
 - ÓÃÓÚ¸¡µãÊı±È½ÏµÄ¼«Ğ¡Öµ¡£
-#### ´úÂëÊ¾Àı
+### ´úÂëÊ¾Àı
 ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ ConstantsFp32 ÀàÖĞ³£Á¿µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
 ```csharp
 using System;
@@ -548,7 +548,7 @@ public class ConstantsFp32Example
 ## Vorcyc.Mathematics.NumberMapper Àà
 Vorcyc.Mathematics.NumberMapper ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË½«Ò»¸öÖµ´ÓÒ»¸ö·¶Î§Ó³Éäµ½ÁíÒ»¸ö·¶Î§µÄ·½·¨¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
 ·½·¨Çåµ¥¼°ËµÃ÷
-### 1.	Map
+#### 1.	Map
 - ½«ÊäÈëÖµ´ÓÒ»¸ö·¶Î§Ó³Éäµ½ÁíÒ»¸ö·¶Î§¡£
 - `public static TNumber Map<TNumber>(this TNumber number, TNumber inMin, TNumber inMax, TNumber outMin, TNumber outMax, InputValueOutOfRangeHandleBehavior handleBehavior = InputValueOutOfRangeHandleBehavior.Saturating) where TNumber : unmanaged, INumber<TNumber>`
 	-   ²ÎÊı:
@@ -562,7 +562,7 @@ Vorcyc.Mathematics.NumberMapper ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË½«Ò»¸öÖµ´ÓÒ»¸ö·¶Î§Ó³Éäµ½ÁíÒ»
 	-	Òì³£:
 		1.	ArgumentOutOfRangeException: µ± inMin ´óÓÚ»òµÈÓÚ inMax£¬»ò outMin ´óÓÚ»òµÈÓÚ outMax Ê±Å×³ö¡£
 		2.	ArgumentException: µ± number ³¬³öÊäÈë·¶Î§ÇÒ handleBehavior Îª InputValueOutOfRangeHandleBehavior.ThrowException Ê±Å×³ö¡£
-### 2.	Map
+#### 2.	Map
 - ½«¸¡µãÊı´ÓÒ»¸ö·¶Î§Ó³Éäµ½ÁíÒ»¸ö·¶Î§£¬²¢·µ»ØÒ»¸ö²¼¶ûÖµÖ¸Ê¾ÊÇ·ñ³É¹¦¡£
 - `public static bool Map<TFloatingNumber>(TFloatingNumber input, TFloatingNumber inputMin, TFloatingNumber inputMax, TFloatingNumber outputMin, TFloatingNumber outputMax, out TFloatingNumber result) where TFloatingNumber : unmanaged, IFloatingPointIeee754<TFloatingNumber>`
 	-	²ÎÊı:
@@ -579,7 +579,7 @@ Vorcyc.Mathematics.NumberMapper ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË½«Ò»¸öÖµ´ÓÒ»¸ö·¶Î§Ó³Éäµ½ÁíÒ»
 		1.	Saturating: ½«ÊäÈëÖµ¼Ğ½ôµ½×î½üµÄ±ß½çÖµ¡£
 		2.	ThrowException: µ±ÊäÈëÖµ³¬³ö·¶Î§Ê±Å×³öÒì³£¡£
 			
-#### ´úÂëÊ¾Àı
+### ´úÂëÊ¾Àı
 ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ NumberMapper ÀàÖĞ·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
 
 ```csharp
@@ -616,8 +616,8 @@ public class NumberMapperExample
 ## Vorcyc.Mathematics.PinnableArray Àà
 
 Vorcyc.Mathematics.PinnableArray ÊÇÒ»¸ö·ºĞÍÀà£¬±íÊ¾Ò»¸ö¿É¹Ì¶¨ÄÚ´æµÄÒ»Î¬Êı×é£¬ÓÃÒÔÌá¹©¸ßĞÔÄÜÄÚ´æ·ÃÎÊ»úÖÆºÍÊı×éµÄ²Ù×÷¡£¸ÃÀàÌá¹©ÁË¶àÖÖ·½·¨ºÍÊôĞÔÀ´²Ù×÷Êı×é£¬²¢ÇÒ¿ÉÒÔ½«Êı×é¹Ì¶¨ÔÚÄÚ´æÖĞ£¬ÒÔ±ãÓë·ÇÍĞ¹Ü´úÂë½øĞĞ½»»¥¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
-#### ·½·¨Çåµ¥¼°ËµÃ÷
-### 1.	¹¹Ôìº¯Êı
+### ·½·¨Çåµ¥¼°ËµÃ÷
+#### 1.	¹¹Ôìº¯Êı
 - `public PinnableArray(ArraySegment<T> segment, bool pin = false)`
 	Ê¹ÓÃ ArraySegment&lt;T> ³õÊ¼»¯ PinnableArray ÊµÀı¡£
 - `public PinnableArray(Span<T> span, bool pin = false)`
@@ -628,13 +628,13 @@ Vorcyc.Mathematics.PinnableArray ÊÇÒ»¸ö·ºĞÍÀà£¬±íÊ¾Ò»¸ö¿É¹Ì¶¨ÄÚ´æµÄÒ»Î¬Êı×é£¬ÓÃÒ
 	Ê¹ÓÃÊı×éµÄ²¿·ÖÄÚÈİ³õÊ¼»¯ PinnableArray ÊµÀı¡£
 - `public PinnableArray(int count, bool pin = false)`
 	Ê¹ÓÃÖ¸¶¨³¤¶È³õÊ¼»¯ PinnableArray ÊµÀı¡£
-### 2.	Pin
+#### 2.	Pin
 -	`public void Pin()`
 	½« PinnableArray ¹Ì¶¨ÔÚÄÚ´æÖĞ£¬ÒÔ±ãÓë·ÇÍĞ¹Ü´úÂë½øĞĞ½»»¥¡£
-### 3.	Unpin
+#### 3.	Unpin
 -	`public void Unpin()`
 	È¡Ïû¹Ì¶¨ PinnableArray£¬Ê¹Æä¿ÉÒÔ±»À¬»ø»ØÊÕ¡£
-### 4.	AsSpan
+#### 4.	AsSpan
 -	`public Span<T> AsSpan()`
 	·µ»Ø±íÊ¾µ±Ç°Êı×éµÄ Span&lt;T>¡£
 -	`public Span<T> AsSpan(int start, int length)`
@@ -645,7 +645,7 @@ Vorcyc.Mathematics.PinnableArray ÊÇÒ»¸ö·ºĞÍÀà£¬±íÊ¾Ò»¸ö¿É¹Ì¶¨ÄÚ´æµÄÒ»Î¬Êı×é£¬ÓÃÒ
 	·µ»Ø±íÊ¾µ±Ç°Êı×é´ÓÖ¸¶¨Ë÷Òı¿ªÊ¼µÄ Span&lt;T>¡£
 -	`public Span<T> AsSpan(Range range)`
 	·µ»Ø±íÊ¾µ±Ç°Êı×éÖ¸¶¨·¶Î§µÄ Span&lt;T>¡£
-### 5.	Fill
+#### 5.	Fill
 -	`public void Fill(T value)`
 	ÓÃÖ¸¶¨ÖµÌî³äÕû¸öÊı×é¡£
 -	`public void Fill(T startValue, T step)`
@@ -654,12 +654,12 @@ Vorcyc.Mathematics.PinnableArray ÊÇÒ»¸ö·ºĞÍÀà£¬±íÊ¾Ò»¸ö¿É¹Ì¶¨ÄÚ´æµÄÒ»Î¬Êı×é£¬ÓÃÒ
 	ÓÃÁíÒ»¸ö·ÇÍĞ¹ÜÀàĞÍµÄÖµÌî³äÊı×é¡£
 -   `public void FillWithRandomNumber()`
 	ÓÃËæ»úÊıÌî³äÊı×é¡£
-### 6.	Each
+#### 6.	Each
 -   `public void Each(Func<int, T, T> func)`
 	Ê¹ÓÃÖ¸¶¨µÄº¯Êı±éÀúÊı×éµÄÃ¿¸öÔªËØ¡£
 -   `public void Each(Func<int, T?, T, T?, T> func, Direction direction = Direction.Forward)`
 	Ê¹ÓÃÖ¸¶¨µÄº¯Êı±éÀúÊı×éµÄÃ¿¸öÔªËØ£¬²¢Ö¸¶¨±éÀú·½Ïò¡£
-### 7.	Max
+#### 7.	Max
 -   `public T Max()`
 	·µ»ØÊı×éÖĞµÄ×î´óÖµ¡£
 -   `public T Max(int start, int length)`
@@ -668,7 +668,7 @@ Vorcyc.Mathematics.PinnableArray ÊÇÒ»¸ö·ºĞÍÀà£¬±íÊ¾Ò»¸ö¿É¹Ì¶¨ÄÚ´æµÄÒ»Î¬Êı×é£¬ÓÃÒ
 	Òì²½·µ»ØÊı×éÖĞµÄ×î´óÖµ¡£
 -   `public async Task<T> MaxAsync(int start, int length, int? numberOfWorkers = null, bool useTPL = false)`
 	Òì²½·µ»ØÊı×éÖ¸¶¨·¶Î§ÄÚµÄ×î´óÖµ¡£
-### 8.	Min
+#### 8.	Min
 -   `public T Min()`
 	·µ»ØÊı×éÖĞµÄ×îĞ¡Öµ¡£
 -   `public T Min(int start, int length)`
@@ -677,7 +677,7 @@ Vorcyc.Mathematics.PinnableArray ÊÇÒ»¸ö·ºĞÍÀà£¬±íÊ¾Ò»¸ö¿É¹Ì¶¨ÄÚ´æµÄÒ»Î¬Êı×é£¬ÓÃÒ
 	Òì²½·µ»ØÊı×éÖĞµÄ×îĞ¡Öµ¡£¸Ã·½·¨Í¨¹ı²¢ĞĞÖ´ĞĞ£¬Õë¶Ô´ó¹æÄ£¹æ¾ØĞ§¹û¸ü¼Ñ¡£
 -   `public async Task<T> MinAsync(int start, int length, int? numberOfWorkers = null, bool useTPL = false)`
 	Òì²½·µ»ØÊı×éÖ¸¶¨·¶Î§ÄÚµÄ×îĞ¡Öµ¡£¸Ã·½·¨Í¨¹ı²¢ĞĞÖ´ĞĞ£¬Õë¶Ô´ó¹æÄ£¹æ¾ØĞ§¹û¸ü¼Ñ¡£
-### 9.	Map
+#### 9.	Map
 -    `public void MapIn(T fromMin, T fromMax, T toMin, T toMax)`
 	½«Êı×éÖĞµÄÖµ´ÓÒ»¸ö·¶Î§Ó³Éäµ½ÁíÒ»¸ö·¶Î§¡£
 -   `public void MapIn(T toMin, T toMax)`
@@ -686,43 +686,43 @@ Vorcyc.Mathematics.PinnableArray ÊÇÒ»¸ö·ºĞÍÀà£¬±íÊ¾Ò»¸ö¿É¹Ì¶¨ÄÚ´æµÄÒ»Î¬Êı×é£¬ÓÃÒ
 	·µ»ØÒ»¸öĞÂµÄ PinnableArray£¬ÆäÖĞµÄÖµ´ÓÒ»¸ö·¶Î§Ó³Éäµ½ÁíÒ»¸ö·¶Î§¡£
 -    `public PinnableArray<T> Map(T toMin, T toMax)`
 	·µ»ØÒ»¸öĞÂµÄ PinnableArray£¬ÆäÖĞµÄÖµ´Óµ±Ç°·¶Î§Ó³Éäµ½Ö¸¶¨·¶Î§¡£
-### 10.	Dot
+#### 10.	Dot
 -    `public T Dot(PinnableArray<T> another)`
 	¼ÆËãµ±Ç°Êı×éÓëÁíÒ»¸ö PinnableArray µÄµã»ı¡£
-### 11.	Dispose
+#### 11.	Dispose
 -    `public void Dispose()`
 	ÊÍ·Å PinnableArray Õ¼ÓÃµÄ×ÊÔ´¡£
-#### Ã¶¾Ù
-### 12.	`Direction`
+### Ã¶¾Ù
+#### 12.	`Direction`
 -    ¶¨Òå±éÀúÊı×éµÄ·½Ïò¡£
 -    Öµ:
 	1.	`Forward`: ´ÓÇ°Ïòºó±éÀú¡£
 	2.	`Inverse`: ´ÓºóÏòÇ°±éÀú¡£
 	
-#### ÊôĞÔ  
-### 13.	IsPinned
+### ÊôĞÔ  
+#### 13.	IsPinned
 -    `public bool IsPinned { get; }`
 	»ñÈ¡µ±Ç°Êı×éÊÇ·ñÒÑ¹Ì¶¨ÔÚÄÚ´æÖĞ¡£
-### 14.	Length
+#### 14.	Length
 -    `public int Length { get; }`
 	»ñÈ¡µ±Ç°Êı×éµÄ³¤¶È¡£
-### 15.	Values
+#### 15.	Values
 -    `public T[] Values { get; }`
 	»ñÈ¡µ±Ç°Êı×éµÄÆÕÍ¨Êı×éĞÎÊ½¡£
-#### ²Ù×÷·ûÖØÔØ
-### 16.	 +
+### ²Ù×÷·ûÖØÔØ
+#### 16.	 +
 -    `public static PinnableArray<T> operator +(PinnableArray<T> left, PinnableArray<T> right)`
 -    `public static PinnableArray<T> operator +(PinnableArray<T> left, T right)`
 -    `public static PinnableArray<T> operator +(T left, PinnableArray<T> right)`
-### 17.	-
+#### 17.	-
 -    `public static PinnableArray<T> operator -(PinnableArray<T> left, PinnableArray<T> right)`
 -    `public static PinnableArray<T> operator -(PinnableArray<T> left, T right)`
 -    `public static PinnableArray<T> operator -(T left, PinnableArray<T> right)`
-### 18.	*
+#### 18.	*
 -    `public static PinnableArray<T> operator *(PinnableArray<T> left, PinnableArray<T> right)`
 -    `public static PinnableArray<T> operator *(PinnableArray<T> left, T right)`
 -    `public static PinnableArray<T> operator *(T left, PinnableArray<T> right)`
-### 19.	/
+#### 19.	/
 -    `public static PinnableArray<T> operator /(PinnableArray<T> left, PinnableArray<T> right)`
 -    `public static PinnableArray<T> operator /(PinnableArray<T> left, T right)`
 -    `public static PinnableArray<T> operator /(T left, PinnableArray<T> right)`
@@ -811,4 +811,493 @@ public class PinnableArrayExample
 		pinnableArray.Dispose();
 	}
 }
+```
+
+
+## SimpleRNG_Fp32 ºÍ SimpleRNG_Fp64 Àà
+
+Vorcyc.Mathematics.SimpleRNG_Fp32 ºÍ Vorcyc.Mathematics.SimpleRNG_Fp64 ÊÇÁ½¸ö¾²Ì¬Àà£¬·Ö±ğÓÃÓÚÉú³É 32 Î»ºÍ 64 Î»¸¡µãÊıµÄËæ»úÊı¡£ËüÃÇ»ùÓÚ George Marsaglia µÄ MWC£¨³Ë·¨Óë½øÎ»£©Ëã·¨£¬ÄÜ¹»Éú³ÉÍ¨¹ı Marsaglia µÄ DIEHARD Ëæ»úÊıÉú³ÉÆ÷²âÊÔµÄËæ»úÊı¡£
+### ·½·¨Çåµ¥¼°ËµÃ÷
+#### 1. SetSeed
+- `public static void SetSeed(uint u, uint v)`
+  - ÉèÖÃËæ»úÊıÉú³ÉÆ÷µÄÖÖ×Ó¡£
+  - ²ÎÊı:
+	- `u`: µÚÒ»¸öÖÖ×ÓÖµ¡£
+	- `v`: µÚ¶ş¸öÖÖ×ÓÖµ¡£
+
+- `public static void SetSeed(uint u)`
+  - ÉèÖÃËæ»úÊıÉú³ÉÆ÷µÄÖÖ×Ó¡£
+  - ²ÎÊı:
+	- `u`: ÖÖ×ÓÖµ¡£
+
+- `public static void SetSeedFromSystemTime()`
+  - Ê¹ÓÃÏµÍ³Ê±¼äÉèÖÃËæ»úÊıÉú³ÉÆ÷µÄÖÖ×Ó¡£
+
+#### 2. GetUniform
+- `public static double GetUniform()`
+  - Éú³ÉÒ»¸ö (0, 1) Çø¼äÄÚµÄ¾ùÔÈ·Ö²¼Ëæ»úÊı¡£
+
+#### 3. GetNormal
+- `public static double GetNormal()`
+  - Éú³ÉÒ»¸ö¾ùÖµÎª 0£¬±ê×¼²îÎª 1 µÄÕıÌ¬·Ö²¼Ëæ»úÊı¡£
+
+- `public static double GetNormal(double mean, double standardDeviation)`
+  - Éú³ÉÒ»¸öÖ¸¶¨¾ùÖµºÍ±ê×¼²îµÄÕıÌ¬·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `mean`: ¾ùÖµ¡£
+	- `standardDeviation`: ±ê×¼²î¡£
+
+#### 4. GetExponential
+- `public static double GetExponential()`
+  - Éú³ÉÒ»¸ö¾ùÖµÎª 1 µÄÖ¸Êı·Ö²¼Ëæ»úÊı¡£
+
+- `public static double GetExponential(double mean)`
+  - Éú³ÉÒ»¸öÖ¸¶¨¾ùÖµµÄÖ¸Êı·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `mean`: ¾ùÖµ¡£
+
+#### 5. GetGamma
+- `public static double GetGamma(double shape, double scale)`
+  - Éú³ÉÒ»¸öÖ¸¶¨ĞÎ×´ºÍ³ß¶È²ÎÊıµÄÙ¤Âí·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `shape`: ĞÎ×´²ÎÊı¡£
+	- `scale`: ³ß¶È²ÎÊı¡£
+
+#### 6. GetChiSquare
+- `public static double GetChiSquare(double degreesOfFreedom)`
+  - Éú³ÉÒ»¸öÖ¸¶¨×ÔÓÉ¶ÈµÄ¿¨·½·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `degreesOfFreedom`: ×ÔÓÉ¶È¡£
+
+#### 7. GetInverseGamma
+- `public static double GetInverseGamma(double shape, double scale)`
+  - Éú³ÉÒ»¸öÖ¸¶¨ĞÎ×´ºÍ³ß¶È²ÎÊıµÄÄæÙ¤Âí·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `shape`: ĞÎ×´²ÎÊı¡£
+	- `scale`: ³ß¶È²ÎÊı¡£
+
+#### 8. GetWeibull
+- `public static double GetWeibull(double shape, double scale)`
+  - Éú³ÉÒ»¸öÖ¸¶¨ĞÎ×´ºÍ³ß¶È²ÎÊıµÄÍş²¼¶û·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `shape`: ĞÎ×´²ÎÊı¡£
+	- `scale`: ³ß¶È²ÎÊı¡£
+
+#### 9. GetCauchy
+- `public static double GetCauchy(double median, double scale)`
+  - Éú³ÉÒ»¸öÖ¸¶¨ÖĞÎ»ÊıºÍ³ß¶È²ÎÊıµÄ¿ÂÎ÷·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `median`: ÖĞÎ»Êı¡£
+	- `scale`: ³ß¶È²ÎÊı¡£
+
+#### 10. GetStudentT
+- `public static double GetStudentT(double degreesOfFreedom)`
+  - Éú³ÉÒ»¸öÖ¸¶¨×ÔÓÉ¶ÈµÄ t ·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `degreesOfFreedom`: ×ÔÓÉ¶È¡£
+
+#### 11. GetLaplace
+- `public static double GetLaplace(double mean, double scale)`
+  - Éú³ÉÒ»¸öÖ¸¶¨¾ùÖµºÍ³ß¶È²ÎÊıµÄÀ­ÆÕÀ­Ë¹·Ö²¼£¨Ë«Ö¸Êı·Ö²¼£©Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `mean`: ¾ùÖµ¡£
+	- `scale`: ³ß¶È²ÎÊı¡£
+
+#### 12. GetLogNormal
+- `public static double GetLogNormal(double mu, double sigma)`
+  - Éú³ÉÒ»¸ö¶ÔÊıÕıÌ¬·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `mu`: ¶ÔÊıÕıÌ¬·Ö²¼µÄ¾ùÖµ¡£
+	- `sigma`: ¶ÔÊıÕıÌ¬·Ö²¼µÄ±ê×¼²î¡£
+
+#### 13. GetBeta
+- `public static double GetBeta(double a, double b)`
+  - Éú³ÉÒ»¸öÖ¸¶¨²ÎÊıµÄ±´Ëş·Ö²¼Ëæ»úÊı¡£
+  - ²ÎÊı:
+	- `a`: ±´Ëş·Ö²¼µÄµÚÒ»¸ö²ÎÊı¡£
+	- `b`: ±´Ëş·Ö²¼µÄµÚ¶ş¸ö²ÎÊı¡£
+### ´úÂëÊ¾Àı
+ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ SimpleRNG_Fp32 ºÍ SimpleRNG_Fp64 ÀàÖĞ¶à¸ö·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
+```csharp
+using System;
+using Vorcyc.Mathematics;
+
+public class SimpleRNGExample
+{
+	public static void Main()
+	{
+		// Ê¹ÓÃ SimpleRNG_Fp64 Éú³ÉËæ»úÊı
+		SimpleRNG_Fp64.SetSeedFromSystemTime();
+		double uniform64 = SimpleRNG_Fp64.GetUniform();
+		double normal64 = SimpleRNG_Fp64.GetNormal();
+		double exponential64 = SimpleRNG_Fp64.GetExponential();
+		double gamma64 = SimpleRNG_Fp64.GetGamma(2.0, 2.0);
+		double chiSquare64 = SimpleRNG_Fp64.GetChiSquare(2.0);
+		double inverseGamma64 = SimpleRNG_Fp64.GetInverseGamma(2.0, 2.0);
+		double weibull64 = SimpleRNG_Fp64.GetWeibull(2.0, 2.0);
+		double cauchy64 = SimpleRNG_Fp64.GetCauchy(0.0, 1.0);
+		double studentT64 = SimpleRNG_Fp64.GetStudentT(2.0);
+		double laplace64 = SimpleRNG_Fp64.GetLaplace(0.0, 1.0);
+		double logNormal64 = SimpleRNG_Fp64.GetLogNormal(0.0, 1.0);
+		double beta64 = SimpleRNG_Fp64.GetBeta(2.0, 2.0);
+
+		Console.WriteLine("SimpleRNG_Fp64:");
+		Console.WriteLine($"Uniform: {uniform64}");
+		Console.WriteLine($"Normal: {normal64}");
+		Console.WriteLine($"Exponential: {exponential64}");
+		Console.WriteLine($"Gamma: {gamma64}");
+		Console.WriteLine($"ChiSquare: {chiSquare64}");
+		Console.WriteLine($"InverseGamma: {inverseGamma64}");
+		Console.WriteLine($"Weibull: {weibull64}");
+		Console.WriteLine($"Cauchy: {cauchy64}");
+		Console.WriteLine($"StudentT: {studentT64}");
+		Console.WriteLine($"Laplace: {laplace64}");
+		Console.WriteLine($"LogNormal: {logNormal64}");
+		Console.WriteLine($"Beta: {beta64}");
+
+		// Ê¹ÓÃ SimpleRNG_Fp32 Éú³ÉËæ»úÊı
+		SimpleRNG_Fp32.SetSeedFromSystemTime();
+		float uniform32 = SimpleRNG_Fp32.GetUniform();
+		float normal32 = SimpleRNG_Fp32.GetNormal();
+		float exponential32 = SimpleRNG_Fp32.GetExponential();
+		float gamma32 = SimpleRNG_Fp32.GetGamma(2.0f, 2.0f);
+		float chiSquare32 = SimpleRNG_Fp32.GetChiSquare(2.0f);
+		float inverseGamma32 = SimpleRNG_Fp32.GetInverseGamma(2.0f, 2.0f);
+		float weibull32 = SimpleRNG_Fp32.GetWeibull(2.0f, 2.0f);
+		float cauchy32 = SimpleRNG_Fp32.GetCauchy(0.0f, 1.0f);
+		float studentT32 = SimpleRNG_Fp32.GetStudentT(2.0f);
+		float laplace32 = SimpleRNG_Fp32.GetLaplace(0.0f, 1.0f);
+		float logNormal32 = SimpleRNG_Fp32.GetLogNormal(0.0f, 1.0f);
+		float beta32 = SimpleRNG_Fp32.GetBeta(2.0f, 2.0f);
+
+		Console.WriteLine("SimpleRNG_Fp32:");
+		Console.WriteLine($"Uniform: {uniform32}");
+		Console.WriteLine($"Normal: {normal32}");
+		Console.WriteLine($"Exponential: {exponential32}");
+		Console.WriteLine($"Gamma: {gamma32}");
+		Console.WriteLine($"ChiSquare: {chiSquare32}");
+		Console.WriteLine($"InverseGamma: {inverseGamma32}");
+		Console.WriteLine($"Weibull: {weibull32}");
+		Console.WriteLine($"Cauchy: {cauchy32}");
+		Console.WriteLine($"StudentT: {studentT32}");
+		Console.WriteLine($"Laplace: {laplace32}");
+		Console.WriteLine($"LogNormal: {logNormal32}");
+		Console.WriteLine($"Beta: {beta32}");
+	}
+}
+```
+
+
+## Vorcyc.Mathematics.TrigonometryHelper Àà
+Vorcyc.Mathematics.TrigonometryHelper ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÓÃÓÚÈı½ÇÔËËãµÄ¸¨Öú·½·¨¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
+### ·½·¨Çåµ¥¼°ËµÃ÷
+#### 1.	RadiansToDegrees
+`public static double RadiansToDegrees(double a)`  
+`public static float RadiansToDegrees(float radians)`  
+½«½Ç¶È´Ó»¡¶È×ª»»Îª¶È¡£
+#### 2.	DegreesToRadians
+`public static double DegreesToRadians(double a)`  
+`public static float DegreesToRadians(float degrees)`  
+½«½Ç¶È´Ó¶È×ª»»Îª»¡¶È¡£
+#### 3.	GetAngleDifference
+`public static float GetAngleDifference(float radianAngle1, float radianAngle2)`  
+»ñÈ¡Á½¸ö½Ç¶ÈÖ®¼äµÄ²îÖµ£¬µ¥Î»Îª»¡¶È¡£
+#### 4.	RadianMin
+`public static float RadianMin(float radianAngle)`
+`public static double RadianMin(double radianAngle)`
+½«½Ç¶È¼õÉÙµ½ÆäµÈĞ§µÄ -¦Ğ ºÍ ¦Ğ Ö®¼ä¡£
+#### 5.	Angle
+`public static float Angle(float x, float y)`  
+`public static double Angle(double x, double y)`  
+»ñÈ¡ÓÉÏòÁ¿ [x,y] ĞÎ³ÉµÄ½Ç¶È£¬µ¥Î»Îª»¡¶È¡£
+#### 6.	Acosh
+`public static double Acosh(double x)`  
+`public static float Acosh(float x)`  
+·µ»ØÖ¸¶¨ÖµµÄË«ÇúÓàÏÒ¡£
+#### 7.	Asinh
+`public static double Asinh(double d)`  
+`public static float Asinh(float d)`  
+`public static T Asinh<T>(T x) where T : struct, IFloatingPointIeee754<T>`  
+·µ»ØÖ¸¶¨ÖµµÄË«ÇúÕıÏÒ¡£
+#### 8.	Atanh
+`public static double Atanh(double d)`  
+`public static float Atanh(float d)`  
+·µ»ØÖ¸¶¨ÖµµÄË«ÇúÕıÇĞ¡£
+#### 9.	Sinc
+`public static double Sinc(double x)`  
+`public static float Sinc(float x)`  
+`public static T Sinc<T>(T x) where T : IFloatingPointIeee754<T>`  
+¼ÆËã Sinc º¯Êı¡£
+### ´úÂëÊ¾Àı
+ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ TrigonometryHelper ÀàÖĞ¶à¸ö·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
+```csharp
+using System;
+using Vorcyc.Mathematics;
+
+public class TrigonometryHelperExample
+{
+	public static void Main()
+	{
+		// ½«½Ç¶È´Ó»¡¶È×ª»»Îª¶È
+		double radians = Math.PI;
+		double degrees = TrigonometryHelper.RadiansToDegrees(radians);
+		Console.WriteLine($"Radians: {radians}, Degrees: {degrees}");
+
+		// ½«½Ç¶È´Ó¶È×ª»»Îª»¡¶È
+		degrees = 180.0;
+		radians = TrigonometryHelper.DegreesToRadians(degrees);
+		Console.WriteLine($"Degrees: {degrees}, Radians: {radians}");
+
+		// »ñÈ¡Á½¸ö½Ç¶ÈÖ®¼äµÄ²îÖµ£¬µ¥Î»Îª»¡¶È
+		float angle1 = 1.0f;
+		float angle2 = 2.0f;
+		float angleDifference = TrigonometryHelper.GetAngleDifference(angle1, angle2);
+		Console.WriteLine($"Angle1: {angle1}, Angle2: {angle2}, Difference: {angleDifference}");
+
+		// ½«½Ç¶È¼õÉÙµ½ÆäµÈĞ§µÄ -¦Ğ ºÍ ¦Ğ Ö®¼ä
+		float radianAngle = 4.0f;
+		float reducedAngle = TrigonometryHelper.RadianMin(radianAngle);
+		Console.WriteLine($"Radian Angle: {radianAngle}, Reduced Angle: {reducedAngle}");
+
+		// »ñÈ¡ÓÉÏòÁ¿ [x,y] ĞÎ³ÉµÄ½Ç¶È£¬µ¥Î»Îª»¡¶È
+		float x = 1.0f;
+		float y = 1.0f;
+		float vectorAngle = TrigonometryHelper.Angle(x, y);
+		Console.WriteLine($"Vector [x,y]: [{x},{y}], Angle: {vectorAngle}");
+
+		// ·µ»ØÖ¸¶¨ÖµµÄË«ÇúÓàÏÒ
+		double value = 2.0;
+		double acoshValue = TrigonometryHelper.Acosh(value);
+		Console.WriteLine($"Value: {value}, Acosh: {acoshValue}");
+
+		// ·µ»ØÖ¸¶¨ÖµµÄË«ÇúÕıÏÒ
+		value = 1.0;
+		double asinhValue = TrigonometryHelper.Asinh(value);
+		Console.WriteLine($"Value: {value}, Asinh: {asinhValue}");
+
+		// ·µ»ØÖ¸¶¨ÖµµÄË«ÇúÕıÇĞ
+		value = 0.5;
+		double atanhValue = TrigonometryHelper.Atanh(value);
+		Console.WriteLine($"Value: {value}, Atanh: {atanhValue}");
+
+		// ¼ÆËã Sinc º¯Êı
+		double sincValue = TrigonometryHelper.Sinc(value);
+		Console.WriteLine($"Sinc({value}) = {sincValue}");
+	}
+}
+
+```
+
+
+## VMath Àà
+Vorcyc.Mathematics.VMath ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÊıÑ§º¯ÊıºÍ²Ù×÷¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
+### ·½·¨Çåµ¥¼°ËµÃ÷
+#### 1.	BinomialCoefficient
+`public static float BinomialCoefficient(int k, int n)`  
+¼ÆËã¶şÏîÊ½ÏµÊı¡£
+#### 2.	Diff
+`public static void Diff(float[] samples, float[] diff)`  
+¼ÆËãÀëÉ¢²î·Ö¡£
+#### 3.	InterpolateLinear
+`public static void InterpolateLinear(float[] x, float[] y, float[] arg, float[] interp)`  
+½øĞĞÏßĞÔ²åÖµ¡£
+#### 4.	BilinearTransform
+`public static void BilinearTransform(double[] re, double[] im)`  
+`public static void BilinearTransform(float[] re, float[] im)`  
+½øĞĞË«ÏßĞÔ±ä»»¡£
+#### 5.	Unwrap
+`public static double[] Unwrap(double[] phase, double tolerance = Math.PI)`  
+`public static float[] Unwrap(float[] phase, float tolerance = ConstantsFp32.PI)`  
+`public static T[] Unwrap<T>(T[] phase, T? tolerance = null) where T : unmanaged, IFloatingPointIeee754<T>`  
+½øĞĞÏàÎ»Õ¹¿ª¡£
+#### 6.	Wrap
+`public static double[] Wrap(double[] phase, double tolerance = Math.PI)`  
+`public static float[] Wrap(float[] phase, float tolerance = ConstantsFp32.PI)`  
+½øĞĞÏàÎ»°ü¹ü¡£
+#### 7.	FindNth
+`public static float FindNth(float[] a, int n, int start, int end)`  
+`public static T FindNth<T>(Span<T> values, int n) where T : INumber<T>`  
+²éÕÒÊı×éÖĞµÄµÚ n ¸öË³ĞòÍ³¼ÆÁ¿¡£
+#### 8.	I0
+`public static double I0(double x)`  
+`public static float I0(float x)`  
+`public static T I0<T>(T x) where T : IFloatingPointIeee754<T>`  
+`public static Complex<T> I0<T>(Complex<T> x) where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>`  
+¼ÆËãµÚÒ»ÀàĞŞÕı±´Èû¶ûº¯Êı I0¡£
+#### 9.	PolynomialRoots
+`public static Complex[]? PolynomialRoots(double[] a, int maxIterations = PolyRootsIterations)`  
+`public static ComplexFp32[]? PolynomialRoots(float[] a, int maxIterations = PolyRootsIterations)`  
+Ê¹ÓÃ Durand-Kerner Ëã·¨¼ÆËã¶àÏîÊ½µÄ¸´Êı¸ù¡£
+#### 10.	EvaluatePolynomial
+`public static Complex EvaluatePolynomial(double[] a, Complex x)`  
+`public static ComplexFp32 EvaluatePolynomial(float[] a, ComplexFp32 x)`  
+Ê¹ÓÃ Horner ·½°¸¼ÆËã¶àÏîÊ½¡£
+#### 11.	MultiplyPolynomials
+`public static Complex[] MultiplyPolynomials(Complex[] poly1, Complex[] poly2)`  
+`public static ComplexFp32[] MultiplyPolynomials(ComplexFp32[] poly1, ComplexFp32[] poly2)`
+³Ë·¨¶àÏîÊ½¡£
+#### 12.	DividePolynomial
+`public static Complex[][] DividePolynomial(Complex[] dividend, Complex[] divisor)`  
+`public static ComplexFp32[][] DividePolynomial(ComplexFp32[] dividend, ComplexFp32[] divisor)`  
+³ı·¨¶àÏîÊ½¡£
+#### 13.	Gcd
+`public static int Gcd(int n, int m)`  
+`public static T Gcd<T>(this T a, T b) where T : IBinaryInteger<T>`  
+Ê¹ÓÃÅ·¼¸ÀïµÃËã·¨¼ÆËãÁ½¸öÕûÊıµÄ×î´ó¹«Ô¼Êı£¨GCD£©¡£
+#### 14.	Hcf
+`public static int Hcf(int a, int b)`  
+¼ÆËãÁ½¸öÕûÊıµÄ×î´ó¹«Ô¼Êı£¨HCF£©£¬Ê¹ÓÃµİ¹é·½·¨¡£
+#### 15.	Lcm
+`public static int Lcm(int a, int b)`  
+¼ÆËãÁ½¸öÕûÊıµÄ×îĞ¡¹«±¶Êı£¨LCM£©¡£
+#### 16.	SimplestIntegerRatioOfFraction
+`public static (int numerator, int denominator) SimplestIntegerRatioOfFraction(int numerator, int denominator)`  
+È¡·ÖÊıµÄ×î¼òÕûÊı±È¡£
+#### 17.	Hypotenuse
+`public static double Hypotenuse(double a, double b)`  
+`public static float Hypotenuse(float a, float b)`  
+¼ÆËãÈı½ÇĞÎĞ±±ß¡£
+#### 18.	Mod
+`public static int Mod(int x, int m)`  
+`public static double Mod(double x, double m)`  
+`public static float Mod(float x, float m)`  
+»ñÈ¡ÕûÊı»òÊµÊıµÄÄ£¡£
+#### 19.	FactorialPower
+`public static int FactorialPower(int value, int degree)`  
+·µ»ØÖ¸¶¨ÖµµÄ½×³ËÃİ¡£
+#### 20.	TruncatedPower
+`public static double TruncatedPower(double value, double degree)`  
+½Ø¶ÏÃİº¯Êı¡£
+#### 21.	InvSqrt
+`public static float InvSqrt(float f)`  
+¿ìËÙÄæ¸¡µãÊıÆ½·½¸ù¡£
+#### 22.	Max
+`public static float Max(float a, float b, float c)`  
+`public static double Max(double a, double b, double c)`  
+»ñÈ¡Èı¸öÖµÖĞµÄ×î´óÖµ¡£
+#### 23.	Min
+`public static float Min(float a, float b, float c)`  
+`public static double Min(double a, double b, double c)`  
+»ñÈ¡Èı¸öÖµÖĞµÄ×îĞ¡Öµ¡£
+#### 24.	Pow2
+`public static int Pow2(int power)`  
+¼ÆËã 2 µÄÃİ¡£
+#### 25.	Log2
+`public static int Log2(int x)`  
+`public static int Log2_2(int x)`  
+»ñÈ¡¶ş½øÖÆ¶ÔÊıµÄ»ùÊı¡£
+#### 26.	Factorial
+`public static int Factorial(int n)`  
+¼ÆËã½×³Ë¡£
+#### 27.	Sqrt
+`public static decimal Sqrt(decimal x, decimal epsilon = 0.0M)`  
+·µ»ØÖ¸¶¨ decimal ÊıµÄÆ½·½¸ù¡£
+#### 28.	Ulp
+`public static double Ulp(double value)`  
+`ublic static float Ulp(float value)`  
+`public static Half Ulp(Half value)`  
+¼ÆËãÊäÈëÖµµÄ×îºóÒ»Î»µ¥Î»£¨ULP£©¡£
+### ´úÂëÊ¾Àı
+ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ VMath ÀàÖĞ¶à¸ö·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
+```csharp
+using System;
+using Vorcyc.Mathematics;
+
+public class VMathExample
+{
+	public static void Main()
+	{
+		// ¼ÆËã¶şÏîÊ½ÏµÊı
+		int k = 3;
+		int n = 5;
+		float binomialCoefficient = VMath.BinomialCoefficient(k, n);
+		Console.WriteLine($"BinomialCoefficient({k}, {n}) = {binomialCoefficient}");
+
+		// ¼ÆËãÀëÉ¢²î·Ö
+		float[] samples = { 1.0f, 2.0f, 4.0f, 7.0f };
+		float[] diff = new float[samples.Length];
+		VMath.Diff(samples, diff);
+		Console.WriteLine($"Diff: {string.Join(", ", diff)}");
+
+		// ½øĞĞÏßĞÔ²åÖµ
+		float[] xValues = { 0.0f, 1.0f, 2.0f };
+		float[] yValues = { 0.0f, 1.0f, 4.0f };
+		float[] arg = { 0.5f, 1.5f };
+		float[] interp = new float[arg.Length];
+		VMath.InterpolateLinear(xValues, yValues, arg, interp);
+		Console.WriteLine($"InterpolateLinear: {string.Join(", ", interp)}");
+
+		// ½øĞĞË«ÏßĞÔ±ä»»
+		double[] re = { 0.5, 0.6 };
+		double[] im = { 0.5, 0.6 };
+		VMath.BilinearTransform(re, im);
+		Console.WriteLine($"BilinearTransform: re = {string.Join(", ", re)}, im = {string.Join(", ", im)}");
+
+		// ½øĞĞÏàÎ»Õ¹¿ª
+		double[] phase = { 0.0, Math.PI, 2 * Math.PI, 3 * Math.PI };
+		double[] unwrappedPhase = VMath.Unwrap(phase);
+		Console.WriteLine($"Unwrap: {string.Join(", ", unwrappedPhase)}");
+
+		// ²éÕÒÊı×éÖĞµÄµÚ n ¸öË³ĞòÍ³¼ÆÁ¿
+		float[] array = { 3.0f, 1.0f, 4.0f, 1.5f };
+		float nthValue = VMath.FindNth(array, 2, 0, array.Length - 1);
+		Console.WriteLine($"FindNth: {nthValue}");
+
+		// ¼ÆËãµÚÒ»ÀàĞŞÕı±´Èû¶ûº¯Êı I0
+		double x = 1.0;
+		double i0Value = VMath.I0(x);
+		Console.WriteLine($"I0({x}) = {i0Value}");
+
+		// Ê¹ÓÃ Durand-Kerner Ëã·¨¼ÆËã¶àÏîÊ½µÄ¸´Êı¸ù
+		double[] coefficients = { 1.0, -6.0, 11.0, -6.0 };
+		var roots = VMath.PolynomialRoots(coefficients);
+		Console.WriteLine($"PolynomialRoots: {string.Join(", ", roots)}");
+
+		// ¼ÆËã¶àÏîÊ½
+		var complexX = new Complex(1.0, 1.0);
+		var polynomialValue = VMath.EvaluatePolynomial(coefficients, complexX);
+		Console.WriteLine($"EvaluatePolynomial: {polynomialValue}");
+
+		// ³Ë·¨¶àÏîÊ½
+		var poly1 = new Complex[] { new Complex(1.0, 0.0), new Complex(2.0, 0.0) };
+		var poly2 = new Complex[] { new Complex(3.0, 0.0), new Complex(4.0, 0.0) };
+		var multipliedPoly = VMath.MultiplyPolynomials(poly1, poly2);
+		Console.WriteLine($"MultiplyPolynomials: {string.Join(", ", multipliedPoly)}");
+
+		// ³ı·¨¶àÏîÊ½
+		var dividend = new Complex[] { new Complex(1.0, 0.0), new Complex(2.0, 0.0), new Complex(1.0, 0.0) };
+		var divisor = new Complex[] { new Complex(1.0, 0.0), new Complex(1.0, 0.0) };
+		var dividedPoly = VMath.DividePolynomial(dividend, divisor);
+		Console.WriteLine($"DividePolynomial: quotient = {string.Join(", ", dividedPoly[0])}, remainder = {string.Join(", ", dividedPoly[1])}");
+
+		// ¼ÆËã×î´ó¹«Ô¼Êı
+		int gcdValue = VMath.Gcd(48, 18);
+		Console.WriteLine($"Gcd(48, 18) = {gcdValue}");
+
+		// ¼ÆËã×îĞ¡¹«±¶Êı
+		int lcmValue = VMath.Lcm(4, 5);
+		Console.WriteLine($"Lcm(4, 5) = {lcmValue}");
+
+		// ¼ÆËãÈı½ÇĞÎĞ±±ß
+		double hypotenuseValue = VMath.Hypotenuse(3.0, 4.0);
+		Console.WriteLine($"Hypotenuse(3.0, 4.0) = {hypotenuseValue}");
+
+		// »ñÈ¡ÕûÊıµÄÄ£
+		int modValue = VMath.Mod(10, 3);
+		Console.WriteLine($"Mod(10, 3) = {modValue}");
+
+		// ¼ÆËã½×³Ë
+		int factorialValue = VMath.Factorial(5);
+		Console.WriteLine($"Factorial(5) = {factorialValue}");
+
+		// ¼ÆËãÆ½·½¸ù
+		decimal sqrtValue = VMath.Sqrt(16.0M);
+		Console.WriteLine($"Sqrt(16.0) = {sqrtValue}");
+
+		// ¼ÆËãÊäÈëÖµµÄ×îºóÒ»Î»µ¥Î»£¨ULP£©
+		double ulpValue = VMath.Ulp(1.0);
+		Console.WriteLine($"Ulp(1.0) = {ulpValue}");
+	}
+}
+
 ```
