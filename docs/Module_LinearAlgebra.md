@@ -6,13 +6,16 @@
 - :bookmark: [Vorcyc.Mathematics.LinearAlgebra.BasisTransformation 类](#vorcycmathematicslinearalgebrabasistransformation-类)
 - :bookmark: [Vorcyc.Mathematics.LinearAlgebra.LinearEquationSolver 类](#vorcycmathematicslinearalgebralinearequationsolver-类)
 - :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Matrix 类](#vorcycmathematicslinearalgebramatrix-类)
-- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Matrix&lt;T> 类](#vorcycmathematicslinearalgebramatrix&lt;t>-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Matrix&lt;T> 类](#vorcycmathematicslinearalgebramatrixt-类)
 - :bookmark: [Vorcyc.Mathematics.LinearAlgebra.MatrixHelper 类](#vorcyc.athematicslinearalgebramatrixhelper-类)
 - :bookmark: [Vorcyc.Mathematics.LinearAlgebra.MatrixOperations 类](#vorcycmathematicslinearalgebramatrixoperations-类)
 - :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Quaternion 结构](#vorcycmathematicslinearalgebraquaternion-结构)
 - :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Tensor 类](#vorcycmathematicslinearalgebratensor-类)
-- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Tensor&lt;T> 类](#vorcycmathematicslinearalgebratensor&lt;t>-类)
-- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Vector&lt;T> 类](#vorcycmathematicslinearalgebravector&lt;t>-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Tensor&lt;T> 类](#vorcycmathematicslinearalgebratensort-类)
+- :bookmark: [Vorcyc.Mathematics.LinearAlgebra.Vector&lt;T> 类](#vorcycmathematicslinearalgebravectort-类)
+
+---
+
 
 ## Vorcyc.Mathematics.LinearAlgebra.BasisTransformation 类
 
