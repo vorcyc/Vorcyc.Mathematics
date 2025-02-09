@@ -19,7 +19,7 @@
 - :bookmark: [Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.FactorAnalysis&lt;T> 类](#vorcycmathematicsmachinelearningdimensionalityreductionfactoranalysist-类)
 - :bookmark: [Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.PCA&lt;TSelf> 类](#vorcycmathematicsmachinelearningdimensionalityreductionpcatself-类)
 - :bookmark: [Vorcyc.Mathematics.MachineLearning.DimensionalityReduction.TSNE&lt;T> 类](#vorcycmathematicsmachinelearningdimensionalityreductiontsnet-类)
-- :bookmark: [距离度量类](#机器学习模块-距离度量)
+- :bookmark: [距离度量类](#距离度量类)
 
 
 ---
@@ -1432,7 +1432,7 @@ public class TSNEExample
 }
 ```
 
-# 机器学习模块 - 距离度量
+# 距离度量类
 
 ## Vorcyc.Mathematics.MachineLearning.Distances.Angular&lt;TSelf> 类
 
