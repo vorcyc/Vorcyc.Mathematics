@@ -47,7 +47,7 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 :blue_book:[手册](Module_DeepLearning.md)
 
 ***实验性模块***：包含一些实验性的功能，可能会在未来版本中更改或删除。  
-***Experimental Module***: Contains some experimental features that may change or be removed in future versions.
+***Experimental Module***: Contains some experimental features that may change or be removed in future versions.  
 :blue_book:[手册](Module_Experimental.md)
 
 **线性代数模块**：提供矩阵和向量运算、矩阵分解等功能。   
