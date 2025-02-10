@@ -19,8 +19,6 @@
 
 :ledger:目录  
 - :bookmark: [FrequencyDomain 类](#frequencydomain-类)
-- :bookmark: [IFrequencyDomain 接口](#ifrequencydomain-接口)
-- :bookmark: [ITimeDomainSignal 接口](#itimedomainsignal-接口)
 - :bookmark: [Signal 类](#signal-类)
 - :bookmark: [SignalExtension 类](#signalextension-类)
 - :bookmark: [SignalSegment 类](#signalsegment-类)
@@ -31,9 +29,9 @@
 
 
 
-## ExtendedKalmanFilter1D<T> 类
+## ExtendedKalmanFilter1D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter1D<T> 是一个用于一维扩展卡尔曼滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter1D&lt;T> 是一个用于一维扩展卡尔曼滤波器的类。
 
 ### 属性
 
@@ -72,7 +70,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter1D<T> 是一�
   - 返回值: 更新后的状态估计。
 
 ### 代码示例
-以下是一个使用 ExtendedKalmanFilter1D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 ExtendedKalmanFilter1D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
 ```csharp
 using System;
@@ -127,9 +125,9 @@ public class ExtendedKalmanFilter1DExample
 
 
 
-## ExtendedKalmanFilter2D<T> 类
+## ExtendedKalmanFilter2D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter2D<T> 是一个用于二维扩展卡尔曼滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter2D&lt;T> 是一个用于二维扩展卡尔曼滤波器的类。
 
 ### 属性
 
@@ -168,7 +166,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter2D<T> 是一�
   - 返回值: 更新后的状态估计。
 
 ### 代码示例
-以下是一个使用 ExtendedKalmanFilter2D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 ExtendedKalmanFilter2D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
 
 ```csharp
@@ -236,9 +234,9 @@ public class ExtendedKalmanFilter2DExample
 ```
 
 
-## Vorcyc.Mathematics.Experimental.KalmanFilters.InformationFilter1D<T> 类
+## InformationFilter1D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.InformationFilter1D<T> 是一个用于一维信息滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.InformationFilter1D&lt;T> 是一个用于一维信息滤波器的类。
 
 ### 属性
 
@@ -275,7 +273,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.InformationFilter1D<T> 是一个�
   - 返回值: 更新后的状态估计。
 
 ### 代码示例
-以下是一个使用 InformationFilter1D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 InformationFilter1D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
 ```csharp
 using System;
@@ -323,9 +321,9 @@ public class InformationFilter1DExample
 ```
 
 
-## Vorcyc.Mathematics.Experimental.KalmanFilters.ParticleFilter1D<T> 类
+## ParticleFilter1D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.ParticleFilter1D<T> 是一个用于一维粒子滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.ParticleFilter1D&lt;T> 是一个用于一维粒子滤波器的类。
 
 ### 属性
 
@@ -363,7 +361,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.ParticleFilter1D<T> 是一个用�
   - 返回值: 当前状态的估计值。
 
 ### 代码示例
-以下是一个使用 ParticleFilter1D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 ParticleFilter1D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
 ```csharp
 using System;
@@ -405,9 +403,9 @@ public class ParticleFilter1DExample
     }
 }
 ```
-## Vorcyc.Mathematics.Experimental.KalmanFilters.SquareRootKalmanFilter1D<T> 类
+## SquareRootKalmanFilter1D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.SquareRootKalmanFilter1D<T> 是一个用于一维平方根卡尔曼滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.SquareRootKalmanFilter1D&lt;T> 是一个用于一维平方根卡尔曼滤波器的类。
 
 ### 属性
 
@@ -444,7 +442,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.SquareRootKalmanFilter1D<T> 是一
   - 返回值: 更新后的状态估计。
 
 ### 代码示例
-以下是一个使用 SquareRootKalmanFilter1D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 SquareRootKalmanFilter1D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 ```csharp
 using System;
 using Vorcyc.Mathematics.Experimental.KalmanFilters;
@@ -487,9 +485,9 @@ public class SquareRootKalmanFilter1DExample
     }
 }
 ```
-## Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter1D<T> 类
+## StandardKalmanFilter1D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter1D<T> 是一个用于一维标准卡尔曼滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter1D&lt;T> 是一个用于一维标准卡尔曼滤波器的类。
 
 ### 属性
 
@@ -526,7 +524,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter1D<T> 是一�
   - 返回值: 更新后的状态估计。
 
 ### 代码示例
-以下是一个使用 StandardKalmanFilter1D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 StandardKalmanFilter1D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
 ```csharp
 using System;
@@ -571,9 +569,9 @@ public class StandardKalmanFilter1DExample
     }
 }
 ```
-## Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter2D<T> 类
+## StandardKalmanFilter2D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter2D<T> 是一个用于二维标准卡尔曼滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter2D&lt;T> 是一个用于二维标准卡尔曼滤波器的类。
 
 ### 属性
 
@@ -610,7 +608,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter2D<T> 是一�
   - 返回值: 更新后的状态估计。
 
 ### 代码示例
-以下是一个使用 StandardKalmanFilter2D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 StandardKalmanFilter2D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
 ```csgarp
 using System;
@@ -663,9 +661,9 @@ public class StandardKalmanFilter2DExample
 }
 ```
 
-## Vorcyc.Mathematics.Experimental.KalmanFilters.UnscentedKalmanFilter1D<T> 类
+## UnscentedKalmanFilter1D&lt;T> 类
 
-Vorcyc.Mathematics.Experimental.KalmanFilters.UnscentedKalmanFilter1D<T> 是一个用于一维无迹卡尔曼滤波器的类。
+Vorcyc.Mathematics.Experimental.KalmanFilters.UnscentedKalmanFilter1D&lt;T> 是一个用于一维无迹卡尔曼滤波器的类。
 
 ### 属性
 
@@ -704,7 +702,7 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.UnscentedKalmanFilter1D<T> 是一�
   - 返回值: 更新后的状态估计。
 
 ### 代码示例
-以下是一个使用 UnscentedKalmanFilter1D<T> 类中多个方法的示例，并在示例中加入了注释：
+以下是一个使用 UnscentedKalmanFilter1D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 ```csharp
 using System;
 using Vorcyc.Mathematics.Experimental.KalmanFilters;
@@ -763,8 +761,9 @@ public class UnscentedKalmanFilter1DExample
 
 ---
 
-> 以下类型都位于 Vorcyc.Mathematics.Experimental.KalmanFilters 命名空间
-## Vorcyc.Mathematics.Experimental.Signals.FrequencyDomain 类
+> 以下类型都位于 Vorcyc.Mathematics.Experimental.Signals 命名空间
+
+## FrequencyDomain 类
 
 Vorcyc.Mathematics.Experimental.Signals.FrequencyDomain 是一个用于表示频域信号的类。
 
@@ -929,7 +928,7 @@ public class FrequencyDomainExample
 
 
 
-## Vorcyc.Mathematics.Experimental.Signals.Signal 类
+## Signal 类
 
 Vorcyc.Mathematics.Experimental.Signals.Signal 是一个用于表示信号的类，包含信号样本和采样率，并提供计算信号属性的方法。
 
@@ -1108,7 +1107,7 @@ public class SignalExample
     }
 }
 ```
-## Vorcyc.Mathematics.Experimental.Signals.SignalExtension 类
+## SignalExtension 类
 
 Vorcyc.Mathematics.Experimental.Signals.SignalExtension 是一个用于扩展信号类功能的静态类，提供了生成各种波形的方法。
 
@@ -1213,7 +1212,7 @@ public class SignalExtensionExample
     }
 }
 ```
-## Vorcyc.Mathematics.Experimental.Signals.SignalSegment 类
+## SignalSegment 类
 
 Vorcyc.Mathematics.Experimental.Signals.SignalSegment 是一个用于表示信号段的类，实现了 ITimeDomainSignal 接口。
 
