@@ -31,7 +31,7 @@
 
 
 
-## Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter1D<T> 类
+## ExtendedKalmanFilter1D<T> 类
 
 Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter1D<T> 是一个用于一维扩展卡尔曼滤波器的类。
 
@@ -127,7 +127,7 @@ public class ExtendedKalmanFilter1DExample
 
 
 
-## Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter2D<T> 类
+## ExtendedKalmanFilter2D<T> 类
 
 Vorcyc.Mathematics.Experimental.KalmanFilters.ExtendedKalmanFilter2D<T> 是一个用于二维扩展卡尔曼滤波器的类。
 
