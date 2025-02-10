@@ -1,7 +1,8 @@
 ﻿# 统计模块 - Statistics Module
-> 以下方法均位于类 ：Vorcyc.Mathematics.Statistics
 
 Vorcyc.Mathematics.Statistics类是一个全面的工具类，用于对数值数据进行统计分析，支持多种数据结构和数值类型。它包括查找极值、计算总和、平均值、方差，以及识别最大值和最小值及其索引的方法。该类在可能的情况下利用硬件加速以优化性能。
+
+> 以下方法均位于类 ：Vorcyc.Mathematics.Statistics
 
 :ledger:目录  
 - :bookmark: [FindExtremeValue 方法](#1-findextremevalue-方法)

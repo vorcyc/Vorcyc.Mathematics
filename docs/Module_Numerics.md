@@ -7,17 +7,17 @@
 
 :ledger:目录  
 - :bookmark: [BigFloat](#1-bigfloat)
-- :bookmark: [Complex<T>](#2-complext)
+- :bookmark: [Complex&lt;T>](#2-complext)
 - :bookmark: [ComplexFp32](#3-complexfp32)
 - :bookmark: [Int24](#4-int24)
 - :bookmark: [IntRange](#5-intrange)
 - :bookmark: [Number](#6-number)
-- :bookmark: [Point<T>](#7-pointt)
+- :bookmark: [Point&lt;T>](#7-pointt)
 - :bookmark: [PointFp32](#8-pointfp32)
-- :bookmark: [Range<T>](#9-ranget)
-- :bookmark: [Rational<T>](#10-rationalt)
+- :bookmark: [Range&lt;T>](#9-ranget)
+- :bookmark: [Rational&lt;T>](#10-rationalt)
 - :bookmark: [RectangleFP32](#11-rectanglefp32)
-- :bookmark: [Size<T>](#12-sizet)
+- :bookmark: [Size&lt;T>](#12-sizet)
 - :bookmark: [SizeFp32](#13-sizefp32)
 - :bookmark: [UInt24](#14-uint24)
 

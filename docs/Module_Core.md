@@ -1,5 +1,7 @@
 # 核心模块 - Core Module
 
+包含基本的数学运算和常用函数。  
+
 > 以下所有类型都位于命名空间 ：Vorcyc.Mathematics
 
 :ledger:目录  
