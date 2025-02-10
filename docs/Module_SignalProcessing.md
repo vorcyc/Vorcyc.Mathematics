@@ -2,18 +2,34 @@
 
 Vorcyc.Mathematics.Statistics类是一个全面的工具类，用于对数值数据进行统计分析，支持多种数据结构和数值类型。它包括查找极值、计算总和、平均值、方差，以及识别最大值和最小值及其索引的方法。该类在可能的情况下利用硬件加速以优化性能。
 
-> 以下方法均位于类 ：Vorcyc.Mathematics.Statistics
+> 以下方法均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing
 
 :ledger:目录  
-- :bookmark: [FindExtremeValue 方法](#1-findextremevalue-方法)
-- :bookmark: [Sum 方法](#2-sum-方法)
-- :bookmark: [Average 方法](#3-average-方法)
-- :bookmark: [Variance 方法](#4-variance-方法)
-- :bookmark: [GetMaximumMinimumMedian 方法](#5-getmaximumminimummedian-方法)
-- :bookmark: [Max 方法](#6-max-方法)
-- :bookmark: [LocateMax 方法](#7-locatemax-方法)
-- :bookmark: [Min 方法](#8-min-方法)
-- :bookmark: [LocateMin 方法](#9-locatemin-方法)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Base.AudioEffect 类](#vorcycmathematicssignalprocessingeffectsbaseaudioeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Base.WetDryMixer 类](#vorcycmathematicssignalprocessingeffectsbasewetdrymixer-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Stereo.BinauralPanEffect 类](#vorcycmathematicssignalprocessingeffectsstereobinauralpaneffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Stereo.ItdIldPanEffect 类](#vorcycmathematicssignalprocessingeffectsstereoitdildpaneffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Stereo.PanEffect 类](#vorcycmathematicssignalprocessingeffectsstereopaneffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Stereo.PingPongDelayEffect 类](#vorcycmathematicssignalprocessingeffectsstereopingpongdelayeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Stereo.StereoDelayEffect 类](#vorcycmathematicssignalprocessingeffectsstereostereodelayeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.Stereo.StereoEffect 类](#vorcycmathematicssignalprocessingeffectsstereostereoeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.BitCrusherEffect 类](#vorcycmathematicssignalprocessingeffectsbitcrushereffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.ChorusEffect 类](#vorcycmathematicssignalprocessingeffectschoruseffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.DelayEffect 类](#vorcycmathematicssignalprocessingeffectsdelayeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.DistortionEffect 类](#vorcycmathematicssignalprocessingeffectsdistortioneffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.EchoEffect 类](#vorcycmathematicssignalprocessingeffectsechoeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.FlangerEffect 类](#vorcycmathematicssignalprocessingeffectsflangereffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.MorphEffect 类](#vorcycmathematicssignalprocessingeffectsmorpheffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.PhaserEffect 类](#vorcycmathematicssignalprocessingeffectsphasereffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.PitchShiftEffect 类](#vorcycmathematicssignalprocessingeffectspitchshifteffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.PitchShiftVocoderEffect 类](#vorcycmathematicssignalprocessingeffectspitchshiftvocodereffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.RobotEffect 类](#vorcycmathematicssignalprocessingeffectsroboteffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.TremoloEffect 类](#vorcycmathematicssignalprocessingeffectstremoloeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.TubeDistortionEffect 类](#vorcycmathematicssignalprocessingeffectstubedistortioneffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.VibratoEffect 类](#vorcycmathematicssignalprocessingeffectsvibratoeffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.WahwahEffect 类](#vorcycmathematicssignalprocessingeffectswahwaheffect-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Effects.WhisperEffect 类](#vorcycmathematicssignalprocessingeffectswhispereffect-类)  
+
 
 
 ---
@@ -1075,4 +1091,774 @@ public class FlangerEffectExample
         Console.WriteLine($"Processed Sample: {processedSample}");
     }
 }
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.MorphEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.MorphEffect 是一个用于混合（变形）两个声音信号的音频效果类，继承了 AudioEffect 类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. MorphEffect 构造函数
+- `public MorphEffect(int hopSize, int fftSize = 0)`
+  - 构造 MorphEffect 实例。
+  - 参数:
+    - `hopSize`: 跳跃长度（样本数）。
+    - `fftSize`: FFT 大小，默认为 0。
+
+#### 2. Process
+- `public float Process(float sample, float mix)`
+  - 处理一个输入信号样本和一个要混合的信号样本。
+  - 参数:
+    - `sample`: 输入信号样本。
+    - `mix`: 要与输入信号混合的信号样本。
+  - 返回值: 处理后的样本。
+
+#### 3. ProcessFrame
+- `protected void ProcessFrame()`
+  - 处理一个帧（块）。
+
+#### 4. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+#### 5. ApplyTo
+- `public DiscreteSignal ApplyTo(DiscreteSignal signal, DiscreteSignal mix)`
+  - 将效果应用于整个输入信号和混合信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `mix`: 要与输入信号混合的信号。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 6. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。此方法在 MorphEffect 类中未实现。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+### 代码示例
+以下是一个使用 MorphEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+using Vorcyc.Mathematics.SignalProcessing;
+
+public class MorphEffectExample
+{
+    public static void Main()
+    {
+        // 创建 MorphEffect 实例
+        var morphEffect = new MorphEffect(256, 1024);
+        // 定义输入信号和混合信号
+        float[] inputSamples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        float[] mixSamples = { 0.4f, 0.5f, 0.45f, 0.6f, 0.55f };
+        var inputSignal = new DiscreteSignal(44100, inputSamples);
+        var mixSignal = new DiscreteSignal(44100, mixSamples);
+
+        // 将效果应用于整个信号
+        var processedSignal = morphEffect.ApplyTo(inputSignal, mixSignal);
+
+        // 输出处理后的信号样本
+        Console.WriteLine("Processed Signal:");
+        foreach (var sample in processedSignal.Samples)
+        {
+            Console.WriteLine(sample);
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.PhaserEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.PhaserEffect 是一个用于移相音频效果的类，继承了 AudioEffect 类。
+
+### 属性
+
+#### 1. Q
+- `public float Q { get; set; }`
+  - 获取或设置 Q 因子（也称为质量因子，谐振）。
+
+#### 2. LfoFrequency
+- `public float LfoFrequency { get; set; }`
+  - 获取或设置 LFO 频率（以 Hz 为单位）。
+
+#### 3. MinFrequency
+- `public float MinFrequency { get; set; }`
+  - 获取或设置最小 LFO 频率（以 Hz 为单位）。
+
+#### 4. MaxFrequency
+- `public float MaxFrequency { get; set; }`
+  - 获取或设置最大 LFO 频率（以 Hz 为单位）。
+
+#### 5. Lfo
+- `public SignalBuilder Lfo { get; set; }`
+  - 获取或设置 LFO 信号生成器。
+
+### 方法
+
+#### 1. PhaserEffect 构造函数
+- `public PhaserEffect(int samplingRate, float lfoFrequency = 1.0f, float minFrequency = 300, float maxFrequency = 3000, float q = 0.5f)`
+  - 构造 PhaserEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `lfoFrequency`: LFO 频率（以 Hz 为单位），默认为 1.0 Hz。
+    - `minFrequency`: 最小 LFO 频率（以 Hz 为单位），默认为 300 Hz。
+    - `maxFrequency`: 最大 LFO 频率（以 Hz 为单位），默认为 3000 Hz。
+    - `q`: Q 因子（也称为质量因子，谐振），默认为 0.5。
+
+#### 2. PhaserEffect 构造函数
+- `public PhaserEffect(int samplingRate, SignalBuilder lfo, float q = 0.5f)`
+  - 从 LFO 构造 PhaserEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `lfo`: LFO 信号生成器。
+    - `q`: Q 因子（也称为质量因子，谐振），默认为 0.5。
+
+#### 3. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 4. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+### 代码示例
+以下是一个使用 PhaserEffect 类中多个方法的示例，并在示例中加入了注释：
+
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class PhaserEffectExample
+{
+    public static void Main()
+    {
+        // 创建 PhaserEffect 实例
+        var phaserEffect = new PhaserEffect(44100, 0.5f, 300, 3000, 0.7f);
+        // 设置参数
+        phaserEffect.LfoFrequency = 0.8f;
+        phaserEffect.MinFrequency = 200;
+        phaserEffect.MaxFrequency = 4000;
+        phaserEffect.Q = 0.6f;
+
+        // 处理样本
+        float sample = 0.5f;
+        float processedSample = phaserEffect.Process(sample);
+
+        // 输出处理后的样本
+        Console.WriteLine($"Processed Sample: {processedSample}");
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.PitchShiftEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.PitchShiftEffect 是一个用于离线音高移位音频效果的类，基于可用的 TSM 算法和线性插值。PitchShiftEffect 不实现在线处理（方法 Process(float)）。
+
+### 属性
+
+#### 1. Shift
+- `public float Shift { get; set; }`
+  - 获取或设置音高移位比率。
+
+#### 2. Tsm
+- `public TsmAlgorithm Tsm { get; set; }`
+  - 获取或设置时间尺度修改算法。
+
+#### 3. WindowSize
+- `public int WindowSize { get; set; }`
+  - 获取或设置窗口大小（帧长度）。
+
+#### 4. HopSize
+- `public int HopSize { get; set; }`
+  - 获取或设置跳跃长度。
+
+### 方法
+
+#### 1. PitchShiftEffect 构造函数
+- `public PitchShiftEffect(float shift, int windowSize = 1024, int hopSize = 128, TsmAlgorithm tsm = TsmAlgorithm.PhaseVocoderPhaseLocking)`
+  - 构造 PitchShiftEffect 实例。
+  - 参数:
+    - `shift`: 音高移位比率。
+    - `windowSize`: 窗口大小（帧长度），默认为 1024。
+    - `hopSize`: 跳跃长度，默认为 128。
+    - `tsm`: 时间尺度修改算法，默认为 `TsmAlgorithm.PhaseVocoderPhaseLocking`。
+
+#### 2. ApplyTo
+- `public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将效果应用于整个信号，并返回新的音高移位信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 3. Apply
+- `public override void Apply(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将效果应用于整个信号（就地处理）。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+
+#### 4. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。此方法在 PitchShiftEffect 类中未实现。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 5. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+### 代码示例
+以下是一个使用 PitchShiftEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class PitchShiftEffectExample
+{
+    public static void Main()
+    {
+        // 创建 PitchShiftEffect 实例
+        var pitchShiftEffect = new PitchShiftEffect(1.2f, 1024, 128, TsmAlgorithm.PhaseVocoderPhaseLocking);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 将效果应用于整个信号
+        var processedSignal = pitchShiftEffect.ApplyTo(signal);
+
+        // 输出处理后的信号样本
+        Console.WriteLine("Processed Signal:");
+        foreach (var sample in processedSignal.Samples)
+        {
+            Console.WriteLine(sample);
+        }
+    }
+}
+```
+
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.PitchShiftVocoderEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.PitchShiftVocoderEffect 是一个基于重叠加法滤波和频域音高移位的音频效果类，继承了 OverlapAddFilter 类。
+
+### 属性
+
+#### 1. Shift
+- `public float Shift { get; set; }`
+  - 获取或设置音高移位比率。
+
+### 方法
+
+#### 1. PitchShiftVocoderEffect 构造函数
+- `public PitchShiftVocoderEffect(int samplingRate, float shift, int fftSize = 1024, int hopSize = 64)`
+  - 构造 PitchShiftVocoderEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `shift`: 音高移位比率。
+    - `fftSize`: FFT 大小，默认为 1024。
+    - `hopSize`: 跳跃长度，默认为 64。
+
+#### 2. ProcessSpectrum
+- `protected override void ProcessSpectrum(float[] re, float[] im, float[] filteredRe, float[] filteredIm)`
+  - 在每个重叠加法 STFT 步骤中处理一个频谱。
+  - 参数:
+    - `re`: 输入频谱的实部。
+    - `im`: 输入频谱的虚部。
+    - `filteredRe`: 输出频谱的实部。
+    - `filteredIm`: 输出频谱的虚部。
+
+#### 3. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+### 代码示例
+以下是一个使用 PitchShiftVocoderEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class PitchShiftVocoderEffectExample
+{
+    public static void Main()
+    {
+        // 创建 PitchShiftVocoderEffect
+        实例 var pitchShiftVocoderEffect = new PitchShiftVocoderEffect(44100, 1.2f, 1024, 64);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 将效果应用于整个信号
+        var processedSignal = pitchShiftVocoderEffect.ApplyTo(signal);
+
+        // 输出处理后的信号样本
+        Console.WriteLine("Processed Signal:");
+        foreach (var sample in processedSignal.Samples)
+        {
+            Console.WriteLine(sample);
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.RobotEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.RobotEffect 是一个用于语音机器人化的音频效果类，继承了 OverlapAddFilter 类。
+
+### 方法
+
+#### 1. RobotEffect 构造函数
+- `public RobotEffect(int hopSize, int fftSize = 0)`
+  - 构造 RobotEffect 实例。
+  - 参数:
+    - `hopSize`: 跳跃长度（样本数）。
+    - `fftSize`: FFT 大小，默认为 0。
+
+#### 2. ProcessSpectrum
+- `protected override void ProcessSpectrum(float[] re, float[] im, float[] filteredRe, float[] filteredIm)`
+  - 在每个重叠加法 STFT 步骤中处理一个频谱（简单地将相位设置为 0）。
+  - 参数:
+    - `re`: 输入频谱的实部。
+    - `im`: 输入频谱的虚部。
+    - `filteredRe`: 输出频谱的实部。
+    - `filteredIm`: 输出频谱的虚部。
+
+### 代码示例
+以下是一个使用 RobotEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class RobotEffectExample
+{
+    public static void Main()
+    {
+        // 创建 RobotEffect 实例
+        var robotEffect = new RobotEffect(256, 1024);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 将效果应用于整个信号
+        var processedSignal = robotEffect.ApplyTo(signal);
+
+        // 输出处理后的信号样本
+        Console.WriteLine("Processed Signal:");
+        foreach (var sample in processedSignal.Samples)
+        {
+            Console.WriteLine(sample);
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.TremoloEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.TremoloEffect 是一个用于颤音音频效果的类，继承了 AudioEffect 类。
+
+### 属性
+
+#### 1. Depth
+- `public float Depth { get; set; }`
+  - 获取或设置深度。
+
+#### 2. Frequency
+- `public float Frequency { get; set; }`
+  - 获取或设置颤音频率（调制频率）（以 Hz 为单位）。
+
+#### 3. Index
+- `public float Index { get; set; }`
+  - 获取或设置颤音指数（调制指数）。
+
+#### 4. Lfo
+- `public SignalBuilder Lfo { get; set; }`
+  - 获取或设置 LFO 信号生成器。
+
+### 方法
+
+#### 1. TremoloEffect 构造函数
+- `public TremoloEffect(int samplingRate, float depth = 0.5f, float frequency = 10f, float tremoloIndex = 0.5f)`
+  - 构造 TremoloEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `depth`: 深度，默认为 0.5。
+    - `frequency`: 颤音频率（调制频率）（以 Hz 为单位），默认为 10 Hz。
+    - `tremoloIndex`: 颤音指数（调制指数），默认为 0.5。
+
+#### 2. TremoloEffect 构造函数
+- `public TremoloEffect(SignalBuilder lfo, float depth = 0.5f)`
+  - 从 LFO 构造 TremoloEffect 实例。
+  - 参数:
+    - `lfo`: LFO 信号生成器。
+    - `depth`: 深度，默认为 0.5。
+
+#### 3. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 4. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+### 代码示例
+以下是一个使用 TremoloEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class TremoloEffectExample
+{
+    public static void Main()
+    {
+        // 创建 TremoloEffect 实例
+        var tremoloEffect = new TremoloEffect(44100, 0.5f, 10f, 0.5f);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 处理样本
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = tremoloEffect.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.TubeDistortionEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.TubeDistortionEffect 是一个用于管失真音频效果的类，继承了 AudioEffect 类。
+
+### 属性
+
+#### 1. InputGain
+- `public float InputGain { get; set; }`
+  - 获取或设置输入增益（以 dB 为单位）。
+
+#### 2. OutputGain
+- `public float OutputGain { get; set; }`
+  - 获取或设置输出增益（以 dB 为单位）。
+
+#### 3. Q
+- `public float Q { get; set; }`
+  - 获取或设置 Q 因子（工作点）。控制低输入电平的传递函数的线性度。越负越线性。
+
+#### 4. Dist
+- `public float Dist { get; set; }`
+  - 获取或设置失真的特性。数值越高，失真越硬。
+
+#### 5. Rh
+- `public float Rh { get; }`
+  - 获取滤波器系数（接近 1.0），定义高通滤波器中极点的位置，用于去除直流分量。
+
+#### 6. Rl
+- `public float Rl { get; }`
+  - 获取滤波器系数（范围 [0, 1]），定义低通滤波器中极点的位置，用于模拟管放大器中的电容。
+
+### 方法
+
+#### 1. TubeDistortionEffect 构造函数
+- `public TubeDistortionEffect(float inputGain = 20f, float outputGain = -12f, float q = -0.2f, float dist = 5, float rh = 0.995f, float rl = 0.5f)`
+  - 构造 TubeDistortionEffect 实例。
+  - 参数:
+    - `inputGain`: 输入增益（以 dB 为单位），默认为 20 dB。
+    - `outputGain`: 输出增益（以 dB 为单位），默认为 -12 dB。
+    - `q`: Q 因子，默认为 -0.2。
+    - `dist`: 失真的特性，默认为 5。
+    - `rh`: 高通滤波器系数，默认为 0.995。
+    - `rl`: 低通滤波器系数，默认为 0.5。
+
+#### 2. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 3. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+### 代码示例
+以下是一个使用 TubeDistortionEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+public class TubeDistortionEffectExample
+{
+    public static void Main()
+    {
+        // 创建 TubeDistortionEffect 实例
+        var tubeDistortionEffect = new TubeDistortionEffect(20f, -12f, -0.2f, 5, 0.995f, 0.5f);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 处理样本
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = tubeDistortionEffect.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.VibratoEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.VibratoEffect 是一个用于颤音音频效果的类，继承了 AudioEffect 类。
+
+### 属性
+
+#### 1. Width
+- `public float Width { get; set; }`
+  - 获取或设置宽度（以秒为单位）。
+
+#### 2. LfoFrequency
+- `public float LfoFrequency { get; set; }`
+  - 获取或设置 LFO 频率（以 Hz 为单位）。
+
+#### 3. Lfo
+- `public SignalBuilder Lfo { get; set; }`
+  - 获取或设置 LFO 信号生成器。
+
+#### 4. InterpolationMode
+- `public InterpolationMode InterpolationMode { get; set; }`
+  - 获取或设置插值模式。
+
+### 方法
+
+#### 1. VibratoEffect 构造函数
+- `public VibratoEffect(int samplingRate, float lfoFrequency = 1f, float width = 0.003f, InterpolationMode interpolationMode = InterpolationMode.Linear, float reserveWidth = 0f)`
+  - 构造 VibratoEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `lfoFrequency`: LFO 频率（以 Hz 为单位），默认为 1 Hz。
+    - `width`: 宽度（以秒为单位），默认为 0.003 秒。
+    - `interpolationMode`: 插值模式，默认为 `InterpolationMode.Linear`。
+    - `reserveWidth`: 保留宽度的最大时间，默认为 0 秒。
+
+#### 2. VibratoEffect 构造函数
+- `public VibratoEffect(int samplingRate, SignalBuilder lfo, float width = 0.003f, InterpolationMode interpolationMode = InterpolationMode.Linear, float reserveWidth = 0f)`
+  - 从 LFO 构造 VibratoEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `lfo`: LFO 信号生成器。
+    - `width`: 宽度（以秒为单位），默认为 0.003 秒。
+    - `interpolationMode`: 插值模式，默认为 `InterpolationMode.Linear`。
+    - `reserveWidth`: 保留宽度的最大时间，默认为 0 秒。
+
+#### 3. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 4. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+### 代码示例
+以下是一个使用 VibratoEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class VibratoEffectExample
+{
+    public static void Main()
+    {
+        // 创建 VibratoEffect 实例
+        var vibratoEffect = new VibratoEffect(44100, 1f, 0.003f, InterpolationMode.Linear, 0f);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 处理样本
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = vibratoEffect.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.WahwahEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.WahwahEffect 是一个用于 Wah-Wah 音频效果的类，继承了 AudioEffect 类。
+
+### 属性
+
+#### 1. LfoFrequency
+- `public float LfoFrequency { get; set; }`
+  - 获取或设置 LFO 频率（以 Hz 为单位）。
+
+#### 2. MinFrequency
+- `public float MinFrequency { get; set; }`
+  - 获取或设置最小 LFO 频率（以 Hz 为单位）。
+
+#### 3. MaxFrequency
+- `public float MaxFrequency { get; set; }`
+  - 获取或设置最大 LFO 频率（以 Hz 为单位）。
+
+#### 4. Q
+- `public float Q { get; set; }`
+  - 获取或设置 Q 因子（也称为质量因子，谐振）。
+
+#### 5. Lfo
+- `public SignalBuilder Lfo { get; set; }`
+  - 获取或设置 LFO 信号生成器。
+
+### 方法
+
+#### 1. WahwahEffect 构造函数
+- `public WahwahEffect(int samplingRate, float lfoFrequency = 1.0f, float minFrequency = 300, float maxFrequency = 1500, float q = 0.5f)`
+  - 构造 WahwahEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `lfoFrequency`: LFO 频率（以 Hz 为单位），默认为 1.0 Hz。
+    - `minFrequency`: 最小 LFO 频率（以 Hz 为单位），默认为 300 Hz。
+    - `maxFrequency`: 最大 LFO 频率（以 Hz 为单位），默认为 1500 Hz。
+    - `q`: Q 因子（也称为质量因子，谐振），默认为 0.5。
+
+#### 2. WahwahEffect 构造函数
+- `public WahwahEffect(int samplingRate, SignalBuilder lfo, float q = 0.5f)`
+  - 从 LFO 构造 WahwahEffect 实例。
+  - 参数:
+    - `samplingRate`: 采样率。
+    - `lfo`: LFO 信号生成器。
+    - `q`: Q 因子（也称为质量因子，谐振），默认为 0.5。
+
+#### 3. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 4. Reset
+- `public override void Reset()`
+  - 重置效果。
+
+### 代码示例
+以下是一个使用 WahwahEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class WahwahEffectExample
+{
+    public static void Main()
+    {
+        // 创建 WahwahEffect 实例
+        var wahwahEffect = new WahwahEffect(44100, 1.0f, 300, 1500, 0.5f);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 处理样本
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = wahwahEffect.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+
+## Vorcyc.Mathematics.SignalProcessing.Effects.WhisperEffect 类
+
+Vorcyc.Mathematics.SignalProcessing.Effects.WhisperEffect 是一个用于语音耳语化的音频效果类，继承了 OverlapAddFilter 类。
+
+### 方法
+
+#### 1. WhisperEffect 构造函数
+- `public WhisperEffect(int hopSize, int fftSize = 0)`
+  - 构造 WhisperEffect 实例。
+  - 参数:
+    - `hopSize`: 跳跃长度（样本数）。
+    - `fftSize`: FFT 大小，默认为 0。
+
+#### 2. ProcessSpectrum
+- `protected override void ProcessSpectrum(float[] re, float[] im, float[] filteredRe, float[] filteredIm)`
+  - 在每个重叠加法 STFT 步骤中处理一个频谱。
+  - 参数:
+    - `re`: 输入频谱的实部。
+    - `im`: 输入频谱的虚部。
+    - `filteredRe`: 输出频谱的实部。
+    - `filteredIm`: 输出频谱的虚部。
+
+### 代码示例
+以下是一个使用 WhisperEffect 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing;
+using Vorcyc.Mathematics.SignalProcessing.Effects;
+
+public class WhisperEffectExample
+{
+    public static void Main()
+    {
+        // 创建 WhisperEffect 实例        
+        var whisperEffect = new WhisperEffect(256, 1024);
+        // 定义输入信号
+        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, samples);
+
+        // 将效果应用于整个信号
+        var processedSignal = whisperEffect.ApplyTo(signal);
+
+        // 输出处理后的信号样本
+        Console.WriteLine("Processed Signal:");
+        foreach (var sample in processedSignal.Samples)
+        {
+            Console.WriteLine(sample);
+        }
+    }
+}
+
 ```
