@@ -610,10 +610,11 @@ Vorcyc.Mathematics.Experimental.KalmanFilters.StandardKalmanFilter2D&lt;T> 是�
 ### 代码示例
 以下是一个使用 StandardKalmanFilter2D&lt;T> 类中多个方法的示例，并在示例中加入了注释：
 
-```csgarp
+```csharp
 using System;
 using Vorcyc.Mathematics.Experimental.KalmanFilters;
 using Vorcyc.Mathematics.LinearAlgebra;
+
 public class StandardKalmanFilter2DExample
 {
     public static void Main()
