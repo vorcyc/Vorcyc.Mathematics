@@ -63,6 +63,20 @@
 - :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.OnePole.LowPassFilter 类](#vorcycmathematicssignalprocessingfiltersonepolelowpassfilter-类)  
 - :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.OnePole.OnePoleFilter 类](#vorcycmathematicssignalprocessingfiltersonepoleonepolefilter-类)  
 - :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase.PolyphaseSystem 类](#vorcycmathematicssignalprocessingfilterspolyphasepolyphasesystem-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.CombFeedbackFilter 类](#vorcycmathematicssignalprocessingfilterscombfeedbackfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.CombFeedforwardFilter 类](#vorcycmathematicssignalprocessingfilterscombfeedforwardfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.DcRemovalFilter 类](#vorcycmathematicssignalprocessingfiltersdcremovalfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.DeEmphasisFilter 类](#vorcycmathematicssignalprocessingfiltersdeemphasisfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.HilbertFilter 类](#vorcycmathematicssignalprocessingfiltershilbertfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter 类](#vorcycmathematicssignalprocessingfiltersmedianfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter2 类](#vorcycmathematicssignalprocessingfiltersmedianfilter2-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.MovingAverageFilter 类](#vorcycmathematicssignalprocessingfiltersmovingaveragefilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.MovingAverageRecursiveFilter 类](#vorcycmathematicssignalprocessingfiltersmovingaveragerecursivefilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.PreEmphasisFilter 类](#vorcycmathematicssignalprocessingfilterspreemphasisfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.RastaFilter 类](#vorcycmathematicssignalprocessingfiltersrastafilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.SavitzkyGolayFilter 类](#vorcycmathematicssignalprocessingfilterssavitzkygolayfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.ThiranFilter 类](#vorcycmathematicssignalprocessingfiltersthiranfilter-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Filters.WienerFilter 类](#vorcycmathematicssignalprocessingfilterswienerfilter-类)  
 
 ---
 
@@ -4963,11 +4977,880 @@ public class PolyphaseSystemExample
 }
 ```
 
----
 
-> 以下类型均位于 Vorcyc.Mathematics.SignalProcessing.Filters.? 命名空间。
+## Vorcyc.Mathematics.SignalProcessing.Filters.CombFeedbackFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.CombFeedbackFilter 是一个用于实现反馈梳状滤波器的类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. CombFeedbackFilter 构造函数
+- `public CombFeedbackFilter(int m, float b0 = 1.0f, float am = 0.6f)`
+  - 构造 CombFeedbackFilter 实例。
+  - 参数:
+    - `m`: 延迟。
+    - `b0`: 系数 b0，默认为 1.0f。
+    - `am`: 系数 am，默认为 0.6f。
+
+#### 2. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 3. ApplyTo
+- `public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将滤波器应用于整个信号，并返回新的滤波信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 4. Change
+- `public void Change(float b0, float am)`
+  - 更改滤波器系数（保持滤波器状态）。
+  - 参数:
+    - `b0`: 系数 b0。
+    - `am`: 系数 am。
+
+### 代码示例
+以下是一个使用 CombFeedbackFilter 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class CombFeedbackFilterExample
+{
+    public static void Main()
+    {
+        // 创建 CombFeedbackFilter 实例
+        var combFilter = new CombFeedbackFilter(4, 1.0f, 0.6f);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, inputSignal);
+
+        // 处理信号并输出结果
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = combFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 更改滤波器系数
+        combFilter.Change(0.8f, 0.4f);
+
+        // 处理信号并输出结果
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = combFilter.Process(sample);
+            Console.WriteLine($"Processed Sample after change: {processedSample}");
+        }
+    }
+}
+```
 
 
----
+## Vorcyc.Mathematics.SignalProcessing.Filters.CombFeedforwardFilter 类
 
-> 以下类型均位于 Vorcyc.Mathematics.SignalProcessing.Filters.? 命名空间。
+Vorcyc.Mathematics.SignalProcessing.Filters.CombFeedforwardFilter 是一个用于实现前馈梳状滤波器的类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. CombFeedforwardFilter 构造函数
+- `public CombFeedforwardFilter(int m, float b0 = 1f, float bm = 0.5f, bool normalize = true)`
+  - 构造 CombFeedforwardFilter 实例。
+  - 参数:
+    - `m`: 延迟。
+    - `b0`: 系数 b0，默认为 1f。
+    - `bm`: 系数 bm，默认为 0.5f。
+    - `normalize`: 是否归一化频率响应，默认为 true。
+
+#### 2. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 3. ApplyTo
+- `public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将滤波器应用于整个信号，并返回新的滤波信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 4. Change
+- `public void Change(float b0, float bm)`
+  - 更改滤波器系数（保持滤波器状态）。
+  - 参数:
+    - `b0`: 系数 b0。
+    - `bm`: 系数 bm。
+
+### 代码示例
+以下是一个使用 CombFeedforwardFilter 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class CombFeedforwardFilterExample
+{
+    public static void Main()
+    {
+        // 创建 CombFeedforwardFilter 实例
+        var combFilter = new CombFeedforwardFilter(4, 1f, 0.5f);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, inputSignal);
+
+        // 处理信号并输出结果
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = combFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 更改滤波器系数
+        combFilter.Change(0.8f, 0.4f);
+
+        // 处理信号并输出结果
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = combFilter.Process(sample);
+            Console.WriteLine($"Processed Sample after change: {processedSample}");
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.DcRemovalFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.DcRemovalFilter 是一个用于实现直流偏移去除的 IIR 滤波器类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. DcRemovalFilter 构造函数
+- `public DcRemovalFilter(float r = 0.995f)`
+  - 构造 DcRemovalFilter 实例。
+  - 参数:
+    - `r`: R 系数，通常在 [0.9, 1] 范围内，默认为 0.995f。
+
+#### 2. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 3. Reset
+- `public override void Reset()`
+  - 重置滤波器。
+
+### 代码示例
+以下是一个使用 DcRemovalFilter 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class DcRemovalFilterExample
+{
+    public static void Main()
+    {
+        // 创建 DcRemovalFilter 实例
+        var dcRemovalFilter = new DcRemovalFilter(0.995f);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = dcRemovalFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 重置滤波器
+        dcRemovalFilter.Reset();
+    }
+}
+```
+
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.DeEmphasisFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.DeEmphasisFilter 是一个用于实现去加重的 IIR 滤波器类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. DeEmphasisFilter 构造函数
+- `public DeEmphasisFilter(float a = 0.97f, bool normalize = false)`
+  - 构造 DeEmphasisFilter 实例。
+  - 参数:
+    - `a`: 去加重系数，默认为 0.97f。
+    - `normalize`: 是否归一化频率响应，默认为 false。
+
+### 代码示例
+以下是一个使用 DeEmphasisFilter 类中构造函数的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class DeEmphasisFilterExample
+{
+    public static void Main()
+    { 
+        // 创建 DeEmphasisFilter 实例
+        var deEmphasisFilter = new DeEmphasisFilter(0.97f, true);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = deEmphasisFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 重置滤波器
+        deEmphasisFilter.Reset();
+    }
+}
+```
+
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.HilbertFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.HilbertFilter 是一个用于实现 Hilbert 滤波器的类。
+
+### 属性
+
+#### 1. Size
+- `public int Size { get; }`
+  - 获取滤波器的大小。
+
+### 方法
+
+#### 1. HilbertFilter 构造函数
+- `public HilbertFilter(int size = 128)`
+  - 构造 HilbertFilter 实例。
+  - 参数:
+    - `size`: 滤波器的大小，默认为 128。
+
+#### 2. MakeKernel
+- `private static IEnumerable<float> MakeKernel(int size)`
+  - 生成给定大小的滤波器核。
+  - 参数:
+    - `size`: 核的大小。
+  - 返回值: 滤波器核的浮点数数组。
+
+### 代码示例
+以下是一个使用 HilbertFilter 类中构造函数的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class HilbertFilterExample
+{
+    public static void Main()
+    {
+        // 创建 HilbertFilter 实例
+        var hilbertFilter = new HilbertFilter(128);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = hilbertFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter 是一个用于实现中值滤波器的类。
+
+### 属性
+
+#### 1. Size
+- `public int Size { get; }`
+  - 获取中值滤波器的大小。
+
+### 方法
+
+#### 1. MedianFilter 构造函数
+- `public MedianFilter(int size = 9)`
+  - 构造 MedianFilter 实例。
+  - 参数:
+    - `size`: 滤波器的大小，默认为 9。
+
+#### 2. ApplyTo
+- `public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将滤波器应用于整个信号，并返回新的滤波信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 3. Process
+- `public float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 4. Reset
+- `public void Reset()`
+  - 重置滤波器。
+
+### 代码示例
+以下是一个使用 MedianFilter 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class MedianFilterExample
+{
+    public static void Main()
+    {
+        // 创建 MedianFilter 实例
+        var medianFilter = new MedianFilter(9);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = medianFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 重置滤波器
+        medianFilter.Reset();
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter2 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter2 是一个用于实现中值滤波器的类。它的实现比 `MedianFilter` 类稍快，但仅适用于较小的滤波器尺寸（不超过 5 左右）。
+
+### 属性
+
+#### 1. Size
+- `public int Size { get; }`
+  - 获取中值滤波器的大小。
+
+### 方法
+
+#### 1. MedianFilter2 构造函数
+- `public MedianFilter2(int size = 9)`
+  - 构造 MedianFilter2 实例。
+  - 参数:
+    - `size`: 滤波器的大小，默认为 9。
+
+#### 2. ApplyTo
+- `public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将滤波器应用于整个信号，并返回新的滤波信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 3. Process
+- `public float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 4. Reset
+- `public void Reset()`
+  - 重置滤波器。
+
+### 代码示例
+以下是一个使用 MedianFilter2 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class MedianFilter2Example
+{
+    public static void Main()
+    {
+        // 创建 MedianFilter2 实例
+        var medianFilter2 = new MedianFilter2(9);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = medianFilter2.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 重置滤波器
+        medianFilter2.Reset();
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.MovingAverageFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.MovingAverageFilter 是一个用于实现非递归移动平均滤波器的类。
+
+### 属性
+
+#### 1. Size
+- `public int Size { get; }`
+  - 获取滤波器的大小。
+
+### 方法
+
+#### 1. MovingAverageFilter 构造函数
+- `public MovingAverageFilter(int size = 9)`
+  - 构造 MovingAverageFilter 实例。
+  - 参数:
+    - `size`: 滤波器的大小，默认为 9。
+
+#### 2. MakeKernel
+- `private static IEnumerable<float> MakeKernel(int size)`
+  - 生成给定大小的滤波器核。
+  - 参数:
+    - `size`: 核的大小。
+  - 返回值: 滤波器核的浮点数数组。
+
+### 代码示例
+以下是一个使用 MovingAverageFilter 类中构造函数的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class MovingAverageFilterExample
+{
+    public static void Main()
+    {
+        // 创建 MovingAverageFilter 实例
+        var movingAverageFilter = new MovingAverageFilter(9);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = movingAverageFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.MovingAverageRecursiveFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.MovingAverageRecursiveFilter 是一个用于实现快速递归移动平均滤波器的类。
+
+### 属性
+
+#### 1. Size
+- `public int Size { get; }`
+  - 获取滤波器的大小。
+
+### 方法
+
+#### 1. MovingAverageRecursiveFilter 构造函数
+- `public MovingAverageRecursiveFilter(int size = 9)`
+  - 构造 MovingAverageRecursiveFilter 实例。
+  - 参数:
+    - `size`: 滤波器的大小，默认为 9。
+
+#### 2. MakeNumerator
+- `private static float[] MakeNumerator(int size)`
+  - 生成给定大小的滤波器分子。
+  - 参数:
+    - `size`: 分子的大小。
+  - 返回值: 滤波器分子的浮点数数组。
+
+#### 3. ApplyTo
+- `public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将滤波器应用于整个信号，并返回新的滤波信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 4. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 5. Reset
+- `public override void Reset()`
+  - 重置滤波器。
+
+### 代码示例
+以下是一个使用 MovingAverageRecursiveFilter 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class MovingAverageRecursiveFilterExample
+{
+    public static void Main()
+    {
+        // 创建 MovingAverageRecursiveFilter 实例
+        var movingAverageRecursiveFilter = new MovingAverageRecursiveFilter(9);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, inputSignal);
+
+        // 处理信号并输出结果
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = movingAverageRecursiveFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 重置滤波器
+        movingAverageRecursiveFilter.Reset();
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.PreEmphasisFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.PreEmphasisFilter 是一个用于实现预加重 FIR 滤波器的类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. PreEmphasisFilter 构造函数
+- `public PreEmphasisFilter(float a = 0.97f, bool normalize = false)`
+  - 构造 PreEmphasisFilter 实例。
+  - 参数:
+    - `a`: 预加重系数，默认为 0.97f。
+    - `normalize`: 是否归一化频率响应，默认为 false。
+
+#### 2. Process
+- `public override float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 3. ApplyTo
+- `public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将滤波器应用于整个信号，并返回新的滤波信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 4. Reset
+- `public override void Reset()`
+  - 重置滤波器。
+
+### 代码示例
+以下是一个使用 PreEmphasisFilter 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class PreEmphasisFilterExample
+{
+    public static void Main()
+    {
+        // 创建 PreEmphasisFilter 实例
+        var preEmphasisFilter = new PreEmphasisFilter(0.97f, true);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, inputSignal);
+
+        // 处理信号并输出结果
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = preEmphasisFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 重置滤波器
+        preEmphasisFilter.Reset();
+    }
+}
+```
+
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.RastaFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.RastaFilter 是一个用于实现 RASTA 滤波器（用于鲁棒语音处理）的 IIR 滤波器类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. RastaFilter 构造函数
+- `public RastaFilter(float pole = 0.98f)`
+  - 构造 RastaFilter 实例。
+  - 参数:
+    - `pole`: 极点，默认为 0.98f。
+
+### 代码示例
+以下是一个使用 RastaFilter 类中构造函数的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class RastaFilterExample
+{
+    public static void Main()
+    {
+        // 创建 RastaFilter 实例
+        var rastaFilter = new RastaFilter(0.98f);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = rastaFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.SavitzkyGolayFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.SavitzkyGolayFilter 是一个用于实现 Savitzky-Golay 滤波器的 FIR 滤波器类。
+
+### 属性
+
+#### 1. Size
+- `public int Size { get; }`
+  - 获取滤波器的大小。
+
+### 方法
+
+#### 1. SavitzkyGolayFilter 构造函数
+- `public SavitzkyGolayFilter(int size, int deriv = 0)`
+  - 构造 SavitzkyGolayFilter 实例。
+  - 参数:
+    - `size`: 滤波器的大小（必须是范围 [5..31] 内的奇数）。
+    - `deriv`: 导数（必须是 0、1 或 2），默认为 0。
+
+### 代码示例
+以下是一个使用 SavitzkyGolayFilter 类中构造函数的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class SavitzkyGolayFilterExample
+{
+    public static void Main()
+    {
+        // 创建 SavitzkyGolayFilter 实例
+        var sgFilter = new SavitzkyGolayFilter(11, 0);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = sgFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.ThiranFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.ThiranFilter 是一个用于实现 N 阶 Thiran 全通插值滤波器的 IIR 滤波器类。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. ThiranFilter 构造函数
+- `public ThiranFilter(int order, float delta)`
+  - 构造 ThiranFilter 实例。
+  - 参数:
+    - `order`: 滤波器阶数。
+    - `delta`: 分数延迟。
+
+#### 2. MakeTf
+- `private static TransferFunction MakeTf(int order, float delta)`
+  - 生成传递函数。
+  - 参数:
+    - `order`: 滤波器阶数。
+    - `delta`: 分数延迟。
+  - 返回值: 生成的 `TransferFunction` 对象。
+
+#### 3. ThiranCoefficient
+- `private static float ThiranCoefficient(int k, int n, float delta)`
+  - 计算传递函数分母的第 k 个系数。
+  - 参数:
+    - `k`: 系数索引。
+    - `n`: 滤波器阶数。
+    - `delta`: 分数延迟。
+  - 返回值: 计算的系数。
+
+### 代码示例
+以下是一个使用 ThiranFilter 类中构造函数的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class ThiranFilterExample
+{
+    public static void Main()
+    {
+        // 定义滤波器阶数和分数延迟
+        int order = 13; float delta = 13.4f;
+
+        // 创建 ThiranFilter 实例
+        var thiranFilter = new ThiranFilter(order, delta);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+
+        // 处理信号并输出结果
+        foreach (var sample in inputSignal)
+        {
+            var processedSample = thiranFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+    }
+}
+```
+
+
+## Vorcyc.Mathematics.SignalProcessing.Filters.WienerFilter 类
+
+Vorcyc.Mathematics.SignalProcessing.Filters.WienerFilter 是一个用于实现维纳滤波器的类。其实现与 `scipy.signal.wiener()` 相同。
+
+### 属性
+
+无公开属性。
+
+### 方法
+
+#### 1. WienerFilter 构造函数
+- `public WienerFilter(int size = 3, float noise = 0.0f)`
+  - 构造 WienerFilter 实例。
+  - 参数:
+    - `size`: 维纳滤波器的大小，默认为 3。
+    - `noise`: 估计的噪声功率，默认为 0.0f。
+
+#### 2. ApplyTo
+- `public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)`
+  - 将滤波器应用于整个信号，并返回新的滤波信号。
+  - 参数:
+    - `signal`: 输入信号。
+    - `method`: 过滤方法，默认为 `FilteringMethod.Auto`。
+  - 返回值: 处理后的 `DiscreteSignal` 对象。
+
+#### 3. Process
+- `public float Process(float sample)`
+  - 处理一个样本。
+  - 参数:
+    - `sample`: 输入样本。
+  - 返回值: 处理后的样本。
+
+#### 4. Reset
+- `public void Reset()`
+  - 重置滤波器。
+
+### 代码示例
+以下是一个使用 WienerFilter 类中多个方法的示例，并在示例中加入了注释：
+
+```csharp
+using System;
+using Vorcyc.Mathematics.SignalProcessing.Filters;
+
+public class WienerFilterExample
+{
+    public static void Main()
+    {
+        // 创建 WienerFilter 实例
+        var wienerFilter = new WienerFilter(3, 0.0f);
+
+        // 定义输入信号
+        float[] inputSignal = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
+        var signal = new DiscreteSignal(44100, inputSignal);
+
+        // 处理信号并输出结果
+        foreach (var sample in signal.Samples)
+        {
+            var processedSample = wienerFilter.Process(sample);
+            Console.WriteLine($"Processed Sample: {processedSample}");
+        }
+
+        // 重置滤波器
+        wienerFilter.Reset();
+    }
+}
+```
