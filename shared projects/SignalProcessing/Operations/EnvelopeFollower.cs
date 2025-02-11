@@ -16,7 +16,7 @@ public class EnvelopeFollower : IFilter, IOnlineFilter
         set
         {
             _attackTime = value;
-            _ga = value < 1e-20 ? 0 : (float)Math.Exp(-1.0 / (value * _fs));
+            _ga = value < 1e-20f ? 0f : MathF.Exp(-1.0f / (value * _fs));
         }
     }
     private float _attackTime;
@@ -30,7 +30,7 @@ public class EnvelopeFollower : IFilter, IOnlineFilter
         set
         {
             _releaseTime = value;
-            _gr = value < 1e-20 ? 0 : (float)Math.Exp(-1.0 / (value * _fs));
+            _gr = value < 1e-20f ? 0f : MathF.Exp(-1.0f / (value * _fs));
         }
     }
     private float _releaseTime;
