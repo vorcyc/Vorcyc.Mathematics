@@ -1,4 +1,4 @@
-﻿当前位置 :open_file_folder: [根目录](README.md) / :open_file_folder: [信号处理模块](Module_SignalProcessing.md) / :open_file_folder: [音频特征提取](Module_SignalProcessing_FeatureExtractors.md)
+﻿当前位置 : [根目录](README.md)/[信号处理模块](Module_SignalProcessing.md)/[音频特征提取](Module_SignalProcessing_FeatureExtractors.md)
 
 # 信号处理模块 - Signal Processing Module
 ## 音频特征提取 - Feature Extractors

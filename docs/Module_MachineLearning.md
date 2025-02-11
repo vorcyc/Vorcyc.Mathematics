@@ -1,4 +1,6 @@
-﻿# 机器学习模块 - Machine Learning Module
+﻿当前位置 : [根目录](README.md)/[机器学习模块](Module_MachineLearning.md)
+
+# 机器学习模块 - Machine Learning Module
 
 > 以下所有类型都位于命名空间 : Vorcyc.Mathematics.MachineLearning
 

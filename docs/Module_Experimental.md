@@ -1,4 +1,6 @@
-﻿# 实验性模块 - Experimental Module
+﻿当前位置 : [根目录](README.md)/[实验性模块](Module_Experimental.md)
+
+# 实验性模块 - Experimental Module
 
 
 > 以下类型都位于 Vorcyc.Mathematics.Experimental.KalmanFilters 命名空间

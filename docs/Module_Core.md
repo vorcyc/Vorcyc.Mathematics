@@ -1,3 +1,5 @@
+当前位置 : [根目录](README.md)/[核心模块](Module_Core.md)
+
 # 核心模块 - Core Module
 
 包含基本的数学运算和常用函数。  

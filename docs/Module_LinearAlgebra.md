@@ -1,4 +1,7 @@
-﻿# 线性代数模块 - Linear Algebra Module
+﻿当前位置 : [根目录](README.md)/[线性代数模块](Module_LinearAlgebra.md)
+
+# 线性代数模块 - Linear Algebra Module
+
 > 以下所有类型都位于命名空间 ：Vorcyc.Mathematics.LinearAlgebra
 
 

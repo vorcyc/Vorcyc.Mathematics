@@ -37,9 +37,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C288D331-8
 		docs\Module_SignalProcessing.md = docs\Module_SignalProcessing.md
 		docs\Module_SignalProcessing_Effects.md = docs\Module_SignalProcessing_Effects.md
 		docs\Module_SignalProcessing_FeatureExtractors.md = docs\Module_SignalProcessing_FeatureExtractors.md
+		docs\Module_SignalProcessing_Features.md = docs\Module_SignalProcessing_Features.md
+		docs\Module_SignalProcessing_Filters.md = docs\Module_SignalProcessing_Filters.md
 		docs\Module_Statistics.md = docs\Module_Statistics.md
 		docs\README.md = docs\README.md
-		TextFile1.md = TextFile1.md
 		docs\VMath 1.0.docx = docs\VMath 1.0.docx
 	EndProjectSection
 EndProject

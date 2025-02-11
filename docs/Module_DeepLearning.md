@@ -1,8 +1,10 @@
-﻿# 深度学习模块 - Deep Learning Module
+﻿当前位置 : [根目录](README.md)/[深度学习模块](Module_DeepLearning.md)
+
+# 深度学习模块 - Deep Learning Module
 
 提供深度学习相关的函数和运算。
 
-> 以下方法均位于类 ：Vorcyc.Mathematics.Statistics
+> 以下方法均位于类 ：Vorcyc.Mathematics.DeepLearning
 
 :ledger:目录  
 - :bookmark: [FindExtremeValue 方法](#1-findextremevalue-方法)

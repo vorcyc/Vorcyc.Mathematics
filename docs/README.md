@@ -54,14 +54,13 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 ***Linear Algebra Module***: Provides matrix and vector operations, matrix decomposition, etc.  
 :blue_book:[手册](Module_LinearAlgebra.md)
 
-
 ***机器学习模块***: 提供机器学习相关的函数和运算。  
 ***Machine Learning Module***: Provides functions and operations related to machine learning.  
 :blue_book:[手册](Module_MachineLearning.md)
 
 **信号处理模块**：用于滤波、傅里叶变换等。  
-**Signal Processing Module**: Used for filtering, Fourier transform, etc.
-
+**Signal Processing Module**: Used for filtering, Fourier transform, etc.  
+:blue_book:[手册](Module_SignalProcessing.md)
 
 ***数值模块***：提供多个常见的数值类型   
 ***Numerics Module***: Provides several common numeric types  
