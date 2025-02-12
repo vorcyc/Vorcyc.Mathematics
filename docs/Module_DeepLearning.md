@@ -2,9 +2,9 @@
 
 # 深度学习模块 - Deep Learning Module
 
-提供深度学习相关的函数和运算。
+该模块目前只有`Layers`类，其中定义了数个方法来表示神经网络层。这些方法使用了CPU上的并行计算来进行优化。
 
-> 以下方法均位于类 ：Vorcyc.Mathematics.DeepLearning
+> 以下方法均位于命名空间 ：Vorcyc.Mathematics.DeepLearning
 
 ---
 
