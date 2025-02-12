@@ -1,10 +1,8 @@
 ﻿using System.Numerics;
-using System.Runtime.CompilerServices;
-using Vorcyc.Mathematics.Framework;
 
-namespace Vorcyc.Mathematics;
+namespace Vorcyc.Mathematics.Statistics;
 
-public static partial class Statistics
+public static partial class Basic
 {
 
 

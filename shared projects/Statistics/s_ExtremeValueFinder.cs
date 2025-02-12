@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics;
+﻿namespace Vorcyc.Mathematics.Statistics;
 
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -8,7 +8,7 @@ using System.Runtime.Intrinsics;
 /// <summary>
 /// Find the max and min value in sequence.
 /// </summary>
-public static partial class Statistics
+public static class ExtremeValueFinder
 {
 
     #region Max Min
@@ -333,7 +333,7 @@ public static partial class Statistics
         float max = maxVector[0];
         float min = minVector[0];
         for (int j = 1; j < vectorSize; j++)
-        {  
+        {
             //max = Math.Max(max, maxVector.GetElement(j));
             //min = Math.Min(min, minVector.GetElement(j));   
             max = Math.Max(max, maxVector[j]);

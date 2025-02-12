@@ -1,4 +1,6 @@
-﻿namespace Vorcyc.Mathematics.Numerics;
+﻿using Vorcyc.Mathematics.Statistics;
+
+namespace Vorcyc.Mathematics.Numerics;
 
 /// <summary>
 /// 表示一个范围的开区间。

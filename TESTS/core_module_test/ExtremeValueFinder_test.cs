@@ -14,22 +14,22 @@ internal class ExtremeValueFinder_test
             var array = new float[count];
             array.FillWithRandomNumber();
 
-            var r = Vorcyc.Mathematics.Statistics.FindExtremeValue_Normal<float>(array);
+            var r = Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Normal<float>(array);
             Console.WriteLine(r);
 
 
-            var r2 = Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector128(array);
+            var r2 = Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector128(array);
             Console.WriteLine(r2);
 
 
-            var r3 = Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector256(array);
+            var r3 = Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector256(array);
             Console.WriteLine(r3);
 
 
-            var rx1 = Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector128(array);
+            var rx1 = Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector128(array);
             Console.WriteLine(rx1);
 
-            var rx2 = Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector256(array);
+            var rx2 = Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector256(array);
             Console.WriteLine(rx2);
 
             //var r4 = Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector512(array);

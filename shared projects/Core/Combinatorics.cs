@@ -25,6 +25,8 @@
 //
 
 
+using System.Numerics;
+
 namespace Vorcyc.Mathematics;
 
 /// <summary>
@@ -509,5 +511,25 @@ public static class Combinatorics
             yield return new SortedSet<T>(value);
     }
 
+    /// <summary>
+    /// 计算从 n 个元素中选取 k 个元素的组合数。
+    /// </summary>
+    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="n">总元素数。</param>
+    /// <param name="k">选取的元素数。</param>
+    /// <returns>组合数，即从 n 个元素中选取 k 个元素的方式数。</returns>
+    /// <remarks>
+    /// 组合数的公式为：
+    /// <code>
+    /// C(n, k) = n! / (k! * (n - k)!)
+    /// </code>
+    /// 其中，n! 表示 n 的阶乘。
+    /// 组合数在概率论和统计学中有广泛的应用，特别是在计算概率分布时。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Combinations<T>(int n, int k) where T : IFloatingPointIeee754<T>
+    {
+        return VMath.Factorial<T>(T.CreateChecked(n)) / (VMath.Factorial<T>(T.CreateChecked(k)) * VMath.Factorial<T>(T.CreateChecked(n - k)));
+    }
 
 }

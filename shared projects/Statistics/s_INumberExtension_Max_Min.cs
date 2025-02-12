@@ -1,10 +1,11 @@
-﻿using System.Numerics;
+﻿namespace Vorcyc.Mathematics.Statistics;
+
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Vorcyc.Mathematics;
 
 /// <summary>Extension methods for <see cref="INumber{T}"/> and <see cref="ValueType"/> ('struct') with SIMD support.</summary>
-public static partial class Statistics
+public static class INumberExtension
 {
 
     //public static double Max(double a ,double b)

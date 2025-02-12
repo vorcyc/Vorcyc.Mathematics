@@ -92,7 +92,7 @@ public abstract class EMBase<T>
         for (int j = 0; j < _numClusters; j++)
         {
             // 当前聚类的责任值之和
-            T responsibilitySum = Statistics.Sum(_responsibilities[j].AsSpan());
+            T responsibilitySum = Statistics.Basic.Sum(_responsibilities[j].AsSpan());
             // 更新权重
             _weights[j] = responsibilitySum / T.CreateChecked(data.Count);
 

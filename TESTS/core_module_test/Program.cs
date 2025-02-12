@@ -17,7 +17,7 @@ using Vorcyc.Mathematics.LinearAlgebra;
 
 //FFT.new_realOnlyFFT();
 
-//Statistics_test.go();
+Statistics_test.others();
 
 //CuFFT_test.my();
 
@@ -46,4 +46,4 @@ using Vorcyc.Mathematics.LinearAlgebra;
 
 
 
-Rational_test.go();
+//Rational_test.go();

@@ -447,7 +447,7 @@ public class Tensor<T> : ICloneable<Tensor<T>>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Sum()
     {
-        return Statistics.Sum(_values.Span);
+        return Statistics.Basic.Sum(_values.Span);
     }
 
     /// <summary>

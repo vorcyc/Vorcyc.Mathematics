@@ -28,28 +28,28 @@ public class ExtremeValueFinder_benchmark
 
     [Benchmark]
     public (float max, float min) Normal() =>
-        Vorcyc.Mathematics.Statistics.FindExtremeValue_Normal(_array.AsSpan());
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Normal(_array.AsSpan());
 
 
     [Benchmark]
     public (float max, float min) Vector128() =>
-        Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector128(_array);
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector128(_array);
 
     [Benchmark]
     public (float max, float min) Vector256() =>
-        Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector256(_array);
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector256(_array);
 
     [Benchmark]
     public (float max, float min) Vector512() =>
-        Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector512(_array);
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector512(_array);
 
 
     [Benchmark]
     public (float max, float min) Vector128_p() =>
-        Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector128(_array);
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector128(_array);
 
     [Benchmark]
     public (float max, float min) Vector256_p() =>
-        Vorcyc.Mathematics.Statistics.FindExtremeValue_Vector256(_array);
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Vector256(_array);
 
 }

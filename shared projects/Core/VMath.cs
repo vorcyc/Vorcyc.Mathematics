@@ -578,10 +578,10 @@ public static partial class VMath
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Log2<T>(T x)
         where T : IBinaryInteger<T>
-    {  
+    {
         // Validate parameters
         if (x <= T.Zero)
-        {      
+        {
             // Cannot have the log of 0
             throw new ArgumentOutOfRangeException("Log2 of zero.");
         }
@@ -594,24 +594,447 @@ public static partial class VMath
         return i;
     }
 
+    #region 阶乘
+
 
     /// <summary>
-    /// 求阶乘
+    /// 计算一个整数的阶乘。
     /// </summary>
-    /// <param name="n"></param>
-    /// <returns></returns>
+    /// <param name="n">要计算阶乘的整数。</param>
+    /// <returns>输入整数的阶乘值。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当 n 为负数时抛出。</exception>
+    /// <remarks>
+    /// 阶乘是所有小于或等于 n 的正整数的乘积，记作 n!。
+    /// 对于 n = 0，阶乘定义为 1。
+    /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Factorial(int n)
     {
-        int num = n;
-        if (num == 0)
+        if (n < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(n), "阶乘未定义负数。");
+        }
+
+        if (n == 0)
         {
             return 1;
         }
-        return (num * Factorial(num - 1));
+        return n * Factorial(n - 1);
+    }
+
+    /// <summary>
+    /// 计算一个泛型整数的阶乘。
+    /// </summary>
+    /// <typeparam name="T">整数类型。</typeparam>
+    /// <param name="n">要计算阶乘的整数。</param>
+    /// <returns>输入整数的阶乘值。</returns>
+    /// <exception cref="ArgumentOutOfRangeException">当 n 为负数时抛出。</exception>
+    /// <remarks>
+    /// 阶乘是所有小于或等于 n 的正整数的乘积，记作 n!。
+    /// 对于 n = 0，阶乘定义为 1。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Factorial<T>(T n) where T : INumber<T>
+    {
+        if (n < T.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(n), "阶乘未定义负数。");
+        }
+
+        if (n == T.Zero)
+        {
+            return T.One;
+        }
+        return n * Factorial(n - T.One);
     }
 
 
+    #endregion
+
+
+    #region gamma函数
+
+
+    /// <summary>
+    /// 使用近似公式计算Gamma函数。
+    /// </summary>
+    /// <param name="x">输入值。</param>
+    /// <returns>Gamma函数的值。</returns>
+    /// <remarks>
+    /// Gamma函数 (Gamma Function) 是数学中的一个重要函数，广泛应用于概率论、统计学和组合数学等领域。
+    /// 它是阶乘函数的扩展，对于正整数 n，Gamma 函数满足 Gamma(n) = (n-1)!。
+    /// 该函数使用Lanczos近似公式进行计算，能够在复数平面上对实数和复数进行扩展。
+    /// <para>
+    /// 具体实现步骤如下：
+    /// <list type="number">
+    /// <item>定义了一组常数 p，用于近似计算。</item>
+    /// <item>如果 x 小于 0.5，使用反射公式计算 Gamma 函数值。</item>
+    /// <item>否则，使用近似公式计算 Gamma 函数值。</item>
+    /// </list>
+    /// </para>
+    /// 该实现能够在较大范围内提供高精度的 Gamma 函数值。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double Gamma(double x)
+    {
+        // 使用近似公式计算Gamma函数
+        double[] p =
+        [
+            0.99999999999980993,
+            676.5203681218851,
+            -1259.1392167224028,
+            771.32342877765313,
+            -176.61502916214059,
+            12.507343278686905,
+            -0.13857109526572012,
+            9.9843695780195716e-6,
+            1.5056327351493116e-7
+        ];
+
+        const double TWO_PI = 2 * Math.PI;
+
+        int g = 7;
+        if (x < 0.5) return Math.PI / (Math.Sin(Math.PI * x) * Gamma(1 - x));
+
+        x -= 1;
+        double a = p[0];
+        double t = x + g + 0.5;
+        for (int i = 1; i < p.Length; i++)
+        {
+            a += p[i] / (x + i);
+        }
+
+        return Math.Sqrt(TWO_PI) * Math.Pow(t, x + 0.5) * Math.Exp(-t) * a;
+    }
+
+    /// <summary>
+    /// 计算Gamma函数的自然对数。
+    /// </summary>
+    /// <param name="x">输入的值</param>
+    /// <returns>Gamma函数的值的自然对数</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static double GammaLog(double x) => Math.Log(Gamma(x));
+
+
+    /// <summary>
+    /// 使用近似公式计算Gamma函数。
+    /// </summary>
+    /// <param name="x">输入值。</param>
+    /// <returns>Gamma函数的值。</returns>
+    /// <remarks>
+    /// Gamma函数 (Gamma Function) 是数学中的一个重要函数，广泛应用于概率论、统计学和组合数学等领域。
+    /// 它是阶乘函数的扩展，对于正整数 n，Gamma 函数满足 Gamma(n) = (n-1)!。
+    /// 该函数使用Lanczos近似公式进行计算，能够在复数平面上对实数和复数进行扩展。
+    /// <para>
+    /// 具体实现步骤如下：
+    /// <list type="number">
+    /// <item>定义了一组常数 p，用于近似计算。</item>
+    /// <item>如果 x 小于 0.5，使用反射公式计算 Gamma 函数值。</item>
+    /// <item>否则，使用近似公式计算 Gamma 函数值。</item>
+    /// </list>
+    /// </para>
+    /// 该实现能够在较大范围内提供高精度的 Gamma 函数值。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float Gamma(float x)
+    {
+        // 使用近似公式计算Gamma函数
+        float[] p =
+        [
+            0.99999999999980993f,
+            676.5203681218851f,
+            -1259.1392167224028f,
+            771.32342877765313f,
+            -176.61502916214059f,
+            12.507343278686905f,
+            -0.13857109526572012f,
+            9.9843695780195716e-6f,
+            1.5056327351493116e-7f
+        ];
+
+        int g = 7;
+        if (x < 0.5f) return ConstantsFp32.PI / (MathF.Sin(ConstantsFp32.PI * x) * Gamma(1f - x));
+
+        x -= 1;
+        float a = p[0];
+        float t = x + g + 0.5f;
+        for (int i = 1; i < p.Length; i++)
+        {
+            a += p[i] / (x + i);
+        }
+
+        return MathF.Sqrt(ConstantsFp32.TWO_PI) * MathF.Pow(t, x + 0.5f) * MathF.Exp(-t) * a;
+    }
+
+    /// <summary>
+    /// 计算Gamma函数的自然对数。
+    /// </summary>
+    /// <param name="x">输入的值</param>
+    /// <returns>Gamma函数的值的自然对数</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float GammaLog(float x) => MathF.Log(Gamma(x));
+
+    /// <summary>
+    /// 使用近似公式计算Gamma函数。
+    /// </summary>
+    /// <typeparam name="T">数值类型。</typeparam>
+    /// <param name="x">输入值。</param>
+    /// <returns>Gamma函数的值。</returns>
+    /// <remarks>
+    /// Gamma函数 (Gamma Function) 是数学中的一个重要函数，广泛应用于概率论、统计学和组合数学等领域。
+    /// 它是阶乘函数的扩展，对于正整数 n，Gamma 函数满足 Gamma(n) = (n-1)!。
+    /// 该函数使用Lanczos近似公式进行计算，能够在复数平面上对实数和复数进行扩展。
+    /// <para>
+    /// 具体实现步骤如下：
+    /// <list type="number">
+    /// <item>定义了一组常数 p，用于近似计算。</item>
+    /// <item>如果 x 小于 0.5，使用反射公式计算 Gamma 函数值。</item>
+    /// <item>否则，使用近似公式计算 Gamma 函数值。</item>
+    /// </list>
+    /// </para>
+    /// 该实现能够在较大范围内提供高精度的 Gamma 函数值。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Gamma<T>(T x) where T : IFloatingPointIeee754<T>
+    {
+        // 使用近似公式计算Gamma函数
+        T[] p =
+        [
+            T.CreateChecked(0.99999999999980993),
+            T.CreateChecked(676.5203681218851),
+            T.CreateChecked(-1259.1392167224028),
+            T.CreateChecked(771.32342877765313),
+            T.CreateChecked(-176.61502916214059),
+            T.CreateChecked(12.507343278686905),
+            T.CreateChecked(-0.13857109526572012),
+            T.CreateChecked(9.9843695780195716e-6),
+            T.CreateChecked(1.5056327351493116e-7)
+        ];
+
+        T g = T.CreateChecked(7);
+        T half = T.One / T.CreateChecked(2);
+        T one = T.One;
+        T pi = T.CreateChecked(Math.PI);
+        T twoPi = T.CreateChecked(2 * Math.PI);
+
+        if (x < half)
+        {
+            return pi / (T.Sin(pi * x) * Gamma(one - x));
+        }
+
+        x -= one;
+        T a = p[0];
+        T t = x + g + half;
+        for (int i = 1; i < p.Length; i++)
+        {
+            a += p[i] / (x + T.CreateChecked(i));
+        }
+
+        return T.Sqrt(twoPi) * T.Pow(t, x + half) * T.Exp(-t) * a;
+    }
+
+    /// <summary>
+    /// 计算Gamma函数的自然对数。
+    /// </summary>
+    /// <typeparam name="T">数值类型</typeparam>
+    /// <param name="x">输入的值</param>
+    /// <returns>Gamma函数的值的自然对数</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T GammaLog<T>(T x) where T : IFloatingPointIeee754<T>
+    {
+        return T.Log(Gamma(x));
+    }
+    #endregion
+
+
+    #region 误差函数
+
+    /// <summary>
+    /// 计算误差函数（Error Function）。
+    /// </summary>
+    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="x">输入值。</param>
+    /// <returns>误差函数的值。</returns>
+    /// <remarks>
+    /// 误差函数（Error Function，简称 erf）在统计学和概率论中有重要的应用。它主要用于计算正态分布的累积分布函数（CDF）。
+    /// 误差函数的定义为：
+    /// <code>
+    /// erf(x) = (2 / √π) ∫[0, x] e^(-t^2) dt
+    /// </code>
+    /// 其中，e 是自然对数的底数，π 是圆周率。
+    /// 
+    /// <para>
+    /// 误差函数的主要用途包括：
+    /// <list type="number">
+    /// <item>正态分布的累积分布函数 ：误差函数用于计算标准正态分布的累积分布函数（CDF）。在正态分布中，累积分布函数表示随机变量小于或等于某个值的概率。
+    /// 公式：Φ(x) = 0.5 * (1 + erf(x / √2))，其中 Φ(x) 是正态分布的累积分布函数，erf 是误差函数。
+    /// </item>
+    /// <item>
+    /// 概率计算 ：误差函数用于计算正态分布下的概率值。例如，计算某个范围内的概率时，可以使用误差函数来简化计算。
+    /// </item>
+    /// <item>
+    /// 数值分析 ：误差函数在数值分析中也有广泛应用，特别是在处理高斯积分和其他涉及正态分布的计算时。
+    /// </item>
+    /// <item>
+    /// 工程和物理学 ：在工程和物理学中，误差函数用于解决涉及正态分布和高斯函数的问题，如信号处理、热传导等领域。
+    /// </item>
+    /// </list>
+    /// </para>
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Erf<T>(T x) where T : IFloatingPointIeee754<T>
+    {
+        // 使用近似公式计算误差函数
+        T sign = x < T.Zero ? T.NegativeOne : T.One;
+        x = T.Abs(x);
+
+        T a1 = T.CreateChecked(0.254829592);
+        T a2 = T.CreateChecked(-0.284496736);
+        T a3 = T.CreateChecked(1.421413741);
+        T a4 = T.CreateChecked(-1.453152027);
+        T a5 = T.CreateChecked(1.061405429);
+        T p = T.CreateChecked(0.3275911);
+
+        T t = T.One / (T.One + p * x);
+        T y = T.One - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * T.Exp(-x * x);
+
+        return sign * y;
+    }
+
+
+    #endregion
+
+
+    #region 不完全Gamma函数
+
+    /// <summary>
+    /// 使用近似公式计算下不完全Gamma函数。
+    /// </summary>
+    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="s">形状参数。</param>
+    /// <param name="x">变量值。</param>
+    /// <returns>下不完全Gamma函数的值。</returns>
+    /// <remarks>
+    /// 下不完全Gamma函数（Lower Incomplete Gamma Function）是Gamma函数的扩展，定义为：
+    /// <code>
+    /// γ(s, x) = ∫[0, x] t^(s-1) * e^(-t) dt
+    /// </code>
+    /// 其中，s 是形状参数，x 是变量值。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T LowerIncompleteGamma<T>(T s, T x) where T : IFloatingPointIeee754<T>
+    {
+        T sum = T.Zero;
+        for (int k = 0; k < 100; k++)
+        {
+            sum += T.Pow(x, s + T.CreateChecked(k)) * T.Exp(-x) / VMath.Factorial<T>(T.CreateChecked(k));
+        }
+        return sum;
+    }
+
+
+    #endregion
+
+
+    #region Beta
+
+    /// <summary>
+    /// 计算 Beta 函数的值。
+    /// </summary>
+    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="alpha">形状参数 α。</param>
+    /// <param name="beta">形状参数 β。</param>
+    /// <returns>Beta 函数的值。</returns>
+    /// <remarks>
+    /// Beta 函数的公式为：
+    /// <code>
+    /// B(α, β) = Γ(α) * Γ(β) / Γ(α + β)
+    /// </code>
+    /// 其中，Γ 是 Gamma 函数。
+    /// Beta 函数在概率论和统计学中有广泛的应用，特别是在处理 Beta 分布时。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Beta<T>(T alpha, T beta) where T : IFloatingPointIeee754<T>
+    {
+        return VMath.Gamma(alpha) * VMath.Gamma(beta) / VMath.Gamma(alpha + beta);
+    }
+
+    /// <summary>
+    /// 计算正则化不完全 Beta 函数的值。
+    /// </summary>
+    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="x">变量值。</param>
+    /// <param name="alpha">形状参数 α。</param>
+    /// <param name="beta">形状参数 β。</param>
+    /// <returns>正则化不完全 Beta 函数的值。</returns>
+    /// <remarks>
+    /// 正则化不完全 Beta 函数的公式为：
+    /// <code>
+    /// I_x(α, β) = (1 / B(α, β)) * ∫[0, x] t^(α-1) * (1-t)^(β-1) dt
+    /// </code>
+    /// 其中，B(α, β) 是 Beta 函数。
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T RegularizedIncompleteBeta<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>
+    {
+        T bt = (x == T.Zero || x == T.One) ? T.Zero :
+            T.Exp(VMath.GammaLog(alpha + beta) - VMath.GammaLog(alpha) - VMath.GammaLog(beta) + alpha * T.Log(x) + beta * T.Log(T.One - x));
+        if (x < (alpha + T.One) / (alpha + beta + T.CreateChecked(2)))
+        {
+            return bt * BetaContinuedFraction(x, alpha, beta) / alpha;
+        }
+        else
+        {
+            return T.One - bt * BetaContinuedFraction(T.One - x, beta, alpha) / beta;
+        }
+    }
+
+    /// <summary>
+    /// 使用连分数展开计算 Beta 函数的值。
+    /// </summary>
+    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
+    /// <param name="x">变量值。</param>
+    /// <param name="alpha">形状参数 α。</param>
+    /// <param name="beta">形状参数 β。</param>
+    /// <returns>Beta 函数的值。</returns>
+    /// <remarks>
+    /// 使用连分数展开计算 Beta 函数的值，公式为：
+    /// <code>
+    /// B(x; α, β) = ∑[m=0, ∞] (m * (β - m) * x) / ((α + 2m - 1) * (α + 2m))
+    /// </code>
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T BetaContinuedFraction<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>
+    {
+        int maxIterations = 100;
+        T epsilon = T.CreateChecked(3.0e-7);
+        T a = T.One;
+        T b = T.One - (alpha + beta) * x / (alpha + T.One);
+        T c = T.One / epsilon;
+        T d = T.One / b;
+        T h = d;
+        for (int m = 1; m <= maxIterations; m++)
+        {
+            int m2 = 2 * m;
+            T aa = T.CreateChecked(m) * (beta - T.CreateChecked(m)) * x / ((alpha - T.One + T.CreateChecked(m2)) * (alpha + T.CreateChecked(m2)));
+            d = T.One + aa * d;
+            if (T.Abs(d) < epsilon) d = epsilon;
+            c = T.One + aa / c;
+            if (T.Abs(c) < epsilon) c = epsilon;
+            h *= d * c;
+            aa = -(alpha + T.CreateChecked(m)) * (alpha + beta + T.CreateChecked(m)) * x / ((alpha + T.CreateChecked(m2)) * (alpha + T.One + T.CreateChecked(m2)));
+            d = T.One + aa * d;
+            if (T.Abs(d) < epsilon) d = epsilon;
+            c = T.One + aa / c;
+            if (T.Abs(c) < epsilon) c = epsilon;
+            h *= d * c;
+        }
+        return h;
+    }
+
+
+
+    #endregion
 
 
     /// <summary>

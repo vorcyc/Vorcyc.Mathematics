@@ -63,10 +63,10 @@
 
   <Import Project="..\..\shared projects\DeepLearning\DeepLearning.projitems" Label="Shared" />
 
-  <Import Project="..\..\shared projects\Statistics_class\Statistics_class.projitems" Label="Shared" />
-
   <Import Project="..\..\shared projects\Framework\Framework.projitems" Label="Shared" />
 
   <Import Project="..\..\shared projects\LinearAlgebra\LinearAlgebra.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Statistics\Statistics.projitems" Label="Shared" />
 
 </Project>

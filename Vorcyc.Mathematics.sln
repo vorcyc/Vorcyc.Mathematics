@@ -65,8 +65,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ML_module_test", "TESTS\ML_
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DeepLearning", "shared projects\DeepLearning\DeepLearning.shproj", "{EAC6A8F4-E78E-4DA0-AA05-A6C1A9B1C6AF}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Statistics_class", "shared projects\Statistics_class\Statistics_class.shproj", "{0B0FEFDE-C426-4203-B897-55E2D9DA98BB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DL_module_test", "TESTS\DL_module_test\DL_module_test.csproj", "{DB1080E4-87CE-4166-8E8B-D98E9B654337}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Framework", "shared projects\Framework\Framework.shproj", "{FE21B649-02D8-49FA-8A58-48A206F3D8AB}"
@@ -74,6 +72,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSP_module_test", "TESTS\DSP_module_test\DSP_module_test.csproj", "{AC068117-F346-41D1-9C94-4156DCCABB3D}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LinearAlgebra", "shared projects\LinearAlgebra\LinearAlgebra.shproj", "{4FBD3895-5EE5-4E7B-A6B6-6BE2EF5FAED8}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Statistics", "shared projects\Statistics\Statistics.shproj", "{ADABFB24-985D-4ACF-8182-0283D7CBD54A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,21 +121,21 @@ Global
 		{B6B8E014-C126-45DC-858E-C067D9916E03} = {E0B00A4A-8D98-4AD3-AA39-F39CFCFCBC4F}
 		{DBA1F647-6010-49E8-A3AD-A039494FEAF3} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 		{EAC6A8F4-E78E-4DA0-AA05-A6C1A9B1C6AF} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
-		{0B0FEFDE-C426-4203-B897-55E2D9DA98BB} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{DB1080E4-87CE-4166-8E8B-D98E9B654337} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 		{FE21B649-02D8-49FA-8A58-48A206F3D8AB} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{AC068117-F346-41D1-9C94-4156DCCABB3D} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 		{4FBD3895-5EE5-4E7B-A6B6-6BE2EF5FAED8} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{ADABFB24-985D-4ACF-8182-0283D7CBD54A} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		shared projects\MachineLearning\MachineLearning.projitems*{05c9ce82-9814-4a38-a874-444151d41daa}*SharedItemsImports = 13
-		shared projects\Statistics_class\Statistics_class.projitems*{0b0fefde-c426-4203-b897-55e2d9da98bb}*SharedItemsImports = 13
 		shared projects\LinearAlgebra\LinearAlgebra.projitems*{4fbd3895-5ee5-4e7b-a6b6-6be2ef5faed8}*SharedItemsImports = 13
 		shared projects\Core\Core.projitems*{61cdf5ae-6d99-4a3e-a3cd-30293c143fe6}*SharedItemsImports = 13
 		shared projects\Numerics\Numerics.projitems*{7ee17963-00e5-412c-a6de-fb94c21e4f57}*SharedItemsImports = 13
+		shared projects\Statistics\Statistics.projitems*{adabfb24-985d-4acf-8182-0283d7cbd54a}*SharedItemsImports = 13
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b2c3419e-250a-487d-bc7c-0c89640b96ae}*SharedItemsImports = 13
 		shared projects\Core\Core.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\DeepLearning\DeepLearning.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
@@ -145,7 +145,7 @@ Global
 		shared projects\MachineLearning\MachineLearning.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Numerics\Numerics.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
-		shared projects\Statistics_class\Statistics_class.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
+		shared projects\Statistics\Statistics.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Experimental\Experimental.projitems*{c60535f6-5504-48a9-934a-53d6b572d846}*SharedItemsImports = 13
 		shared projects\DeepLearning\DeepLearning.projitems*{eac6a8f4-e78e-4da0-aa05-a6c1a9b1c6af}*SharedItemsImports = 13
 		shared projects\Framework\Framework.projitems*{fe21b649-02d8-49fa-8a58-48a206f3d8ab}*SharedItemsImports = 13

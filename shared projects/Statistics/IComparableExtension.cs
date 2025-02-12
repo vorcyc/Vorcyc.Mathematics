@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Vorcyc.Mathematics;
+﻿namespace Vorcyc.Mathematics.Statistics;
 
 /// <summary>
 /// Provides extension methods for <see cref="IComparable{T}"/> and <see cref="IComparable"/>

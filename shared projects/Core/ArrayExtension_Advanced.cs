@@ -323,7 +323,7 @@ public static partial class ArrayExtension
 
         foreach (var s in splited)
         {
-            yield return Statistics.Average(s);
+            yield return Statistics.Basic.Average(s);
         }
     }
 
@@ -363,13 +363,13 @@ public static partial class ArrayExtension
         foreach (var s in splited)
         {
             if (i > targetLength - 1) break;
-            result[i] = Statistics.Average(s);
+            result[i] = Statistics.Basic.Average(s);
             i++;
         }
         //剩余的一堆，再求次均值
         //Set the last one.
         var sub = splited.Skip(targetLength - 1);
-        result[targetLength - 1] = Statistics.Average(sub);
+        result[targetLength - 1] = Statistics.Basic.Average(sub);
 
 
         return result;

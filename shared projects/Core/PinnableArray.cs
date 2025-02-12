@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Vorcyc.Mathematics.Framework;
+using Vorcyc.Mathematics.Statistics;
 
 //https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags#list
 
@@ -636,7 +637,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// Returns the maximum of current <see cref="PinnableArray{TScalar}"/>.
     /// </summary>
     /// <returns></returns>
-    public T Max() => Statistics.Max(_array);// _scalars.Max();
+    public T Max() => Statistics.INumberExtension.Max(_array);// _scalars.Max();
 
 
     /// <summary>
@@ -645,7 +646,7 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     /// <param name="start"></param>
     /// <param name="length"></param>
     /// <returns></returns>
-    public T Max(int start, int length) => Statistics.Max(_array, start, length);
+    public T Max(int start, int length) => Statistics.INumberExtension.Max(_array, start, length);
 
 
     /// <summary>
@@ -678,9 +679,9 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
 
     #region Min
 
-    public T Min() => Statistics.Min(_array);
+    public T Min() => Statistics.INumberExtension.Min(_array);
 
-    public T Min(int start, int length) => Statistics.Min(_array, start, length);
+    public T Min(int start, int length) => Statistics.INumberExtension.Min(_array, start, length);
 
     public async Task<T> MinAsync(int? numberOfWorkers = null, bool useTPL = false)
         => await _array.CompareMinAsync(numberOfWorkers, useTPL);
