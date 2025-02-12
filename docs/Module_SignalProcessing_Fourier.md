@@ -3,6 +3,8 @@
 # 信号处理模块 - Signal Processing Module
 ## 傅立叶变换 - Fourier Transform
 
+`Vorcyc.Mathematics.SignalProcessing.Fourier` 命名空间包含多种傅立叶变换类，包括 `CudaFFT`、`FastFourierTransform` 和 `RealOnlyFFT_Fp32`。`CudaFFT` 类用于实现基于 CUDA 的 FFT 操作，提供前向和逆向 FFT 变换方法。`FastFourierTransform` 类是一个静态类，提供多种前向和逆向 FFT 变换方法，支持实数和复数输入输出。`RealOnlyFFT_Fp32` 类用于实现仅实数输入和输出的 FFT 变换，提供前向和逆向 FFT 变换、幅度谱和功率谱计算方法。这些类提供了丰富的傅立叶变换功能，适用于各种信号处理需求。
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Fourier
 
 ---

@@ -6,6 +6,7 @@
 
 > 以下所有类型都位于命名空间 : Vorcyc.Mathematics.Numerics
 
+---
 
 :ledger:目录  
 - :bookmark: [BigFloat](#1-bigfloat)
@@ -22,8 +23,6 @@
 - :bookmark: [Size&lt;T>](#12-sizet)
 - :bookmark: [SizeFp32](#13-sizefp32)
 - :bookmark: [UInt24](#14-uint24)
-
-
 
 ---
 

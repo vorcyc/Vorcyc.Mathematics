@@ -3,6 +3,8 @@
 # 信号处理模块 - Signal Processing Module
 ## 其他音频特征计算 - Features
 
+`Vorcyc.Mathematics.SignalProcessing.Features` 命名空间包含多种音频特征计算类，包括 `Harmonic`、`Perceptual`、`Pitch` 和 `Spectral`。这些类提供了丰富的音频特征计算功能，如谐波特征、感知特征、音高估计和谱特征，适用于各种音频信号处理需求。
+
 > 以下类型均位于 Vorcyc.Mathematics.SignalProcessing.Features 命名空间。
 
 ---

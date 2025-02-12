@@ -2,6 +2,9 @@
 
 # 机器学习模块 - Machine Learning Module
 
+`Vorcyc.Mathematics.MachineLearning` 命名空间包含多种机器学习算法和工具类，包括决策树、K 最近邻、多元线性回归、随机森林、简单线性回归、支持向量机、朴素贝叶斯分类器、DBSCAN 聚类、期望最大化、高斯混合模型、层次聚类、K 均值聚类、矢量量化、因子分析、主成分分析 (PCA)、t-SNE 降维算法等。此外，还包括多种距离度量类，如 Angular、ArgMax、BrayCurtis、Canberra、Chebyshev、Cosine、Dice、Euclidean、Hamming、Hellinger、Jaccard、Kulczynski、Levenshtein、Manhattan、Matching、Minkowski、PearsonCorrelation、RogersTanimoto、RusselRao、SokalMichener、SokalSneath、WeightedEuclidean、WeightedSquareEuclidean 和 Yule。这些类提供了丰富的机器学习和数据分析功能，适用于各种分类、回归、聚类和降维任务。
+
+
 > 以下所有类型都位于命名空间 : Vorcyc.Mathematics.MachineLearning
 
 :ledger:目录  

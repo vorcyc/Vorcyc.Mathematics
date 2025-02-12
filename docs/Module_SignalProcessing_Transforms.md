@@ -3,16 +3,23 @@
 # 信号处理模块 - Signal Processing Module
 ## 变换操作 - Transforms
 
+`Vorcyc.Mathematics.SignalProcessing.Transforms` 命名空间包含多种变换操作类，包括 `Dct1`、`Dct2`、`Dct3`、`Dct4`、`FastDct2`、`FastDct3`、`FastDct4`、`FastMdct` 和 `Mdct`。这些类提供了离散余弦变换（DCT）和修正离散余弦变换（MDCT）的实现，支持不同类型的 DCT 变换（I、II、III、IV）以及基于 FFT 的快速实现。每个类都提供了直接变换、归一化变换、逆变换和归一化逆变换的方法，适用于各种信号处理需求。
+
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Transforms
 
 ---
 
 :ledger:目录  
-
-
-？？？
-
-
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.Dct1 类](#vorcycmathematicssignalprocessingtransformsdct1-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.Dct2 类](#vorcycmathematicssignalprocessingtransformsdct2-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.Dct3 类](#vorcycmathematicssignalprocessingtransformsdct3-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.Dct4 类](#vorcycmathematicssignalprocessingtransformsdct4-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.FastDct2 类](#vorcycmathematicssignalprocessingtransformsfastdct2-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.FastDct3 类](#vorcycmathematicssignalprocessingtransformsfastdct3-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.FastDct4 类](#vorcycmathematicssignalprocessingtransformsfastdct4-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.FastMdct 类](#vorcycmathematicssignalprocessingtransformsfastmdct-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Transforms.Mdct 类](#vorcycmathematicssignalprocessingtransformsmdct-类)  
 
 ---
 

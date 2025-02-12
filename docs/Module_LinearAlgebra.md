@@ -2,6 +2,9 @@
 
 # 线性代数模块 - Linear Algebra Module
 
+`Vorcyc.Mathematics.LinearAlgebra` 命名空间包含多种线性代数类和结构，包括 `BasisTransformation`、`LinearEquationSolver`、`Matrix`、`Matrix<T>`、`MatrixHelper`、`MatrixOperations`、`Quaternion`、`Tensor`、`Tensor<T>` 和 `Vector<T>`。这些类和结构提供了丰富的线性代数操作和运算方法，如基变换、线性方程组求解、矩阵运算、四元数运算、张量运算和向量运算等，适用于各种数学和科学计算需求。
+
+
 > 以下所有类型都位于命名空间 ：Vorcyc.Mathematics.LinearAlgebra
 
 

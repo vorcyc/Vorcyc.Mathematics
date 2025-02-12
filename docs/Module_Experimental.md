@@ -2,6 +2,10 @@
 
 # 实验性模块 - Experimental Module
 
+`Vorcyc.Mathematics.Experimental.KalmanFilters` 命名空间包含多种卡尔曼滤波器类，包括 `ExtendedKalmanFilter1D<T>`、`ExtendedKalmanFilter2D<T>`、`InformationFilter1D<T>`、`ParticleFilter1D<T>`、`SquareRootKalmanFilter1D<T>`、`StandardKalmanFilter1D<T>`、`StandardKalmanFilter2D<T>` 和 `UnscentedKalmanFilter1D<T>`。这些类提供了丰富的滤波功能，适用于一维和二维的扩展卡尔曼滤波、信息滤波、粒子滤波、平方根卡尔曼滤波、标准卡尔曼滤波和无迹卡尔曼滤波。
+
+
+
 
 > 以下类型都位于 Vorcyc.Mathematics.Experimental.KalmanFilters 命名空间
 
@@ -16,6 +20,9 @@
 - :bookmark: [UnscentedKalmanFilter1D&lt;T> 类](#unscentedkalmanfilter1dt-类)
 
 ---
+
+`Vorcyc.Mathematics.Experimental.Signals` 命名空间包含多种信号处理类，包括 `FrequencyDomain`、`Signal`、`SignalExtension` 和 `SignalSegment`。`FrequencyDomain` 类用于表示频域信号，提供了频率转换、逆变换等方法。`Signal` 类用于表示时域信号，包含信号样本和采样率，并提供计算信号属性的方法。`SignalExtension` 类提供了生成各种波形的方法，如正弦波、余弦波、方波、锯齿波、三角波、白噪声和粉红噪声。`SignalSegment` 类用于表示信号段，实现了 `ITimeDomainSignal` 接口，提供了信号段的频域转换、重采样等方法。
+
 
 > 以下类型都位于 Vorcyc.Mathematics.Experimental.Signals 命名空间
 

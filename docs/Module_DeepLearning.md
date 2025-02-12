@@ -6,17 +6,20 @@
 
 > 以下方法均位于类 ：Vorcyc.Mathematics.DeepLearning
 
-:ledger:目录  
-- :bookmark: [FindExtremeValue 方法](#1-findextremevalue-方法)
-- :bookmark: [Sum 方法](#2-sum-方法)
-- :bookmark: [Average 方法](#3-average-方法)
-- :bookmark: [Variance 方法](#4-variance-方法)
-- :bookmark: [GetMaximumMinimumMedian 方法](#5-getmaximumminimummedian-方法)
-- :bookmark: [Max 方法](#6-max-方法)
-- :bookmark: [LocateMax 方法](#7-locatemax-方法)
-- :bookmark: [Min 方法](#8-min-方法)
-- :bookmark: [LocateMin 方法](#9-locatemin-方法)
+---
 
+:ledger:目录  
+- :bookmark: [Vorcyc.Mathematics.DeepLearning.Layers.Layers 类](#vorcycmathematicsdeeplearninglayerslayers-类)  
+  - :bookmark: [BatchNorm 方法](#1-batchnorm-方法)  
+  - :bookmark: [Conv2D 方法](#2-conv2d-方法)  
+  - :bookmark: [Dense 方法](#3-dense-方法)  
+  - :bookmark: [Fusion 方法](#4-fusion-方法)  
+  - :bookmark: [JoinLayer 方法](#5-joinlayer-方法)  
+  - :bookmark: [LinearLayer 方法](#6-linearlayer-方法)  
+  - :bookmark: [MaxPool2D 方法](#7-maxpool2d-方法)  
+  - :bookmark: [ReLU 方法](#8-relu-方法)  
+  - :bookmark: [Sigmoid 方法](#9-sigmoid-方法)  
+  - :bookmark: [Upsample2D 方法](#10-upsample2d-方法)  
 
 ---
 

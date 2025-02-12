@@ -3,6 +3,9 @@
 # 信号处理模块 - Signal Processing Module
 ## 常用操作 - Operations
 
+`Vorcyc.Mathematics.SignalProcessing.Operations` 命名空间包含多种常用的信号处理操作类，包括卷积操作类（如 `ComplexConvolver`、`Convolver`、`OlaBlockConvolver`、`OlsBlockConvolver`）、动态处理类（如 `DynamicsProcessor`）、包络跟随器类（如 `EnvelopeFollower`）、信号重建类（如 `GriffinLimReconstructor`）、谐波/打击乐分离器类（如 `HarmonicPercussiveSeparator`）、调制类（如 `Modulator`）、通用操作类（如 `Operation`）、重采样类（如 `Resampler`）、谱减法滤波类（如 `SpectralSubtractor`）和波形整形类（如 `WaveShaper`）。这些类提供了丰富的信号处理功能，适用于各种音频和信号处理需求。
+
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Operations
 
 ---

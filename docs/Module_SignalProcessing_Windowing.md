@@ -3,6 +3,8 @@
 # 信号处理模块 - Signal Processing Module
 ## 窗函数 - Windowing
 
+`Vorcyc.Mathematics.SignalProcessing.Windowing` 命名空间包含多种窗函数的计算和应用类，包括 `WindowApplier`、`WindowBuilder` 和 `WindowBuilderExtensions`。`WindowApplier` 类提供了多种窗函数的计算方法，如矩形窗、三角窗、汉明窗、布莱克曼窗、汉宁窗、高斯窗、凯撒窗、凯撒-贝塞尔派生窗、巴特利特-汉宁窗、兰索斯窗、幂正弦窗、平顶窗、升降窗和布莱克曼-哈里斯窗。`WindowBuilder` 类提供了生成各种类型窗函数系数的方法。`WindowBuilderExtensions` 类提供了应用窗函数到信号和样本数组的扩展方法。这些类和方法提供了丰富的窗函数计算和应用功能，适用于各种信号处理需求。
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Windowing
 
 ---

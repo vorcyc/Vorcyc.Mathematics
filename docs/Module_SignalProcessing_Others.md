@@ -3,6 +3,9 @@
 # 信号处理模块 - Signal Processing Module
 ## 其它 - Others
 
+`Vorcyc.Mathematics.SignalProcessing` 命名空间包含多种其它信号处理类，包括 `FractionalDelayLine`、`Lpc` 和 `Scale`。`FractionalDelayLine` 类用于实现信号处理中的分数延迟，提供写入、读取和重置延迟线的方法。`Lpc` 类提供了与线性预测编码 (LPC) 相关的函数，如计算 LPC 系数、LPC 倒谱和线谱频率 (LSF) 的转换。`Scale` 类提供了用于在不同尺度之间进行转换的方法，包括分贝、MIDI 音高、mel 频率、bark 频率和 ERB 频率等。这些类提供了丰富的信号处理功能，适用于各种音频和信号处理需求。
+
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing
 
 ---

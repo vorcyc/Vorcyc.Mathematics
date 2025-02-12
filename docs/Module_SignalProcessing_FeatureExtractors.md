@@ -3,6 +3,9 @@
 # 信号处理模块 - Signal Processing Module
 ## 音频特征提取 - Feature Extractors
 
+`Vorcyc.Mathematics.SignalProcessing.FeatureExtractors` 命名空间包含多种音频特征提取器类，包括 `Mpeg7SpectralFeaturesExtractor`、`SpectralFeaturesExtractor`、`TimeDomainFeaturesExtractor`、`AmsExtractor`、`ChromaExtractor`、`FilterbankExtractor`、`LpccExtractor`、`LpcExtractor`、`MfccExtractor`、`PitchExtractor`、`PlpExtractor`、`PnccExtractor`、`SpnccExtractor` 和 `WaveletExtractor`。这些类提供了丰富的音频特征提取功能，从时域特征、谱特征到各种倒谱系数和小波变换系数，适用于各种音频信号处理需求。
+
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.FeatureExtractors
 
 ---

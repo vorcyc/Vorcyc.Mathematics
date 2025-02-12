@@ -3,6 +3,9 @@
 # 信号处理模块 - Signal Processing Module
 ## 一维滤波器 - Filters
 
+`Vorcyc.Mathematics.SignalProcessing.Filters` 命名空间包含多种一维滤波器类，包括自适应滤波器（如 `LmfFilter`、`LmsFilter`、`NlmfFilter`、`NlmsFilter`、`RlsFilter` 等）、基础滤波器（如 `FilterChain`、`FirFilter`、`IirFilter`、`StereoFilter` 等）、贝塞尔滤波器、双二阶滤波器、巴特沃斯滤波器、切比雪夫滤波器、椭圆滤波器、FIR 滤波器设计器、单极滤波器、多相滤波器、梳状滤波器、直流去除滤波器、去加重滤波器、Hilbert 滤波器、中值滤波器、移动平均滤波器、预加重滤波器、RASTA 滤波器、Savitzky-Golay 滤波器、Thiran 滤波器和维纳滤波器。这些类提供了丰富的滤波功能，适用于各种信号处理需求。
+
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Filters
 
 ---

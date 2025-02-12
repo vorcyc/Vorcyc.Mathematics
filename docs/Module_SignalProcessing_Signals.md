@@ -3,6 +3,8 @@
 # 信号处理模块 - Signal Processing Module
 ## 信号定义和相关操作 - Signals
 
+`Vorcyc.Mathematics.SignalProcessing.Signals` 命名空间包含多种信号定义和相关操作类，包括 `ComplexDiscreteSignal`、`DiscreteSignal` 及其扩展方法。`ComplexDiscreteSignal` 类用于表示有限复数值离散时间信号，提供了信号的实部、虚部、幅度、相位等属性和多种操作方法。`DiscreteSignal` 类用于表示有限实数值离散时间信号，提供了信号的样本、能量、均方根值、过零率、香农熵等属性和方法。扩展方法类 `ComplexDiscreteSignalExtensions` 和 `DiscreteSignalExtensions` 提供了信号的延迟、叠加、连接、放大、衰减、整流、归一化、淡入淡出等操作。这些类和方法提供了丰富的信号处理功能，适用于各种信号处理需求。
+
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Signals
 
 ---
