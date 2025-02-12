@@ -17,7 +17,7 @@
 - :bookmark: [滤波器](Module_SignalProcessing_Filters.md)
 - :bookmark: [傅立叶变换](Module_SignalProcessing_Fourier.md)
 - :bookmark: [常见操作](Module_SignalProcessing_Operations.md)
-- :bookmark: [信号定义和相关操作]
+- :bookmark: [信号定义和相关操作](Module_SignalProcessing_Signals.md)
 - :bookmark: [变换操作]
 - :bookmark: [窗函数操作]
 - :bookmark: [其它]
