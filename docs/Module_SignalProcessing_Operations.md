@@ -1,7 +1,7 @@
-﻿当前位置 : [根目录](README.md)/[信号处理模块](Module_SignalProcessing.md)/[常见操作](Module_SignalProcessing_Operations.md)
+﻿当前位置 : [根目录](README.md)/[信号处理模块](Module_SignalProcessing.md)/[常用操作](Module_SignalProcessing_Operations.md)
 
 # 信号处理模块 - Signal Processing Module
-## 一维滤波器 - Filters
+## 常用操作 - Operations
 
 > 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Operations
 
