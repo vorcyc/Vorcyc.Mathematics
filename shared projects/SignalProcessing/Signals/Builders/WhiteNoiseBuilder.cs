@@ -5,7 +5,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Signals.Builders
     /// <summary>
     /// Represents white noise builder.
     /// <para>
-    /// Parameters that can be set in method <see cref="SignalBuilder.SetParameter(string, double)"/>: 
+    /// Parameters that can be set in method <see cref="SignalBuilder.SetParameter(string, float)"/>: 
     /// <list type="bullet">
     ///     <item>"low", "lo", "min" (default: -1.0)</item>
     ///     <item>"high", "hi", "max" (default: 1.0)</item>

@@ -60,7 +60,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Signals.Builders
             var x = _n % _cycles;
             var sample = x < _cycles / 2 ? _high : _low;
             _n++;
-            return (float)sample;
+            return sample;
         }
 
         /// <summary>

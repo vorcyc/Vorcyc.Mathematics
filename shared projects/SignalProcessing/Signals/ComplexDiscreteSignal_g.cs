@@ -3,6 +3,12 @@
 using System.Numerics;
 using Vorcyc.Mathematics.Numerics;
 
+/// <summary>
+/// Represents a finite complex-valued discrete-time signal.
+/// The signal is stored as two arrays of data (real parts and imaginary parts) sampled at a certain sampling rate.
+/// See also <see cref="ComplexDiscreteSignalExtensions"/> for extra functionality of complex DT signals.
+/// </summary>
+/// <typeparam name="T">The type of the signal's components, which must be an unmanaged floating-point type.</typeparam>
 public class ComplexDiscreteSignal<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
