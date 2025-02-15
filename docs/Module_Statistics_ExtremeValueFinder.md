@@ -10,17 +10,13 @@ Vorcyc.Mathematics.Statistics.ExtremeValueFinder 是一个提供查找序列中�
 ---
 
 :ledger:目录  
-- :bookmark: [FindExtremeValue (float[], int, int) 方法](#1-findextremevalue-float-int-int-方法)  
-- :bookmark: [FindExtremeValue<T> (T[], int, int) 方法](#2-findextremevaluet-t-int-int-方法)  
-- :bookmark: [FindExtremeValue (float[]) 方法](#3-findextremevalue-float-方法)  
-- :bookmark: [FindExtremeValue<T> (T[]) 方法](#4-findextremevaluet-t-方法)  
-- :bookmark: [FindExtremeValue (ArraySegment<float>) 方法](#5-findextremevalue-arraysegmentfloat-方法)  
-- :bookmark: [FindExtremeValue<T> (ArraySegment<T>) 方法](#6-findextremevaluet-arraysegmentt-方法)  
-- :bookmark: [FindExtremeValue (Span<float>) 方法](#7-findextremevalue-spanfloat-方法)  
-- :bookmark: [FindExtremeValue_Normal<T> (Span<T>) 方法](#8-findextremevalue-normal-span-t-方法)  
-- :bookmark: [FindExtremeValue_Vector128 (Span<float>) 方法](#9-findextremevalue-vector128-spanfloat-方法)  
-- :bookmark: [FindExtremeValue_Vector256 (Span<float>) 方法](#10-findextremevalue-vector256-spanfloat-方法)  
-- :bookmark: [FindExtremeValue_Vector512 (Span<float>) 方法](#11-findextremevalue-vector512-spanfloat-方法)  
+- :bookmark: [FindExtremeValue(float[], int, int) 方法](#1-findextremevalue-float-int-int-方法)  
+- :bookmark: [FindExtremeValue&lt;T> (T[], int, int) 方法](#2-findextremevaluet-t-int-int-方法)  
+- :bookmark: [FindExtremeValue(float[]) 方法](#3-findextremevalue-float-方法)  
+- :bookmark: [FindExtremeValue&lt;T>T[]) 方法](#4-findextremevaluet-t-方法)  
+- :bookmark: [FindExtremeValue(ArraySegment<float>) 方法](#5-findextremevalue-arraysegmentfloat-方法)  
+- :bookmark: [FindExtremeValue&lt;T> (ArraySegment<T>) 方法](#6-findextremevaluet-arraysegmentt-方法)  
+- :bookmark: [FindExtremeValue(Span<float>) 方法](#7-findextremevalue-spanfloat-方法)    
 
 
 ---
@@ -63,56 +59,27 @@ Vorcyc.Mathematics.Statistics.ExtremeValueFinder 是一个提供查找序列中�
     - `array`: 数组。
   - 返回值: 包含数组中最大值和最小值的元组。
 
-#### 5. FindExtremeValue (ArraySegment<float>)
+#### 5. FindExtremeValue(ArraySegment<float>)
 - `public static (float max, float min) FindExtremeValue(this ArraySegment<float> arraySegment)`
   - 查找浮点数组段中的最大值和最小值。
   - 参数:
     - `arraySegment`: 浮点数组段。
   - 返回值: 包含数组段中最大值和最小值的元组。
 
-#### 6. FindExtremeValue<T> (ArraySegment<T>)
+#### 6. FindExtremeValue<T>(ArraySegment<T>)
 - `public static (T max, T min) FindExtremeValue<T>(this ArraySegment<T> arraySegment) where T : INumber<T>`
   - 查找数组段中的最大值和最小值。
   - 参数:
     - `arraySegment`: 数组段。
   - 返回值: 包含数组段中最大值和最小值的元组。
 
-#### 7. FindExtremeValue (Span<float>)
+#### 7. FindExtremeValue(Span<float>)
 - `public static (float max, float min) FindExtremeValue(this Span<float> span)`
   - 查找浮点 Span 中的最大值和最小值。
   - 参数:
     - `span`: 浮点 Span。
   - 返回值: 包含 Span 中最大值和最小值的元组。
 
-### 内部方法
-
-#### 1. FindExtremeValue_Normal<T> (Span<T>)
-- `internal static (T max, T min) FindExtremeValue_Normal<T>(this Span<T> span) where T : unmanaged, INumber<T>`
-  - 查找 Span 中的最大值和最小值（普通方法）。
-  - 参数:
-    - `span`: Span。
-  - 返回值: 包含 Span 中最大值和最小值的元组。
-
-#### 2. FindExtremeValue_Vector128 (Span<float>)
-- `internal static (float max, float min) FindExtremeValue_Vector128(this Span<float> span)`
-  - 使用 SSE2 指令集优化，从浮点数的 Span 中获取最大值和最小值。
-  - 参数:
-    - `span`: 浮点 Span。
-  - 返回值: 包含 Span 中最大值和最小值的元组。
-
-#### 3. FindExtremeValue_Vector256 (Span<float>)
-- `internal static (float max, float min) FindExtremeValue_Vector256(this Span<float> span)`
-  - 使用 AVX2 指令集优化，从浮点数的 Span 中获取最大值和最小值。
-  - 参数:
-    - `span`: 浮点 Span。
-  - 返回值: 包含 Span 中最大值和最小值的元组。
-
-#### 4. FindExtremeValue_Vector512 (Span<float>)
-- `internal static (float max, float min) FindExtremeValue_Vector512(this Span<float> span)`
-  - 使用 AVX512 指令集优化，从浮点数的 Span 中获取最大值和最小值。
-  - 参数:
-    - `span`: 浮点 Span。
-  - 返回值: 包含 Span 中最大值和最小值的元组。
 
 ### 代码示例
 以下是一个使用 ExtremeValueFinder 类中多个方法的示例，并在示例中加入了注释：
