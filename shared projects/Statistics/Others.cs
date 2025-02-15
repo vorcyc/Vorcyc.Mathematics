@@ -7,7 +7,9 @@ using System.Numerics;
 
 namespace Vorcyc.Mathematics.Statistics;
 
-
+/// <summary>
+/// 提供其他统计函数，包括协方差、相关系数和线性回归分析。
+/// </summary
 public static class Others
 {
     /// <summary>
