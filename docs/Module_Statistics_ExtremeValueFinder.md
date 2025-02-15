@@ -3,7 +3,7 @@
 # 统计模块 - Statistics Module
 ## 极值查找器 - ExtremeValueFinder
 
-Vorcyc.Mathematics.Statistics.ExtremeValueFinder 是一个提供查找序列中最大值和最小值的方法的类。该类提供了优化的算法以同时获得序列中的最大值和最小值。
+`Vorcyc.Mathematics.Statistics.ExtremeValueFinder` 是一个提供查找序列中最大值和最小值的方法的类。该类提供了优化的算法以同时获得序列中的最大值和最小值。
 
 > 以下方法均位于类 ：Vorcyc.Mathematics.Statistics.ExtremeValueFinder
 

@@ -30,7 +30,7 @@ Vorcyc.Mathematics.Statistics.Advanced 是一个提供高级统计函数的类�
 
 ### 方法
 
-#### 1. Percentile
+#### 1. Percentile 方法
 - `public static T Percentile<T>(this Span<T> sequence, double percentile) where T : IFloatingPointIeee754<T>`
   - 计算数据集的指定百分位数。
   - 参数:
@@ -38,28 +38,28 @@ Vorcyc.Mathematics.Statistics.Advanced 是一个提供高级统计函数的类�
     - `percentile`: 百分位数（0到1之间）。
   - 返回值: 指定百分位数的值。
 
-#### 2. Quartiles
+#### 2. Quartiles 方法
 - `public static (T Q1, T Q2, T Q3) Quartiles<T>(this Span<T> sequence) where T : IFloatingPointIeee754<T>`
   - 计算数据集的四分位数。
   - 参数:
     - `sequence`: 数据集。
   - 返回值: 包含第一、第二和第三四分位数的元组。
 
-#### 3. Skewness
+#### 3. Skewness 方法
 - `public static T Skewness<T>(this Span<T> sequence) where T : IFloatingPointIeee754<T>`
   - 计算数据集的偏度，衡量数据分布的对称性。
   - 参数:
     - `sequence`: 数据集。
   - 返回值: 数据集的偏度值。
 
-#### 4. Kurtosis
+#### 4. Kurtosis 方法
 - `public static T Kurtosis<T>(this Span<T> sequence) where T : IFloatingPointIeee754<T>`
   - 计算数据集的峰度，衡量数据分布的尖锐程度。
   - 参数:
     - `sequence`: 数据集。
   - 返回值: 数据集的峰度值。
 
-#### 5. ConfidenceInterval
+#### 5. ConfidenceInterval 方法
 - `public static (T Lower, T Upper) ConfidenceInterval<T>(this Span<T> sequence, double confidenceLevel) where T : IFloatingPointIeee754<T>`
   - 计算均值或比例的置信区间。
   - 参数:
@@ -67,7 +67,7 @@ Vorcyc.Mathematics.Statistics.Advanced 是一个提供高级统计函数的类�
     - `confidenceLevel`: 置信水平（例如0.95表示95%的置信水平）。
   - 返回值: 包含置信区间下限和上限的元组。
 
-#### 6. TTest
+#### 6. TTest 方法
 - `public static T TTest<T>(this Span<T> sample, T populationMean) where T : IFloatingPointIeee754<T>`
   - 实现各种假设检验，如z检验、t检验、卡方检验等。
   - 参数:
@@ -75,14 +75,14 @@ Vorcyc.Mathematics.Statistics.Advanced 是一个提供高级统计函数的类�
     - `populationMean`: 总体均值。
   - 返回值: t检验的统计量。
 
-#### 7. Anova
+#### 7. Anova 方法
 - `public static T Anova<T>(this IEnumerable<ArraySegment<T>> groups) where T : IFloatingPointIeee754<T>`
   - 实现单因素和多因素方差分析。
   - 参数:
     - `groups`: 数据组的集合。
   - 返回值: 方差分析的F值。
 
-#### 8. ChiSquaredTest
+#### 8. ChiSquaredTest 方法
 - `public static T ChiSquaredTest<T>(this Span<T> observed, Span<T> expected) where T : IFloatingPointIeee754<T>`
   - 实现卡方独立性检验和拟合优度检验。
   - 参数:
@@ -90,7 +90,7 @@ Vorcyc.Mathematics.Statistics.Advanced 是一个提供高级统计函数的类�
     - `expected`: 期望值数据集。
   - 返回值: 卡方检验的统计量。
 
-#### 9. MannWhitneyUTest
+#### 9. MannWhitneyUTest 方法
 - `public static T MannWhitneyUTest<T>(this Span<T> sample1, Span<T> sample2) where T : IFloatingPointIeee754<T>`
   - 实现如曼-惠特尼U检验、克鲁斯卡尔-沃利斯检验等非参数检验。
   - 参数:

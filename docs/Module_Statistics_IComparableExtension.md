@@ -3,7 +3,7 @@
 # 统计模块 - Statistics Module
 ## IComparableExtension
 
-Vorcyc.Mathematics.Statistics.IComparableExtension 是一个提供扩展方法的类，用于简化 IComparable&lt;T> 和 IComparable 的比较操作，并支持并行计算最大值和最小值。
+`Vorcyc.Mathematics.Statistics.IComparableExtension` 是一个提供扩展方法的类，用于简化 IComparable&lt;T> 和 IComparable 的比较操作，并支持并行计算最大值和最小值。
 
 > 以下方法均位于类 ：Vorcyc.Mathematics.Statistics.IComparableExtension
 
