@@ -46,6 +46,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C288D331-8
 		docs\Module_SignalProcessing_Transforms.md = docs\Module_SignalProcessing_Transforms.md
 		docs\Module_SignalProcessing_Windowing.md = docs\Module_SignalProcessing_Windowing.md
 		docs\Module_Statistics.md = docs\Module_Statistics.md
+		docs\Module_Statistics_Advanced.md = docs\Module_Statistics_Advanced.md
+		docs\Module_Statistics_Basic.md = docs\Module_Statistics_Basic.md
+		docs\Module_Statistics_Distribution.md = docs\Module_Statistics_Distribution.md
+		docs\Module_Statistics_ExtremeValueFinder.md = docs\Module_Statistics_ExtremeValueFinder.md
+		docs\Module_Statistics_IComparableExtension.md = docs\Module_Statistics_IComparableExtension.md
+		docs\Module_Statistics_INumberExtension.md = docs\Module_Statistics_INumberExtension.md
+		docs\Module_Statistics_Others.md = docs\Module_Statistics_Others.md
+		docs\Module_Statistics_TimeSeriesAnalysis.md = docs\Module_Statistics_TimeSeriesAnalysis.md
 		docs\README.md = docs\README.md
 		docs\VMath 1.0.docx = docs\VMath 1.0.docx
 	EndProjectSection

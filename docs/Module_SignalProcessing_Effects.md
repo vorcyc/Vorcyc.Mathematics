@@ -6,7 +6,7 @@
 `Vorcyc.Mathematics.SignalProcessing.Effects` 命名空间包含多种音频效果类，包括基础类 `AudioEffect` 和 `WetDryMixer`，以及立体声效果类如 `BinauralPanEffect`、`ItdIldPanEffect` 和 `StereoDelayEffect`。其他效果类包括 `AutowahEffect`、`BitCrusherEffect`、`ChorusEffect`、`DelayEffect`、`DistortionEffect`、`EchoEffect`、`FlangerEffect`、`MorphEffect`、`PhaserEffect`、`PitchShiftEffect`、`PitchShiftVocoderEffect`、`RobotEffect`、`TremoloEffect`、`TubeDistortionEffect`、`VibratoEffect`、`WahwahEffect` 和 `WhisperEffect`。这些类提供了丰富的音频处理功能，从延迟、失真到合唱、移相和音高移位，适用于各种音频信号处理需求。
 
 
-> 以下类型均位于命名空间 ：Vorcyc.Mathematics.SignalProcessing.Effects
+> 以下类型的根命名空间为 ：Vorcyc.Mathematics.SignalProcessing.Effects
 
 ---
 
