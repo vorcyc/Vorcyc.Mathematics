@@ -9,9 +9,9 @@ Vorcyc.Mathematics.Statistics 命名空间提供了全面的统计分析工具�
 :ledger:目录  
 - :bookmark: [基础统计函数](Module_Statistics_Basic.md)
 - :bookmark: [高级统计函数](Module_Statistics_Advanced.md)
+- :bookmark: [其它统计函数](Module_Statistics_Others.md)
 - :bookmark: [分布相关函数](Module_Statistics_Distribution.md)
 - :bookmark: [时间序列分析](Module_Statistics_TimeSeriesAnalysis.md)
-- :bookmark: [其它统计函数](Module_Statistics_Others.md)
 - :bookmark: [IComparable 扩展](Module_Statistics_IComparableExtension.md)
 - :bookmark: [ExtremeValueFinder](Module_Statistics_ExtremeValueFinder.md)
 - :bookmark: [INumber 扩展](Module_Statistics_INumberExtension.md)
