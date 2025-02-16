@@ -1191,6 +1191,7 @@ Vorcyc.Mathematics.VMath ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÊıÑ§º¯ÊıºÍ²Ù×÷¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Ò
 ½Ø¶ÏÃİº¯Êı¡£
 #### 21.	InvSqrt
 `public static float InvSqrt(float f)`  
+`public static double InvSqrt(double f)`  
 ¿ìËÙÄæ¸¡µãÊıÆ½·½¸ù¡£
 #### 22.	Max
 `public static float Max(float a, float b, float c)`  
