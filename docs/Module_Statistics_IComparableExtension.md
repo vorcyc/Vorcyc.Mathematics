@@ -49,7 +49,7 @@
 
 ### 方法
 
-#### 1. LessThan
+#### 1. LessThan 方法
 - `public static bool LessThan<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 确定第一个值是否小于第二个值。
   - 参数:
@@ -57,7 +57,7 @@
     - `value2`: 第二个值。
   - 返回值: 如果第一个值小于第二个值，则返回 `true`；否则返回 `false`。
 
-#### 2. LessThanOrEqual
+#### 2. LessThanOrEqual 方法
 - `public static bool LessThanOrEqual<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 确定第一个值是否小于或等于第二个值。
   - 参数:
@@ -65,7 +65,7 @@
     - `value2`: 第二个值。
   - 返回值: 如果第一个值小于或等于第二个值，则返回 `true`；否则返回 `false`。
 
-#### 3. GreaterThan
+#### 3. GreaterThan 方法
 - `public static bool GreaterThan<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 确定第一个值是否大于第二个值。
   - 参数:
@@ -73,7 +73,7 @@
     - `value2`: 第二个值。
   - 返回值: 如果第一个值大于第二个值，则返回 `true`；否则返回 `false`。
 
-#### 4. GreaterThanOrEqual
+#### 4. GreaterThanOrEqual 方法
 - `public static bool GreaterThanOrEqual<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 确定第一个值是否大于或等于第二个值。
   - 参数:
@@ -81,7 +81,7 @@
     - `value2`: 第二个值。
   - 返回值: 如果第一个值大于或等于第二个值，则返回 `true`；否则返回 `false`。
 
-#### 5. Equal
+#### 5. Equal 方法
 - `public static bool Equal<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 确定第一个值是否等于第二个值。
   - 参数:
@@ -89,7 +89,7 @@
     - `value2`: 第二个值。
   - 返回值: 如果第一个值等于第二个值，则返回 `true`；否则返回 `false`。
 
-#### 6. NotEqual
+#### 6. NotEqual 方法
 - `public static bool NotEqual<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 确定第一个值是否不等于第二个值。
   - 参数:
@@ -97,7 +97,7 @@
     - `value2`: 第二个值。
   - 返回值: 如果第一个值不等于第二个值，则返回 `true`；否则返回 `false`。
 
-#### 7. CompareMax
+#### 7. CompareMax 方法
 - `public static T CompareMax<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 返回两个值中的最大值。
   - 参数:
@@ -105,7 +105,7 @@
     - `value2`: 第二个值。
   - 返回值: 两个值中的最大值。
 
-#### 8. CompareMin
+#### 8. CompareMin 方法
 - `public static T CompareMin<T>(this T value1, T value2) where T : IComparable, IComparable<T>`
   - 返回两个值中的最小值。
   - 参数:
@@ -113,14 +113,14 @@
     - `value2`: 第二个值。
   - 返回值: 两个值中的最小值。
 
-#### 9. CompareMax (数组)
+#### 9. CompareMax (数组) 方法
 - `public static T CompareMax<T>(this T[] values) where T : IComparable, IComparable<T>`
   - 返回数组中的最大值。
   - 参数:
     - `values`: 值的数组。
   - 返回值: 数组中的最大值。
 
-#### 10. CompareMax (数组范围)
+#### 10. CompareMax (数组范围) 方法
 - `public static T CompareMax<T>(this T[] values, int start, int length) where T : IComparable, IComparable<T>`
   - 返回数组指定范围内的最大值。
   - 参数:
@@ -129,21 +129,21 @@
     - `length`: 范围的长度。
   - 返回值: 数组指定范围内的最大值。
 
-#### 11. CompareMax (Span)
+#### 11. CompareMax (Span) 方法
 - `public static T CompareMax<T>(this Span<T> span) where T : IComparable, IComparable<T>`
   - 返回 Span 中的最大值。
   - 参数:
     - `span`: 值的 Span。
   - 返回值: Span 中的最大值。
 
-#### 12. CompareMin (数组)
+#### 12. CompareMin (数组) 方法
 - `public static T CompareMin<T>(this T[] values) where T : IComparable, IComparable<T>`
   - 返回数组中的最小值。
   - 参数:
     - `values`: 值的数组。
   - 返回值: 数组中的最小值。
 
-#### 13. CompareMin (数组范围)
+#### 13. CompareMin (数组范围) 方法
 - `public static T CompareMin<T>(this T[] values, int start, int length) where T : IComparable, IComparable<T>`
   - 返回数组指定范围内的最小值。
   - 参数:
@@ -152,21 +152,21 @@
     - `length`: 范围的长度。
   - 返回值: 数组指定范围内的最小值。
 
-#### 14. CompareMin (Span)
+#### 14. CompareMin (Span) 方法
 - `public static T CompareMin<T>(this Span<T> span) where T : IComparable, IComparable<T>`
   - 返回 Span 中的最小值。
   - 参数:
     - `span`: 值的 Span。
   - 返回值: Span 中的最小值。
 
-#### 15. CompareMaxMin (数组)
+#### 15. CompareMaxMin (数组) 方法
 - `public static (T max, T min) CompareMaxMin<T>(this T[] values) where T : IComparable, IComparable<T>`
   - 返回数组中的最大值和最小值。
   - 参数:
     - `values`: 值的数组。
   - 返回值: 包含数组中最大值和最小值的元组。
 
-#### 16. CompareMaxMin (数组范围)
+#### 16. CompareMaxMin (数组范围) 方法
 - `public static (T max, T min) CompareMaxMin<T>(this T[] values, int start, int length) where T : IComparable, IComparable<T>`
   - 返回数组指定范围内的最大值和最小值。
   - 参数:
@@ -175,21 +175,21 @@
     - `length`: 范围的长度。
   - 返回值: 包含数组指定范围内最大值和最小值的元组。
 
-#### 17. CompareMaxMin (Span)
+#### 17. CompareMaxMin (Span) 方法
 - `public static (T max, T min) CompareMaxMin<T>(this Span<T> span) where T : IComparable, IComparable<T>`
   - 返回 Span 中的最大值和最小值。
   - 参数:
     - `span`: 值的 Span。
   - 返回值: 包含 Span 中最大值和最小值的元组。
 
-#### 18. LocateMax (数组)
+#### 18. LocateMax (数组) 方法
 - `public static (int index, T value) LocateMax<T>(T[] values) where T : IComparable, IComparable<T>`
   - 返回数组中最大元素的索引和值。
   - 参数:
     - `values`: 值的数组。
   - 返回值: 包含数组中最大元素的索引和值的元组。
 
-#### 19. LocateMax (数组范围)
+#### 19. LocateMax (数组范围) 方法
 - `public static (int index, T value) LocateMax<T>(T[] values, int start, int length) where T : IComparable, IComparable<T>`
   - 返回数组指定范围内最大元素的索引和值。
   - 参数:
@@ -198,21 +198,21 @@
     - `length`: 范围的长度。
   - 返回值: 包含数组指定范围内最大元素的索引和值的元组。
 
-#### 20. LocateMax (Span)
+#### 20. LocateMax (Span) 方法
 - `public static (int index, T value) LocateMax<T>(Span<T> span) where T : IComparable, IComparable<T>`
   - 返回 Span 中最大元素的索引和值。
   - 参数:
     - `span`: 值的 Span。
   - 返回值: 包含 Span 中最大元素的索引和值的元组。
 
-#### 21. LocateMin (数组)
+#### 21. LocateMin (数组) 方法
 - `public static (int index, T value) LocateMin<T>(T[] values) where T : IComparable, IComparable<T>`
   - 返回数组中最小元素的索引和值。
   - 参数:
     - `values`: 值的数组。
   - 返回值: 包含数组中最小元素的索引和值的元组。
 
-#### 22. LocateMin (数组范围)
+#### 22. LocateMin (数组范围) 方法
 - `public static (int index, T value) LocateMin<T>(T[] values, int start, int length) where T : IComparable, IComparable<T>`
   - 返回数组指定范围内最小元素的索引和值。
   - 参数:
@@ -221,14 +221,14 @@
     - `length`: 范围的长度。
   - 返回值: 包含数组指定范围内最小元素的索引和值的元组。
 
-#### 23. LocateMin (Span)
+#### 23. LocateMin (Span) 方法
 - `public static (int index, T value) LocateMin<T>(Span<T> span) where T : IComparable, IComparable<T>`
   - 返回 Span 中最小元素的索引和值。
   - 参数:
     - `span`: 值的 Span。
   - 返回值: 包含 Span 中最小元素的索引和值的元组。
 
-#### 24. CompareMaxAsync
+#### 24. CompareMaxAsync 方法
 - `public static Task<TValue> CompareMaxAsync<TValue>(this TValue[] values, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列中的最大值。
   - 参数:
@@ -237,7 +237,7 @@
     - `useTPL`: 如果为 true，则使用任务并行库 (TPL) 进行并行计算。
   - 返回值: 表示异步操作的任务。任务结果包含最大值。
 
-#### 25. CompareMaxAsync (数组范围)
+#### 25. CompareMaxAsync (数组范围) 方法
 - `public static Task<TValue> CompareMaxAsync<TValue>(this TValue[] values, int start, int length, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列指定范围内的最大值。
   - 参数:
@@ -248,7 +248,7 @@
     - `useTPL`: 如果为 true，则使用任务并行库 (TPL) 进行并行计算。
   - 返回值: 表示异步操作的任务。任务结果包含最大值。
 
-#### 26. LocateMaxAsync
+#### 26. LocateMaxAsync 方法
 - `public static Task<(int, TValue)> LocateMaxAsync<TValue>(this TValue[] values, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列中最大元素的索引和值。
   - 参数:
@@ -257,7 +257,7 @@
     - `useTPL`: 如果为 true，则使用任务并行库 (TPL) 进行并行计算。
   - 返回值: 表示异步操作的任务。任务结果包含最大元素的索引和值。
 
-#### 27. LocateMaxAsync (数组范围)
+#### 27. LocateMaxAsync (数组范围) 方法
 - `public static Task<(int, TValue)> LocateMaxAsync<TValue>(this TValue[] values, int start, int length, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列指定范围内最大元素的索引和值。
   - 参数:
@@ -268,7 +268,7 @@
     - `useTPL`: 如果为 true，则使用任务并行库 (TPL) 进行并行计算。
   - 返回值: 表示异步操作的任务。任务结果包含最大元素的索引和值。
 
-#### 28. CompareMinAsync
+#### 28. CompareMinAsync 方法
 - `public static Task<TValue> CompareMinAsync<TValue>(this TValue[] values, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列中的最小值。
   - 参数:
@@ -277,7 +277,7 @@
     - `useTPL`: 如果为 true，则使用任务并行库 (TPL) 进行并行计算。
   - 返回值: 表示异步操作的任务。任务结果包含最小值。
 
-#### 29. CompareMinAsync (数组范围)
+#### 29. CompareMinAsync (数组范围) 方法
 - `public static Task<TValue> CompareMinAsync<TValue>(this TValue[] values, int start, int length, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列指定范围内的最小值。
   - 参数:
@@ -288,7 +288,7 @@
     - `useTPL`: 如果为 true，则使用任务并行库 (TPL) 进行并行计算。
   - 返回值: 表示异步操作的任务。任务结果包含最小值。
 
-#### 30. LocateMinAsync
+#### 30. LocateMinAsync 方法
 - `public static Task<(int, TValue)> LocateMinAsync<TValue>(this TValue[] values, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列中最小元素的索引和值。
   - 参数:
@@ -297,7 +297,7 @@
     - `useTPL`: 如果为 true，则使用任务并行库 (TPL) 进行并行计算。
   - 返回值: 表示异步操作的任务。任务结果包含最小元素的索引和值。
 
-#### 31. LocateMinAsync (数组范围)
+#### 31. LocateMinAsync (数组范围) 方法
 - `public static Task<(int, TValue)> LocateMinAsync<TValue>(this TValue[] values, int start, int length, int? numberOfWorkers = null, bool useTPL = false) where TValue : IComparable, IComparable<TValue>`
   - 返回并行序列指定范围内最小元素的索引和值。
   - 参数:

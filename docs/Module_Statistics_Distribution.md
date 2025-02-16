@@ -33,7 +33,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
 
 ### 方法
 
-#### 1. NormalPDF
+#### 1. NormalPDF 方法
 - `public static T NormalPDF<T>(T x, T mean, T stdDev) where T : IFloatingPointIeee754<T>`
   - 计算正态分布的概率密度函数。
   - 参数:
@@ -42,7 +42,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `stdDev`: 标准差。
   - 返回值: 正态分布的概率密度值。
 
-#### 2. NormalCDF
+#### 2. NormalCDF 方法
 - `public static T NormalCDF<T>(T x, T mean, T stdDev) where T : IFloatingPointIeee754<T>`
   - 计算正态分布的累积分布函数。
   - 参数:
@@ -51,7 +51,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `stdDev`: 标准差。
   - 返回值: 正态分布的累积分布值。
 
-#### 3. PoissonPMF
+#### 3. PoissonPMF 方法
 - `public static T PoissonPMF<T>(int k, T lambda) where T : IFloatingPointIeee754<T>`
   - 计算泊松分布的概率质量函数。
   - 参数:
@@ -59,7 +59,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `lambda`: 单位时间内事件的平均发生率。
   - 返回值: 泊松分布的概率质量值。
 
-#### 4. PoissonCDF
+#### 4. PoissonCDF 方法
 - `public static T PoissonCDF<T>(int k, T lambda) where T : IFloatingPointIeee754<T>`
   - 计算泊松分布的累积分布函数。
   - 参数:
@@ -67,7 +67,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `lambda`: 单位时间内事件的平均发生率。
   - 返回值: 泊松分布的累积分布值。
 
-#### 5. ExponentialPDF
+#### 5. ExponentialPDF 方法
 - `public static T ExponentialPDF<T>(T x, T lambda) where T : IFloatingPointIeee754<T>`
   - 计算指数分布的概率密度函数。
   - 参数:
@@ -75,7 +75,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `lambda`: 分布的参数。
   - 返回值: 指数分布的概率密度值。
 
-#### 6. ExponentialCDF
+#### 6. ExponentialCDF 方法
 - `public static T ExponentialCDF<T>(T x, T lambda) where T : IFloatingPointIeee754<T>`
   - 计算指数分布的累积分布函数。
   - 参数:
@@ -83,7 +83,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `lambda`: 分布的参数。
   - 返回值: 指数分布的累积分布值。
 
-#### 7. BinomialPMF
+#### 7. BinomialPMF 方法
 - `public static T BinomialPMF<T>(int k, int n, T p) where T : IFloatingPointIeee754<T>`
   - 计算二项分布的概率质量函数。
   - 参数:
@@ -92,7 +92,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `p`: 每次试验成功的概率。
   - 返回值: 二项分布的概率质量值。
 
-#### 8. BinomialCDF
+#### 8. BinomialCDF 方法
 - `public static T BinomialCDF<T>(int k, int n, T p) where T : IFloatingPointIeee754<T>`
   - 计算二项分布的累积分布函数。
   - 参数:
@@ -101,7 +101,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `p`: 每次试验成功的概率。
   - 返回值: 二项分布的累积分布值。
 
-#### 9. MultinomialPMF
+#### 9. MultinomialPMF 方法
 - `public static T MultinomialPMF<T>(int[] counts, T[] probabilities) where T : IFloatingPointIeee754<T>`
   - 计算多项分布的概率质量函数。
   - 参数:
@@ -109,7 +109,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `probabilities`: 每个类别的概率。
   - 返回值: 多项分布的概率质量值。
 
-#### 10. GammaPDF
+#### 10. GammaPDF 方法
 - `public static T GammaPDF<T>(T x, T shape, T scale) where T : IFloatingPointIeee754<T>`
   - 计算Gamma分布的概率密度函数。
   - 参数:
@@ -118,7 +118,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `scale`: 尺度参数。
   - 返回值: Gamma分布的概率密度值。
 
-#### 11. GammaCDF
+#### 11. GammaCDF 方法
 - `public static T GammaCDF<T>(T x, T shape, T scale) where T : IFloatingPointIeee754<T>`
   - 计算Gamma分布的累积分布函数。
   - 参数:
@@ -127,7 +127,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `scale`: 尺度参数。
   - 返回值: Gamma分布的累积分布值。
 
-#### 12. BetaPDF
+#### 12. BetaPDF 方法
 - `public static T BetaPDF<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>`
   - 计算Beta分布的概率密度函数。
   - 参数:
@@ -136,7 +136,7 @@ Vorcyc.Mathematics.Statistics.Distribution 是一个提供各种概率分布计�
     - `beta`: 形状参数β。
   - 返回值: Beta分布的概率密度值。
 
-#### 13. BetaCDF
+#### 13. BetaCDF 方法
 - `public static T BetaCDF<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>`
   - 计算Beta分布的累积分布函数。
   - 参数:

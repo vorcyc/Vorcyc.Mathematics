@@ -29,7 +29,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
 
 ### 方法
 
-#### 1. Sum
+#### 1. Sum 方法
 - `public static T Sum<T>(this Span<T> values) where T : INumber<T>`
   - 计算一组值中元素的总和，使用 SIMD 进行优化。
   - 参数:
@@ -47,7 +47,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
   - 异常: 
     - `ArgumentException`: 当 `values` 为空时抛出。
 
-#### 2. Average
+#### 2. Average 方法
 - `public static T Average<T>(this Span<T> values) where T : INumber<T>`
   - 计算一组值中元素的平均值。
   - 参数:
@@ -56,7 +56,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
   - 异常: 
     - `ArgumentException`: 当 `values` 为空时抛出。
 
-#### 3. Median
+#### 3. Median 方法
 - `public static T Median<T>(this Span<T> values) where T : INumber<T>`
   - 计算一组值中元素的中位数。
   - 参数:
@@ -65,7 +65,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
   - 异常: 
     - `ArgumentException`: 当 `values` 为空时抛出。
 
-#### 4. Mode
+#### 4. Mode 方法
 - `public static T Mode<T>(this Span<T> values) where T : INumber<T>`
   - 计算一组值中元素的众数。
   - 参数:
@@ -74,7 +74,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
   - 异常: 
     - `ArgumentException`: 当 `values` 为空时抛出。
 
-#### 5. Variance
+#### 5. Variance 方法
 - `public static (T average, T variance) Variance<T>(this Span<T> values) where T : INumber<T>`
   - 计算一组值中元素的平均值和方差。
   - 参数:
@@ -83,7 +83,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
   - 异常: 
     - `ArgumentException`: 当 `values` 为空时抛出。
 
-#### 6. StandardDeviation
+#### 6. StandardDeviation 方法
 - `public static T StandardDeviation<T>(this Span<T> values) where T : IFloatingPointIeee754<T>`
   - 计算一组值中元素的标准差。
   - 参数:
@@ -92,7 +92,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
   - 异常: 
     - `ArgumentException`: 当 `values` 为空时抛出。
 
-#### 7. CoefficientOfVariation
+#### 7. CoefficientOfVariation 方法
 - `public static T CoefficientOfVariation<T>(this Span<T> values) where T : IFloatingPointIeee754<T>`
   - 计算一组值中元素的变异系数。
   - 参数:
@@ -101,7 +101,7 @@ Vorcyc.Mathematics.Statistics.Basic 是一个提供基本统计函数的类，�
   - 异常: 
     - `ArgumentException`: 当 `values` 为空时抛出。
 
-#### 8. CalculateAllStatistics
+#### 8. CalculateAllStatistics 方法
 - `public static (T Mean, T Median, T Mode, T Variance, T StandardDeviation, T CoefficientOfVariation) CalculateAllStatistics<T>(this Span<T> values) where T : IFloatingPointIeee754<T>`
   - 计算一组值的所有统计值，包括均值、中位数、众数、方差、标准差和变异系数。
   - 参数:

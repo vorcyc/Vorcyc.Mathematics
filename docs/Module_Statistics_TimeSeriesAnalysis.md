@@ -25,7 +25,7 @@ Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis 是一个提供时间序列分�
 
 ### 方法
 
-#### 1. Smooth
+#### 1. Smooth 方法
 - `public static T[] Smooth<T>(this Span<T> series, int windowSize) where T : IFloatingPointIeee754<T>`
   - 实现时间序列的平滑。
   - 参数:
@@ -33,7 +33,7 @@ Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis 是一个提供时间序列分�
     - `windowSize`: 平滑窗口的大小。
   - 返回值: 平滑后的时间序列。
 
-#### 2. Decompose
+#### 2. Decompose 方法
 - `public static (T[] Trend, T[] Seasonal, T[] Residual) Decompose<T>(this Span<T> series, int period) where T : IFloatingPointIeee754<T>`
   - 实现时间序列的分解，返回趋势、季节性和残差。
   - 参数:
@@ -41,7 +41,7 @@ Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis 是一个提供时间序列分�
     - `period`: 季节周期。
   - 返回值: 包含趋势、季节性和残差的元组。
 
-#### 3. Forecast
+#### 3. Forecast 方法
 - `public static T[] Forecast<T>(this Span<T> series, int forecastPeriod) where T : IFloatingPointIeee754<T>`
   - 实现时间序列的预测，返回预测值。
   - 参数:
@@ -49,7 +49,7 @@ Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis 是一个提供时间序列分�
     - `forecastPeriod`: 预测期数。
   - 返回值: 预测值数组。
 
-#### 4. Autocorrelation
+#### 4. Autocorrelation 方法
 - `public static T[] Autocorrelation<T>(this Span<T> series, int lagMax) where T : IFloatingPointIeee754<T>`
   - 计算时间序列的自相关函数。
   - 参数:
@@ -57,7 +57,7 @@ Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis 是一个提供时间序列分�
     - `lagMax`: 最大滞后期数。
   - 返回值: 自相关函数值数组。
 
-#### 5. PartialAutocorrelation
+#### 5. PartialAutocorrelation 方法
 - `public static T[] PartialAutocorrelation<T>(this Span<T> series, int lagMax) where T : IFloatingPointIeee754<T>`
   - 计算时间序列的偏自相关函数。
   - 参数:
@@ -65,7 +65,7 @@ Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis 是一个提供时间序列分�
     - `lagMax`: 最大滞后期数。
   - 返回值: 偏自相关函数值数组。
 
-#### 6. MovingAverage
+#### 6. MovingAverage 方法
 - `public static T[] MovingAverage<T>(this Span<T> series, int windowSize) where T : IFloatingPointIeee754<T>`
   - 计算时间序列的移动平均。
   - 参数:
@@ -73,7 +73,7 @@ Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis 是一个提供时间序列分�
     - `windowSize`: 移动平均窗口的大小。
   - 返回值: 移动平均值数组。
 
-#### 7. ExponentialSmoothing
+#### 7. ExponentialSmoothing 方法
 - `public static T[] ExponentialSmoothing<T>(this Span<T> series, T alpha) where T : IFloatingPointIeee754<T>`
   - 实现时间序列的指数平滑。
   - 参数:

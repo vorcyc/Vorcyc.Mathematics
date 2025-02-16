@@ -22,7 +22,7 @@ Vorcyc.Mathematics.Statistics.Others 是一个提供其他统计函数的类，�
 
 ### 方法
 
-#### 1. Covariance
+#### 1. Covariance 方法
 - `public static T Covariance<T>(this Span<T> x, Span<T> y) where T : INumber<T>`
   - 计算两组数据的协方差。
   - 参数:
@@ -30,7 +30,7 @@ Vorcyc.Mathematics.Statistics.Others 是一个提供其他统计函数的类，�
     - `y`: 第二组数据。
   - 返回值: 两组数据的协方差。
 
-#### 2. CorrelationCoefficient
+#### 2. CorrelationCoefficient 方法
 - `public static T CorrelationCoefficient<T>(this Span<T> x, Span<T> y) where T : IFloatingPointIeee754<T>`
   - 计算两组数据的相关系数。
   - 参数:
@@ -38,7 +38,7 @@ Vorcyc.Mathematics.Statistics.Others 是一个提供其他统计函数的类，�
     - `y`: 第二组数据。
   - 返回值: 两组数据的相关系数。
 
-#### 3. LinearRegression
+#### 3. LinearRegression 方法
 - `public static (T Slope, T Intercept) LinearRegression<T>(this Span<T> x, Span<T> y) where T : IFloatingPointIeee754<T>`
   - 实现简单的线性回归分析。
   - 参数:
