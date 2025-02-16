@@ -29,7 +29,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
 
 ### 方法
 
-#### 1. BatchNorm
+#### 1. BatchNorm 方法
 - `public static Tensor<T> BatchNorm<T>(Tensor<T> input, Tensor<T> mean, Tensor<T> variance, Tensor<T> shift, Tensor<T> scale) where T : IBinaryFloatingPointIeee754<T>`
   - 对输入张量进行批量归一化。
   - 参数:
@@ -50,7 +50,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `scale`: 缩放因子张量。
   - 返回值: 归一化后的张量。
 
-#### 2. Conv2D
+#### 2. Conv2D 方法
 - `public static Tensor<T> Conv2D<T>(Tensor<T> input, Tensor<T>[] filters, Tensor<T> biases, int stride = 1, int dilation = 1) where T : IBinaryFloatingPointIeee754<T>`
   - 对 2D 张量执行卷积操作。
   - 参数:
@@ -71,7 +71,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `dilation`: 卷积扩张率，默认为 1。
   - 返回值: 卷积结果的张量。
 
-#### 3. Dense
+#### 3. Dense 方法
 - `public static Tensor<T> Dense<T>(Tensor<T> input, Tensor<T>[] weights, Tensor<T> biases) where T : IBinaryFloatingPointIeee754<T>`
   - 对输入张量执行密集（全连接）层操作。
   - 参数:
@@ -88,7 +88,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `biases`: 偏置张量。
   - 返回值: 执行密集操作后的张量。
 
-#### 4. Fusion
+#### 4. Fusion 方法
 - `public static Tensor<T> Fusion<T>(Tensor<T> input, Tensor<T> joint) where T : IBinaryFloatingPointIeee754<T>`
   - 合并两个张量。
   - 参数:
@@ -103,7 +103,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `joint`: 要合并的张量。
   - 返回值: 合并后的张量。
 
-#### 5. JoinLayer
+#### 5. JoinLayer 方法
 - `public static Tensor<T> JoinLayer<T>(Tensor<T> input, Tensor<T> joint) where T : IBinaryFloatingPointIeee754<T>`
   - 合并两个张量层。
   - 参数:
@@ -118,7 +118,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `joint`: 要合并的张量。
   - 返回值: 合并后的张量。
 
-#### 6. LinearLayer
+#### 6. LinearLayer 方法
 - `public static Tensor<T> LinearLayer<T>(Tensor<T> input, Tensor<T>[] weights, Tensor<T> biases) where T : IBinaryFloatingPointIeee754<T>`
   - 对输入张量执行线性（全连接）层操作。
   - 参数:
@@ -135,7 +135,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `biases`: 偏置张量。
   - 返回值: 执行线性操作后的张量。
 
-#### 7. MaxPool2D
+#### 7. MaxPool2D 方法
 - `public static Tensor<T> MaxPool2D<T>(Tensor<T> input) where T : IBinaryFloatingPointIeee754<T>, IMinMaxValue<T>`
   - 对输入张量执行二维最大池化操作。
   - 参数:
@@ -148,7 +148,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `input`: 输入的张量。
   - 返回值: 执行最大池化操作后的张量。
 
-#### 8. ReLU
+#### 8. ReLU 方法
 - `public static Tensor<T> ReLU<T>(Tensor<T> input) where T : IBinaryFloatingPointIeee754<T>`
   - 对输入张量执行 ReLU 激活函数操作。
   - 参数:
@@ -161,7 +161,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `input`: 输入的张量。
   - 返回值: 执行 ReLU 操作后的张量。
 
-#### 9. Sigmoid
+#### 9. Sigmoid 方法
 - `public static Tensor<T> Sigmoid<T>(Tensor<T> input) where T : IBinaryFloatingPointIeee754<T>`
   - 对输入张量执行 Sigmoid 激活函数操作。
   - 参数:
@@ -174,7 +174,7 @@ Vorcyc.Mathematics.DeepLearning.Layers.Layers 是一个实现神经网络层的�
     - `input`: 输入的张量。
   - 返回值: 执行 Sigmoid 操作后的张量。
 
-#### 10. Upsample2D
+#### 10. Upsample2D 方法
 - `public static Tensor<T> Upsample2D<T>(Tensor<T> input) where T : IBinaryFloatingPointIeee754<T>`
   - 对输入张量执行二维上采样操作。
   - 参数:

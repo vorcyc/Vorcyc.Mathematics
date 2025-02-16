@@ -10,14 +10,7 @@
 ---
 
 :ledger:目录  
-- :bookmark: [FindExtremeValue(float[], int, int) 方法](#1-findextremevaluefloat-int-int-方法)  
-- :bookmark: [FindExtremeValue&lt;T> (T[], int, int) 方法](#2-findextremevaluett-int-int-方法)  
-- :bookmark: [FindExtremeValue(float[]) 方法](#3-findextremevaluefloat-方法)  
-- :bookmark: [FindExtremeValue&lt;T>T[]) 方法](#4-findextremevaluett-方法)  
-- :bookmark: [FindExtremeValue(ArraySegment&lt;float>) 方法](#5-findextremevaluearraysegmentfloat-方法)  
-- :bookmark: [FindExtremeValue&lt;T> (ArraySegment&lt;T>) 方法](#6-findextremevaluetarraysegmentt-方法)  
-- :bookmark: [FindExtremeValue(Span&lt;float>) 方法](#7-findextremevaluespanfloat-方法)    
-
+- :bookmark: [FindExtremeValue 方法](#1-findextremevalue-方法)  
 
 ---
 
@@ -27,7 +20,9 @@ Vorcyc.Mathematics.Statistics.ExtremeValueFinder 是一个提供查找序列中�
 
 ### 方法
 
-#### 1. FindExtremeValue(float[], int, int) 方法
+#### 1. FindExtremeValue 方法
+查找序列中的最大值和最小值。
+
 - `public static (float max, float min) FindExtremeValue(this float[] array, int start, int length)`
   - 查找浮点数组指定范围内的最大值和最小值。
   - 参数:
@@ -36,7 +31,6 @@ Vorcyc.Mathematics.Statistics.ExtremeValueFinder 是一个提供查找序列中�
     - `length`: 范围的长度。
   - 返回值: 包含指定范围内最大值和最小值的元组。
 
-#### 2. FindExtremeValue&lt;T>(T[], int, int) 方法
 - `public static (T max, T min) FindExtremeValue<T>(this T[] array, int start, int length) where T : INumber<T>`
   - 查找数组指定范围内的最大值和最小值。
   - 参数:
@@ -45,41 +39,35 @@ Vorcyc.Mathematics.Statistics.ExtremeValueFinder 是一个提供查找序列中�
     - `length`: 范围的长度。
   - 返回值: 包含指定范围内最大值和最小值的元组。
 
-#### 3. FindExtremeValue(float[]) 方法
 - `public static (float max, float min) FindExtremeValue(this float[] array)`
   - 查找浮点数组中的最大值和最小值。
   - 参数:
     - `array`: 浮点数组。
   - 返回值: 包含数组中最大值和最小值的元组。
 
-#### 4. FindExtremeValue&lt;T>(T[]) 方法
 - `public static (T max, T min) FindExtremeValue<T>(this T[] array) where T : INumber<T>`
   - 查找数组中的最大值和最小值。
   - 参数:
     - `array`: 数组。
   - 返回值: 包含数组中最大值和最小值的元组。
 
-#### 5. FindExtremeValue(ArraySegment&lt;float>) 方法
 - `public static (float max, float min) FindExtremeValue(this ArraySegment<float> arraySegment)`
   - 查找浮点数组段中的最大值和最小值。
   - 参数:
     - `arraySegment`: 浮点数组段。
   - 返回值: 包含数组段中最大值和最小值的元组。
 
-#### 6. FindExtremeValue&lt;T>(ArraySegment&lt;T>) 方法
 - `public static (T max, T min) FindExtremeValue<T>(this ArraySegment<T> arraySegment) where T : INumber<T>`
   - 查找数组段中的最大值和最小值。
   - 参数:
     - `arraySegment`: 数组段。
   - 返回值: 包含数组段中最大值和最小值的元组。
 
-#### 7. FindExtremeValue(Span&lt;float>) 方法
 - `public static (float max, float min) FindExtremeValue(this Span<float> span)`
   - 查找浮点 Span 中的最大值和最小值。
   - 参数:
     - `span`: 浮点 Span。
   - 返回值: 包含 Span 中最大值和最小值的元组。
-
 
 ### 代码示例
 以下是一个使用 ExtremeValueFinder 类中多个方法的示例，并在示例中加入了注释：
