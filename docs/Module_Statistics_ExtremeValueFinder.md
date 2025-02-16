@@ -11,7 +11,7 @@
 
 :ledger:目录  
 - :bookmark: [FindExtremeValue(float[], int, int) 方法](#1-findextremevaluefloat-int-int-方法)  
-- :bookmark: [FindExtremeValue&lt;T> (T[], int, int) 方法](#2-findextremevaluettint-int-方法)  
+- :bookmark: [FindExtremeValue&lt;T> (T[], int, int) 方法](#2-findextremevaluett-int-int-方法)  
 - :bookmark: [FindExtremeValue(float[]) 方法](#3-findextremevaluefloat-方法)  
 - :bookmark: [FindExtremeValue&lt;T>T[]) 方法](#4-findextremevaluett-方法)  
 - :bookmark: [FindExtremeValue(ArraySegment&lt;float>) 方法](#5-findextremevaluearraysegmentfloat-方法)  
