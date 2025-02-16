@@ -18,7 +18,6 @@
 - :bookmark: [Vorcyc.Mathematics.TrigonometryHelper Àà](#vorcycmathematicstrigonometryhelper-Àà)
 - :bookmark: [Vorcyc.Mathematics.VMath Àà](#vmath-Àà)
 
-
 ---
 
 ## Vorcyc.Mathematics.ArrayExtension Àà
@@ -1110,7 +1109,8 @@ public class TrigonometryHelperExample
 ```
 
 
-## VMath Àà
+## Vorcyc.Mathematics.VMath Àà
+
 Vorcyc.Mathematics.VMath ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÊıÑ§º¯ÊıºÍ²Ù×÷¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Òª¹¦ÄÜ£º
 ### ·½·¨Çåµ¥¼°ËµÃ÷
 #### 1.	BinomialCoefficient
@@ -1155,7 +1155,7 @@ Vorcyc.Mathematics.VMath ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÊıÑ§º¯ÊıºÍ²Ù×÷¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Ò
 Ê¹ÓÃ Horner ·½°¸¼ÆËã¶àÏîÊ½¡£
 #### 11.	MultiplyPolynomials
 `public static Complex[] MultiplyPolynomials(Complex[] poly1, Complex[] poly2)`  
-`public static ComplexFp32[] MultiplyPolynomials(ComplexFp32[] poly1, ComplexFp32[] poly2)`
+`public static ComplexFp32[] MultiplyPolynomials(ComplexFp32[] poly1, ComplexFp32[] poly2)`  
 ³Ë·¨¶àÏîÊ½¡£
 #### 12.	DividePolynomial
 `public static Complex[][] DividePolynomial(Complex[] dividend, Complex[] divisor)`  
@@ -1210,28 +1210,50 @@ Vorcyc.Mathematics.VMath ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÊıÑ§º¯ÊıºÍ²Ù×÷¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Ò
 »ñÈ¡¶ş½øÖÆ¶ÔÊıµÄ»ùÊı¡£
 #### 26.	Factorial
 `public static int Factorial(int n)`  
+`public static T Factorial<T>(T n) where T : INumber<T>`  
 ¼ÆËã½×³Ë¡£
-#### 27.	Sqrt
+#### 27.	Gamma
+`public static double Gamma(double x)`  
+`public static float Gamma(float x)`  
+`public static T Gamma<T>(T x) where T : IFloatingPointIeee754<T>`  
+Ê¹ÓÃ½üËÆ¹«Ê½¼ÆËãGammaº¯Êı¡£
+#### 28.	GammaLog
+`public static double GammaLog(double x)`  
+`public static float GammaLog(float x)`  
+`public static T GammaLog<T>(T x) where T : IFloatingPointIeee754<T>`  
+¼ÆËãGammaº¯ÊıµÄ×ÔÈ»¶ÔÊı¡£
+#### 29.	Erf
+`public static T Erf<T>(T x) where T : IFloatingPointIeee754<T>`  
+¼ÆËãÎó²îº¯Êı£¨Error Function£©¡£
+#### 30.	LowerIncompleteGamma
+`public static T LowerIncompleteGamma<T>(T s, T x) where T : IFloatingPointIeee754<T>`  
+Ê¹ÓÃ½üËÆ¹«Ê½¼ÆËãÏÂ²»ÍêÈ«Gammaº¯Êı¡£
+#### 31.	Beta
+`public static T Beta<T>(T alpha, T beta) where T : IFloatingPointIeee754<T>`  
+¼ÆËã Beta º¯ÊıµÄÖµ¡£
+#### 32.	RegularizedIncompleteBeta
+`public static T RegularizedIncompleteBeta<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>`  
+¼ÆËãÕıÔò»¯²»ÍêÈ« Beta º¯ÊıµÄÖµ¡£
+#### 33.	Sqrt
 `public static decimal Sqrt(decimal x, decimal epsilon = 0.0M)`  
 ·µ»ØÖ¸¶¨ decimal ÊıµÄÆ½·½¸ù¡£
-#### 28.	Ulp
+#### 34.	Ulp
 `public static double Ulp(double value)`  
-`ublic static float Ulp(float value)`  
+`public static float Ulp(float value)`  
 `public static Half Ulp(Half value)`  
 ¼ÆËãÊäÈëÖµµÄ×îºóÒ»Î»µ¥Î»£¨ULP£©¡£
 ### ´úÂëÊ¾Àı
 ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ VMath ÀàÖĞ¶à¸ö·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
-```csharp
+
+```
 using System;
 using Vorcyc.Mathematics;
-
 public class VMathExample
 {
 	public static void Main()
 	{
 		// ¼ÆËã¶şÏîÊ½ÏµÊı
-		int k = 3;
-		int n = 5;
+		int k = 3; int n = 5;
 		float binomialCoefficient = VMath.BinomialCoefficient(k, n);
 		Console.WriteLine($"BinomialCoefficient({k}, {n}) = {binomialCoefficient}");
 
@@ -1253,7 +1275,7 @@ public class VMathExample
 		double[] re = { 0.5, 0.6 };
 		double[] im = { 0.5, 0.6 };
 		VMath.BilinearTransform(re, im);
-		Console.WriteLine($"BilinearTransform: re = {string.Join(", ", re)}, im = {string.Join(", ", im)}");
+		Console.WriteLine($"BilinearTransform: re = {string.join(", ", re)}, im = {string.join(", ", im)}");
 
 		// ½øĞĞÏàÎ»Õ¹¿ª
 		double[] phase = { 0.0, Math.PI, 2 * Math.PI, 3 * Math.PI };
@@ -1321,5 +1343,4 @@ public class VMathExample
 		Console.WriteLine($"Ulp(1.0) = {ulpValue}");
 	}
 }
-
 ```
