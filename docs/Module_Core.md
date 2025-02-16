@@ -1245,9 +1245,10 @@ Vorcyc.Mathematics.VMath ÊÇÒ»¸ö¾²Ì¬Àà£¬Ìá¹©ÁË¶àÖÖÊıÑ§º¯ÊıºÍ²Ù×÷¡£¸ÃÀà°üº¬ÒÔÏÂÖ÷Ò
 ### ´úÂëÊ¾Àı
 ÒÔÏÂÊÇÒ»¸öÊ¹ÓÃ VMath ÀàÖĞ¶à¸ö·½·¨µÄÊ¾Àı£¬²¢ÔÚÊ¾ÀıÖĞ¼ÓÈëÁË×¢ÊÍ£º
 
-```
+```csharp
 using System;
 using Vorcyc.Mathematics;
+
 public class VMathExample
 {
 	public static void Main()
