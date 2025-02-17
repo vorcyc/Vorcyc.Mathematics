@@ -9,24 +9,24 @@
 ---
 
 :ledger:目录  
-- :bookmark: [BigFloat](#1-bigfloat)
-- :bookmark: [Complex&lt;T>](#2-complext)
-- :bookmark: [ComplexFp32](#3-complexfp32)
-- :bookmark: [Int24](#4-int24)
-- :bookmark: [IntRange](#5-intrange)
-- :bookmark: [Number](#6-number)
-- :bookmark: [Point&lt;T>](#7-pointt)
-- :bookmark: [PointFp32](#8-pointfp32)
-- :bookmark: [Range&lt;T>](#9-ranget)
-- :bookmark: [Rational&lt;T>](#10-rationalt)
-- :bookmark: [RectangleFP32](#11-rectanglefp32)
-- :bookmark: [Size&lt;T>](#12-sizet)
-- :bookmark: [SizeFp32](#13-sizefp32)
-- :bookmark: [UInt24](#14-uint24)
+- :bookmark: [Vorcyc.Mathematics.Numerics.BigFloat 结构体](#1-vorcycmathematicsnumericsbigfloat-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.Complex<T> 结构体](#2-vorcycmathematicsnumericscomplext-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.ComplexFp32 结构体](#3-vorcycmathematicsnumericscomplexfp32-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.Int24 结构体](#4-vorcycmathematicsnumericsint24-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.IntRange 结构体](#5-vorcycmathematicsnumericsintrange-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.Number 类](#6-vorcycmathematicsnumericsnumber-类)
+- :bookmark: [Vorcyc.Mathematics.Numerics.Point<T> 结构体](#7-vorcycmathematicsnumericspointt-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.PointFp32 结构体](#8-vorcycmathematicsnumericspointfp32-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.Range<T> 类](#9-vorcycmathematicsnumericsranget-类)
+- :bookmark: [Vorcyc.Mathematics.Numerics.Rational<T> 结构体](#10-vorcycmathematicsnumericsrationalt-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.RectangleFP32 结构体](#11-vorcycmathematicsnumericsrectanglefp32-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.Size<T> 结构体](#12-vorcycmathematicsnumericssizet-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.SizeFp32 结构体](#13-vorcycmathematicsnumericssizefp32-结构体)
+- :bookmark: [Vorcyc.Mathematics.Numerics.UInt24 结构体](#14-vorcycmathematicsnumericsuint24-结构体)
 
 ---
 
-## 1. BigFloat
+## 1. Vorcyc.Mathematics.Numerics.BigFloat 结构体
 一个表示高精度浮点数的结构体。
 
 ### 功能：
@@ -59,7 +59,7 @@ Console.WriteLine($"Pow: {resultPow}");
 
 
 
-## 2. Complex&lt;T&gt;
+## 2. Vorcyc.Mathematics.Numerics.Complex&lt;T&gt; 结构体
 一个表示复数的结构体，具有泛型数值类型。
 
 ### 功能：
@@ -94,7 +94,7 @@ Console.WriteLine($"Conjugate: {conjugate}");
 
 
 
-## 3. ComplexFp32
+## 3. Vorcyc.Mathematics.Numerics.ComplexFp32 结构体
 一个表示复数的结构体，具有单精度浮点数分量。
 
 ### 功能：
@@ -129,7 +129,7 @@ Console.WriteLine($"Conjugate: {conjugate}");
 
 
 
-## 4. Int24
+## 4. Vorcyc.Mathematics.Numerics.Int24 结构体
 一个表示24位有符号整数的结构体。
 
 ### 功能：
@@ -157,7 +157,7 @@ Console.WriteLine($"Divide: {resultDiv}");
 ```
 
 
-## 5. IntRange
+## 5. Vorcyc.Mathematics.Numerics.IntRange 结构体
 一个表示整数范围的结构体。
 
 ### 功能：
@@ -182,7 +182,7 @@ Console.WriteLine($"Intersection: [{intersection.Min}, {intersection.Max}]");
 
 
 
-## 6. Number
+## 6. Vorcyc.Mathematics.Numerics.Number 类
 一个表示数字的类，作为数字列表，具有任意精度。
 
 ### 功能：
@@ -208,7 +208,7 @@ Console.WriteLine($"Multiply: {resultMul}");
 Console.WriteLine($"Divide: {resultDiv}");
 ```
 
-## 7. Point&lt;T&gt;
+## 7. Vorcyc.Mathematics.Numerics.Point&lt;T&gt; 结构体
 一个表示二维平面上点的结构体，具有泛型数值类型。
 
 ### 功能：
@@ -235,7 +235,7 @@ Console.WriteLine($"Distance: {distance}");
 ```
 
 
-## 8. PointFp32
+## 8. Vorcyc.Mathematics.Numerics.PointFp32 结构体
 一个表示二维平面上点的结构体，具有单精度浮点数坐标。
 
 ### 功能：
@@ -261,7 +261,7 @@ Console.WriteLine($"Distance: {distance}");
 ```
 
 
-## 9. Range&lt;T&gt;
+## 9. Vorcyc.Mathematics.Numerics.Range&lt;T&gt; 类
 一个表示值范围的类，具有泛型数值类型。
 
 ### 功能：
@@ -287,7 +287,7 @@ Console.WriteLine($"Union: [{union.Minimum}, {union.Maximum}]");
 
 
 
-## 10. Rational&lt;T&gt;
+## 10. Vorcyc.Mathematics.Numerics.Rational&lt;T&gt; 结构体
 一个表示有理数的结构体，具有泛型整数类型。
 
 ### 功能：
@@ -315,7 +315,7 @@ Console.WriteLine($"Divide: {resultDiv}");
 
 
 
-## 11. RectangleFP32
+## 11. Vorcyc.Mathematics.Numerics.RectangleFP32 结构体
 一个表示具有浮点数坐标和尺寸的矩形结构体。
 
 ### 功能：
@@ -341,7 +341,7 @@ Console.WriteLine($"Union: {union}");
 
 
 
-## 12. Size&lt;T&gt;
+## 12. Vorcyc.Mathematics.Numerics.Size&lt;T&gt; 结构体
 一个表示二维尺寸的结构体，具有泛型数值类型。
 ### 功能：
 - 表示二维尺寸
@@ -366,7 +366,7 @@ Console.WriteLine($"Multiply: {resultMul}");
 Console.WriteLine($"Divide: {resultDiv}");
 ```
 
-## 13. SizeFp32
+## 13. Vorcyc.Mathematics.Numerics.SizeFp32 结构体
 一个表示二维尺寸的结构体，具有单精度浮点数尺寸。
 ### 功能：
 - 表示二维尺寸
@@ -394,7 +394,7 @@ Console.WriteLine($"Divide: {resultDiv}");
 
 
 
-## 14. UInt24
+## 14. Vorcyc.Mathematics.Numerics.UInt24 结构体
 一个表示24位无符号整数的结构体。
 ## 功能：
 - 表示24位无符号整数
