@@ -57,6 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C288D331-8
 		docs\README-en_us.md = docs\README-en_us.md
 		docs\README.md = docs\README.md
 		docs\VMath 1.0.docx = docs\VMath 1.0.docx
+		docs\上传所有markdowns到仓库.sh = docs\上传所有markdowns到仓库.sh
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "logos", "logos", "{2768E470-4251-4508-91F0-0146EA8EFD62}"

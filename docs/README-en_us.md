@@ -9,9 +9,13 @@ Vorcyc® Mathematics is a math library mainly for .NET, designed to fully levera
 [Goto Chinese Edition](README.md)
 
 The main significance is:
-1. Fully leverage the latest features of .NET for optimal performance.
+1. Fully leverage the latest features of .NET for optimal performance, such as:
+   - Using SIMD-accelerated CPU serial computation, parallel computation, and generic mathematics.
+   - Using Span&lt;T> instead of arrays as parameters and Memory&lt;T> as fields.
+   - Using managed pointers and memory pools to improve performance.
 2. Supplement the deficiencies of .NET's built-in common mathematical functions.
 3. Provide additional mathematical algorithms and operations.
+
 
 ---
 

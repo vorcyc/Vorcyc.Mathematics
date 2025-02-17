@@ -9,7 +9,10 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 [Goto English Edition](README-en_us.md)
 
 主要意义有：
-1. 充分利用.NET最新特性以获得最佳性能。
+1. 充分利用.NET最新特性以获得最佳性能。如：
+	- 使用SIMD加速的CPU串行计算、并行计算、泛型数学。
+	- 使用 Span&lt;T> 替代 数组作为参数；使用Memory&lt;T> 作为字段。
+	- 使用托管指针和内存池以提高性能。
 2. 补充.NET内建常用数学函数的不足。
 3. 提供额外的数学算法和运算。
 
