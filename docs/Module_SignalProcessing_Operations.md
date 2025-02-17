@@ -11,20 +11,20 @@
 ---
 
 :ledger:目录  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.ComplexConvolver 类](#vorcycmathematicssignalprocessingoperationsconvolutioncomplexconvolver-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.Convolver 类](#vorcycmathematicssignalprocessingoperationsconvolutionconvolver-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.OlaBlockConvolver 类](#vorcycmathematicssignalprocessingoperationsconvolutionolablockconvolver-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.OlsBlockConvolver 类](#vorcycmathematicssignalprocessingoperationsconvolutionolsblockconvolver-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsMode 枚举](#vorcycmathematicssignalprocessingoperationsdynamicsmode-枚举)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsProcessor 类](#vorcycmathematicssignalprocessingoperationsdynamicsprocessor-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.EnvelopeFollower 类](#vorcycmathematicssignalprocessingoperationsenvelopefollower-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.GriffinLimReconstructor 类](#vorcycmathematicssignalprocessingoperationsgriffinlimreconstructor-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.HarmonicPercussiveSeparator 类](#vorcycmathematicssignalprocessingoperationsharmonicpercussiveseparator-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Modulator 类](#vorcycmathematicssignalprocessingoperationsmodulator-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Operation 类](#vorcycmathematicssignalprocessingoperationsoperation-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Resampler 类](#vorcycmathematicssignalprocessingoperationsresampler-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.SpectralSubtractor 类](#vorcycmathematicssignalprocessingoperationsspectralsubtractor-类)  
-- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.WaveShaper 类](#vorcycmathematicssignalprocessingoperationswaveshaper-类)  
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.ComplexConvolver 类](#vorcycmathematicssignalprocessingoperationsconvolutioncomplexconvolver-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.Convolver 类](#vorcycmathematicssignalprocessingoperationsconvolutionconvolver-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.OlaBlockConvolver 类](#vorcycmathematicssignalprocessingoperationsconvolutionolablockconvolver-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Convolution.OlsBlockConvolver 类](#vorcycmathematicssignalprocessingoperationsconvolutionolsblockconvolver-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsMode 枚举](#vorcycmathematicssignalprocessingoperationsdynamicsmode-枚举)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsProcessor 类](#vorcycmathematicssignalprocessingoperationsdynamicsprocessor-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.EnvelopeFollower 类](#vorcycmathematicssignalprocessingoperationsenvelopefollower-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.GriffinLimReconstructor 类](#vorcycmathematicssignalprocessingoperationsgriffinlimreconstructor-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.HarmonicPercussiveSeparator 类](#vorcycmathematicssignalprocessingoperationsharmonicpercussiveseparator-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Modulator 类](#vorcycmathematicssignalprocessingoperationsmodulator-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Operation 类](#vorcycmathematicssignalprocessingoperationsoperation-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.Resampler 类](#vorcycmathematicssignalprocessingoperationsresampler-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.SpectralSubtractor 类](#vorcycmathematicssignalprocessingoperationsspectralsubtractor-类)
+- :bookmark: [Vorcyc.Mathematics.SignalProcessing.Operations.WaveShaper 类](#vorcycmathematicssignalprocessingoperationswaveshaper-类)
 
 ---
 
