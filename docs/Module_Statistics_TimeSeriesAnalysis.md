@@ -1,6 +1,7 @@
 ﻿当前位置 : [根目录](README.md)/[统计模块](Module_Statistics.md)/[时间序列分析](Module_Statistics_TimeSeriesAnalysis.md)
 
 # 统计模块 - Statistics Module
+## 时间序列分析 - Time Series Analysis
 
 `Vorcyc.Mathematics.Statistics.TimeSeriesAnalysis` 是一个提供时间序列分析方法的类，包括平滑、分解、预测、自相关、偏自相关、移动平均和指数平滑。
 
