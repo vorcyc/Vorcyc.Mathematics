@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+	<TargetFramework>net9.0</TargetFramework>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <BaseOutputPath>..\..\bin\</BaseOutputPath>
@@ -13,8 +13,8 @@
 	  <Company>Vorcyc</Company>
 	  <Description>A pure dotNET and high performance math library.</Description>
 	  <Copyright>Vorcyc® Mathematics</Copyright>
-	  <Version>0.6.0.0</Version>
-	  <AssemblyVersion>0.6.0.0</AssemblyVersion>
+	  <Version>0.7.0.0</Version>
+	  <AssemblyVersion>0.7.0.0</AssemblyVersion>
 	  <Title>Vorcy.Mathematics</Title>
 	  <PackageIcon>logo1.png</PackageIcon>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -68,5 +68,7 @@
   <Import Project="..\..\shared projects\LinearAlgebra\LinearAlgebra.projitems" Label="Shared" />
 
   <Import Project="..\..\shared projects\Statistics\Statistics.projitems" Label="Shared" />
+
+  <Import Project="..\..\shared projects\Calculus\Calculus.projitems" Label="Shared" />
 
 </Project>

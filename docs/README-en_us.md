@@ -76,3 +76,11 @@ The main significance is:
 :blue_book:[Manual](Module_Statistics.md)
 
 ---
+
+
+**Calculus Module**: Provides comprehensive computational tools, including limit calculation, integration, derivative calculation, Taylor series expansion, Fourier series expansion, Runge-Kutta method for solving differential equations, and Newton-Raphson method for solving nonlinear equations.   
+:blue_book:[Manual](Module_Calculus.md)
+
+---
+
+

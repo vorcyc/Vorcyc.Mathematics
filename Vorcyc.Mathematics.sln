@@ -28,6 +28,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C288D331-8806-4DEA-8CD9-2FD047BFA947}"
 	ProjectSection(SolutionItems) = preProject
 		docs\License.txt = docs\License.txt
+		docs\Module_Calculus.md = docs\Module_Calculus.md
 		docs\Module_Core.md = docs\Module_Core.md
 		docs\Module_DeepLearning.md = docs\Module_DeepLearning.md
 		docs\Module_Experimental.md = docs\Module_Experimental.md
@@ -85,6 +86,10 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LinearAlgebra", "shared pro
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Statistics", "shared projects\Statistics\Statistics.shproj", "{ADABFB24-985D-4ACF-8182-0283D7CBD54A}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Calculus", "shared projects\Calculus\Calculus.shproj", "{E3B4493B-E4A8-40F5-853C-957EBEC0B951}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calculus_module_test", "TESTS\Calculus_module_test\Calculus_module_test.csproj", "{9049E085-6D5F-4A52-82AC-D7AFDBF50944}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +120,10 @@ Global
 		{AC068117-F346-41D1-9C94-4156DCCABB3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC068117-F346-41D1-9C94-4156DCCABB3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC068117-F346-41D1-9C94-4156DCCABB3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9049E085-6D5F-4A52-82AC-D7AFDBF50944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9049E085-6D5F-4A52-82AC-D7AFDBF50944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9049E085-6D5F-4A52-82AC-D7AFDBF50944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9049E085-6D5F-4A52-82AC-D7AFDBF50944}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -136,6 +145,8 @@ Global
 		{AC068117-F346-41D1-9C94-4156DCCABB3D} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 		{4FBD3895-5EE5-4E7B-A6B6-6BE2EF5FAED8} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
 		{ADABFB24-985D-4ACF-8182-0283D7CBD54A} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{E3B4493B-E4A8-40F5-853C-957EBEC0B951} = {0B7B090A-F8B5-46A1-A425-BBB95BBB1746}
+		{9049E085-6D5F-4A52-82AC-D7AFDBF50944} = {D5EB45E7-1CD1-4F11-B3F5-07714F84190D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25E67A34-CD17-4456-8998-1540AE23F9D7}
@@ -147,6 +158,7 @@ Global
 		shared projects\Numerics\Numerics.projitems*{7ee17963-00e5-412c-a6de-fb94c21e4f57}*SharedItemsImports = 13
 		shared projects\Statistics\Statistics.projitems*{adabfb24-985d-4acf-8182-0283d7cbd54a}*SharedItemsImports = 13
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b2c3419e-250a-487d-bc7c-0c89640b96ae}*SharedItemsImports = 13
+		shared projects\Calculus\Calculus.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Core\Core.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\DeepLearning\DeepLearning.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Experimental\Experimental.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
@@ -157,6 +169,7 @@ Global
 		shared projects\SignalProcessing\SignalProcessing.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Statistics\Statistics.projitems*{b6b8e014-c126-45dc-858e-c067d9916e03}*SharedItemsImports = 5
 		shared projects\Experimental\Experimental.projitems*{c60535f6-5504-48a9-934a-53d6b572d846}*SharedItemsImports = 13
+		shared projects\Calculus\Calculus.projitems*{e3b4493b-e4a8-40f5-853c-957ebec0b951}*SharedItemsImports = 13
 		shared projects\DeepLearning\DeepLearning.projitems*{eac6a8f4-e78e-4da0-aa05-a6c1a9b1c6af}*SharedItemsImports = 13
 		shared projects\Framework\Framework.projitems*{fe21b649-02d8-49fa-8a58-48a206f3d8ab}*SharedItemsImports = 13
 	EndGlobalSection
