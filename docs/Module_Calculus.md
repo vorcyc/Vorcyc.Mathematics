@@ -1,7 +1,5 @@
 ﻿当前位置 : [根目录](README.md)/[微积分模块](Module_Calculus.md)
 
-好的，这里是根据 `Module_Statistics.md` 和 `Module_Statistics_Basic.md` 的写法整理的文档：
-
 ---
 
 ## 计算模块 - Calculus Module
