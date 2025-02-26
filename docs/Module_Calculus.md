@@ -9,14 +9,13 @@ Vorcyc.Mathematics.Calculus 命名空间提供了全面的计算工具，包括�
 > 本模块所有类型的根命名空间为 ：Vorcyc.Mathematics.Calculus
 
 :ledger:目录  
-- :bookmark: [极限计算](Module_Calculus_Limits.md)
-- :bookmark: [积分计算](Module_Calculus_Integration.md)
-- :bookmark: [导数计算](Module_Calculus_Derivative.md)
-- :bookmark: [泰勒级数展开](Module_Calculus_TaylorSeries.md)
-- :bookmark: [傅里叶级数展开](Module_Calculus_FourierSeries.md)
-- :bookmark: [龙格-库塔法](Module_Calculus_RungeKutta.md)
-- :bookmark: [牛顿-拉夫逊法](Module_Calculus_NewtonRaphson.md)
-
+- :bookmark: [Vorcyc.Mathematics.Calculus.Limits 类](#vorcycmathematicscalculuslimits-类)
+- :bookmark: [Vorcyc.Mathematics.Calculus.Integration 类](#vorcycmathematicscalculusintegration-类)
+- :bookmark: [Vorcyc.Mathematics.Calculus.Derivative 类](#vorcycmathematicscalculusderivative-类)
+- :bookmark: [Vorcyc.Mathematics.Calculus.Series.TaylorSeries 类](#vorcycmathematicscalculusseriestaylorseries-类)
+- :bookmark: [Vorcyc.Mathematics.Calculus.Series.FourierSeries 类](#vorcycmathematicscalculusseriesfourierseries-类)
+- :bookmark: [Vorcyc.Mathematics.Calculus.NumericalMethods.RungeKutta 类](#vorcycmathematicscalculusnumericalmethodsrungekutta-类)
+- :bookmark: [Vorcyc.Mathematics.Calculus.NumericalMethods.NewtonRaphson 类](#vorcycmathematicscalculusnumericalmethodsnewtonraphson-类)
 
 ---
 
