@@ -2,7 +2,7 @@
 
 ---
 
-## 计算模块 - Calculus Module
+## 微积分模块 - Calculus Module
 
 Vorcyc.Mathematics.Calculus 命名空间提供了全面的计算工具，包括极限计算、积分计算、导数计算、泰勒级数展开、傅里叶级数展开、龙格-库塔法求解微分方程和牛顿-拉夫逊法求解非线性方程。
 
