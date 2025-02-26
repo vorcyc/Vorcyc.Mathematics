@@ -37,7 +37,7 @@ using Vorcyc.Mathematics.LinearAlgebra;
 /// </code>
 /// </remarks>
 //[Filter(design: FilterDesignMethod.StandardKalman, structure: FilterStructure.Kalman, description: "二维标准卡尔曼滤波器")]
-public class StandardKalmanFilter2D<T> where T : struct, INumber<T>
+public class StandardKalmanFilter2D<T> where T : struct, IFloatingPointIeee754<T>
 {
     private Matrix<T> A; // 状态转移矩阵
     private Matrix<T> B; // 控制输入矩阵

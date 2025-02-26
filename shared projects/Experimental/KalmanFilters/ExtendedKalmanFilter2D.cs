@@ -37,7 +37,7 @@ using Vorcyc.Mathematics.LinearAlgebra;
 /// var updatedState = ekf.Update(z, NonlinearMeasurementFunction);
 /// </code>
 /// </remarks>
-public class ExtendedKalmanFilter2D<T> where T : struct, INumber<T>
+public class ExtendedKalmanFilter2D<T> where T : struct, IFloatingPointIeee754<T>
 {
     private Matrix<T> A; // 状态转移矩阵
     private Matrix<T> B; // 控制输入矩阵

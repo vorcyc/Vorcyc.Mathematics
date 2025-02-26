@@ -8,4 +8,6 @@ using Vorcyc.Mathematics;
 
 
 
-GMM_test.go();
+//GMM_test.go();
+
+Regression_test.Go();
