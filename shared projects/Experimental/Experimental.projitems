@@ -9,6 +9,27 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Experimental</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\01_LinearRegession.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\02_PolynomialRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\03_ExponentialRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\04_LogarithmicRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\05_PowerRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\06_SinusoidalRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\07_CubicSplineInterpolation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\08_LocallyWeighted.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\09_MovingAverageFitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\10_NonlinearRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\11_GaussianProcessRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\12_NeuralNetworkFitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\13_SupportVectorRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\14_BayesianRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\CurveFitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\CurveFittingMethod.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\DataRow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\FitResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\NeuralNetwork.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\OptimizationMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\SpanHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\ExtendedKalmanFilter1D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\ExtendedKalmanFilter2D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KalmanFilters\InformationFilter1D.cs" />
