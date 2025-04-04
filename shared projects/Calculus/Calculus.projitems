@@ -20,7 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Series\TaylorSeries.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)readme.txt" />
+    <None Include="$(MSBuildThisFileDirectory)readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)NumericalMethods\" />

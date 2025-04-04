@@ -22,6 +22,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)TimeSeriesAnalysis.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)contents.txt" />
+    <None Include="$(MSBuildThisFileDirectory)contents.txt" />
   </ItemGroup>
 </Project>

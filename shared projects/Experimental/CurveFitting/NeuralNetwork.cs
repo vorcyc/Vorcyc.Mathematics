@@ -656,7 +656,7 @@ public class NeuralNetwork_Sequential<T>
         return parameters.ToArray();
     }
 
-}/// <summary>
+}
 
 
 

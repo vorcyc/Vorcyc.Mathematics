@@ -189,7 +189,7 @@ public class DataRowCollection<T> : IEnumerable<DataRow<T>>
     /// <param name="columns">列集合，用于支持按列名访问。</param>
     /// <exception cref="ArgumentException">如果 <paramref name="rowCount"/> 小于 0。</exception>
     /// <exception cref="ArgumentNullException">如果 <paramref name="data"/> 或 <paramref name="columns"/> 为 null。</exception>
-    public DataRowCollection(T[,] data, int rowCount, DataColumnCollection<T> columns)
+    internal DataRowCollection(T[,] data, int rowCount, DataColumnCollection<T> columns)
     {
         if (rowCount < 0)
             throw new ArgumentException("行数必须是非负数", nameof(rowCount));
@@ -309,25 +309,36 @@ public class DataRowCollection<T> : IEnumerable<DataRow<T>>
 
 
 /// <summary>
-/// 表示数据表中的列集合，管理一组 <see cref="DataColumn{T}"/> 对象，并支持按名称访问。
+/// 表示一个泛型数据列的集合，支持按索引或名称访问列。
 /// </summary>
-/// <typeparam name="T">值的类型，必须实现 INumber{T} 接口。</typeparam>
+/// <typeparam name="T">列数据的类型，必须实现 <see cref="INumber{T}"/> 接口。</typeparam>
 public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     where T : INumber<T>
 {
-    private DataColumn<T>[] _columns;
-    private T[,] _data;
-    private readonly Dictionary<string, DataColumn<T>> _nameToColumn;
+    private DataColumn<T>[] _columns; // 存储列对象的数组
+    private T[,] _data; // 底层数据数组
+    private readonly Dictionary<string, DataColumn<T>> _nameToColumn; // 列名到列对象的映射
+    private readonly List<string?> _columnNames; // 缓存所有列名的列表
 
     /// <summary>
-    /// 初始化 <see cref="DataColumnCollection{T}"/> 类的新实例。
+    /// 获取所有列的名称。
     /// </summary>
-    /// <param name="data">数据表的共享数据数组。</param>
+    public string[]? Names => _columnNames.ToArray();
+
+    /// <summary>
+    /// 获取集合中的列数。
+    /// </summary>
+    public int Count => _columns.Length;
+
+    /// <summary>
+    /// 初始化 <see cref="DataColumnCollection{T}"/> 的新实例。
+    /// </summary>
+    /// <param name="data">底层数据数组。</param>
     /// <param name="columnCount">列数。</param>
-    /// <param name="columnNames">列名称数组。</param>
-    /// <exception cref="ArgumentException">如果 <paramref name="columnCount"/> 小于 0。</exception>
-    /// <exception cref="ArgumentNullException">如果 <paramref name="data"/> 为 null。</exception>
-    public DataColumnCollection(T[,] data, int columnCount, string[]? columnNames = null)
+    /// <param name="columnNames">列名数组（可选）。</param>
+    /// <exception cref="ArgumentException">如果列数为负数，则抛出此异常。</exception>
+    /// <exception cref="ArgumentNullException">如果数据数组为 null，则抛出此异常。</exception>
+    internal DataColumnCollection(T[,] data, int columnCount, string[]? columnNames = null)
     {
         if (columnCount < 0)
             throw new ArgumentException("列数必须是非负数", nameof(columnCount));
@@ -337,38 +348,57 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
         _data = data;
         _columns = new DataColumn<T>[columnCount];
         _nameToColumn = new Dictionary<string, DataColumn<T>>(columnCount);
+        _columnNames = new List<string?>(columnCount);
 
+        // 初始化列和列名
         for (int i = 0; i < columnCount; i++)
         {
             string? name = columnNames != null && i < columnNames.Length ? columnNames[i] : null;
             _columns[i] = new DataColumn<T>(_data, i, name);
+            _columnNames.Add(name);
             if (name != null)
                 _nameToColumn[name] = _columns[i];
         }
     }
 
     /// <summary>
-    /// 获取指定索引处的列。
+    /// 通过列索引获取或设置列。
     /// </summary>
-    /// <param name="index">列索引。</param>
-    /// <returns>指定索引处的列。</returns>
-    /// <exception cref="IndexOutOfRangeException">如果列索引超出范围。</exception>
-    public DataColumn<T> this[int index]
+    /// <param name="columnIndex">列索引。</param>
+    /// <returns>对应的 <see cref="DataColumn{T}"/> 对象。</returns>
+    /// <exception cref="IndexOutOfRangeException">如果索引超出范围，则抛出此异常。</exception>
+    public DataColumn<T> this[int columnIndex]
     {
         get
         {
-            if (index < 0 || index >= _columns.Length)
-                throw new IndexOutOfRangeException($"列索引 {index} 超出范围 [0, {_columns.Length - 1}]");
-            return _columns[index];
+            if (columnIndex < 0 || columnIndex >= Count)
+                throw new IndexOutOfRangeException($"列索引 {columnIndex} 超出范围 [0, {Count - 1}]");
+            return _columns[columnIndex];
+        }
+        set
+        {
+            if (columnIndex < 0 || columnIndex >= Count)
+                throw new IndexOutOfRangeException($"列索引 {columnIndex} 超出范围 [0, {Count - 1}]");
+            _columns[columnIndex] = value;
+            // 更新列名映射
+            if (_columns[columnIndex].Name != null)
+            {
+                _nameToColumn[_columns[columnIndex].Name] = _columns[columnIndex];
+                _columnNames[columnIndex] = _columns[columnIndex].Name;
+            }
+            else
+            {
+                _columnNames[columnIndex] = null;
+            }
         }
     }
 
     /// <summary>
-    /// 获取指定名称的列。
+    /// 通过列名获取列。
     /// </summary>
-    /// <param name="name">列名称。</param>
-    /// <returns>指定名称的列。</returns>
-    /// <exception cref="ArgumentException">如果未找到指定名称的列。</exception>
+    /// <param name="name">列名。</param>
+    /// <returns>对应的 <see cref="DataColumn{T}"/> 对象。</returns>
+    /// <exception cref="ArgumentException">如果列名不存在，则抛出此异常。</exception>
     public DataColumn<T> this[string name]
     {
         get
@@ -380,12 +410,7 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     }
 
     /// <summary>
-    /// 获取列数。
-    /// </summary>
-    public int Count => _columns.Length;
-
-    /// <summary>
-    /// 添加新列。
+    /// 添加一列到集合中。
     /// </summary>
     /// <param name="columnName">新列的名称（可选）。</param>
     /// <param name="defaultValue">新列的默认值（可选）。</param>
@@ -399,24 +424,25 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
             for (int j = 0; j < Count; j++)
                 newData[i, j] = _data[i, j];
 
-        // 初始化新列
+        // 填充新列的默认值
         for (int i = 0; i < _data.GetLength(0); i++)
             newData[i, newColumnCount - 1] = defaultValue ?? default(T);
 
-        // 更新数据和列集合
         _data = newData;
         Array.Resize(ref _columns, newColumnCount);
         _columns[newColumnCount - 1] = new DataColumn<T>(_data, newColumnCount - 1, columnName);
+        _columnNames.Add(columnName); // 更新列名缓存
+
         if (columnName != null)
             _nameToColumn[columnName] = _columns[newColumnCount - 1];
     }
 
     /// <summary>
-    /// 删除指定索引处的列。
+    /// 从集合中移除指定索引的列。
     /// </summary>
-    /// <param name="columnIndex">要删除的列索引。</param>
-    /// <exception cref="IndexOutOfRangeException">如果列索引超出范围。</exception>
-    /// <exception cref="InvalidOperationException">如果尝试删除最后一列。</exception>
+    /// <param name="columnIndex">要移除的列索引。</param>
+    /// <exception cref="IndexOutOfRangeException">如果索引超出范围，则抛出此异常。</exception>
+    /// <exception cref="InvalidOperationException">如果尝试移除最后一列，则抛出此异常。</exception>
     public void RemoveColumn(int columnIndex)
     {
         if (columnIndex < 0 || columnIndex >= Count)
@@ -427,7 +453,7 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
         int newColumnCount = Count - 1;
         var newData = new T[_data.GetLength(0), newColumnCount];
 
-        // 复制数据并跳过被删除的列
+        // 复制数据，跳过要移除的列
         for (int i = 0; i < _data.GetLength(0); i++)
         {
             int newCol = 0;
@@ -436,16 +462,19 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
                     newData[i, newCol++] = _data[i, j];
         }
 
-        // 更新列集合
         string? removedName = _columns[columnIndex].Name;
         var newColumns = new DataColumn<T>[newColumnCount];
+        _columnNames.RemoveAt(columnIndex); // 移除对应列名
         int newIndex = 0;
         for (int j = 0; j < Count; j++)
             if (j != columnIndex)
-                newColumns[newIndex++] = new DataColumn<T>(_data, newIndex - 1, _columns[j].Name);
+            {
+                newColumns[newIndex] = new DataColumn<T>(_data, newIndex, _columns[j].Name);
+                newIndex++;
+            }
         _columns = newColumns;
 
-        // 更新名称映射
+        // 重建列名映射
         _nameToColumn.Clear();
         foreach (var col in _columns)
             if (col.Name != null)
@@ -455,22 +484,7 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     }
 
     /// <summary>
-    /// 删除指定名称的列。
-    /// </summary>
-    /// <param name="columnName">要删除的列名称。</param>
-    /// <exception cref="ArgumentException">如果未找到指定名称的列。</exception>
-    /// <exception cref="InvalidOperationException">如果尝试删除最后一列。</exception>
-    public void RemoveColumn(string columnName)
-    {
-        if (!_nameToColumn.TryGetValue(columnName, out var column))
-            throw new ArgumentException($"未找到名为 '{columnName}' 的列");
-
-        // 调用基于索引的 RemoveColumn 方法
-        RemoveColumn(column.ColumnIndex);
-    }
-
-    /// <summary>
-    /// 更新底层数据引用（供 DataRowCollection 调用）。
+    /// 更新底层数据数组。
     /// </summary>
     /// <param name="newData">新的数据数组。</param>
     internal void UpdateData(T[,] newData)
@@ -478,21 +492,39 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
         _data = newData;
         for (int i = 0; i < Count; i++)
             _columns[i] = new DataColumn<T>(_data, i, _columns[i].Name);
+        // _columnNames 不变，因为列名未修改
     }
 
     /// <summary>
-    /// 返回表示当前列集合的字符串。
+    /// 返回列集合的枚举器。
     /// </summary>
-    /// <returns>表示当前列集合的字符串。如果为空，返回 "DataColumnCollection: Empty"；否则返回每列的字符串表示，按列排列。</returns>
-    public override string ToString()
+    /// <returns>列的枚举器。</returns>
+    public IEnumerator<DataColumn<T>> GetEnumerator()
     {
-        if (Count == 0)
-            return "DataColumnCollection: Empty";
-        return $"DataColumnCollection ({Count} columns):\n{string.Join("\n", _columns.Select(c => c.ToString()))}";
+        return ((IEnumerable<DataColumn<T>>)_columns).GetEnumerator();
     }
 
-    public IEnumerator<DataColumn<T>> GetEnumerator() => ((IEnumerable<DataColumn<T>>)_columns).GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => _columns.GetEnumerator();
+    /// <summary>
+    /// 返回列集合的非泛型枚举器。
+    /// </summary>
+    /// <returns>列的非泛型枚举器。</returns>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    /// <summary>
+    /// 返回集合的字符串表示形式。
+    /// </summary>
+    /// <returns>包含列信息的字符串。</returns>
+    public override string ToString()
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"DataColumnCollection ({Count} columns):");
+        foreach (var col in _columns)
+            sb.AppendLine(col.ToString());
+        return sb.ToString();
+    }
 }
 
 /// <summary>
@@ -526,7 +558,7 @@ public class DataTable<T>
     /// <param name="columnCount">列数。</param>
     /// <param name="columnNames">列名称数组。</param>
     /// <exception cref="ArgumentException">如果 <paramref name="rowCount"/> 或 <paramref name="columnCount"/> 小于 0，或 <paramref name="columnNames"/> 的长度与 <paramref name="columnCount"/> 不匹配。</exception>
-    internal DataTable(int rowCount, int columnCount, string[]? columnNames = null)
+    public DataTable(int rowCount, int columnCount, string[]? columnNames = null)
     {
         if (rowCount < 0 || columnCount < 0)
             throw new ArgumentException("行数和列数必须是非负数");
