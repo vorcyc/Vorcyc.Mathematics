@@ -1,593 +1,338 @@
 ﻿namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
 
-/* duan linli aka cyclone_dll
- * 19.11.5
- * VORCYC CO,.LTD
+/*25.5.10 与 SIMD 和 Parallel版本一起实现。
+ * 按理说应该有 SIMDParallel 同时的版本，并且达到最优，但是暂时有问题，所以暂时不放上来。
+ * 
+ * 那么基于现在的版本，小规模的时候用 Normal版本，，大规模的时候用 Parallel版本 是最优选择。
  */
 
 
-//var input = new float[10] { -1, 2, -3, 4, -5, 6, -7, 8, -9, 10 };//, -11, 12, -13, 14, -15, 16 };
-//FastFourierTransform.Forward(input, 0, out ComplexFP32[] output, 16);
-
-
-//            foreach (var x in output)
-//                Console.WriteLine(x);
-
-//            Console.WriteLine("----------------");
-
-//            FastFourierTransform.Inverse(output, 0, 16);
-
-//            foreach (var x in output)
-//                Console.WriteLine(x);
-
-//不给足够的实际数组量也可以正确执行，结果只要关注实际数量即可
-
-
-
-
-#if NET6_0_OR_GREATER
-using static System.MathF;
-#else
-    using static Vorcyc.Offlet.Math.VMath;
-#endif
-
-public static class FastFourierTransform
+/// <summary>
+/// FFT code version.
+/// </summary>
+public enum FftVersion
 {
+    /// <summary>
+    /// 普通版本，默认版本。当数据量小时推荐。
+    /// </summary>
+    Normal,
+    /// <summary>
+    /// SIMD指令优化的版本。由于目前的设计，当数据量过大时会栈溢出。
+    /// </summary>
+    SIMD,
+    /// <summary>
+    /// 并行优化的版本，当数据量大时推荐。
+    /// </summary>
+    Parallel
+}
 
-    private const float PI = 3.14159265358979323846f;
+/// <summary>
+/// Provides methods for FFT.
+/// </summary>
+/// <remarks>
+/// <para>5.5.10 与 SIMD 和 Parallel版本一起实现，作为3种版本的统一接口。</para>
+/// <para>本应该有 SIMDParallel 同时的版本，并且达到最优，但是暂时有问题，所以暂时不放上来。</para>
+/// <para>那么基于现在的版本，小规模的时候用 Normal版本，大规模的时候用 Parallel版本 是最优选择。</para>
+/// </remarks>
+public unsafe static class FastFourierTransform
+{
+    // 委托定义，覆盖所有 Forward 和 Inverse 重载
+    private delegate bool ForwardPtrFloatDelegate(float* input, ComplexFp32* output, int N);
+    private delegate bool ForwardArrayFloatDelegate(float[] input, int offset, ComplexFp32* output, int N);
+    private delegate bool ForwardArrayOutFloatDelegate(float[] input, int offset, out ComplexFp32[] output, int N);
+    private delegate bool ForwardSpanFloatDelegate(ReadOnlySpan<float> input, Span<ComplexFp32> output);
+    private delegate bool ForwardPtrComplexDelegate(ComplexFp32* input, ComplexFp32* output, int N);
+    private delegate bool ForwardSpanComplexDelegate(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output);
+    private delegate bool ForwardArrayComplexDelegate(ComplexFp32[] input, int offset, ComplexFp32[] output, int N);
+    private delegate bool ForwardInplacePtrDelegate(ComplexFp32* data, int N);
+    private delegate bool ForwardInplaceArrayDelegate(ComplexFp32[] data, int offset, int N);
+    private delegate bool ForwardInplaceSpanDelegate(Span<ComplexFp32> data);
 
-    private const float Negative_PI = -3.14159265358979323846f;
+    private delegate bool InversePtrDelegate(ComplexFp32* input, ComplexFp32* output, int N, bool scale);
+    private delegate bool InverseArrayDelegate(ComplexFp32[] input, int inOffset, out ComplexFp32[] output, int outOffset, int N, bool scale);
+    private delegate bool InverseSpanDelegate(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, bool scale);
+    private delegate bool InverseInplacePtrDelegate(ComplexFp32* data, int N, bool scale);
+    private delegate bool InverseInplaceArrayDelegate(ComplexFp32[] data, int offset, int N, bool scale);
+    private delegate bool InverseInplaceSpanDelegate(Span<ComplexFp32> data, bool scale);
 
-    #region private methods
+    // 委托字段，默认指向 Normal 版本
+    private static ForwardPtrFloatDelegate _forwardPtrFloat = FastFourierTransformNormal.Forward;
+    private static ForwardArrayOutFloatDelegate _forwardArrayOutFloat = FastFourierTransformNormal.Forward;
+    private static ForwardSpanFloatDelegate _forwardSpanFloat = FastFourierTransformNormal.Forward;
+    private static ForwardPtrComplexDelegate _forwardPtrComplex = FastFourierTransformNormal.Forward;
+    private static ForwardSpanComplexDelegate _forwardSpanComplex = FastFourierTransformNormal.Forward;
+    private static ForwardArrayComplexDelegate _forwardArrayComplex = FastFourierTransformNormal.Forward;
+    private static ForwardInplacePtrDelegate _forwardInplacePtr = FastFourierTransformNormal.Forward;
+    private static ForwardInplaceArrayDelegate _forwardInplaceArray = FastFourierTransformNormal.Forward;
+    private static ForwardInplaceSpanDelegate _forwardInplaceSpan = FastFourierTransformNormal.Forward;
 
-    //R to C
-    private static unsafe void Rearrange(float* input, ComplexFp32* output, int N)
+    private static InversePtrDelegate _inversePtr = FastFourierTransformNormal.Inverse;
+    private static InverseArrayDelegate _inverseArray = FastFourierTransformNormal.Inverse;
+    private static InverseSpanDelegate _inverseSpan = FastFourierTransformNormal.Inverse;
+    private static InverseInplacePtrDelegate _inverseInplacePtr = FastFourierTransformNormal.Inverse;
+    private static InverseInplaceArrayDelegate _inverseInplaceArray = FastFourierTransformNormal.Inverse;
+    private static InverseInplaceSpanDelegate _inverseInplaceSpan = FastFourierTransformNormal.Inverse;
+
+    private static FftVersion _version = FftVersion.Normal;
+
+    /// <summary>
+    /// Sets the FFT version to perform related methods.
+    /// </summary>
+    public static FftVersion Version
     {
-        //  data entry position
-        int target = 0;
-        //   Process all positions of input signal
-        for (int position = 0; position < N; ++position)
+        get => _version;
+        set
         {
-            //  Set data entry
-            output[target] = input[position];
-            //  Bit mask
-            int mask = N;
-            //  While bit is set
-            while ((target & (mask >>= 1)) != 0)
-                //  Drop bit
-                target &= ~mask;
-            //  The current bit is 0 - set it
-            target |= mask;
-        }
-    }
+            if (_version == value)
+                return;
 
-
-    private static void Rearrange(ReadOnlySpan<float> input, Span<ComplexFp32> output)
-    {
-        //  data entry position
-        int target = 0;
-        //   Process all positions of input signal
-        for (int position = 0; position < input.Length; ++position)
-        {
-            //  Set data entry
-            output[target] = input[position];
-            //  Bit mask
-            int mask = input.Length;
-            //  While bit is set
-            while ((target & (mask >>= 1)) != 0)
-                //  Drop bit
-                target &= ~mask;
-            //  The current bit is 0 - set it
-            target |= mask;
-        }
-    }
-
-
-    //C to C
-    private static unsafe void Rearrange(ComplexFp32* input, ComplexFp32* output, int N)
-    {
-        //   data entry position
-        int target = 0;
-        //   Process all positions of input signal
-        for (int position = 0; position < N; ++position)
-        {
-            //  Set data entry
-            output[target] = input[position];
-            //   Bit mask
-            int mask = N;
-            //   While bit is set
-            while ((target & (mask >>= 1)) != 0)
-                //   Drop bit
-                target &= ~mask;
-            //   The current bit is 0 - set it
-            target |= mask;
-        }
-    }
-
-
-    private static void Rearrange(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output)
-    {
-        //   data entry position
-        int target = 0;
-        //   Process all positions of input signal
-        for (int position = 0; position < input.Length; ++position)
-        {
-            //  Set data entry
-            output[target] = input[position];
-            //   Bit mask
-            int mask = input.Length;
-            //   While bit is set
-            while ((target & (mask >>= 1)) != 0)
-                //   Drop bit
-                target &= ~mask;
-            //   The current bit is 0 - set it
-            target |= mask;
-        }
-    }
-
-
-    //C to C , inplace
-    private static unsafe void Rearrange(ComplexFp32* data, int N)
-    {
-        //   Swap position
-        int target = 0;
-        //   Process all positions of input signal
-        for (int position = 0; position < N; ++position)
-        {
-            //   Only for not yet swapped entries
-            if (target > position)
+            _version = value;
+            switch (value)
             {
-                //   Swap entries
-                ComplexFp32 temp = (data[target]);
-                data[target] = data[position];
-                data[position] = temp;
-            }
-            //   Bit mask
-            int mask = N;
-            //   While bit is set
-            while ((target & (mask >>= 1)) != 0)
-                //   Drop bit
-                target &= ~mask;
-            //   The current bit is 0 - set it
-            target |= mask;
-        }
-    }
-
-
-    private static void Rearrange(Span<ComplexFp32> data)
-    {
-        //   Swap position
-        int target = 0;
-        //   Process all positions of input signal
-        for (int position = 0; position < data.Length; ++position)
-        {
-            //   Only for not yet swapped entries
-            if (target > position)
-            {
-                //   Swap entries
-                ComplexFp32 temp = (data[target]);
-                data[target] = data[position];
-                data[position] = temp;
-            }
-            //   Bit mask
-            int mask = data.Length;
-            //   While bit is set
-            while ((target & (mask >>= 1)) != 0)
-                //   Drop bit
-                target &= ~mask;
-            //   The current bit is 0 - set it
-            target |= mask;
-        }
-    }
-
-
-    //FFT implementation
-    private static unsafe void Perform(ComplexFp32* data, int N, bool inverse = false)
-    {
-        float pi = inverse ? PI : Negative_PI;
-        //   Iteration through dyads, quadruples, octads and so on...
-        for (int step = 1; step < N; step <<= 1)
-        {
-            //   Jump to the next entry of the same transform factor
-            int jump = step << 1;
-            //   Angle increment
-            float delta = pi / (float)step;
-            //   Auxiliary sin(delta / 2)
-            float sine = Sin(delta * .5f);
-            //   Multiplier for trigonometric recurrence
-            ComplexFp32 multiplier = new(-2.0f * sine * sine, Sin(delta));
-            //   Start value for transform factor, fi = 0
-            ComplexFp32 factor = ComplexFp32.One;// new ComplexFP32(1.0f);
-                                                 //   Iteration through groups of different transform factor
-            for (int group = 0; group < step; ++group)
-            {
-                //   Iteration within group 
-                for (int pair = group; pair < N; pair += jump)
-                {
-                    //   Match position
-                    int match = pair + step;
-                    //   Second term of two-point transform
-                    ComplexFp32 product = factor * data[match];
-                    //   Transform for fi + pi
-                    data[match] = data[pair] - product;
-                    //   Transform for fi
-                    data[pair] += product;
-                }
-                //   Successive transform factor via trigonometric recurrence
-                factor = multiplier * factor + factor;
+                case FftVersion.Normal:
+                    _forwardPtrFloat = FastFourierTransformNormal.Forward;
+                    _forwardArrayOutFloat = FastFourierTransformNormal.Forward;
+                    _forwardSpanFloat = FastFourierTransformNormal.Forward;
+                    _forwardPtrComplex = FastFourierTransformNormal.Forward;
+                    _forwardSpanComplex = FastFourierTransformNormal.Forward;
+                    _forwardArrayComplex = FastFourierTransformNormal.Forward;
+                    _forwardInplacePtr = FastFourierTransformNormal.Forward;
+                    _forwardInplaceArray = FastFourierTransformNormal.Forward;
+                    _forwardInplaceSpan = FastFourierTransformNormal.Forward;
+                    _inversePtr = FastFourierTransformNormal.Inverse;
+                    _inverseArray = FastFourierTransformNormal.Inverse;
+                    _inverseSpan = FastFourierTransformNormal.Inverse;
+                    _inverseInplacePtr = FastFourierTransformNormal.Inverse;
+                    _inverseInplaceArray = FastFourierTransformNormal.Inverse;
+                    _inverseInplaceSpan = FastFourierTransformNormal.Inverse;
+                    break;
+                case FftVersion.SIMD:
+                    _forwardPtrFloat = FastFourierTransformSIMD.Forward;
+                    _forwardArrayOutFloat = FastFourierTransformSIMD.Forward;
+                    _forwardSpanFloat = FastFourierTransformSIMD.Forward;
+                    _forwardPtrComplex = FastFourierTransformSIMD.Forward;
+                    _forwardSpanComplex = FastFourierTransformSIMD.Forward;
+                    _forwardArrayComplex = FastFourierTransformSIMD.Forward;
+                    _forwardInplacePtr = FastFourierTransformSIMD.Forward;
+                    _forwardInplaceArray = FastFourierTransformSIMD.Forward;
+                    _forwardInplaceSpan = FastFourierTransformSIMD.Forward;
+                    _inversePtr = FastFourierTransformSIMD.Inverse;
+                    _inverseArray = FastFourierTransformSIMD.Inverse;
+                    _inverseSpan = FastFourierTransformSIMD.Inverse;
+                    _inverseInplacePtr = FastFourierTransformSIMD.Inverse;
+                    _inverseInplaceArray = FastFourierTransformSIMD.Inverse;
+                    _inverseInplaceSpan = FastFourierTransformSIMD.Inverse;
+                    break;
+                case FftVersion.Parallel:
+                    _forwardPtrFloat = FastFourierTransformParallel.Forward;
+                    _forwardArrayOutFloat = FastFourierTransformParallel.Forward;
+                    _forwardSpanFloat = FastFourierTransformParallel.Forward;
+                    _forwardPtrComplex = FastFourierTransformParallel.Forward;
+                    _forwardSpanComplex = FastFourierTransformParallel.Forward;
+                    _forwardArrayComplex = FastFourierTransformParallel.Forward;
+                    _forwardInplacePtr = FastFourierTransformParallel.Forward;
+                    _forwardInplaceArray = FastFourierTransformParallel.Forward;
+                    _forwardInplaceSpan = FastFourierTransformParallel.Forward;
+                    _inversePtr = FastFourierTransformParallel.Inverse;
+                    _inverseArray = FastFourierTransformParallel.Inverse;
+                    _inverseSpan = FastFourierTransformParallel.Inverse;
+                    _inverseInplacePtr = FastFourierTransformParallel.Inverse;
+                    _inverseInplaceArray = FastFourierTransformParallel.Inverse;
+                    _inverseInplaceSpan = FastFourierTransformParallel.Inverse;
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown FFT version");
             }
         }
     }
-
-
-    private static void Perform(Span<ComplexFp32> data, bool inverse = false)
-    {
-        float pi = inverse ? PI : Negative_PI;
-        //   Iteration through dyads, quadruples, octads and so on...
-        for (int step = 1; step < data.Length; step <<= 1)
-        {
-            //   Jump to the next entry of the same transform factor
-            int jump = step << 1;
-            //   Angle increment
-            float delta = pi / (float)step;
-            //   Auxiliary sin(delta / 2)
-            float sine = Sin(delta * .5f);
-            //   Multiplier for trigonometric recurrence
-            ComplexFp32 multiplier = new ComplexFp32(-2.0f * sine * sine, Sin(delta));
-            //   Start value for transform factor, fi = 0
-            ComplexFp32 factor = ComplexFp32.One;// new ComplexFP32(1.0f);
-                                                 //   Iteration through groups of different transform factor
-            for (int group = 0; group < step; ++group)
-            {
-                //   Iteration within group 
-                for (int pair = group; pair < data.Length; pair += jump)
-                {
-                    //   Match position
-                    int match = pair + step;
-                    //   Second term of two-point transform
-                    ComplexFp32 product = factor * data[match];
-                    //   Transform for fi + pi
-                    data[match] = data[pair] - product;
-                    //   Transform for fi
-                    data[pair] += product;
-                }
-                //   Successive transform factor via trigonometric recurrence
-                factor = multiplier * factor + factor;
-            }
-        }
-    }
-
-
-    //Scaling of inverse FFT result
-    private static unsafe void Scale(ComplexFp32* data, int N)
-    {
-        float factor = 1.0f / N;
-        //   Scale all data entries
-        for (int position = 0; position < N; ++position)
-            data[position] *= factor;
-    }
-
-
-    private static void Scale(Span<ComplexFp32> data)
-    {
-        float factor = 1.0f / data.Length;
-        //   Scale all data entries
-        for (int position = 0; position < data.Length; ++position)
-            data[position] *= factor;
-    }
-
-    #endregion
 
     #region Forward
 
     /// <summary>
-    /// Forward fast fourier transform , Real-number to Complex-number.
+    /// Performs a forward Fast Fourier Transform, converting a real-number sequence to complex-number sequence.
     /// </summary>
-    /// <param name="input">input data : real-number sequence (tine-domain)</param>
-    /// <param name="output">transform result</param>
-    /// <param name="N">FFT length</param>
-    /// <returns></returns>
+    /// <param name="input">Input data: real-number sequence (time-domain).</param>
+    /// <param name="output">Transform result: complex-number sequence (frequency-domain).</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static unsafe bool Forward(float* input, ComplexFp32* output, int N)
     {
-        //   Check input parameters
-        if (input == null || output == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(input, output, N);
-        //   Call FFT implementation
-        Perform(output, N);
-        //   Succeeded
-        return true;
+        return _forwardPtrFloat(input, output, N);
     }
 
-    //过渡版本
-    private static unsafe bool Forward(float[] input, int offset, ComplexFp32* output, int N)
-    {
-        fixed (float* pIn = input)
-        {
-            return Forward(pIn + offset, output, N);
-        }
-    }
 
     /// <summary>
-    /// Forward fast fourier transform , Real-number to Complex-number.
+    /// Performs a forward Fast Fourier Transform, converting a real-number array to complex-number array.
     /// </summary>
-    /// <param name="input">input data : real-number sequence (tine-domain)</param>
-    /// <param name="output">transform result</param>
-    /// <param name="N">FFT length</param>
-    /// <returns></returns>
+    /// <param name="input">Input data: real-number array (time-domain).</param>
+    /// <param name="offset">Offset into the input array.</param>
+    /// <param name="output">Transform result: complex-number array (frequency-domain).</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(float[] input, int offset, out ComplexFp32[] output, int N)
     {
-        unsafe
-        {
-            var result = new ComplexFp32[N];
-            fixed (ComplexFp32* pOut = result)
-            {
-                var success = Forward(input, offset, pOut, N);
-                output = result;
-                return success;
-            }
-        }
+        return _forwardArrayOutFloat(input, offset, out output, N);
     }
 
-
-
+    /// <summary>
+    /// Performs a forward Fast Fourier Transform, converting a real-number span to complex-number span.
+    /// </summary>
+    /// <param name="input">Input data: real-number span (time-domain).</param>
+    /// <param name="output">Transform result: complex-number span (frequency-domain).</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(ReadOnlySpan<float> input, Span<ComplexFp32> output)
     {
-        //   Check input parameters
-        if (input == null || output == null || input.Length < 1 || !input.Length.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(input, output);
-        //   Call FFT implementation
-        Perform(output);
-        //   Succeeded
-        return true;
+        return _forwardSpanFloat(input, output);
     }
 
-
-
     /// <summary>
-    /// Forward fast fourier transform , Complex-number to Complex-number.
+    /// Performs a forward Fast Fourier Transform, converting a complex-number sequence to complex-number sequence.
     /// </summary>
-    /// <param name="input">input data : complex-number sequence(time-domain)</param>
-    /// <param name="output">transform result</param>
-    /// <param name="N">FFT length</param>
-    /// <returns></returns>
+    /// <param name="input">Input data: complex-number sequence (time-domain).</param>
+    /// <param name="output">Transform result: complex-number sequence (frequency-domain).</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static unsafe bool Forward(ComplexFp32* input, ComplexFp32* output, int N)
     {
-        //   Check input parameters
-        if (input == null || output == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(input, output, N);
-        //   Call FFT implementation
-        Perform(output, N);
-        //   Succeeded
-        return true;
+        return _forwardPtrComplex(input, output, N);
     }
-
-
-    public static unsafe bool Forward(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output)
-    {
-        var N = input.Length;
-        //   Check input parameters
-        if (input == null || output == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(input, output);
-        //   Call FFT implementation
-        Perform(output);
-        //   Succeeded
-        return true;
-    }
-
-
 
     /// <summary>
-    /// Forward fast fourier transform , Complex-number to Complex-number.
+    /// Performs a forward Fast Fourier Transform, converting a complex-number span to complex-number span.
     /// </summary>
-    /// <param name="input">input data : complex-number sequence(time-domain)</param>
-    /// <param name="offset">offset</param>
-    /// <param name="output">transform result</param>
-    /// <param name="N">FFT length</param>
-    /// <returns></returns>
+    /// <param name="input">Input data: complex-number span (time-domain).</param>
+    /// <param name="output">Transform result: complex-number span (frequency-domain).</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
+    public static bool Forward(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output)
+    {
+        return _forwardSpanComplex(input, output);
+    }
+
+    /// <summary>
+    /// Performs a forward Fast Fourier Transform, converting a complex-number array to complex-number array.
+    /// </summary>
+    /// <param name="input">Input data: complex-number array (time-domain).</param>
+    /// <param name="offset">Offset into the input array.</param>
+    /// <param name="output">Transform result: complex-number array (frequency-domain).</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(ComplexFp32[] input, int offset, ComplexFp32[] output, int N)
     {
-        unsafe
-        {
-            fixed (ComplexFp32* pIn = input, pOut = output)
-            {
-                return Forward(pIn + offset, pOut, N);
-            }
-        }
+        return _forwardArrayComplex(input, offset, output, N);
     }
 
     /// <summary>
-    /// Forward fast fourier transform , Inplace Version.
+    /// Performs a forward Fast Fourier Transform, inplace version.
     /// </summary>
-    /// <param name="data">input and result</param>
-    /// <param name="N">FFT length</param>
-    /// <returns></returns>
+    /// <param name="data">Input and output data: complex-number sequence (time-domain to frequency-domain).</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static unsafe bool Forward(ComplexFp32* data, int N)
     {
-        //   Check input parameters
-        if (data == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Rearrange
-        Rearrange(data, N);
-        //   Call FFT implementation
-        Perform(data, N);
-        //   Succeeded
-        return true;
+        return _forwardInplacePtr(data, N);
     }
-
-
 
     /// <summary>
-    /// Forward fast fourier transform , Inplace Version.
+    /// Performs a forward Fast Fourier Transform, inplace version.
     /// </summary>
-    /// <param name="data">input and result</param>
-    /// <param name="offset"></param>
-    /// <param name="N">>FFT length</param>
-    /// <returns></returns>
+    /// <param name="data">Input and output data: complex-number array (time-domain to frequency-domain).</param>
+    /// <param name="offset">Offset into the data array.</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(ComplexFp32[] data, int offset, int N)
     {
-        unsafe
-        {
-            fixed (ComplexFp32* pData = data)
-            {
-                return Forward(pData + offset, N);
-            }
-        }
+        return _forwardInplaceArray(data, offset, N);
     }
 
-
+    /// <summary>
+    /// Performs a forward Fast Fourier Transform, inplace version.
+    /// </summary>
+    /// <param name="data">Input and output data: complex-number span (time-domain to frequency-domain).</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(Span<ComplexFp32> data)
     {
-        var N = data.Length;
-        //   Check input parameters
-        if (data == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Rearrange
-        Rearrange(data);
-        //   Call FFT implementation
-        Perform(data);
-        //   Succeeded
-        return true;
+        return _forwardInplaceSpan(data);
     }
-
 
     #endregion
 
     #region Inverse
 
     /// <summary>
-    /// Inverse fast fourier transform , Complex-number to complex-number.
+    /// Performs an inverse Fast Fourier Transform, converting a complex-number sequence to complex-number sequence.
     /// </summary>
-    /// <param name="input">input : frequency-domain data</param>
-    /// <param name="output">the result of time-domain data</param>
-    /// <param name="N">the input length</param>
-    /// <param name="scale">determine if scale</param>
-    /// <returns></returns>
+    /// <param name="input">Input data: complex-number sequence (frequency-domain).</param>
+    /// <param name="output">Transform result: complex-number sequence (time-domain).</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <param name="scale">If true, scales the result by 1/N.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static unsafe bool Inverse(ComplexFp32* input, ComplexFp32* output, int N, bool scale = true)
     {
-        //   Check input parameters
-        if (input == null || output == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(input, output, N);
-        //   Call FFT implementation
-        Perform(output, N, true);
-        //   Scale if necessary
-        if (scale)
-            Scale(output, N);
-        //   Succeeded
-        return true;
+        return _inversePtr(input, output, N, scale);
     }
 
     /// <summary>
-    /// Inverse fast fourier transform , Complex-number to complex-number.
+    /// Performs an inverse Fast Fourier Transform, converting a complex-number array to complex-number array.
     /// </summary>
-    /// <param name="input">input : frequency-domain data</param>
-    /// <param name="output">the result of time-domain data</param>
-    /// <param name="N">the input length</param>
-    /// <param name="scale">determine if scale</param>
-    /// <returns></returns>
+    /// <param name="input">Input data: complex-number array (frequency-domain).</param>
+    /// <param name="inOffset">Offset into the input array.</param>
+    /// <param name="output">Transform result: complex-number array (time-domain).</param>
+    /// <param name="outOffset">Offset into the output array.</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <param name="scale">If true, scales the result by 1/N.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Inverse(ComplexFp32[] input, int inOffset, out ComplexFp32[] output, int outOffset, int N, bool scale = true)
     {
-        unsafe
-        {
-            var result = new ComplexFp32[N];
-            fixed (ComplexFp32* pIn = input, pOut = result)
-            {
-                var success = Inverse(pIn + inOffset, pOut + outOffset, N, scale);
-                output = result;
-                return success;
-            }
-        }
+        return _inverseArray(input, inOffset, out output, outOffset, N, scale);
     }
-
-
-    public static unsafe bool Inverse(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, bool scale = true)
-    {
-        var N = input.Length;
-        //   Check input parameters
-        if (input == null || output == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(input, output);
-        //   Call FFT implementation
-        Perform(output, true);
-        //   Scale if necessary
-        if (scale)
-            Scale(output);
-        //   Succeeded
-        return true;
-    }
-
 
     /// <summary>
-    /// Inverse fast fourier transform , Inplace Version
+    /// Performs an inverse Fast Fourier Transform, converting a complex-number span to complex-number span.
     /// </summary>
-    /// <param name="data">frequency-domain to time-domain</param>
-    /// <param name="N">the input length</param>
-    /// <param name="scale">determine if scale</param>
-    /// <returns></returns>
+    /// <param name="input">Input data: complex-number span (frequency-domain).</param>
+    /// <param name="output">Transform result: complex-number span (time-domain).</param>
+    /// <param name="scale">If true, scales the result by 1/N.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
+    public static bool Inverse(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, bool scale = true)
+    {
+        return _inverseSpan(input, output, scale);
+    }
+
+    /// <summary>
+    /// Performs an inverse Fast Fourier Transform, inplace version.
+    /// </summary>
+    /// <param name="data">Input and output data: complex-number sequence (frequency-domain to time-domain).</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <param name="scale">If true, scales the result by 1/N.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static unsafe bool Inverse(ComplexFp32* data, int N, bool scale = true)
     {
-        //   Check input parameters
-        if (data == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(data, N);
-        //   Call FFT implementation
-        Perform(data, N, true);
-        //   Scale if necessary
-        if (scale)
-            Scale(data, N);
-        //   Succeeded
-        return true;
+        return _inverseInplacePtr(data, N, scale);
     }
 
     /// <summary>
-    /// Inverse fast fourier transform , Inplace Version
+    /// Performs an inverse Fast Fourier Transform, inplace version.
     /// </summary>
-    /// <param name="data">frequency-domain to time-domain</param>
-    /// <param name="N">the input length</param>
-    /// <param name="scale">determine if scale</param>
-    /// <returns></returns>
+    /// <param name="data">Input and output data: complex-number array (frequency-domain to time-domain).</param>
+    /// <param name="offset">Offset into the data array.</param>
+    /// <param name="N">FFT length, must be a power of 2.</param>
+    /// <param name="scale">If true, scales the result by 1/N.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Inverse(ComplexFp32[] data, int offset, int N, bool scale = true)
     {
-        unsafe
-        {
-            fixed (ComplexFp32* pData = data)
-            {
-                return Inverse(pData + offset, N, scale);
-            }
-        }
+        return _inverseInplaceArray(data, offset, N, scale);
     }
 
-
-    public static unsafe bool Inverse(Span<ComplexFp32> data, bool scale = true)
+    /// <summary>
+    /// Performs  Performs an inverse Fast Fourier Transform, inplace version.
+    /// </summary>
+    /// <param name="data">Input and output data: complex-number span (frequency-domain to time-domain).</param>
+    /// <param name="scale">If true, scales the result by 1/N.</param>
+    /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
+    public static bool Inverse(Span<ComplexFp32> data, bool scale = true)
     {
-        var N = data.Length;
-        //   Check input parameters
-        if (data == null || N < 1 || !N.IsPowerOf2())
-            return false;
-        //   Initialize data
-        Rearrange(data);
-        //   Call FFT implementation
-        Perform(data, true);
-        //   Scale if necessary
-        if (scale)
-            Scale(data);
-        //   Succeeded
-        return true;
+        return _inverseInplaceSpan(data, scale);
     }
-
 
     #endregion
-
 }
-

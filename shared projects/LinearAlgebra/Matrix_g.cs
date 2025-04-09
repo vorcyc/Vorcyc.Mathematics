@@ -30,6 +30,12 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// </summary>
     public int Columns => _columns;
 
+    /// <summary>
+    /// 获取底层数据数组（仅限内部使用）。
+    /// </summary>
+    /// <returns>底层数据的一维数组。</returns>
+    internal T[] GetInternalData() => _values;
+
     #region 构造器
 
     /// <summary>

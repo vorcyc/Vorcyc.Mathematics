@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComputingContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataHelper\CsvManipulater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataHelper\DataTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataHelper\DataTableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Direction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute.cs" />

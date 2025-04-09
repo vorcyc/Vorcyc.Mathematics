@@ -14,7 +14,7 @@ internal class FFT
 
         ReadOnlySpan<float> input = [-1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11, 12, -13, 14, -15, 16];
         Span<ComplexFp32> output = new ComplexFp32[input.Length];
-        FastFourierTransform.Forward(input, output);
+        FastFourierTransformNormal.Forward(input, output);
 
 
         foreach (var x in output)
@@ -22,7 +22,7 @@ internal class FFT
 
         Console.WriteLine("----------------");
 
-        FastFourierTransform.Inverse(output);
+        FastFourierTransformNormal.Inverse(output);
 
         foreach (var x in output)
             Console.WriteLine(x);

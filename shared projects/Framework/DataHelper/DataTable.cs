@@ -610,6 +610,12 @@ public class DataTable<T>
     }
 
     /// <summary>
+    /// 获取底层数据数组（仅限内部使用）。
+    /// </summary>
+    /// <returns>底层数据的二维数组。</returns>
+    internal T[,] GetInternalData() => _data;
+
+    /// <summary>
     /// 返回表示当前数据表的字符串。
     /// </summary>
     /// <returns>表示当前数据表的字符串，包含行数、列数以及行和列的详细信息。</returns>

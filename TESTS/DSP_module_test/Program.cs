@@ -31,7 +31,7 @@ internal class Program
 
         
 
-         FastFourierTransform.Inverse(fd.Result);
+         FastFourierTransformNormal.Inverse(fd.Result);
 
         fd.Result.PrintLine();
     }

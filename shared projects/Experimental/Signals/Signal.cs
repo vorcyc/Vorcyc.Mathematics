@@ -104,13 +104,13 @@ public class Signal : ITimeDomainSignal, ICloneable<Signal>
     {
         if (window is null && _length.IsPowerOf2())//若不应用窗函数，则直接使用补过 0 后的样本进行变换
         {
-            FastFourierTransform.Forward(_samples, 0, out var result, _length);
+            FastFourierTransformNormal.Forward(_samples, 0, out var result, _length);
             return new FrequencyDomain(0, _length, _length, result, this, window);
         }
         else//由于窗函数需要修改样本值，所以只要使用窗函数都需要创建临时副本
         {
             var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_samples, 0, _length.NextPowerOf2(), _length, window);
-            FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
+            FastFourierTransformNormal.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
             return new FrequencyDomain(0, windowedSamples.Length, _length, result, this, window);
         }
     }

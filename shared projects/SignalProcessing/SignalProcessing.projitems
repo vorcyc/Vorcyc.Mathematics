@@ -161,8 +161,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\CudaFFT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\CUDA_FFT.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransform.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransform2.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransform3.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransformNormal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransformParallel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransformSIMD.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\RealOnlyFFT_Fp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FractionalDelayLine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterpolationMode.cs" />

@@ -92,13 +92,13 @@ public class SignalSegment : ITimeDomainSignal
     {
         if (window is null && _length.IsPowerOf2())
         {
-            FastFourierTransform.Forward(_signal._samples, _start, out var result, _length);
+            FastFourierTransformNormal.Forward(_signal._samples, _start, out var result, _length);
             return new FrequencyDomain(_start, _length, _length, result, this, null);
         }
         else
         {
             var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_signal._samples, _start, _length.NextPowerOf2(), _length, window);
-            FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
+            FastFourierTransformNormal.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
             return new FrequencyDomain(_start, windowedSamples.Length, _length, result, this, window);
         }
     }

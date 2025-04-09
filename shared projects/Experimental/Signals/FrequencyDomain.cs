@@ -146,7 +146,7 @@ public class FrequencyDomain : IFrequencyDomain
     public void Inverse()
     {
         // 执行 FFT 逆变换
-        FastFourierTransform.Inverse(_fftResult);
+        FastFourierTransformNormal.Inverse(_fftResult);
 
         // 将逆变换结果写回信号的采样数据中
         for (int signalIndex = _offset, freqIndex = 0;
