@@ -99,18 +99,25 @@ public class Signal : ITimeDomainSignal, ICloneable<Signal>
         return result;
     }
 
-
-    public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null)
+    /// <summary>
+    /// 将信号段转换为频域信号。
+    /// </summary>
+    /// <param name="window">窗口类型，可选参数。</param>
+    /// <param name="fftVersion">FFT的执行方式。建议小规模数据用<see cref="FftVersion.Normal"/>，大规模数据用<see cref="FftVersion.Parallel"/>。默认为<see cref="FftVersion.Normal"/></param>
+    /// <returns>频域信号对象。</returns>
+    public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)
     {
+        FastFourierTransform.Version = fftVersion;
+
         if (window is null && _length.IsPowerOf2())//若不应用窗函数，则直接使用补过 0 后的样本进行变换
         {
-            FastFourierTransformNormal.Forward(_samples, 0, out var result, _length);
+            FastFourierTransform.Forward(_samples, 0, out var result, _length);
             return new FrequencyDomain(0, _length, _length, result, this, window);
         }
         else//由于窗函数需要修改样本值，所以只要使用窗函数都需要创建临时副本
         {
             var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_samples, 0, _length.NextPowerOf2(), _length, window);
-            FastFourierTransformNormal.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
+            FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
             return new FrequencyDomain(0, windowedSamples.Length, _length, result, this, window);
         }
     }

@@ -1,31 +1,27 @@
 ﻿using System.Globalization;
 using System.Numerics;
+using System.Text;
 
 namespace Vorcyc.Mathematics.Framework.DataHelper;
 
 /// <summary>
-/// 提供从 CSV 文件读取数据并返回 <see cref="DataTable{T}"/> 对象的功能，以及将数据异步保存到 CSV 文件的工具类。
+/// 提供从 CSV 文件读取数据并返回 <see cref="DataTable{T}"/> 对象的功能，以及将数据保存到 CSV 文件的工具类。
 /// </summary>
 public static class CsvManipulater
 {
     #region Private Helpers
 
     /// <summary>
-    /// <summary>
     /// 异步逐行读取 CSV 文件的所有行。
     /// </summary>
     /// <param name="filePath">CSV 文件的路径。</param>
-    /// <param name="cancellationToken">用于取消操作的令牌。</param>
     /// <returns>异步枚举的行数据。</returns>
-    /// <exception cref="ArgumentException">如果文件路径无效或文件不存在，则抛出此异常。</exception>
-    private static async IAsyncEnumerable<string> ReadLinesAsync(string filePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    /// <exception cref="ArgumentException">如果文件路径无效，则抛出此异常。</exception>
+    private static async IAsyncEnumerable<string> ReadLinesAsync(string filePath)
     {
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-            throw new ArgumentException("文件路径无效或文件不存在", nameof(filePath));
-
-        using var reader = new StreamReader(filePath); // 使用同步 using，因为 StreamReader 不支持 IAsyncDisposable
+        using var reader = new StreamReader(filePath);
         string? line;
-        while ((line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) is not null)
+        while ((line = await reader.ReadLineAsync()) is not null)
         {
             if (!string.IsNullOrEmpty(line)) // 跳过空行
                 yield return line;
@@ -42,8 +38,6 @@ public static class CsvManipulater
     /// <param name="columnIndices">要读取的列索引数组（可选）。</param>
     /// <param name="columnNamesInput">要读取的列名称数组（可选）。</param>
     /// <returns>一个元组，包含总列数、起始行索引和列名数组。</returns>
-    /// <exception cref="ArgumentException">如果标题行为空，则抛出此异常。</exception>
-    /// <exception cref="FormatException">如果标题行中的列数与分隔符计算不一致，则抛出此异常。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static (int totalColumns, int startLine, string[]? columnNames) GetCsvMetadata<T>(
         string header, bool hasHeader, char delimiter, int[]? columnIndices = null, string[]? columnNamesInput = null)
@@ -65,9 +59,11 @@ public static class CsvManipulater
                 ? columnIndices.Select(i => i >= 0 && i < headerArray.Length ? headerArray[i] : throw new ArgumentOutOfRangeException(nameof(columnIndices), $"索引 {i} 超出范围")).ToArray()
                 : columnNamesInput ?? headerArray;
         }
-        else if (columnNamesInput == null)
+        else
         {
-            columnNames = Enumerable.Range(0, totalColumns).Select(i => $"Column{i}").ToArray(); // 默认列名
+            columnNames = columnIndices is not null
+                ? columnIndices.Select(i => $"Column{i}").ToArray()
+                : columnNamesInput ?? Enumerable.Range(0, totalColumns).Select(i => $"Column{i}").ToArray();
         }
 
         return (totalColumns, startLine, columnNames);
@@ -112,7 +108,7 @@ public static class CsvManipulater
     /// <param name="delimiter">CSV 文件的分隔符。</param>
     /// <param name="filterConditions">基于函数的过滤条件（可选）。</param>
     /// <param name="filterColumns">基于比较的过滤条件（可选）。</param>
-    /// <param name="estimatedRowCount">预估的行数，用于预分配内存（默认为 0，表示动态调整）。</param>
+    /// <param name="estimatedRowCount">预估的行数，用于预分配内存。</param>
     /// <returns>过滤后的行列表。</returns>
     /// <exception cref="FormatException">如果行数据格式错误或无法解析，则抛出此异常。</exception>
     /// <exception cref="ArgumentException">如果过滤条件无效，则抛出此异常。</exception>
@@ -120,16 +116,16 @@ public static class CsvManipulater
         IAsyncEnumerable<string> lines, int startLine, int totalColumns, char delimiter,
         Dictionary<int, Func<T, bool>>? filterConditions = null,
         Dictionary<int, (T value, FilterCondition condition)>? filterColumns = null,
-        int estimatedRowCount = 0)
+        int estimatedRowCount = 1000)
         where T : INumber<T>, IComparable<T>
     {
-        var filteredRows = new List<string>(estimatedRowCount > 0 ? estimatedRowCount : 1000); // 默认容量 1000
-        var filterCols = filterConditions?.Keys.ToHashSet() ?? filterColumns?.Keys.ToHashSet(); // 缓存过滤列
+        var filteredRows = new List<string>(estimatedRowCount);
+        var filterCols = filterConditions?.Keys.ToHashSet() ?? filterColumns?.Keys.ToHashSet();
         int rowIndex = 0;
 
         await foreach (var line in lines)
         {
-            if (rowIndex++ < startLine) continue; // 跳过标题行
+            if (rowIndex++ < startLine) continue;
 
             var lineSpan = line.AsSpan();
             if (lineSpan.Count(delimiter) + 1 != totalColumns)
@@ -199,23 +195,23 @@ public static class CsvManipulater
         where T : INumber<T>
     {
         var dataTable = new DataTable<T>(filteredRows.Count, columnIndices.Length, columnNames);
+        var columnSet = columnIndices.ToHashSet();
 
         for (int rowIndex = 0; rowIndex < filteredRows.Count; rowIndex++)
         {
             var lineSpan = filteredRows[rowIndex].AsSpan();
-            int colIndex = 0, start = 0;
-            for (int i = 0; i < lineSpan.Length && colIndex <= columnIndices.Max(); i++)
+            int colIndex = 0, start = 0, targetColIndex = 0;
+            for (int i = 0; i < lineSpan.Length && targetColIndex < columnIndices.Length; i++)
             {
                 if (lineSpan[i] == delimiter || i == lineSpan.Length - 1)
                 {
                     int length = (i == lineSpan.Length - 1 && lineSpan[i] != delimiter) ? i - start + 1 : i - start;
-                    int targetColIndex = Array.IndexOf(columnIndices, colIndex);
-                    if (targetColIndex != -1) // 如果当前列在 columnIndices 中
+                    if (columnSet.Contains(colIndex))
                     {
                         var valueSpan = lineSpan.Slice(start, length);
                         try
                         {
-                            dataTable[rowIndex, targetColIndex] = T.Parse(valueSpan, CultureInfo.InvariantCulture);
+                            dataTable[rowIndex, targetColIndex++] = T.Parse(valueSpan, CultureInfo.InvariantCulture);
                         }
                         catch (FormatException ex)
                         {
@@ -234,6 +230,8 @@ public static class CsvManipulater
 
     #region Public Methods
 
+    #region Read All Columns
+
     /// <summary>
     /// 从指定的 CSV 文件中读取所有列数据，并返回一个 <see cref="DataTable{T}"/> 对象。
     /// </summary>
@@ -247,14 +245,11 @@ public static class CsvManipulater
     public static async Task<DataTable<T>> ReadAsync<T>(string filePath, bool hasHeader = true, char delimiter = ',')
         where T : INumber<T>
     {
-        if (!File.Exists(filePath))
-            throw new ArgumentException("文件路径无效或文件不存在", nameof(filePath));
-
         string? header = null;
         int totalColumns = 0, rowCount = 0;
-        var linesForHeader = ReadLinesAsync(filePath);
+        var lines = ReadLinesAsync(filePath);
 
-        await foreach (var line in linesForHeader)
+        await foreach (var line in lines)
         {
             if (rowCount++ == 0)
             {
@@ -264,16 +259,15 @@ public static class CsvManipulater
             }
         }
 
-        if (header == null)
-            throw new ArgumentException("CSV 文件为空", nameof(filePath));
-
-        var (totalCols, startLine, columnNames) = GetCsvMetadata<T>(header, hasHeader, delimiter);
+        var (totalCols, startLine, columnNames) = GetCsvMetadata<T>(header!, hasHeader, delimiter);
         var columnIndices = Enumerable.Range(0, totalColumns).ToArray();
-
-        var linesForData = ReadLinesAsync(filePath);
-        var filteredRows = await FilterRowsAsync<T>(linesForData, startLine, totalCols, delimiter);
+        var filteredRows = await FilterRowsAsync<T>(lines, startLine, totalCols, delimiter, estimatedRowCount: rowCount - startLine);
         return PopulateDataTableSpan<T>(filteredRows, columnIndices, delimiter, columnNames);
     }
+
+    #endregion
+
+    #region Read by Column Indices
 
     /// <summary>
     /// 从指定的 CSV 文件中读取指定列索引的数据，并返回一个 <see cref="DataTable{T}"/> 对象。
@@ -291,14 +285,12 @@ public static class CsvManipulater
     {
         if (columnsToRead is null)
             throw new ArgumentException("列索引数组不能为 null", nameof(columnsToRead));
-        if (!File.Exists(filePath))
-            throw new ArgumentException("文件路径无效或文件不存在", nameof(filePath));
 
         string? header = null;
         int totalColumns = 0, rowCount = 0;
-        var linesForHeader = ReadLinesAsync(filePath);
+        var lines = ReadLinesAsync(filePath);
 
-        await foreach (var line in linesForHeader)
+        await foreach (var line in lines)
         {
             if (rowCount++ == 0)
             {
@@ -308,16 +300,99 @@ public static class CsvManipulater
             }
         }
 
-        if (header == null)
-            throw new ArgumentException("CSV 文件为空", nameof(filePath));
-
-        var (totalCols, startLine, columnNames) = GetCsvMetadata<T>(header, hasHeader, delimiter, columnsToRead);
+        var (totalCols, startLine, columnNames) = GetCsvMetadata<T>(header!, hasHeader, delimiter, columnsToRead);
         ValidateColumns<T>(totalCols, columnsToRead, null, null);
-
-        var linesForData = ReadLinesAsync(filePath);
-        var filteredRows = await FilterRowsAsync<T>(linesForData, startLine, totalCols, delimiter);
+        var filteredRows = await FilterRowsAsync<T>(lines, startLine, totalCols, delimiter, estimatedRowCount: rowCount - startLine);
         return PopulateDataTableSpan<T>(filteredRows, columnsToRead, delimiter, columnNames);
     }
+
+    /// <summary>
+    /// 从指定的 CSV 文件中读取指定列索引的数据，并根据条件过滤返回一个 <see cref="DataTable{T}"/> 对象。
+    /// </summary>
+    /// <typeparam name="T">值的类型，必须实现 <see cref="INumber{T}"/> 接口。</typeparam>
+    /// <param name="filePath">CSV 文件路径。</param>
+    /// <param name="columnsToRead">要读取的列索引数组。</param>
+    /// <param name="filterConditions">要应用的过滤条件字典，键为列索引，值为过滤函数。</param>
+    /// <param name="hasHeader">指示 CSV 文件是否包含标题行，默认为 <c>true</c>。</param>
+    /// <param name="delimiter">CSV 文件的分隔符，默认为 <c>,</c>。</param>
+    /// <returns>包含读取和过滤数据的 <see cref="DataTable{T}"/> 对象。</returns>
+    /// <exception cref="ArgumentException">当文件为空、路径无效、列索引数组无效或过滤条件为空时抛出。</exception>
+    /// <exception cref="FormatException">当无法解析数据为类型 <typeparamref name="T"/> 时抛出。</exception>
+    public static async Task<DataTable<T>> ReadAsync<T>(
+        string filePath, int[] columnsToRead, Dictionary<int, Func<T, bool>> filterConditions,
+        bool hasHeader = true, char delimiter = ',')
+        where T : INumber<T>
+    {
+        if (columnsToRead is null)
+            throw new ArgumentException("列索引数组不能为 null", nameof(columnsToRead));
+        if (filterConditions is null || filterConditions.Count == 0)
+            throw new ArgumentException("必须指定要过滤的列索引和条件", nameof(filterConditions));
+
+        string? header = null;
+        int totalColumns = 0, rowCount = 0;
+        var lines = ReadLinesAsync(filePath);
+
+        await foreach (var line in lines)
+        {
+            if (rowCount++ == 0)
+            {
+                header = line;
+                totalColumns = header.AsSpan().Count(delimiter) + 1;
+                break;
+            }
+        }
+
+        var (totalCols, startLine, columnNames) = GetCsvMetadata<T>(header!, hasHeader, delimiter, columnsToRead);
+        ValidateColumns<T>(totalCols, columnsToRead, null, null);
+        var filteredRows = await FilterRowsAsync<T>(lines, startLine, totalCols, delimiter, filterConditions, estimatedRowCount: rowCount - startLine);
+        return PopulateDataTableSpan<T>(filteredRows, columnsToRead, delimiter, columnNames);
+    }
+
+    /// <summary>
+    /// 从指定的 CSV 文件中读取指定列索引的数据，并根据比较条件过滤返回一个 <see cref="DataTable{T}"/> 对象。
+    /// </summary>
+    /// <typeparam name="T">值的类型，必须实现 <see cref="INumber{T}"/> 和 <see cref="IComparable{T}"/> 接口。</typeparam>
+    /// <param name="filePath">CSV 文件路径。</param>
+    /// <param name="columnsToRead">要读取的列索引数组。</param>
+    /// <param name="filterColumns">要应用的比较过滤条件字典，键为列索引，值为 (比较值, 条件) 元组。</param>
+    /// <param name="hasHeader">指示 CSV 文件是否包含标题行，默认为 <c>true</c>。</param>
+    /// <param name="delimiter">CSV 文件的分隔符，默认为 <c>,</c>。</param>
+    /// <returns>包含读取和过滤数据的 <see cref="DataTable{T}"/> 对象。</returns>
+    /// <exception cref="ArgumentException">当文件为空、路径无效、列索引数组无效或过滤条件无效时抛出。</exception>
+    /// <exception cref="FormatException">当无法解析数据为类型 <typeparamref name="T"/> 时抛出。</exception>
+    public static async Task<DataTable<T>> ReadAsync<T>(
+        string filePath, int[] columnsToRead, Dictionary<int, (T value, FilterCondition condition)> filterColumns,
+        bool hasHeader = true, char delimiter = ',')
+        where T : INumber<T>, IComparable<T>
+    {
+        if (columnsToRead is null)
+            throw new ArgumentException("列索引数组不能为 null", nameof(columnsToRead));
+        if (filterColumns is null || filterColumns.Count == 0)
+            throw new ArgumentException("必须指定要过滤的列索引和条件", nameof(filterColumns));
+
+        string? header = null;
+        int totalColumns = 0, rowCount = 0;
+        var lines = ReadLinesAsync(filePath);
+
+        await foreach (var line in lines)
+        {
+            if (rowCount++ == 0)
+            {
+                header = line;
+                totalColumns = header.AsSpan().Count(delimiter) + 1;
+                break;
+            }
+        }
+
+        var (totalCols, startLine, columnNames) = GetCsvMetadata<T>(header!, hasHeader, delimiter, columnsToRead);
+        ValidateColumns<T>(totalCols, columnsToRead, null, null);
+        var filteredRows = await FilterRowsAsync<T>(lines, startLine, totalCols, delimiter, null, filterColumns, rowCount - startLine);
+        return PopulateDataTableSpan<T>(filteredRows, columnsToRead, delimiter, columnNames);
+    }
+
+    #endregion
+
+    #region Read by Column Names
 
     /// <summary>
     /// 从指定的 CSV 文件中读取指定列名称的数据，并返回一个 <see cref="DataTable{T}"/> 对象。
@@ -335,14 +410,12 @@ public static class CsvManipulater
     {
         if (columnsToRead is null)
             throw new ArgumentException("列名称数组不能为 null", nameof(columnsToRead));
-        if (!File.Exists(filePath))
-            throw new ArgumentException("文件路径无效或文件不存在", nameof(filePath));
 
         string? header = null;
         int totalColumns = 0, rowCount = 0;
-        var linesForHeader = ReadLinesAsync(filePath);
+        var lines = ReadLinesAsync(filePath);
 
-        await foreach (var line in linesForHeader)
+        await foreach (var line in lines)
         {
             if (rowCount++ == 0)
             {
@@ -352,19 +425,146 @@ public static class CsvManipulater
             }
         }
 
-        if (header == null)
-            throw new ArgumentException("CSV 文件为空", nameof(filePath));
-
-        var headerArray = header.Split(delimiter);
+        var headerArray = header!.Split(delimiter);
         var columnMap = headerArray.Select((name, index) => (name, index))
                                    .ToDictionary(x => x.name, x => x.index);
         var columnIndices = columnsToRead.Select(name => columnMap[name]).ToArray();
         var (totalCols, startLine, _) = GetCsvMetadata<T>(header, true, delimiter);
         ValidateColumns<T>(totalCols, null, columnsToRead, headerArray);
-
-        var linesForData = ReadLinesAsync(filePath);
-        var filteredRows = await FilterRowsAsync<T>(linesForData, startLine, totalCols, delimiter);
+        var filteredRows = await FilterRowsAsync<T>(lines, startLine, totalCols, delimiter, estimatedRowCount: rowCount - startLine);
         return PopulateDataTableSpan<T>(filteredRows, columnIndices, delimiter, columnsToRead);
+    }
+
+    /// <summary>
+    /// 从指定的 CSV 文件中读取指定列名称的数据，并根据条件过滤返回一个 <see cref="DataTable{T}"/> 对象。
+    /// </summary>
+    /// <typeparam name="T">值的类型，必须实现 <see cref="INumber{T}"/> 接口。</typeparam>
+    /// <param name="filePath">CSV 文件路径。</param>
+    /// <param name="columnsToRead">要读取的列名称数组。</param>
+    /// <param name="filterConditions">要应用的过滤条件字典，键为列名称，值为过滤函数。</param>
+    /// <param name="delimiter">CSV 文件的分隔符，默认为 <c>,</c>。</param>
+    /// <returns>包含读取和过滤数据的 <see cref="DataTable{T}"/> 对象。</returns>
+    /// <exception cref="ArgumentException">当文件为空、路径无效、列名称数组无效或过滤条件为空时抛出。</exception>
+    /// <exception cref="FormatException">当无法解析数据为类型 <typeparamref name="T"/> 时抛出。</exception>
+    public static async Task<DataTable<T>> ReadAsync<T>(
+        string filePath, string[] columnsToRead, Dictionary<string, Func<T, bool>> filterConditions,
+        char delimiter = ',')
+        where T : INumber<T>
+    {
+        if (columnsToRead is null)
+            throw new ArgumentException("列名称数组不能为 null", nameof(columnsToRead));
+        if (filterConditions is null || filterConditions.Count == 0)
+            throw new ArgumentException("必须指定要过滤的列名称和条件", nameof(filterConditions));
+
+        string? header = null;
+        int totalColumns = 0, rowCount = 0;
+        var lines = ReadLinesAsync(filePath);
+
+        await foreach (var line in lines)
+        {
+            if (rowCount++ == 0)
+            {
+                header = line;
+                totalColumns = header.AsSpan().Count(delimiter) + 1;
+                break;
+            }
+        }
+
+        var headerArray = header!.Split(delimiter);
+        var columnMap = headerArray.Select((name, index) => (name, index))
+                                   .ToDictionary(x => x.name, x => x.index);
+        var columnIndices = columnsToRead.Select(name => columnMap[name]).ToArray();
+        var filterConditionsByIndex = filterConditions.ToDictionary(kv => columnMap[kv.Key], kv => kv.Value);
+        var (totalCols, startLine, _) = GetCsvMetadata<T>(header, true, delimiter);
+        ValidateColumns<T>(totalCols, null, columnsToRead, headerArray);
+        var filteredRows = await FilterRowsAsync<T>(lines, startLine, totalCols, delimiter, filterConditionsByIndex, estimatedRowCount: rowCount - startLine);
+        return PopulateDataTableSpan<T>(filteredRows, columnIndices, delimiter, columnsToRead);
+    }
+
+    /// <summary>
+    /// 从指定的 CSV 文件中读取指定列名称的数据，并根据比较条件过滤返回一个 <see cref="DataTable{T}"/> 对象。
+    /// </summary>
+    /// <typeparam name="T">值的类型，必须实现 <see cref="INumber{T}"/> 和 <see cref="IComparable{T}"/> 接口。</typeparam>
+    /// <param name="filePath">CSV 文件路径。</param>
+    /// <param name="columnsToRead">要读取的列名称数组。</param>
+    /// <param name="filterColumns">要应用的比较过滤条件字典，键为列名称，值为 (比较值, 条件) 元组。</param>
+    /// <param name="delimiter">CSV 文件的分隔符，默认为 <c>,</c>。</param>
+    /// <returns>包含读取和过滤数据的 <see cref="DataTable{T}"/> 对象。</returns>
+    /// <exception cref="ArgumentException">当文件为空、路径无效、列名称数组无效或过滤条件无效时抛出。</exception>
+    /// <exception cref="FormatException">当无法解析数据为类型 <typeparamref name="T"/> 时抛出。</exception>
+    public static async Task<DataTable<T>> ReadAsync<T>(
+        string filePath, string[] columnsToRead, Dictionary<string, (T value, FilterCondition condition)> filterColumns,
+        char delimiter = ',')
+        where T : INumber<T>, IComparable<T>
+    {
+        if (columnsToRead is null)
+            throw new ArgumentException("列名称数组不能为 null", nameof(columnsToRead));
+        if (filterColumns is null || filterColumns.Count == 0)
+            throw new ArgumentException("必须指定要过滤的列名称和条件", nameof(filterColumns));
+
+        string? header = null;
+        int totalColumns = 0, rowCount = 0;
+        var lines = ReadLinesAsync(filePath);
+
+        await foreach (var line in lines)
+        {
+            if (rowCount++ == 0)
+            {
+                header = line;
+                totalColumns = header.AsSpan().Count(delimiter) + 1;
+                break;
+            }
+        }
+
+        var headerArray = header!.Split(delimiter);
+        var columnMap = headerArray.Select((name, index) => (name, index))
+                                   .ToDictionary(x => x.name, x => x.index);
+        var columnIndices = columnsToRead.Select(name => columnMap[name]).ToArray();
+        var filterColumnsByIndex = filterColumns.ToDictionary(kv => columnMap[kv.Key], kv => kv.Value);
+        var (totalCols, startLine, _) = GetCsvMetadata<T>(header, true, delimiter);
+        ValidateColumns<T>(totalCols, null, columnsToRead, headerArray);
+        var filteredRows = await FilterRowsAsync<T>(lines, startLine, totalCols, delimiter, null, filterColumnsByIndex, rowCount - startLine);
+        return PopulateDataTableSpan<T>(filteredRows, columnIndices, delimiter, columnsToRead);
+    }
+
+    #endregion
+
+    #region Save Methods
+
+    /// <summary>
+    /// 同步将 <see cref="DataTable{T}"/> 对象保存到指定的 CSV 文件中。
+    /// </summary>
+    /// <typeparam name="T">值的类型，必须实现 <see cref="INumber{T}"/> 接口。</typeparam>
+    /// <param name="dataTable">要保存的数据表。</param>
+    /// <param name="filePath">CSV 文件路径。</param>
+    /// <param name="delimiter">CSV 文件的分隔符，默认为 <c>,</c>。</param>
+    /// <exception cref="ArgumentNullException">如果 <paramref name="dataTable"/> 或 <paramref name="filePath"/> 为 null，则抛出此异常。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Save<T>(DataTable<T> dataTable, string filePath, char delimiter = ',')
+        where T : INumber<T>
+    {
+        if (dataTable is null)
+            throw new ArgumentNullException(nameof(dataTable));
+        if (filePath is null)
+            throw new ArgumentNullException(nameof(filePath));
+
+        using var writer = new StreamWriter(filePath);
+
+        if (dataTable.Columns.Count > 0 && dataTable.Columns[0].Name is not null)
+        {
+            var columnNames = dataTable.Columns.Select(c => c.Name ?? $"Column{c.ColumnIndex}");
+            writer.WriteLine(string.Join(delimiter, columnNames));
+        }
+
+        for (int rowIndex = 0; rowIndex < dataTable.RowCount; rowIndex++)
+        {
+            var values = new string[dataTable.ColumnCount];
+            for (int colIndex = 0; colIndex < dataTable.ColumnCount; colIndex++)
+            {
+                values[colIndex] = dataTable[rowIndex, colIndex].ToString() ?? "";
+            }
+            writer.WriteLine(string.Join(delimiter, values));
+        }
     }
 
     /// <summary>
@@ -376,6 +576,7 @@ public static class CsvManipulater
     /// <param name="delimiter">CSV 文件的分隔符，默认为 <c>,</c>。</param>
     /// <returns>表示异步保存操作的任务。</returns>
     /// <exception cref="ArgumentNullException">如果 <paramref name="dataTable"/> 或 <paramref name="filePath"/> 为 null，则抛出此异常。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static async Task SaveAsync<T>(DataTable<T> dataTable, string filePath, char delimiter = ',')
         where T : INumber<T>
     {
@@ -384,13 +585,12 @@ public static class CsvManipulater
         if (filePath is null)
             throw new ArgumentNullException(nameof(filePath));
 
-        await using var writer = new StreamWriter(filePath);
+        await using var writer = new StreamWriter(filePath, false, Encoding.UTF8);
 
-        // 使用 ColumnNames 属性获取列名
-        var columnNames = dataTable.Columns.Names;
-        if (columnNames != null && columnNames.Length > 0 && columnNames[0] != null)
+        if (dataTable.Columns.Count > 0 && dataTable.Columns[0].Name is not null)
         {
-            await writer.WriteLineAsync(string.Join(delimiter, columnNames.Select(name => name ?? "")));
+            var columnNames = dataTable.Columns.Select(c => c.Name ?? $"Column{c.ColumnIndex}");
+            await writer.WriteLineAsync(string.Join(delimiter, columnNames));
         }
 
         for (int rowIndex = 0; rowIndex < dataTable.RowCount; rowIndex++)
@@ -403,6 +603,8 @@ public static class CsvManipulater
             await writer.WriteLineAsync(string.Join(delimiter, values));
         }
     }
+
+    #endregion
 
     #endregion
 }

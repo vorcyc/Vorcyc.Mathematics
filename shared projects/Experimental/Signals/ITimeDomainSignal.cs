@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 using Vorcyc.Mathematics.Statistics;
 
@@ -343,8 +344,9 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
     /// 将时域信号转换为频域信号。
     /// </summary>
     /// <param name="window">加窗类型（可选）。</param>
+    /// <param name="fftVersion">FFT的执行方式。建议小规模数据用<see cref="FftVersion.Normal"/>，大规模数据用<see cref="FftVersion.Parallel"/>。默认为<see cref="FftVersion.Normal"/></param>
     /// <returns>频域信号的 <see cref="FrequencyDomain"/> 对象。</returns>
-    FrequencyDomain TransformToFrequencyDomain(WindowType? window = null);
+    FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal);
 
 
     /// <summary>

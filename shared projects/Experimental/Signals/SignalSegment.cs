@@ -87,18 +87,20 @@ public class SignalSegment : ITimeDomainSignal
     /// 将信号段转换为频域信号。
     /// </summary>
     /// <param name="window">窗口类型，可选参数。</param>
+    /// <param name="fftVersion">FFT的执行方式。建议小规模数据用<see cref="FftVersion.Normal"/>，大规模数据用<see cref="FftVersion.Parallel"/>。默认为<see cref="FftVersion.Normal"/></param>
     /// <returns>频域信号对象。</returns>
-    public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null)
+    public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)
     {
+        FastFourierTransform.Version = fftVersion;
         if (window is null && _length.IsPowerOf2())
         {
-            FastFourierTransformNormal.Forward(_signal._samples, _start, out var result, _length);
+            FastFourierTransform.Forward(_signal._samples, _start, out var result, _length);
             return new FrequencyDomain(_start, _length, _length, result, this, null);
         }
         else
         {
             var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_signal._samples, _start, _length.NextPowerOf2(), _length, window);
-            FastFourierTransformNormal.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
+            FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
             return new FrequencyDomain(_start, windowedSamples.Length, _length, result, this, window);
         }
     }
