@@ -235,7 +235,7 @@ internal static class FastFourierTransformNormal
             //   Auxiliary sin(delta / 2)
             float sine = Sin(delta * .5f);
             //   Multiplier for trigonometric recurrence
-            ComplexFp32 multiplier = new ComplexFp32(-2.0f * sine * sine, Sin(delta));
+            ComplexFp32 multiplier = new(-2.0f * sine * sine, Sin(delta));
             //   Start value for transform factor, fi = 0
             ComplexFp32 factor = ComplexFp32.One;// new ComplexFP32(1.0f);
                                                  //   Iteration through groups of different transform factor
@@ -315,6 +315,7 @@ internal static class FastFourierTransformNormal
     /// Forward fast fourier transform , Real-number to Complex-number.
     /// </summary>
     /// <param name="input">input data : real-number sequence (tine-domain)</param>
+    /// <param name="offset"></param>
     /// <param name="output">transform result</param>
     /// <param name="N">FFT length</param>
     /// <returns></returns>
@@ -337,7 +338,7 @@ internal static class FastFourierTransformNormal
     public static bool Forward(ReadOnlySpan<float> input, Span<ComplexFp32> output)
     {
         //   Check input parameters
-        if (input == null || output == null || input.Length < 1 || !input.Length.IsPowerOf2())
+        if (input.IsEmpty || output.IsEmpty || input.Length < 1 || !input.Length.IsPowerOf2())
             return false;
         //   Initialize data
         Rearrange(input, output);
@@ -374,7 +375,7 @@ internal static class FastFourierTransformNormal
     {
         var N = input.Length;
         //   Check input parameters
-        if (input == null || output == null || N < 1 || !N.IsPowerOf2())
+        if (input.IsEmpty || output.IsEmpty || N < 1 || !N.IsPowerOf2())
             return false;
         //   Initialize data
         Rearrange(input, output);
@@ -449,7 +450,7 @@ internal static class FastFourierTransformNormal
     {
         var N = data.Length;
         //   Check input parameters
-        if (data == null || N < 1 || !N.IsPowerOf2())
+        if (data.IsEmpty || N < 1 || !N.IsPowerOf2())
             return false;
         //   Rearrange
         Rearrange(data);
@@ -492,7 +493,9 @@ internal static class FastFourierTransformNormal
     /// Inverse fast fourier transform , Complex-number to complex-number.
     /// </summary>
     /// <param name="input">input : frequency-domain data</param>
+    /// <param name="inOffset"></param>
     /// <param name="output">the result of time-domain data</param>
+    /// <param name="outOffset"></param>
     /// <param name="N">the input length</param>
     /// <param name="scale">determine if scale</param>
     /// <returns></returns>
@@ -515,7 +518,7 @@ internal static class FastFourierTransformNormal
     {
         var N = input.Length;
         //   Check input parameters
-        if (input == null || output == null || N < 1 || !N.IsPowerOf2())
+        if (input.IsEmpty || output.IsEmpty || N < 1 || !N.IsPowerOf2())
             return false;
         //   Initialize data
         Rearrange(input, output);
@@ -556,6 +559,7 @@ internal static class FastFourierTransformNormal
     /// Inverse fast fourier transform , Inplace Version
     /// </summary>
     /// <param name="data">frequency-domain to time-domain</param>
+    /// <param name="offset"></param>
     /// <param name="N">the input length</param>
     /// <param name="scale">determine if scale</param>
     /// <returns></returns>
@@ -575,7 +579,7 @@ internal static class FastFourierTransformNormal
     {
         var N = data.Length;
         //   Check input parameters
-        if (data == null || N < 1 || !N.IsPowerOf2())
+        if (data.IsEmpty || N < 1 || !N.IsPowerOf2())
             return false;
         //   Initialize data
         Rearrange(data);

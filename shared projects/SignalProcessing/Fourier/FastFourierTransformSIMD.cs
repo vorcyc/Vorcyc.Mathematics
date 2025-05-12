@@ -12,7 +12,7 @@ using static System.MathF;
 using static Vorcyc.Offlet.Math.VMath;
 #endif
 
-public static class FastFourierTransformSIMD
+internal static class FastFourierTransformSIMD
 {
     private const float PI = 3.14159265358979323846f;
     private const float Negative_PI = -3.14159265358979323846f;
