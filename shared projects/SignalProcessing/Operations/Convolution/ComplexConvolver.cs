@@ -75,8 +75,8 @@ public class ComplexConvolver
     {
         // first, try to divide polynomials
 
-        var div = VMath.DividePolynomial(signal.Real.Zip(signal.Imag, (r, i) => new ComplexFp32(r, i)).ToArray(),
-                                               kernel.Real.Zip(kernel.Imag, (r, i) => new ComplexFp32(r, i)).ToArray());
+        var div = VMath.DividePolynomial(signal.Real.Zip(signal.Imag, (r, i) => new ComplexF(r, i)).ToArray(),
+                                               kernel.Real.Zip(kernel.Imag, (r, i) => new ComplexF(r, i)).ToArray());
 
         var quotient = div[0];
         var remainder = div[1];

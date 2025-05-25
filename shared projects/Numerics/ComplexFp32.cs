@@ -1,10 +1,17 @@
 ﻿namespace Vorcyc.Mathematics.Numerics;
 
+
 /*
  * 
  * 23.9.26 从泛型版本改过来 ，之前的那个版本放弃了
  * 不用属性而是直接用字段，并且是可读可写的字段
+ * 
+ * 25.7.9
+ * 1 改回只读结构体
+ * 2 增加与值元祖互转
+ * 3 增加从长度为2的 Span<T> 高性能转换为 ComplexF
  */
+
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -20,7 +27,7 @@ using System.Runtime.InteropServices;
 /// </summary>
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
-public /*readonly*/ struct ComplexFp32
+public readonly struct ComplexFp32
     : IEquatable<ComplexFp32>,
       IFormattable,
       INumberBase<ComplexFp32>,
@@ -35,13 +42,7 @@ public /*readonly*/ struct ComplexFp32
                                                      | NumberStyles.AllowThousands | NumberStyles.AllowExponent
                                                      | NumberStyles.AllowCurrencySymbol | NumberStyles.AllowHexSpecifier);
 
-
-    public static readonly ComplexFp32 Zero = new(0f, 0f);
-    public static readonly ComplexFp32 One = new(1f, 0f);
-    public static readonly ComplexFp32 ImaginaryOne = new(0f, 1f);
-    public static readonly ComplexFp32 NaN = new(float.NaN, float.NaN);
-    public static readonly ComplexFp32 Infinity = new(float.PositiveInfinity, float.PositiveInfinity);
-
+   
     private static float InverseOfLog10 = 0.43429448190325f; // 1 / Log(10)
 
     // This is the largest x for which (Hypot(x,x) + x) will not overflow. It is used for branching inside Sqrt.
@@ -54,41 +55,16 @@ public /*readonly*/ struct ComplexFp32
     private static readonly float s_log2 = float.Log(2f);
 
     // Do not rename, these fields are needed for binary serialization
-    //private readonly float m_real; // Do not rename (binary serialization)
-    //private readonly float m_imaginary; // Do not rename (binary serialization)
+    private readonly float _real; // Do not rename (binary serialization)
+    private readonly float _imaginary; // Do not rename (binary serialization)
 
     public ComplexFp32(float real = 0f, float imaginary = 0f)
     {
-        Real = real;
-        Imaginary = imaginary;
+        _real = real;
+        _imaginary = imaginary;
     }
 
-    //public float Real => m_real;
-
-
-    //public float Imaginary => m_imaginary;
-
-
-    /// <summary>
-    /// The real part.
-    /// </summary>
-    public float Real = 0f;
-
-    /// <summary>
-    /// The imaginary part.
-    /// </summary>
-    public float Imaginary = 0f;
-
-    /// <summary>
-    /// Gets the magnitude (or absolute value) of a complex number.
-    /// </summary>
-    public float Magnitude => Abs(this);
-
-    /// <summary>
-    /// Gets the phase of a complex number.
-    /// </summary>
-    public float Phase => float.Atan2(Imaginary, Real);
-
+    #region 类型转换
 
     /// <summary>
     /// Deconstruct to <see cref="ValueTuple{T1,T2}"/>.
@@ -101,112 +77,350 @@ public /*readonly*/ struct ComplexFp32
         imaginary = Imaginary;
     }
 
+    /// <summary>
+    /// Implicitly converts a tuple of real and imaginary parts to a <see cref="ComplexF"/>.
+    /// </summary>
+    public static implicit operator ComplexFp32((float real, float imaginary) value)
+    {
+        return new ComplexFp32(value.real, value.imaginary);
+    }
 
+
+    /// <summary>
+    /// Implicitly converts a <see cref="ComplexF"/> to a tuple containing its real and imaginary parts.
+    /// </summary>
+    public static implicit operator (float real, float imaginary)(ComplexFp32 value)
+    {
+        return (value.Real, value.Imaginary);
+    }
+
+    /// <summary>
+    /// Converts a <see cref="Span{T}"/> of floats containing at least two elements into a <see cref="ComplexF"/> instance.
+    /// The first element represents the real part, and the second element represents the imaginary part.
+    /// </summary>
+    /// <param name="span">A <see cref="Span{T}"/> of floats with at least two elements, where span[0] is the real part and span[1] is the imaginary part.</param>
+    /// <returns>A <see cref="ComplexF"/> instance initialized with the real and imaginary parts from the input span.</returns>
+    /// <exception cref="ArgumentException">Thrown when the input span has fewer than two elements.</exception>
+    /// <remarks>
+    /// This method uses <see cref="System.Runtime.CompilerServices.Unsafe.As{TFrom, TTo}(ref TFrom)"/> for efficient memory reinterpretation,
+    /// assuming the memory layout of <see cref="ComplexF"/> is compatible with two consecutive <see cref="float"/> values.
+    /// Ensure that <see cref="ComplexF"/> is defined with <see cref="System.Runtime.InteropServices.StructLayoutAttribute"/>
+    /// set to <see cref="System.Runtime.InteropServices.LayoutKind.Sequential"/> to guarantee correct memory alignment.
+    /// </remarks>
+    public static ComplexFp32 FromSpan(Span<float> span)
+    {
+        if (span.Length < 2)
+            throw new ArgumentException("Span must have at least 2 elements.");
+
+        //return new ComplexF(span[0], span[1]);
+        return Unsafe.As<float, ComplexFp32>(ref span[0]);
+        //return MemoryMarshal.Cast<float, ComplexF>(span)[0];
+
+        //使用内联数组：
+        //[InlineArray(2)]
+        //public struct ComplexF
+        //{
+        //    private float _element0; // 实部
+        //                             // 第二个元素隐式为虚部
+
+        //    public float Real => this[0];
+        //    public float Imaginary => this[1];
+        //}
+
+        //public static ComplexF ToComplexF(Span<float> span)
+        //{
+        //    if (span.Length < 2)
+        //        throw new ArgumentException("Span must have at least 2 elements.");
+
+        //    return MemoryMarshal.AsRef<ComplexF>(span);
+        //}
+    }
+
+    #endregion
+
+
+    /// <summary>
+    /// The real part.
+    /// </summary>
+    public float Real => _real;
+
+    /// <summary>
+    /// The imaginary part.
+    /// </summary>
+    public float Imaginary => _imaginary;
+
+    /// <summary>
+    /// Gets a complex number with real and imaginary parts equal to zero.
+    /// </summary>
+    public static ComplexFp32 Zero => new(0, 0);
+
+    /// <summary>
+    /// Represents the complex number one (1 + 0i) using single-precision floating-point numbers.
+    /// </summary>
+    public static readonly ComplexFp32 One = new(1f, 0f);
+
+    /// <summary>
+    /// Represents the imaginary unit (0 + 1i) using single-precision floating-point numbers, where i is the square root of -1.
+    /// </summary>
+    public static readonly ComplexFp32 ImaginaryOne = new(0f, 1f);
+
+    /// <summary>
+    /// Represents a complex number with both real and imaginary parts as NaN (Not a Number) using single-precision floating-point numbers.
+    /// </summary>
+    public static readonly ComplexFp32 NaN = new(float.NaN, float.NaN);
+
+    /// <summary>
+    /// Represents a complex number with both real and imaginary parts as positive infinity using single-precision floating-point numbers.
+    /// </summary>
+    public static readonly ComplexFp32 Infinity = new(float.PositiveInfinity, float.PositiveInfinity);
+
+
+
+    /// <summary>
+    /// Gets the magnitude (or absolute value) of a complex number.
+    /// </summary>
+    public float Magnitude => Abs(this);
+
+    /// <summary>
+    /// Gets the phase of a complex number.
+    /// </summary>
+    public float Phase => float.Atan2(Imaginary, Real);
+
+    /// <summary>
+    /// Creates a complex number from polar coordinates using single-precision floating-point numbers.
+    /// </summary>
+    /// <param name="magnitude">The magnitude, which is the distance from the origin (the absolute value).</param>
+    /// <param name="phase">The phase, which is the angle from the real axis, in radians.</param>
+    /// <returns>A complex number with the specified magnitude and phase.</returns>
     public static ComplexFp32 FromPolarCoordinates(float magnitude, float phase)
     {
         return new ComplexFp32(magnitude * float.Cos(phase), magnitude * float.Sin(phase));
     }
 
+    /// <summary>
+    /// Negates a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to negate.</param>
+    /// <returns>The result of negating the real and imaginary parts of <paramref name="value"/>.</returns>
     public static ComplexFp32 Negate(ComplexFp32 value)
     {
         return -value;
     }
 
+    /// <summary>
+    /// Adds two complex numbers.
+    /// </summary>
+    /// <param name="left">The first complex number to add.</param>
+    /// <param name="right">The second complex number to add.</param>
+    /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/>.</returns>
     public static ComplexFp32 Add(ComplexFp32 left, ComplexFp32 right)
     {
         return left + right;
     }
 
+    /// <summary>
+    /// Adds a complex number and a real number.
+    /// </summary>
+    /// <param name="left">The complex number to add.</param>
+    /// <param name="right">The real number to add.</param>
+    /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 Add(ComplexFp32 left, float right)
     {
         return left + right;
     }
 
+    /// <summary>
+    /// Adds a real number and a complex number.
+    /// </summary>
+    /// <param name="left">The real number to add.</param>
+    /// <param name="right">The complex number to add.</param>
+    /// <returns>The sum of <paramref name="left"/> treated as a complex number with zero imaginary part and <paramref name="right"/>.</returns>
     public static ComplexFp32 Add(float left, ComplexFp32 right)
     {
         return left + right;
     }
 
+    /// <summary>
+    /// Subtracts one complex number from another.
+    /// </summary>
+    /// <param name="left">The complex number to subtract from.</param>
+    /// <param name="right">The complex number to subtract.</param>
+    /// <returns>The result of subtracting <paramref name="right"/> from <paramref name="left"/>.</returns>
     public static ComplexFp32 Subtract(ComplexFp32 left, ComplexFp32 right)
     {
         return left - right;
     }
 
+    /// <summary>
+    /// Subtracts a real number from a complex number.
+    /// </summary>
+    /// <param name="left">The complex number to subtract from.</param>
+    /// <param name="right">The real number to subtract.</param>
+    /// <returns>The result of subtracting <paramref name="right"/> treated as a complex number with zero imaginary part from <paramref name="left"/>.</returns>
     public static ComplexFp32 Subtract(ComplexFp32 left, float right)
     {
         return left - right;
     }
 
+    /// <summary>
+    /// Subtracts a complex number from a real number.
+    /// </summary>
+    /// <param name="left">The real number to subtract from.</param>
+    /// <param name="right">The complex number to subtract.</param>
+    /// <returns>The result of subtracting <paramref name="right"/> from <paramref name="left"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 Subtract(float left, ComplexFp32 right)
     {
         return left - right;
     }
 
+    /// <summary>
+    /// Multiplies two complex numbers.
+    /// </summary>
+    /// <param name="left">The first complex number to multiply.</param>
+    /// <param name="right">The second complex number to multiply.</param>
+    /// <returns>The product of <paramref name="left"/> and <paramref name="right"/>.</returns>
     public static ComplexFp32 Multiply(ComplexFp32 left, ComplexFp32 right)
     {
         return left * right;
     }
 
+    /// <summary>
+    /// Multiplies a complex number by a real number.
+    /// </summary>
+    /// <param name="left">The complex number to multiply.</param>
+    /// <param name="right">The real number to multiply.</param>
+    /// <returns>The product of <paramref name="left"/> and <paramref name="right"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 Multiply(ComplexFp32 left, float right)
     {
         return left * right;
     }
 
+    /// <summary>
+    /// Multiplies a real number by a complex number.
+    /// </summary>
+    /// <param name="left">The real number to multiply.</param>
+    /// <param name="right">The complex number to multiply.</param>
+    /// <returns>The product of <paramref name="left"/> treated as a complex number with zero imaginary part and <paramref name="right"/>.</returns>
     public static ComplexFp32 Multiply(float left, ComplexFp32 right)
     {
         return left * right;
     }
 
+    /// <summary>
+    /// Divides one complex number by another.
+    /// </summary>
+    /// <param name="dividend">The complex number to divide.</param>
+    /// <param name="divisor">The complex number to divide by.</param>
+    /// <returns>The result of dividing <paramref name="dividend"/> by <paramref name="divisor"/>.</returns>
     public static ComplexFp32 Divide(ComplexFp32 dividend, ComplexFp32 divisor)
     {
         return dividend / divisor;
     }
 
+    /// <summary>
+    /// Divides a complex number by a real number.
+    /// </summary>
+    /// <param name="dividend">The complex number to divide.</param>
+    /// <param name="divisor">The real number to divide by.</param>
+    /// <returns>The result of dividing <paramref name="dividend"/> by <paramref name="divisor"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 Divide(ComplexFp32 dividend, float divisor)
     {
         return dividend / divisor;
     }
 
+    /// <summary>
+    /// Divides a real number by a complex number.
+    /// </summary>
+    /// <param name="dividend">The real number to divide.</param>
+    /// <param name="divisor">The complex number to divide by.</param>
+    /// <returns>The result of dividing <paramref name="dividend"/> treated as a complex number with zero imaginary part by <paramref name="divisor"/>.</returns>
     public static ComplexFp32 Divide(float dividend, ComplexFp32 divisor)
     {
         return dividend / divisor;
     }
 
+    /// <summary>
+    /// Computes the unary negation of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to negate.</param>
+    /// <returns>The complex number with negated real and imaginary parts.</returns>
     public static ComplexFp32 operator -(ComplexFp32 value)  /* Unary negation of a complex number */
     {
         return new ComplexFp32(-value.Real, -value.Imaginary);
     }
 
+    /// <summary>
+    /// Adds two complex numbers.
+    /// </summary>
+    /// <param name="left">The first complex number to add.</param>
+    /// <param name="right">The second complex number to add.</param>
+    /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/>.</returns>
     public static ComplexFp32 operator +(ComplexFp32 left, ComplexFp32 right)
     {
         return new ComplexFp32(left.Real + right.Real, left.Imaginary + right.Imaginary);
     }
 
+    /// <summary>
+    /// Adds a complex number and a real number.
+    /// </summary>
+    /// <param name="left">The complex number to add.</param>
+    /// <param name="right">The real number to add.</param>
+    /// <returns>The sum of <paramref name="left"/> and <paramref name="right"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 operator +(ComplexFp32 left, float right)
     {
         return new ComplexFp32(left.Real + right, left.Imaginary);
     }
 
+    /// <summary>
+    /// Adds a real number and a complex number.
+    /// </summary>
+    /// <param name="left">The real number to add.</param>
+    /// <param name="right">The complex number to add.</param>
+    /// <returns>The sum of <paramref name="left"/> treated as a complex number with zero imaginary part and <paramref name="right"/>.</returns>
     public static ComplexFp32 operator +(float left, ComplexFp32 right)
     {
         return new ComplexFp32(left + right.Real, right.Imaginary);
     }
 
+    /// <summary>
+    /// Subtracts one complex number from another.
+    /// </summary>
+    /// <param name="left">The complex number to subtract from.</param>
+    /// <param name="right">The complex number to subtract.</param>
+    /// <returns>The result of subtracting <paramref name="right"/> from <paramref name="left"/>.</returns>
     public static ComplexFp32 operator -(ComplexFp32 left, ComplexFp32 right)
     {
         return new ComplexFp32(left.Real - right.Real, left.Imaginary - right.Imaginary);
     }
 
+    /// <summary>
+    /// Subtracts a real number from a complex number.
+    /// </summary>
+    /// <param name="left">The complex number to subtract from.</param>
+    /// <param name="right">The real number to subtract.</param>
+    /// <returns>The result of subtracting <paramref name="right"/> treated as a complex number with zero imaginary part from <paramref name="left"/>.</returns>
     public static ComplexFp32 operator -(ComplexFp32 left, float right)
     {
         return new ComplexFp32(left.Real - right, left.Imaginary);
     }
 
+    /// <summary>
+    /// Subtracts a complex number from a real number.
+    /// </summary>
+    /// <param name="left">The real number to subtract from.</param>
+    /// <param name="right">The complex number to subtract.</param>
+    /// <returns>The result of subtracting <paramref name="right"/> from <paramref name="left"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 operator -(float left, ComplexFp32 right)
     {
         return new ComplexFp32(left - right.Real, -right.Imaginary);
     }
 
+    /// <summary>
+    /// Multiplies two complex numbers.
+    /// </summary>
+    /// <param name="left">The first complex number to multiply.</param>
+    /// <param name="right">The second complex number to multiply.</param>
+    /// <returns>The product of <paramref name="left"/> and <paramref name="right"/>, computed as (ac - bd) + (bc + ad)i where a and b are the real and imaginary parts of <paramref name="left"/>, and c and d are the real and imaginary parts of <paramref name="right"/>.</returns>
     public static ComplexFp32 operator *(ComplexFp32 left, ComplexFp32 right)
     {
         // Multiplication:  (a + bi)(c + di) = (ac -bd) + (bc + ad)i
@@ -215,6 +429,12 @@ public /*readonly*/ struct ComplexFp32
         return new ComplexFp32(result_realpart, result_imaginarypart);
     }
 
+    /// <summary>
+    /// Multiplies a complex number by a real number.
+    /// </summary>
+    /// <param name="left">The complex number to multiply.</param>
+    /// <param name="right">The real number to multiply.</param>
+    /// <returns>The product of <paramref name="left"/> and <paramref name="right"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 operator *(ComplexFp32 left, float right)
     {
         if (!float.IsFinite(left.Real))
@@ -235,6 +455,12 @@ public /*readonly*/ struct ComplexFp32
         return new ComplexFp32(left.Real * right, left.Imaginary * right);
     }
 
+    /// <summary>
+    /// Multiplies a real number by a complex number.
+    /// </summary>
+    /// <param name="left">The real number to multiply.</param>
+    /// <param name="right">The complex number to multiply.</param>
+    /// <returns>The product of <paramref name="left"/> treated as a complex number with zero imaginary part and <paramref name="right"/>.</returns>
     public static ComplexFp32 operator *(float left, ComplexFp32 right)
     {
         if (!float.IsFinite(right.Real))
@@ -255,6 +481,12 @@ public /*readonly*/ struct ComplexFp32
         return new ComplexFp32(left * right.Real, left * right.Imaginary);
     }
 
+    /// <summary>
+    /// Divides one complex number by another using Smith's formula.
+    /// </summary>
+    /// <param name="left">The complex number to divide.</param>
+    /// <param name="right">The complex number to divide by.</param>
+    /// <returns>The result of dividing <paramref name="left"/> by <paramref name="right"/>.</returns>
     public static ComplexFp32 operator /(ComplexFp32 left, ComplexFp32 right)
     {
         // Division : Smith's formula.
@@ -276,6 +508,12 @@ public /*readonly*/ struct ComplexFp32
         }
     }
 
+    /// <summary>
+    /// Divides a complex number by a real number.
+    /// </summary>
+    /// <param name="left">The complex number to divide.</param>
+    /// <param name="right">The real number to divide by.</param>
+    /// <returns>The result of dividing <paramref name="left"/> by <paramref name="right"/> treated as a complex number with zero imaginary part.</returns>
     public static ComplexFp32 operator /(ComplexFp32 left, float right)
     {
         // IEEE prohibit optimizations which are value changing
@@ -305,6 +543,12 @@ public /*readonly*/ struct ComplexFp32
         return new ComplexFp32(left.Real / right, left.Imaginary / right);
     }
 
+    /// <summary>
+    /// Divides a real number by a complex number using Smith's formula.
+    /// </summary>
+    /// <param name="left">The real number to divide.</param>
+    /// <param name="right">The complex number to divide by.</param>
+    /// <returns>The result of dividing <paramref name="left"/> treated as a complex number with zero imaginary part by <paramref name="right"/>.</returns>
     public static ComplexFp32 operator /(float left, ComplexFp32 right)
     {
         // Division : Smith's formula.
@@ -325,6 +569,11 @@ public /*readonly*/ struct ComplexFp32
         }
     }
 
+    /// <summary>
+    /// Computes the absolute value (or magnitude) of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the absolute value of.</param>
+    /// <returns>The magnitude of <paramref name="value"/>, computed as sqrt(real^2 + imaginary^2) using single-precision floating-point arithmetic.</returns>
     public static float Abs(ComplexFp32 value)
     {
         return Hypot(value.Real, value.Imaginary);
@@ -395,12 +644,22 @@ public /*readonly*/ struct ComplexFp32
 
     }
 
+    /// <summary>
+    /// Returns the complex conjugate of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to conjugate.</param>
+    /// <returns>The complex conjugate of <paramref name="value"/>, where the real part remains unchanged and the imaginary part is negated, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Conjugate(ComplexFp32 value)
     {
         // Conjugate of a Complex number: the conjugate of x+i*y is x-i*y
         return new ComplexFp32(value.Real, -value.Imaginary);
     }
 
+    /// <summary>
+    /// Returns the reciprocal of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to find the reciprocal of.</param>
+    /// <returns>The reciprocal of <paramref name="value"/>, computed as 1 divided by <paramref name="value"/>, or <see cref="Zero"/> if <paramref name="value"/> is zero, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Reciprocal(ComplexFp32 value)
     {
         // Reciprocal of a Complex number : the reciprocal of x+i*y is 1/(x+i*y)

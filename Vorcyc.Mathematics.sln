@@ -27,6 +27,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Experimental", "shared proj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C288D331-8806-4DEA-8CD9-2FD047BFA947}"
 	ProjectSection(SolutionItems) = preProject
+		docs\changelog.txt = docs\changelog.txt
 		docs\License.txt = docs\License.txt
 		docs\Module_Calculus.md = docs\Module_Calculus.md
 		docs\Module_Core.md = docs\Module_Core.md
