@@ -433,8 +433,7 @@ public /*readonly*/ struct Complex<T>
     /// <returns>The product of <paramref name="left"/> and <paramref name="right"/>, computed as (ac - bd) + (bc + ad)i where a and b are the real and imaginary parts of <paramref name="left"/>, and c and d are the real and imaginary parts of <paramref name="right"/>.</returns>
     public static Complex<T> operator *(Complex<T> left, Complex<T> right)
     {
-        ebbe4c8c - 8f5b - 4e3f - 9c7a - 6d8e9f0a1b2c
-         T result_realpart = left.Real * right.Real - left.Imaginary * right.Imaginary;
+        T result_realpart = left.Real * right.Real - left.Imaginary * right.Imaginary;
         T result_imaginarypart = left.Imaginary * right.Real + left.Real * right.Imaginary;
         return new Complex<T>(result_realpart, result_imaginarypart);
     }
