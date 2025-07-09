@@ -1,17 +1,10 @@
 ﻿namespace Vorcyc.Mathematics.Numerics;
 
-
 /*
  * 
  * 23.9.26 从泛型版本改过来 ，之前的那个版本放弃了
  * 不用属性而是直接用字段，并且是可读可写的字段
- * 
- * 25.7.9
- * 1 改回只读结构体
- * 2 增加与值元祖互转
- * 3 增加从长度为2的 Span<T> 高性能转换为 ComplexF
  */
-
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -27,7 +20,7 @@ using System.Runtime.InteropServices;
 /// </summary>
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct ComplexFp32
+public /*readonly*/ struct ComplexFp32
     : IEquatable<ComplexFp32>,
       IFormattable,
       INumberBase<ComplexFp32>,
@@ -42,7 +35,13 @@ public readonly struct ComplexFp32
                                                      | NumberStyles.AllowThousands | NumberStyles.AllowExponent
                                                      | NumberStyles.AllowCurrencySymbol | NumberStyles.AllowHexSpecifier);
 
-   
+
+    public static readonly ComplexFp32 Zero = new(0f, 0f);
+    public static readonly ComplexFp32 One = new(1f, 0f);
+    public static readonly ComplexFp32 ImaginaryOne = new(0f, 1f);
+    public static readonly ComplexFp32 NaN = new(float.NaN, float.NaN);
+    public static readonly ComplexFp32 Infinity = new(float.PositiveInfinity, float.PositiveInfinity);
+
     private static float InverseOfLog10 = 0.43429448190325f; // 1 / Log(10)
 
     // This is the largest x for which (Hypot(x,x) + x) will not overflow. It is used for branching inside Sqrt.
@@ -55,14 +54,41 @@ public readonly struct ComplexFp32
     private static readonly float s_log2 = float.Log(2f);
 
     // Do not rename, these fields are needed for binary serialization
-    private readonly float _real; // Do not rename (binary serialization)
-    private readonly float _imaginary; // Do not rename (binary serialization)
+    //private readonly float m_real; // Do not rename (binary serialization)
+    //private readonly float m_imaginary; // Do not rename (binary serialization)
 
     public ComplexFp32(float real = 0f, float imaginary = 0f)
     {
-        _real = real;
-        _imaginary = imaginary;
+        Real = real;
+        Imaginary = imaginary;
     }
+
+    //public float Real => m_real;
+
+
+    //public float Imaginary => m_imaginary;
+
+
+    /// <summary>
+    /// The real part.
+    /// </summary>
+    public float Real = 0f;
+
+    /// <summary>
+    /// The imaginary part.
+    /// </summary>
+    public float Imaginary = 0f;
+
+    /// <summary>
+    /// Gets the magnitude (or absolute value) of a complex number.
+    /// </summary>
+    public float Magnitude => Abs(this);
+
+    /// <summary>
+    /// Gets the phase of a complex number.
+    /// </summary>
+    public float Phase => float.Atan2(Imaginary, Real);
+
 
     #region 类型转换
 
@@ -78,35 +104,28 @@ public readonly struct ComplexFp32
     }
 
     /// <summary>
-    /// Implicitly converts a tuple of real and imaginary parts to a <see cref="ComplexF"/>.
+    /// Implicitly converts a <see cref="Complex{T}"/> to a tuple containing its real and imaginary parts.
     /// </summary>
-    public static implicit operator ComplexFp32((float real, float imaginary) value)
-    {
-        return new ComplexFp32(value.real, value.imaginary);
-    }
-
-
-    /// <summary>
-    /// Implicitly converts a <see cref="ComplexF"/> to a tuple containing its real and imaginary parts.
-    /// </summary>
-    public static implicit operator (float real, float imaginary)(ComplexFp32 value)
+    public static implicit operator (float Real, float Imaginary)(ComplexFp32 value)
     {
         return (value.Real, value.Imaginary);
     }
 
     /// <summary>
-    /// Converts a <see cref="Span{T}"/> of floats containing at least two elements into a <see cref="ComplexF"/> instance.
+    /// Implicitly converts a tuple of real and imaginary parts to a <see cref="Complex{T}"/>.
+    /// </summary>
+    public static implicit operator ComplexFp32((float Real, float Imaginary) value)
+    {
+        return new ComplexFp32(value.Real, value.Imaginary);
+    }
+
+    /// <summary>
+    /// Converts a <see cref="Span{Single}"/> containing at least two floats into a <see cref="ComplexFp32"/> instance.
     /// The first element represents the real part, and the second element represents the imaginary part.
     /// </summary>
-    /// <param name="span">A <see cref="Span{T}"/> of floats with at least two elements, where span[0] is the real part and span[1] is the imaginary part.</param>
-    /// <returns>A <see cref="ComplexF"/> instance initialized with the real and imaginary parts from the input span.</returns>
+    /// <param name="span">A <see cref="Span{Single}"/> with at least two elements, where span[0] is the real part and span[1] is the imaginary part.</param>
+    /// <returns>A <see cref="ComplexFp32"/> instance initialized with the real and imaginary parts from the input span.</returns>
     /// <exception cref="ArgumentException">Thrown when the input span has fewer than two elements.</exception>
-    /// <remarks>
-    /// This method uses <see cref="System.Runtime.CompilerServices.Unsafe.As{TFrom, TTo}(ref TFrom)"/> for efficient memory reinterpretation,
-    /// assuming the memory layout of <see cref="ComplexF"/> is compatible with two consecutive <see cref="float"/> values.
-    /// Ensure that <see cref="ComplexF"/> is defined with <see cref="System.Runtime.InteropServices.StructLayoutAttribute"/>
-    /// set to <see cref="System.Runtime.InteropServices.LayoutKind.Sequential"/> to guarantee correct memory alignment.
-    /// </remarks>
     public static ComplexFp32 FromSpan(Span<float> span)
     {
         if (span.Length < 2)
@@ -137,55 +156,6 @@ public readonly struct ComplexFp32
     }
 
     #endregion
-
-
-    /// <summary>
-    /// The real part.
-    /// </summary>
-    public float Real => _real;
-
-    /// <summary>
-    /// The imaginary part.
-    /// </summary>
-    public float Imaginary => _imaginary;
-
-    /// <summary>
-    /// Gets a complex number with real and imaginary parts equal to zero.
-    /// </summary>
-    public static ComplexFp32 Zero => new(0, 0);
-
-    /// <summary>
-    /// Represents the complex number one (1 + 0i) using single-precision floating-point numbers.
-    /// </summary>
-    public static readonly ComplexFp32 One = new(1f, 0f);
-
-    /// <summary>
-    /// Represents the imaginary unit (0 + 1i) using single-precision floating-point numbers, where i is the square root of -1.
-    /// </summary>
-    public static readonly ComplexFp32 ImaginaryOne = new(0f, 1f);
-
-    /// <summary>
-    /// Represents a complex number with both real and imaginary parts as NaN (Not a Number) using single-precision floating-point numbers.
-    /// </summary>
-    public static readonly ComplexFp32 NaN = new(float.NaN, float.NaN);
-
-    /// <summary>
-    /// Represents a complex number with both real and imaginary parts as positive infinity using single-precision floating-point numbers.
-    /// </summary>
-    public static readonly ComplexFp32 Infinity = new(float.PositiveInfinity, float.PositiveInfinity);
-
-
-
-    /// <summary>
-    /// Gets the magnitude (or absolute value) of a complex number.
-    /// </summary>
-    public float Magnitude => Abs(this);
-
-    /// <summary>
-    /// Gets the phase of a complex number.
-    /// </summary>
-    public float Phase => float.Atan2(Imaginary, Real);
-
     /// <summary>
     /// Creates a complex number from polar coordinates using single-precision floating-point numbers.
     /// </summary>
@@ -643,7 +613,6 @@ public readonly struct ComplexFp32
         }
 
     }
-
     /// <summary>
     /// Returns the complex conjugate of a complex number.
     /// </summary>
@@ -670,39 +639,96 @@ public readonly struct ComplexFp32
         return One / value;
     }
 
+    /// <summary>
+    /// Determines whether two complex numbers are equal.
+    /// </summary>
+    /// <param name="left">The first complex number to compare.</param>
+    /// <param name="right">The second complex number to compare.</param>
+    /// <returns><see langword="true"/> if the real and imaginary parts of <paramref name="left"/> and <paramref name="right"/> are equal; otherwise, <see langword="false"/>.</returns>
     public static bool operator ==(ComplexFp32 left, ComplexFp32 right)
     {
         return left.Real == right.Real && left.Imaginary == right.Imaginary;
     }
 
+    /// <summary>
+    /// Determines whether two complex numbers are not equal.
+    /// </summary>
+    /// <param name="left">The first complex number to compare.</param>
+    /// <param name="right">The second complex number to compare.</param>
+    /// <returns><see langword="true"/> if the real or imaginary parts of <paramref name="left"/> and <paramref name="right"/> are not equal; otherwise, <see langword="false"/>.</returns>
     public static bool operator !=(ComplexFp32 left, ComplexFp32 right)
     {
         return left.Real != right.Real || left.Imaginary != right.Imaginary;
     }
 
+    /// <summary>
+    /// Determines whether the specified object is equal to the current complex number.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current complex number.</param>
+    /// <returns><see langword="true"/> if <paramref name="obj"/> is a <see cref="ComplexFp32"/> and its real and imaginary parts are equal to the current instance; otherwise, <see langword="false"/>.</returns>
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         return obj is ComplexFp32 other && Equals(other);
     }
 
+    /// <summary>
+    /// Determines whether the specified complex number is equal to the current complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compare with the current instance.</param>
+    /// <returns><see langword="true"/> if the real and imaginary parts of <paramref name="value"/> are equal to the current instance; otherwise, <see langword="false"/>.</returns>
     public bool Equals(ComplexFp32 value)
     {
         return Real.Equals(value.Real) && Imaginary.Equals(value.Imaginary);
     }
 
+    /// <summary>
+    /// Returns a hash code for the current complex number.
+    /// </summary>
+    /// <returns>A hash code based on the real and imaginary parts of the complex number.</returns>
     public override int GetHashCode() => HashCode.Combine(Real, Imaginary);
 
+    /// <summary>
+    /// Returns a string representation of the complex number using the default format.
+    /// </summary>
+    /// <returns>A string in the format "&lt;real; imaginary&gt;" using single-precision floating-point numbers.</returns>
     public override string ToString() => $"<{Real}; {Imaginary}>";
 
+    /// <summary>
+    /// Returns a string representation of the complex number with the specified format for its real and imaginary parts.
+    /// </summary>
+    /// <param name="format">The format string for the real and imaginary parts.</param>
+    /// <returns>A string in the format "&lt;real; imaginary&gt;" with the specified format applied to the real and imaginary parts.</returns>
     public string ToString([StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format) => ToString(format, null);
 
+    /// <summary>
+    /// Returns a string representation of the complex number using the specified format provider.
+    /// </summary>
+    /// <param name="provider">The format provider to use for formatting the real and imaginary parts.</param>
+    /// <returns>A string in the format "&lt;real; imaginary&gt;" using the specified format provider.</returns>
     public string ToString(IFormatProvider? provider) => ToString(null, provider);
 
+    /// <summary>
+    /// Returns a string representation of the complex number with the specified format and format provider.
+    /// </summary>
+    /// <param name="format">The format string for the real and imaginary parts.</param>
+    /// <param name="provider">The format provider to use for formatting the real and imaginary parts.</param>
+    /// <returns>A string in the format "&lt;real; imaginary&gt;" with the specified format and format provider applied to the real and imaginary parts.</returns>
     public string ToString([StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format, IFormatProvider? provider)
     {
         return string.Format(provider, "<{0}; {1}>", Real.ToString(format, provider), Imaginary.ToString(format, provider));
     }
 
+    /// <summary>
+    /// Computes the sine of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the sine of.</param>
+    /// <returns>The sine of <paramref name="value"/>, computed as sin(x)cosh(y) + i cos(x)sinh(y), where x is the real part and y is the imaginary part, using single-precision floating-point numbers.</returns>
+    /// <remarks>
+    /// There is a known limitation with this algorithm: inputs that cause sinh and cosh to overflow, but for
+    /// which sin or cos are small enough that sin * cosh or cos * sinh are still representable, nonetheless
+    /// produce overflow. For example, Sin((0.01, 711.0)) should produce (~3.0E306, PositiveInfinity), but
+    /// instead produces (PositiveInfinity, PositiveInfinity).
+    /// </remarks>
     public static ComplexFp32 Sin(ComplexFp32 value)
     {
         // We need both sinh and cosh of imaginary part. To avoid multiple calls to Math.Exp with the same value,
@@ -718,6 +744,11 @@ public readonly struct ComplexFp32
         // instead produces (PositiveInfinity, PositiveInfinity).
     }
 
+    /// <summary>
+    /// Computes the hyperbolic sine of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the hyperbolic sine of.</param>
+    /// <returns>The hyperbolic sine of <paramref name="value"/>, computed via the relation sinh(z) = -i sin(iz), using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Sinh(ComplexFp32 value)
     {
         // Use sinh(z) = -i sin(iz) to compute via sin(z).
@@ -725,6 +756,11 @@ public readonly struct ComplexFp32
         return new ComplexFp32(sin.Imaginary, -sin.Real);
     }
 
+    /// <summary>
+    /// Computes the arcsine of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the arcsine of.</param>
+    /// <returns>The arcsine of <paramref name="value"/>, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Asin(ComplexFp32 value)
     {
         float b, bPrime, v;
@@ -746,6 +782,11 @@ public readonly struct ComplexFp32
         return new ComplexFp32(u, v);
     }
 
+    /// <summary>
+    /// Computes the cosine of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the cosine of.</param>
+    /// <returns>The cosine of <paramref name="value"/>, computed as cos(x)cosh(y) - i sin(x)sinh(y), where x is the real part and y is the imaginary part, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Cos(ComplexFp32 value)
     {
         var p = float.Exp(value.Imaginary);
@@ -755,12 +796,22 @@ public readonly struct ComplexFp32
         return new ComplexFp32(float.Cos(value.Real) * cosh, -float.Sin(value.Real) * sinh);
     }
 
+    /// <summary>
+    /// Computes the hyperbolic cosine of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the hyperbolic cosine of.</param>
+    /// <returns>The hyperbolic cosine of <paramref name="value"/>, computed via the relation cosh(z) = cos(iz), using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Cosh(ComplexFp32 value)
     {
         // Use cosh(z) = cos(iz) to compute via cos(z).
         return Cos(new ComplexFp32(-value.Imaginary, value.Real));
     }
 
+    /// <summary>
+    /// Computes the arccosine of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the arccosine of.</param>
+    /// <returns>The arccosine of <paramref name="value"/>, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Acos(ComplexFp32 value)
     {
         float b, bPrime, v;
@@ -782,6 +833,16 @@ public readonly struct ComplexFp32
         return new ComplexFp32(u, v);
     }
 
+    /// <summary>
+    /// Computes the tangent of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the tangent of.</param>
+    /// <returns>The tangent of <paramref name="value"/>, computed as (sin(2x) + i sinh(2y)) / (cos(2x) + cosh(2y)) for small imaginary parts, or an equivalent form to avoid overflow, using single-precision floating-point numbers.</returns>
+    /// <remarks>
+    /// This approach does not work for |y| > ~355, because sinh(2y) and cosh(2y) overflow,
+    /// even though their ratio does not. In that case, the method divides through by cosh to compute
+    /// tan z = (sin(2x) / cosh(2y) + i tanh(2y)) / (1 + cos(2x) / cosh(2y)).
+    /// </remarks>
     public static ComplexFp32 Tan(ComplexFp32 value)
     {
         // tan z = sin z / cos z, but to avoid unnecessary repeated trig computations, use
@@ -811,6 +872,11 @@ public readonly struct ComplexFp32
         }
     }
 
+    /// <summary>
+    /// Computes the hyperbolic tangent of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the hyperbolic tangent of.</param>
+    /// <returns>The hyperbolic tangent of <paramref name="value"/>, computed via the relation tanh(z) = -i tan(iz), using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Tanh(ComplexFp32 value)
     {
         // Use tanh(z) = -i tan(iz) to compute via tan(z).
@@ -818,6 +884,11 @@ public readonly struct ComplexFp32
         return new ComplexFp32(tan.Imaginary, -tan.Real);
     }
 
+    /// <summary>
+    /// Computes the arctangent of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the arctangent of.</param>
+    /// <returns>The arctangent of <paramref name="value"/>, computed as (i/2) * (log(1 - iz) - log(1 + iz)), using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Atan(ComplexFp32 value)
     {
         ComplexFp32 two = new(2f, 0f);
@@ -942,28 +1013,64 @@ public readonly struct ComplexFp32
         }
     }
 
+    /// <summary>
+    /// Determines whether a complex number is finite.
+    /// </summary>
+    /// <param name="value">The complex number to check.</param>
+    /// <returns><see langword="true"/> if both the real and imaginary parts of <paramref name="value"/> are finite; otherwise, <see langword="false"/>.</returns>
     public static bool IsFinite(ComplexFp32 value) => float.IsFinite(value.Real) && float.IsFinite(value.Imaginary);
 
+    /// <summary>
+    /// Determines whether a complex number is infinite.
+    /// </summary>
+    /// <param name="value">The complex number to check.</param>
+    /// <returns><see langword="true"/> if either the real or imaginary part of <paramref name="value"/> is infinite; otherwise, <see langword="false"/>.</returns>
     public static bool IsInfinity(ComplexFp32 value) => float.IsInfinity(value.Real) || float.IsInfinity(value.Imaginary);
 
+    /// <summary>
+    /// Determines whether a complex number is NaN (Not a Number).
+    /// </summary>
+    /// <param name="value">The complex number to check.</param>
+    /// <returns><see langword="true"/> if <paramref name="value"/> is neither finite nor infinite (i.e., NaN); otherwise, <see langword="false"/>.</returns>
     public static bool IsNaN(ComplexFp32 value) => !IsInfinity(value) && !IsFinite(value);
 
+    /// <summary>
+    /// Computes the natural logarithm of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the logarithm of.</param>
+    /// <returns>The natural logarithm of <paramref name="value"/>, computed as ln(|z|) + i*arg(z), where |z| is the magnitude and arg(z) is the phase, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Log(ComplexFp32 value)
     {
         return new ComplexFp32(float.Log(Abs(value)), float.Atan2(value.Imaginary, value.Real));
     }
 
+    /// <summary>
+    /// Computes the logarithm of a complex number with a specified base.
+    /// </summary>
+    /// <param name="value">The complex number to compute the logarithm of.</param>
+    /// <param name="baseValue">The base of the logarithm.</param>
+    /// <returns>The logarithm of <paramref name="value"/> with base <paramref name="baseValue"/>, computed as log(value)/log(baseValue), using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Log(ComplexFp32 value, float baseValue)
     {
         return Log(value) / Log(baseValue);
     }
 
+    /// <summary>
+    /// Computes the base-10 logarithm of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the base-10 logarithm of.</param>
+    /// <returns>The base-10 logarithm of <paramref name="value"/>, computed as log(value)/log(10), using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Log10(ComplexFp32 value)
     {
         ComplexFp32 tempLog = Log(value);
         return Scale(tempLog, InverseOfLog10);
     }
 
+    /// <summary>
+    /// Computes the exponential of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the exponential of.</param>
+    /// <returns>The exponential of <paramref name="value"/>, computed as e^x * (cos(y) + i*sin(y)), where x is the real part and y is the imaginary part, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Exp(ComplexFp32 value)
     {
         var expReal = float.Exp(value.Real);
@@ -972,9 +1079,18 @@ public readonly struct ComplexFp32
         return new ComplexFp32(cosImaginary, sinImaginary);
     }
 
+    /// <summary>
+    /// Computes the square root of a complex number.
+    /// </summary>
+    /// <param name="value">The complex number to compute the square root of.</param>
+    /// <returns>The principal square root of <paramref name="value"/> with non-negative real part, using single-precision floating-point numbers.</returns>
+    /// <remarks>
+    /// If the components are too large, Hypot will overflow, even though the subsequent sqrt would
+    /// make the result representable. To avoid this, we re-scale (by exact powers of 2 for accuracy)
+    /// when we encounter very large components to avoid intermediate infinities.
+    /// </remarks>
     public static ComplexFp32 Sqrt(ComplexFp32 value)
     {
-
         if (value.Imaginary == 0f)
         {
             // Handle the trivial case quickly.
@@ -1053,6 +1169,12 @@ public readonly struct ComplexFp32
         return new ComplexFp32(x, y);
     }
 
+    /// <summary>
+    /// Computes a complex number raised to a complex power.
+    /// </summary>
+    /// <param name="value">The complex number to raise to the power.</param>
+    /// <param name="power">The complex power to raise the number to.</param>
+    /// <returns>The result of raising <paramref name="value"/> to the power of <paramref name="power"/>, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Pow(ComplexFp32 value, ComplexFp32 power)
     {
         if (power == Zero)
@@ -1079,6 +1201,12 @@ public readonly struct ComplexFp32
         return new ComplexFp32(t * float.Cos(newRho), t * float.Sin(newRho));
     }
 
+    /// <summary>
+    /// Computes a complex number raised to a real power.
+    /// </summary>
+    /// <param name="value">The complex number to raise to the power.</param>
+    /// <param name="power">The real power to raise the number to.</param>
+    /// <returns>The result of raising <paramref name="value"/> to the power of <paramref name="power"/>, using single-precision floating-point numbers.</returns>
     public static ComplexFp32 Pow(ComplexFp32 value, float power)
     {
         return Pow(value, new ComplexFp32(power, 0f));
