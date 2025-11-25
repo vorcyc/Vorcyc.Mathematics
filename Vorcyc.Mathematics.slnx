@@ -1,0 +1,70 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/basic_benchmark/basic_benchmark.csproj" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/changelog.txt" />
+    <File Path="docs/License.txt" />
+    <File Path="docs/Module_Calculus.md" />
+    <File Path="docs/Module_Core.md" />
+    <File Path="docs/Module_DeepLearning.md" />
+    <File Path="docs/Module_Experimental.md" />
+    <File Path="docs/Module_LinearAlgebra.md" />
+    <File Path="docs/Module_MachineLearning.md" />
+    <File Path="docs/Module_Numerics.md" />
+    <File Path="docs/Module_SignalProcessing.md" />
+    <File Path="docs/Module_SignalProcessing_Effects.md" />
+    <File Path="docs/Module_SignalProcessing_FeatureExtractors.md" />
+    <File Path="docs/Module_SignalProcessing_Features.md" />
+    <File Path="docs/Module_SignalProcessing_Filters.md" />
+    <File Path="docs/Module_SignalProcessing_Fourier.md" />
+    <File Path="docs/Module_SignalProcessing_Operations.md" />
+    <File Path="docs/Module_SignalProcessing_Others.md" />
+    <File Path="docs/Module_SignalProcessing_Signals.md" />
+    <File Path="docs/Module_SignalProcessing_Transforms.md" />
+    <File Path="docs/Module_SignalProcessing_Windowing.md" />
+    <File Path="docs/Module_Statistics.md" />
+    <File Path="docs/Module_Statistics_Advanced.md" />
+    <File Path="docs/Module_Statistics_Basic.md" />
+    <File Path="docs/Module_Statistics_Distribution.md" />
+    <File Path="docs/Module_Statistics_ExtremeValueFinder.md" />
+    <File Path="docs/Module_Statistics_IComparableExtension.md" />
+    <File Path="docs/Module_Statistics_INumberExtension.md" />
+    <File Path="docs/Module_Statistics_Others.md" />
+    <File Path="docs/Module_Statistics_TimeSeriesAnalysis.md" />
+    <File Path="docs/NavTree.md" />
+    <File Path="docs/README-en_us.md" />
+    <File Path="docs/README.md" />
+    <File Path="docs/上传所有markdowns到仓库.sh" />
+  </Folder>
+  <Folder Name="/docs/logos/">
+    <File Path="docs/logos/logo1.png" />
+    <File Path="docs/logos/VMath logo with colorful math symbols on a blackboard, VMath more prominent.png" />
+    <File Path="docs/logos/VMath logo with colorful math symbols on a blackboard, VMath prominent.png" />
+    <File Path="docs/logos/VMath logo with colorful math symbols on a blackboard.png" />
+    <File Path="docs/logos/黑板上的数学符号，不要有人.png" />
+  </Folder>
+  <Folder Name="/shared projects/">
+    <Project Path="shared projects/Calculus/Calculus.shproj" />
+    <Project Path="shared projects/ComputingContext/ComputingContext.shproj" />
+    <Project Path="shared projects/Core/Core.shproj" />
+    <Project Path="shared projects/DeepLearning/DeepLearning.shproj" />
+    <Project Path="shared projects/Experimental/Experimental.shproj" />
+    <Project Path="shared projects/Framework/Framework.shproj" />
+    <Project Path="shared projects/LinearAlgebra/LinearAlgebra.shproj" />
+    <Project Path="shared projects/MachineLearning/MachineLearning.shproj" />
+    <Project Path="shared projects/Numerics/Numerics.shproj" />
+    <Project Path="shared projects/SignalProcessing/SignalProcessing.shproj" />
+    <Project Path="shared projects/Statistics/Statistics.shproj" />
+  </Folder>
+  <Folder Name="/targets/">
+    <Project Path="targets/dotNET10_Portable/dotNET10_Portable.csproj" />
+  </Folder>
+  <Folder Name="/TESTS/">
+    <Project Path="TESTS/Calculus_module_test/Calculus_module_test.csproj" />
+    <Project Path="TESTS/core_module_test/core_module_test.csproj" />
+    <Project Path="TESTS/DL_module_test/DL_module_test.csproj" />
+    <Project Path="TESTS/DSP_module_test/DSP_module_test.csproj" />
+    <Project Path="TESTS/ML_module_test/ML_module_test.csproj" />
+  </Folder>
+</Solution>

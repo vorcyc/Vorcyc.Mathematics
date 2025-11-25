@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4fbd3895-5ee5-4e7b-a6b6-6be2ef5faed8</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Vorcyc.Mathematics.LinearAlgebra</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BasisTransformation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DimensionMismatchException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LinearEquationSolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Matrix.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MatrixHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MatrixOperations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Matrix_f.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Matrix_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Quaternion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tensor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tensor_g.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Vector_g.cs" />
+  </ItemGroup>
+</Project>

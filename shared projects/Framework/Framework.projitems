@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>fe21b649-02d8-49fa-8a58-48a206f3d8ab</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Vorcyc.Mathematics.Framework</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComputingBackend.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComputingContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataHelper\CsvManipulater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataHelper\DataTable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataHelper\DataTableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Direction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute2.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Guard.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ICloneable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\LanguageExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\PrintHelper.cs" />
+  </ItemGroup>
+</Project>
