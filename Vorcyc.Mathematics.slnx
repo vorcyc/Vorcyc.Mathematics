@@ -44,6 +44,9 @@
     <File Path="docs/logos/VMath logo with colorful math symbols on a blackboard.png" />
     <File Path="docs/logos/黑板上的数学符号，不要有人.png" />
   </Folder>
+  <Folder Name="/extension shared projects/">
+    <Project Path="extension shared projects/FFTW/FFTW.shproj" Id="9d39e3a0-9a33-4c41-86ca-6381b3e9602b" />
+  </Folder>
   <Folder Name="/shared projects/">
     <Project Path="shared projects/Calculus/Calculus.shproj" />
     <Project Path="shared projects/ComputingContext/ComputingContext.shproj" />
@@ -59,6 +62,7 @@
   </Folder>
   <Folder Name="/targets/">
     <Project Path="targets/dotNET10_Portable/dotNET10_Portable.csproj" />
+    <Project Path="targets/dotNET10_Portable_Extensions_FFTW/dotNET10_Portable_Extensions_FFTW.csproj" Id="cd5509dd-4a90-4023-9ba3-327e9569685d" />
   </Folder>
   <Folder Name="/TESTS/">
     <Project Path="TESTS/Calculus_module_test/Calculus_module_test.csproj" />

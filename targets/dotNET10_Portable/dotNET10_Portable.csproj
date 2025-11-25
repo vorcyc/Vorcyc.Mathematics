@@ -9,18 +9,19 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<AssemblyName>Vorcyc.Mathematics</AssemblyName>
 		<RootNamespace>Vorcyc.Mathematics</RootNamespace>
-		<Authors>cyclone_dll ( linliduan )</Authors>
+		<Authors>cyclone_dll ( LinLi Duan )</Authors>
 		<Company>Vorcyc</Company>
 		<Description>A pure dotNET and high performance math library.</Description>
 		<Copyright>Vorcyc® Mathematics</Copyright>
-		<Version>0.8.0.0</Version>
-		<AssemblyVersion>0.8.0.0</AssemblyVersion>
+		<Version>0.8.1.0</Version>
+		<AssemblyVersion>0.8.1.0</AssemblyVersion>
 		<Title>Vorcy.Mathematics</Title>
 		<PackageIcon>logo1.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>.NET Math Statistics DSP LinearAlgebra Numerics ArrayEx Generic-Math misc</PackageTags>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageLicenseFile>License.txt</PackageLicenseFile>
+		<RepositoryUrl>https://github.com/vorcyc/Vorcyc.Mathematics</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,8 +1,8 @@
 ﻿Software Name: Vorcyc.Mathematics
 
-Version: 0.8.0.0
+Version: 0.8.1.0
 
-Copyright © 2024 Vorcyc
+Copyright 2025 Vorcyc©
 
 End User License Agreement (EULA)
 Please read this End User License Agreement (“Agreement”) carefully. This is a legal agreement between you (an individual or a single entity) and Vorcyc (“Licensor”) regarding the use of Vorcyc.Mathematics (“Software”).

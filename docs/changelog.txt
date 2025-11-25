@@ -19,3 +19,8 @@
 PinnableArray<T>类的类型约束由 unmanaged, INumber<T> 修改为 unmanaged, INumberBase<T>，以支持更多数值类型
 PinnableArray<T>类类中的 Max() 、Min() 方法转移到 PinnableArrayExtension 类中作为扩展方法实现，并且类型约束为 unmanaged, INumber<T>
 为PinnableArray<T>类添加按引用传递元素的 Each() 方法
+
+
+0.8.1.0
+- 2024.11.28
+添加 dotNET10_Portable_Extensions_FFTW 库，其为 FFTW库的.NET封装，并且用了新代码优化性能。

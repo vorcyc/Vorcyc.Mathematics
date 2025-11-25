@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>9d39e3a0-9a33-4c41-86ca-6381b3e9602b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Vorcyc.Mathematics.Extensions.FFTW</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\Dft1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\Dft2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\Dft3D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\DftND.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\RealToReal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\Utilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\Dft1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\Dft2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\Dft3D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\DftND.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\RealToReal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\Utilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interop\enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interop\fftw.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interop\fftwf.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PinnableArraySignalExtension.cs" />
+  </ItemGroup>
+</Project>
