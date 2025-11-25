@@ -3,6 +3,7 @@
 ## A high performance math library.
 
 ![VMath logo](logos/logo1.png "logo")
+0.8.0
 
 Vorcyc® Mathematics is a math library mainly for .NET, designed to fully leverage the latest features of .NET and provide high-performance and accurate mathematical functions and operations. It is written in C# and can be used in any .NET application.
 
