@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>05c9ce82-9814-4a38-a874-444151d41daa</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Vorcyc.Mathematics.MachineLearning</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Regression\another_SimpleLinearRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\DBSCAN.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\EMBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\ExpectationMaximization.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\GMM.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\KMeansClusterer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\VectorQuantization.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DecisionTree.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\TSNE.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Angular.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\ArgMax.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\BrayCurtis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Canberra.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Chebyshev.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Cosine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Dice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Euclidean.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Hamming.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Hellinger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\IDistance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\ISimilarity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Jaccard.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Kulczynski.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Levenshtein.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Manhattan.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Matching.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Minkowski.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\PearsonCorrelation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\RogersTanimoto.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\RusselRao.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\SokalMichener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\SokalSneath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedEuclidean.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\WeightedSquareEuclidean.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distances\Yule.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\FactorAnalysis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Clustering\HierarchicalClustering.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMachineLearning.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KNN.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classfication\NaiveBayes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\PCA.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RandomForest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Regression\MultipleLinearRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Regression\PolynomialRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Regression\RidgeRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Regression\SimpleLinearRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SupportVectorMachine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Distances\readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Classfication\" />
+  </ItemGroup>
+</Project>

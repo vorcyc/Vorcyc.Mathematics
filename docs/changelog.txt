@@ -1,0 +1,21 @@
+0.7.5.0 - 2025.7.9
+
+1. 修改 ComplexFp32 和 Complex<T> 类型：
+	 * 1 改回只读结构体
+	 * 2 增加与值元祖互转
+	 * 3 增加从长度为2的 Span<T> 高性能转换为 ComplexF
+2. 添加 Complex类型，保持与ComplexFp32 和 Complex<T> 的实现一致
+3. 修改 PinableArray 的类型约束为 INumberBase<T>，以支持包含Complex在内的更多数值类型
+
+
+
+25.11.18
+添加 Vorcyc.Mathematics.Helpers.StringExtensions 类，包含字符串扩展方法
+
+25.11.20
+预编译工程由 net9.0 修改为 net10.0
+
+25.11.25
+PinnableArray<T>类的类型约束由 unmanaged, INumber<T> 修改为 unmanaged, INumberBase<T>，以支持更多数值类型
+PinnableArray<T>类类中的 Max() 、Min() 方法转移到 PinnableArrayExtension 类中作为扩展方法实现，并且类型约束为 unmanaged, INumber<T>
+为PinnableArray<T>类添加按引用传递元素的 Each() 方法

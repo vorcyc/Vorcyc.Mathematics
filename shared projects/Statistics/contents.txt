@@ -1,0 +1,39 @@
+﻿基本统计函数  
+1.	均值 (Mean): 计算一组数据的平均值。
+2.	中位数 (Median): 计算一组数据的中位数。
+3.	众数 (Mode): 计算一组数据中出现频率最高的值。
+4.	方差 (Variance): 计算一组数据的方差。
+5.	标准差 (Standard Deviation): 计算一组数据的标准差。
+6.	变异系数 (Coefficient of Variation): 衡量数据的离散程度。  
+
+分布相关函数
+7.	正态分布 (Normal Distribution): 计算正态分布的概率密度函数和累积分布函数。
+8.	泊松分布 (Poisson Distribution): 计算泊松分布的概率质量函数和累积分布函数。
+9.	指数分布 (Exponential Distribution): 计算指数分布的概率密度函数和累积分布函数。
+10.	二项分布 (Binomial Distribution): 计算二项分布的概率质量函数和累积分布函数。
+11.	多项分布 (Multinomial Distribution): 计算多项分布的概率质量函数。
+12.	Gamma分布 (Gamma Distribution): 计算Gamma分布的概率密度函数和累积分布函数。
+13.	Beta分布 (Beta Distribution): 计算Beta分布的概率密度函数和累积分布函数。  
+
+高级统计函数
+14.	百分位数 (Percentiles): 计算数据集的指定百分位数。
+15.	四分位数 (Quartiles): 计算数据集的四分位数。
+16.	偏度 (Skewness): 计算数据集的偏度，衡量数据分布的对称性。
+17.	峰度 (Kurtosis): 计算数据集的峰度，衡量数据分布的尖锐程度。
+18.	置信区间 (Confidence Intervals): 计算均值或比例的置信区间。
+19.	假设检验 (Hypothesis Testing): 实现各种假设检验，如z检验、t检验、卡方检验等。
+20.	方差分析 (ANOVA): 实现单因素和多因素方差分析。
+21.	卡方检验 (Chi-Squared Test): 实现卡方独立性检验和拟合优度检验。
+22.	非参数检验 (Non-parametric Tests): 实现如曼-惠特尼U检验、克鲁斯卡尔-沃利斯检验等非参数检验。  
+
+时间序列分析
+23.	时间序列分析 (Time Series Analysis): 实现时间序列的平滑、分解和预测。
+24.	自相关函数 (Autocorrelation Function, ACF): 计算时间序列的自相关函数。
+25.	偏自相关函数 (Partial Autocorrelation Function, PACF): 计算时间序列的偏自相关函数。
+26.	移动平均 (Moving Average): 计算时间序列的移动平均。
+27.	指数平滑 (Exponential Smoothing): 实现时间序列的指数平滑。  
+
+其他统计函数
+28.	协方差 (Covariance): 计算两组数据的协方差。
+29.	相关系数 (Correlation Coefficient): 计算两组数据的相关系数。
+30.	线性回归 (Linear Regression): 实现简单的线性回归分析。

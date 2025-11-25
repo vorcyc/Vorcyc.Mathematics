@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e3b4493b-e4a8-40f5-853c-957ebec0b951</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Vorcyc.Mathematics.Calculus</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Derivative.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DualNumber.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Series\FourierSeries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Functions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Integration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Limits.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\NewtonRaphson.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\RungeKutta.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Series\TaylorSeries.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)NumericalMethods\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Series\" />
+  </ItemGroup>
+</Project>
