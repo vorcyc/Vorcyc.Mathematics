@@ -13,8 +13,8 @@
 		<Company>Vorcyc</Company>
 		<Description>.NET binding of FFTW library based-on Vorcyc.Mathematics. lib</Description>
 		<Copyright>Vorcyc® Mathematics</Copyright>
-		<Version>0.8.2.0</Version>
-		<AssemblyVersion>0.8.2.0</AssemblyVersion>
+		<Version>0.8.2.1</Version>
+		<AssemblyVersion>0.8.2.1</AssemblyVersion>
 		<Title>Vorcy.Mathematics.Extensions.FFTW</Title>
 		<PackageIcon>logo1.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -23,6 +23,13 @@
 		<PackageLicenseFile>License.txt</PackageLicenseFile>
 		<RepositoryUrl>https://github.com/vorcyc/Vorcyc.Mathematics</RepositoryUrl>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="runtimes\win-x64\native\*.dll"
+			  Pack="true"
+			  PackagePath="runtimes/win-x64/native"
+			  CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <None Include="..\..\docs\License.txt" Link="License.txt">
@@ -41,15 +48,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\dotNET10_Portable\dotNET10_Portable.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="runtimes\win-x64\native\libfftw3-3.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="runtimes\win-x64\native\libfftw3f-3.dll">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 
 	<Import Project="..\..\extension shared projects\FFTW\FFTW.projitems" Label="Shared" />
