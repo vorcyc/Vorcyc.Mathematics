@@ -102,6 +102,7 @@ public static class Dft1D
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
+        ArgumentException.ThrowIfArrayLengthNotEqual(input, output);
 
         var plan = fftwf.dft_1d(input.Length, input, output, direction, flags);
         InvalidOperationException.ThrowIfZero(plan, "Failed to create complex plan.");
@@ -133,10 +134,8 @@ public static class Dft1D
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
-        if (input.Length != output.Length)
-        {
-            throw new ArgumentException("Input and output spans must have the same length.");
-        }
+        ArgumentException.ThrowIfArrayLengthNotEqual(input, output, "Input and output spans must have the same length.");
+
         unsafe
         {
             fixed (ComplexFp32* pInput = input)
@@ -173,6 +172,7 @@ public static class Dft1D
     {
         InvalidOperationException.ThrowIfUnpinned(realInput);
         InvalidOperationException.ThrowIfUnpinned(complexOutput);
+        ArgumentException.ThrowIfArrayLengthNotEqual(realInput, complexOutput);
 
         var plan = fftwf.dft_r2c_1d(realInput.Length, realInput, complexOutput, flags);
 
@@ -203,10 +203,8 @@ public static class Dft1D
     {
         ArgumentNullException.ThrowIfEmpty(realInput);
         ArgumentNullException.ThrowIfEmpty(complexOutput);
-        if (realInput.Length != complexOutput.Length * 2 - 2)
-        {
-            throw new ArgumentException("Input length must be equal to output length * 2 - 2 for real-to-complex transform.");
-        }
+        ArgumentException.ThrowIfArrayLengthNotEqual(realInput, complexOutput);
+
         unsafe
         {
             fixed (float* pRealInput = realInput)
@@ -241,6 +239,7 @@ public static class Dft1D
     {
         InvalidOperationException.ThrowIfUnpinned(complexInput);
         InvalidOperationException.ThrowIfUnpinned(realOutput);
+        ArgumentException.ThrowIfArrayLengthNotEqual(realOutput, complexInput);
 
         var plan = fftwf.dft_c2r_1d(complexInput.Length, complexInput, realOutput, flags);
 
@@ -286,10 +285,8 @@ public static class Dft1D
     {
         ArgumentNullException.ThrowIfEmpty(complexInput);
         ArgumentNullException.ThrowIfEmpty(realOutput);
-        if (realOutput.Length != complexInput.Length * 2 - 2)
-        {
-            throw new ArgumentException("Output length must be equal to input length * 2 - 2 for complex-to-real transform.");
-        }
+        ArgumentException.ThrowIfArrayLengthNotEqual(realOutput, complexInput);
+
         unsafe
         {
             fixed (ComplexFp32* pComplexInput = complexInput)

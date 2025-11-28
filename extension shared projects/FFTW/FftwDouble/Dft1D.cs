@@ -202,10 +202,7 @@ public static class Dft1D
     {
         ArgumentNullException.ThrowIfEmpty(realInput);
         ArgumentNullException.ThrowIfEmpty(complexOutput);
-        if (realInput.Length != complexOutput.Length * 2 - 2)
-        {
-            throw new ArgumentException("Input length must be equal to output length * 2 - 2 for real-to-complex transform.");
-        }
+ 
         unsafe
         {
             fixed (double* pRealInput = realInput)
@@ -287,10 +284,7 @@ public static class Dft1D
     {
         ArgumentNullException.ThrowIfEmpty(complexInput);
         ArgumentNullException.ThrowIfEmpty(realOutput);
-        if (realOutput.Length != complexInput.Length * 2 - 2)
-        {
-            throw new ArgumentException("Output length must be equal to input length * 2 - 2 for complex-to-real transform.");
-        }
+  
         unsafe
         {
             fixed (Complex* pComplexInput = complexInput)

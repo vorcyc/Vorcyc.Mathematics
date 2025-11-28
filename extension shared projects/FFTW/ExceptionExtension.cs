@@ -1,8 +1,14 @@
 ﻿using System.Numerics;
-using Vorcyc.Mathematics;
 
 namespace Vorcyc.Mathematics.Extensions.FFTW;
 
+/// <summary>
+/// Provides extension methods for validating arguments and throwing <see cref="ArgumentNullException"/> when null,
+/// empty, or invalid values are detected.
+/// </summary>
+/// <remarks>Use the methods in this class to enforce argument validation for reference types, strings, pointers,
+/// and spans. These methods help ensure that method parameters meet required preconditions and throw standardized
+/// exceptions when validation fails.</remarks>
 public static class ArgumentNullExceptionExtension
 {
 
@@ -80,10 +86,92 @@ public static class ArgumentNullExceptionExtension
             }
         }
 
+
+
     }
 }
 
+/// <summary>
+/// Provides extension methods for validating argument values and throwing exceptions when argument conditions are not
+/// met.
+/// </summary>
+/// <remarks>This static class contains methods that assist in argument validation, enabling more expressive and
+/// concise error handling for method parameters. The extension methods are designed to be used with <see
+/// cref="ArgumentException"/> to enforce argument constraints and improve code readability.</remarks>
+public static class ArgumentExceptionExtension
+{
 
+    extension(ArgumentException)
+    {
+
+        /// <summary>
+        /// Throws an exception if the lengths of the specified arrays are not equal.
+        /// </summary>
+        /// <typeparam name="T1">The type of elements in the first array. Must be unmanaged and implement <see cref="INumberBase{T1}"/>.</typeparam>
+        /// <typeparam name="T2">The type of elements in the second array. Must be unmanaged and implement <see cref="INumberBase{T2}"/>.</typeparam>
+        /// <param name="arr1">The first array to compare for length equality.</param>
+        /// <param name="arr2">The second array to compare for length equality.</param>
+        /// <param name="message">An optional custom error message to include in the exception. If <see langword="null"/>, a default message
+        /// is used.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="arr1"/> and <paramref name="arr2"/> do not have the same length.</exception>
+        public static void ThrowIfArrayLengthNotEqual<T1,T2>(PinnableArray<T1> arr1, PinnableArray<T2> arr2, string? message = null) 
+            where T1 : unmanaged, INumberBase<T1>
+            where T2 : unmanaged, INumberBase<T2>
+        {
+            if (arr1.Length != arr2.Length)
+            {
+                throw new ArgumentException(message ?? $"Array lengths are not equal. {nameof(arr1)}.Length: {arr1.Length}, {nameof(arr2)}.Length: {arr2.Length}");
+            }
+        }
+
+
+
+        /// <summary>
+        /// Throws an exception if the specified arrays do not have equal lengths.
+        /// </summary>
+        /// <typeparam name="T1">The type of elements in the first array.</typeparam>
+        /// <typeparam name="T2">The type of elements in the second array.</typeparam>
+        /// <param name="arr1">The first array to compare for length equality. Cannot be null.</param>
+        /// <param name="arr2">The second array to compare for length equality. Cannot be null.</param>
+        /// <param name="message">An optional custom error message to include in the exception. If null, a default message is used.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="arr1"/> and <paramref name="arr2"/> do not have equal lengths.</exception>
+        public static void ThrowIfArrayLengthNotEqual<T1,T2>(T1[] arr1, T2[] arr2, string? message = null)
+        {
+            if (arr1.Length != arr2.Length)
+            {
+                throw new ArgumentException(message ?? $"Array lengths are not equal. {nameof(arr1)}.Length: {arr1.Length}, {nameof(arr2)}.Length: {arr2.Length}");
+            }
+        }
+
+
+
+        /// <summary>
+        /// Throws an exception if the lengths of the specified spans are not equal.
+        /// </summary>
+        /// <typeparam name="T1">The type of elements in the first span.</typeparam>
+        /// <typeparam name="T2">The type of elements in the second span.</typeparam>
+        /// <param name="arr1">The first span to compare for length equality.</param>
+        /// <param name="arr2">The second span to compare for length equality.</param>
+        /// <param name="message">An optional custom error message to include in the exception. If null, a default message is used.</param>
+        /// <exception cref="ArgumentException">Thrown if the lengths of <paramref name="arr1"/> and <paramref name="arr2"/> are not equal.</exception>
+        public static void ThrowIfArrayLengthNotEqual<T1, T2>(Span<T1> arr1, Span<T2> arr2, string? message = null)
+        {
+            if (arr1.Length != arr2.Length)
+            {
+                throw new ArgumentException(message ?? $"Array lengths are not equal. {nameof(arr1)}.Length: {arr1.Length}, {nameof(arr2)}.Length: {arr2.Length}");
+            }
+        }
+
+    }
+}
+
+/// <summary>
+/// Provides extension methods for validating operation conditions and throwing an <see
+/// cref="InvalidOperationException"/> when required.
+/// </summary>
+/// <remarks>Use these methods to enforce preconditions related to pointer validity and array pinning,
+/// particularly in scenarios involving interop or unsafe code. These extensions help ensure that invalid states are
+/// detected early and reported with meaningful exceptions.</remarks>
 public static class InvalidOperationExceptionExtension
 {
 

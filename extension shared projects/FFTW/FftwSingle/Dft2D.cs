@@ -65,6 +65,8 @@ public static class Dft2D
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
+        ArgumentException.ThrowIfArrayLengthNotEqual(input, output, "Input and output PinnableArrays must have the same length.");
+
         var plan = fftwf.dft_2d(nx, ny, input, output, direction, flags);
         InvalidOperationException.ThrowIfZero(plan, "Failed to create 2D complex plan.");
         try
