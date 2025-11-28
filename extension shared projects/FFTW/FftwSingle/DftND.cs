@@ -1,24 +1,124 @@
-﻿using Vorcyc.Mathematics.Extensions.FFTW.Interop;
+﻿using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
+using Vorcyc.Mathematics.Extensions.FFTW.Interop;
 using Vorcyc.Mathematics.Numerics;
 
-namespace Vorcyc.Mathematics.Extensions.FFTW.FftwSingle;
+namespace Vorcyc.Mathematics.Extensions.FFTW;
 
 /// <summary>
 /// 基于 FFTW 单精度接口的 n 维离散傅里叶变换帮助类。
-/// 提供复数-复数 (C2C)、实数-复数 (R2C) 与复数-实数 (C2R) 的指针、Span 和已固定数组重载。
+/// 提供复数-复数 (C2C)、实数-复数 (R2C) 与复数-实数 (C2R) 的简洁公共 API：Forward / Inverse；原始实现改为 internal 并统一负责计划创建/执行/销毁。
 /// </summary>
 /// <remarks>
-/// - 本类方法统一封装 FFTW 计划的创建、执行与销毁流程。<br/>
-/// - 默认不进行归一化；若需缩放请在外部处理，或在 C2R 重载中使用 <c>scale</c> 参数。<br/>
-/// - 传入的缓冲区应为连续内存并满足维度元素总数；已固定重载要求缓冲区处于 Pinned 状态。<br/>
+/// 使用说明：
+/// - 默认不进行归一化；如需缩放请在外部处理，或在 C2R 的 Inverse 重载中启用 <c>scale</c>。<br/>
+/// - 传入缓冲区应为连续内存并满足维度元素总数；已固定重载要求缓冲区处于 Pinned 状态。<br/>
 /// - 多维接口要求 <c>dims</c> 长度等于维度数 rank；计划创建失败会抛出 <see cref="InvalidOperationException"/>。<br/>
 /// </remarks>
-public static class DftND
+public static partial class DftND
 {
+    // ==========================
+    // 精简友好命名的公共 API
+    // ==========================
 
-    // Generic n-D helpers
+    // C2C Forward（复数→复数，n 维）
 
-    #region NDComplex
+
+    /// <summary>
+    /// 执行 n 维复数→复数正向傅里叶变换（C2C，Span 重载）。
+    /// </summary>
+    /// <param name="input">输入数据缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据）。</param>
+    /// <param name="output">输出数据缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据）。</param>
+    /// <param name="dims">每一维的尺寸数组（长度即维度数 rank）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(Span<ComplexFp32> input, Span<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDComplex(input, output, dims, fftw_direction.Forward, flags);
+
+    /// <summary>
+    /// 执行 n 维复数→复数正向傅里叶变换（C2C，PinnableArray 重载）。
+    /// </summary>
+    /// <param name="input">已固定的输入缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据）。</param>
+    /// <param name="output">已固定的输出缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据）。</param>
+    /// <param name="dims">每一维的尺寸数组（长度即维度数 rank）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDComplex(input, output, dims, fftw_direction.Forward, flags);
+
+    // C2C Inverse（复数→复数，n 维）
+
+    /// <summary>
+    /// 执行 n 维复数→复数逆向傅里叶变换（C2C，Span 重载）。
+    /// 注意：FFTW 的逆变换默认不执行归一化；如需 1/∏dims 等缩放请在外部处理。
+    /// </summary>
+    /// <param name="input">输入数据。</param>
+    /// <param name="output">输出数据。</param>
+    /// <param name="dims">每一维的尺寸数组。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(Span<ComplexFp32> input, Span<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDComplex(input, output, dims, fftw_direction.Backward, flags);
+
+    /// <summary>
+    /// 执行 n 维复数→复数逆向傅里叶变换（C2C，PinnableArray 重载）。
+    /// 注意：FFTW 的逆变换默认不执行归一化；如需 1/∏dims 等缩放请在外部处理。
+    /// </summary>
+    /// <param name="input">已固定的输入缓冲区。</param>
+    /// <param name="output">已固定的输出缓冲区。</param>
+    /// <param name="dims">每一维的尺寸数组。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDComplex(input, output, dims, fftw_direction.Backward, flags);
+
+    // R2C Forward（实数→复数，n 维）
+
+
+    /// <summary>
+    /// 执行 n 维实数→复数正向傅里叶变换（R2C，Span 重载，输出为紧凑半谱）。
+    /// </summary>
+    /// <param name="realInput">输入数据缓冲区（线性展平的 n 维 <see cref="float"/> 数据）。</param>
+    /// <param name="complexOutput">输出数据缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据，半谱约定）。</param>
+    /// <param name="dims">每一维的尺寸数组。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(Span<float> realInput, Span<ComplexFp32> complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDR2C(realInput, complexOutput, dims, flags);
+
+    /// <summary>
+    /// 执行 n 维实数→复数正向傅里叶变换（R2C，PinnableArray 重载，输出为紧凑半谱）。
+    /// </summary>
+    /// <param name="realInput">已固定的输入缓冲区（线性展平的 n 维 <see cref="float"/> 数据）。</param>
+    /// <param name="complexOutput">已固定的输出缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据，半谱约定）。</param>
+    /// <param name="dims">每一维的尺寸数组。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(PinnableArray<float> realInput, PinnableArray<ComplexFp32> complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDR2C(realInput, complexOutput, dims, flags);
+
+    // C2R Inverse（复数→实数，n 维）
+
+    /// <summary>
+    /// 执行 n 维复数半谱→实数逆向傅里叶变换（C2R，Span 重载），可选按 1/∏dims 自动归一化。
+    /// </summary>
+    /// <param name="complexInput">输入数据缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据，半谱约定）。</param>
+    /// <param name="realOutput">输出数据缓冲区（线性展平的 n 维 <see cref="float"/> 数据）。</param>
+    /// <param name="dims">每一维的尺寸数组。</param>
+    /// <param name="scale">是否按元素总数进行 1/∏dims 归一化，默认 <c>true</c>。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(Span<ComplexFp32> complexInput, Span<float> realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDC2R(complexInput, realOutput, dims, scale, flags);
+
+    /// <summary>
+    /// 执行 n 维复数半谱→实数逆向傅里叶变换（C2R，PinnableArray 重载），可选按 1/∏dims 自动归一化。
+    /// </summary>
+    /// <param name="complexInput">已固定的复数输入缓冲区（线性展平的 n 维 <see cref="ComplexFp32"/> 数据，半谱约定）。</param>
+    /// <param name="realOutput">已固定的实数输出缓冲区（线性展平的 n 维 <see cref="float"/> 数据）。</param>
+    /// <param name="dims">每一维的尺寸数组。</param>
+    /// <param name="scale">是否按元素总数进行 1/∏dims 归一化，默认 <c>true</c>。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(PinnableArray<ComplexFp32> complexInput, PinnableArray<float> realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+        => DftNDC2R(complexInput, realOutput, dims, scale, flags);
+
+    // ==========================
+    // 原始实现（内部管线，设为 internal）
+    // ==========================
+
+    #region NDComplex (internal)
 
     /// <summary>
     /// 执行 n 维复数到复数 (C2C) DFT（指针重载）。
@@ -34,13 +134,13 @@ public static class DftND
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="input"/> 或 <paramref name="output"/> 为零指针时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void DftNDComplex(IntPtr input, IntPtr output, ReadOnlySpan<int> dims, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDComplex_Single(IntPtr input, IntPtr output, ReadOnlySpan<int> dims, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfZero(input);
         ArgumentNullException.ThrowIfZero(output);
 
         var rank = dims.Length;
-        var n = dims.ToArray(); // FFTW needs int[]
+        var n = dims.ToArray(); // FFTW 需要 int[]
 
         var plan = fftwf.dft(rank, n, input, output, direction, flags);
         InvalidOperationException.ThrowIfZero(plan, "Failed to create n-D complex plan.");
@@ -68,7 +168,7 @@ public static class DftND
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="input"/> 或 <paramref name="output"/> 为空(Length==0)时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void DftNDComplex(Span<ComplexFp32> input, Span<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDComplex(Span<ComplexFp32> input, Span<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
@@ -107,7 +207,7 @@ public static class DftND
     /// - 在允许的情形下可采用原地模式；请确保缓冲区已固定(Pinned)。<br/>
     /// </remarks>
     /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
-    public static void DftNDComplex(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDComplex(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, ReadOnlySpan<int> dims, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
@@ -128,7 +228,7 @@ public static class DftND
 
     #endregion
 
-    #region R2C
+    #region R2C (internal)
 
     /// <summary>
     /// 执行 n 维实数到复数 (R2C) DFT（指针重载）。
@@ -142,7 +242,7 @@ public static class DftND
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="realInput"/> 或 <paramref name="complexOutput"/> 为零指针时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void DftNDR2C(IntPtr realInput, IntPtr complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDR2C_Single(IntPtr realInput, IntPtr complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfZero(realInput);
         ArgumentNullException.ThrowIfZero(complexOutput);
@@ -173,7 +273,7 @@ public static class DftND
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="realInput"/> 或 <paramref name="complexOutput"/> 为空(Length==0)时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void DftNDR2C(Span<float> realInput, Span<ComplexFp32> complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDR2C(Span<float> realInput, Span<ComplexFp32> complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(realInput);
         ArgumentNullException.ThrowIfEmpty(complexOutput);
@@ -208,7 +308,7 @@ public static class DftND
     /// - 在允许的情形下可采用原地模式；请确保缓冲区已固定(Pinned)。<br/>
     /// </remarks>
     /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
-    public static void DftNDR2C(PinnableArray<float> realInput, PinnableArray<ComplexFp32> complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDR2C(PinnableArray<float> realInput, PinnableArray<ComplexFp32> complexOutput, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(realInput);
         InvalidOperationException.ThrowIfUnpinned(complexOutput);
@@ -227,7 +327,7 @@ public static class DftND
 
     #endregion
 
-    #region NDC2R
+    #region NDC2R (internal)
 
     /// <summary>
     /// 执行 n 维复数到实数 (C2R) 逆变换（指针重载），可选对结果进行 1/∏dims 缩放。
@@ -242,7 +342,7 @@ public static class DftND
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="complexInput"/> 或 <paramref name="realOutput"/> 为零指针时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void DftNDC2R(IntPtr complexInput, IntPtr realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDC2R_Single(IntPtr complexInput, IntPtr realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfZero(complexInput);
         ArgumentNullException.ThrowIfZero(realOutput);
@@ -262,7 +362,7 @@ public static class DftND
 
         if (scale)
         {
-            // Scale by 1/totalCount
+            // 按总元素数进行 1/∏dims 归一化
             var total = 1;
             for (var i = 0; i < dims.Length; i++) total *= dims[i];
 
@@ -292,7 +392,7 @@ public static class DftND
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="complexInput"/> 或 <paramref name="realOutput"/> 为空(Length==0)时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void DftNDC2R(Span<ComplexFp32> complexInput, Span<float> realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDC2R(Span<ComplexFp32> complexInput, Span<float> realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(complexInput);
         ArgumentNullException.ThrowIfEmpty(realOutput);
@@ -316,7 +416,7 @@ public static class DftND
         }
         if (scale)
         {
-            // Scale by 1/totalCount
+            // 按总元素数进行 1/∏dims 归一化
             var total = 1;
             for (var i = 0; i < dims.Length; i++) total *= dims[i];
             unsafe
@@ -346,7 +446,7 @@ public static class DftND
     /// - 启用 <paramref name="scale"/> 时按总元素数对输出进行均匀缩放。<br/>
     /// </remarks>
     /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
-    public static void DftNDC2R(PinnableArray<ComplexFp32> complexInput, PinnableArray<float> realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+    internal static void DftNDC2R(PinnableArray<ComplexFp32> complexInput, PinnableArray<float> realOutput, ReadOnlySpan<int> dims, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(complexInput);
         InvalidOperationException.ThrowIfUnpinned(realOutput);
@@ -363,7 +463,7 @@ public static class DftND
         }
         if (scale)
         {
-            // Scale by 1/totalCount
+            // 按总元素数进行 1/∏dims 归一化
             var total = 1;
             for (var i = 0; i < dims.Length; i++) total *= dims[i];
             unsafe
@@ -378,5 +478,4 @@ public static class DftND
     }
 
     #endregion
-
 }

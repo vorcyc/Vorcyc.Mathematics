@@ -1,21 +1,78 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
 using Vorcyc.Mathematics.Extensions.FFTW.Interop;
 
-namespace Vorcyc.Mathematics.Extensions.FFTW.FftwDouble;
+namespace Vorcyc.Mathematics.Extensions.FFTW;
 
 /// <summary>
 /// 基于 FFTW 双精度接口的三维复数到复数 (C2C) 离散傅里叶变换辅助类。
-/// 提供指针、Span 与已固定数组三种重载，统一封装计划的创建、执行与销毁流程。
+/// 提供简洁公共 API：Forward / Inverse；原始实现改为 internal 并统一封装计划的创建、执行与销毁流程。
 /// </summary>
 /// <remarks>
 /// - FFTW 默认不执行归一化；若需 1/(nx*ny*nz) 等缩放，请在外部完成。<br/>
 /// - 可原地或非原地调用，是否允许原地取决于数据布局与 FFTW 限制。<br/>
 /// - 输入/输出缓冲区需为连续内存，展平后长度至少为 nx*ny*nz。<br/>
 /// </remarks>
-public static class Dft3D
+public static partial class Dft3D
 {
+    // ==========================
+    // 精简友好命名的公共 API
+    // ==========================
 
-    // 3D complex-to-complex
+    // Forward（C2C）
+    /// <summary>
+    /// 执行三维复数到复数的正向傅里叶变换（C2C，Span 重载）。
+    /// </summary>
+    /// <param name="input">输入数据（线性展平的 3D <see cref="Complex"/>）。</param>
+    /// <param name="output">输出数据（线性展平的 3D <see cref="Complex"/>）。</param>
+    /// <param name="nx">X 维度大小（第一维长度）。</param>
+    /// <param name="ny">Y 维度大小（第二维长度）。</param>
+    /// <param name="nz">Z 维度大小（第三维长度）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(Span<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+        => Dft3DComplex(input, output, nx, ny, nz, fftw_direction.Forward, flags);
+
+    /// <summary>
+    /// 执行三维复数到复数的正向傅里叶变换（C2C，PinnableArray 重载）。
+    /// </summary>
+    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="nx">X 维度大小（第一维长度）。</param>
+    /// <param name="ny">Y 维度大小（第二维长度）。</param>
+    /// <param name="nz">Z 维度大小（第三维长度）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(PinnableArray<Complex> input, PinnableArray<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+        => Dft3DComplex(input, output, nx, ny, nz, fftw_direction.Forward, flags);
+
+    // Inverse（C2C）
+
+    /// <summary>
+    /// 执行三维复数到复数的逆向傅里叶变换（C2C，Span 重载）。注意：FFTW 的逆变换不执行归一化。
+    /// </summary>
+    /// <param name="input">输入数据（线性展平的 3D <see cref="Complex"/>）。</param>
+    /// <param name="output">输出数据（线性展平的 3D <see cref="Complex"/>）。</param>
+    /// <param name="nx">X 维度大小（第一维长度）。</param>
+    /// <param name="ny">Y 维度大小（第二维长度）。</param>
+    /// <param name="nz">Z 维度大小（第三维长度）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(Span<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+        => Dft3DComplex(input, output, nx, ny, nz, fftw_direction.Backward, flags);
+
+    /// <summary>
+    /// 执行三维复数到复数的逆向傅里叶变换（C2C，PinnableArray 重载）。注意：FFTW 的逆变换不执行归一化。
+    /// </summary>
+    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="nx">X 维度大小（第一维长度）。</param>
+    /// <param name="ny">Y 维度大小（第二维长度）。</param>
+    /// <param name="nz">Z 维度大小（第三维长度）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(PinnableArray<Complex> input, PinnableArray<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+        => Dft3DComplex(input, output, nx, ny, nz, fftw_direction.Backward, flags);
+
+    // ==========================
+    // 原始实现（内部管线，设为 internal）
+    // ==========================
 
     /// <summary>
     /// 执行三维复数到复数 (C2C) DFT（指针重载，支持原地/非原地）。
@@ -33,7 +90,7 @@ public static class Dft3D
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="input"/> 或 <paramref name="output"/> 为零指针时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void Dft3DComplex(IntPtr input, IntPtr output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft3DComplex_Double(IntPtr input, IntPtr output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfZero(input);
         ArgumentNullException.ThrowIfZero(output);
@@ -68,7 +125,7 @@ public static class Dft3D
     /// <exception cref="ArgumentNullException">当 <paramref name="input"/> 或 <paramref name="output"/> 为空(Length==0)时抛出。</exception>
     /// <exception cref="ArgumentException">当输入或输出长度小于指定维度总元素数时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    public static void Dft3DComplex(Span<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft3DComplex(Span<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
@@ -79,7 +136,7 @@ public static class Dft3D
             fixed (Complex* inputPtr = input)
             fixed (Complex* outputPtr = output)
             {
-                Dft3DComplex((IntPtr)inputPtr, (IntPtr)outputPtr, nx, ny, nz, direction, flags);
+                Dft3DComplex_Double((IntPtr)inputPtr, (IntPtr)outputPtr, nx, ny, nz, direction, flags);
             }
         }
     }
@@ -99,7 +156,7 @@ public static class Dft3D
     /// - 在允许的情形下可采用原地模式；请确保缓冲区已固定(Pinned)。<br/>
     /// </remarks>
     /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
-    public static void Dft3DComplex(PinnableArray<Complex> input, PinnableArray<Complex> output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft3DComplex(PinnableArray<Complex> input, PinnableArray<Complex> output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
@@ -114,5 +171,4 @@ public static class Dft3D
             fftw.destroy_plan(plan);
         }
     }
-
 }

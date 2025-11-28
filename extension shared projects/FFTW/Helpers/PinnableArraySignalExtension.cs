@@ -1,8 +1,7 @@
-﻿using Vorcyc.Mathematics;
+﻿using System.Numerics;
 using Vorcyc.Mathematics.Numerics;
-using System.Numerics;
 
-namespace Vorcyc.Mathematics.Extensions.FFTW;
+namespace Vorcyc.Mathematics.Extensions.FFTW.Helpers;
 
 /// <summary>
 /// 针对 <see cref="PinnableArray{T}"/> 的信号/频谱相关扩展方法集合。

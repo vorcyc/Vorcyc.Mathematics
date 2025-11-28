@@ -6,7 +6,7 @@ namespace Vorcyc.Mathematics.Extensions.FFTW.Interop;
 /// Contains the Basic Interface FFTW functions for single-precision (float) operations
 /// </summary>
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
-public static partial class fftwf
+internal static partial class fftwf
 
 {
     private const string LibraryName = "runtimes//win-x64//native//libfftw3f-3.dll";
@@ -258,7 +258,7 @@ public static partial class fftwf
     /// <param name="flags">Flags that specify the behavior of the planner</param>
     [LibraryImport(LibraryName, EntryPoint = "fftwf_plan_r2r")]
     public static partial IntPtr r2r(int rank, ReadOnlySpan<int> n, IntPtr input, IntPtr output,
-        fftw_kind[] kind, fftw_flags flags);
+        ReadOnlySpan<fftw_kind> kind, fftw_flags flags);
 
     /// <summary>
     /// Returns (approximately) the number of flops used by a certain plan

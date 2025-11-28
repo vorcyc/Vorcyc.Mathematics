@@ -61,7 +61,7 @@ public enum fftw_flags : uint
 /// <summary>
 /// Defines direction of operation
 /// </summary>
-public enum fftw_direction : int
+internal enum fftw_direction : int
 {
     /// <summary>
     /// Computes a regular DFT
@@ -84,7 +84,7 @@ public enum fftw_direction : int
 /// - RODFT**：各型离散正弦变换 (DST)。<br/>
 /// 具体边界条件与采样点约定由 **00/01/10/11** 后缀区分。
 /// </remarks>
-public enum fftw_kind : uint
+internal enum fftw_kind : uint
 {
     /// <summary>
     /// 实数到半复数 (Real-to-Half-Complex) 变换。
