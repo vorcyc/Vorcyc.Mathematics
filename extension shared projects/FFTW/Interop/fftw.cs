@@ -6,7 +6,7 @@ namespace Vorcyc.Mathematics.Extensions.FFTW.Interop;
 /// Contains the Basic Interface FFTW functions for double-precision (double) operations
 /// </summary>
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
-internal static partial class fftw
+public static partial class fftw
 #pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 {
     private const string LibraryName = "runtimes//win-x64//native//libfftw3-3.dll";

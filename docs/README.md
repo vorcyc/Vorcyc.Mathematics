@@ -3,7 +3,7 @@
 ## A high performance math library.
 
 ![VMath logo](logos/logo1.png "logo")
-0.8.3.0
+0.8.3.1
 
 Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.NET的最新特性并提供高性能和准确度的数学函数和运算。它是用C#编写的，可以在任何.NET应用程序中使用。
 
