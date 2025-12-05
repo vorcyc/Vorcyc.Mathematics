@@ -8,7 +8,7 @@ using System.Runtime.Intrinsics;
 using Vorcyc.Mathematics;
 
 
-//BenchmarkRunner.Run<FFT_new_old_benchmark>();
+BenchmarkRunner.Run<FFT_new_old_benchmark>();
 
 //BenchmarkRunner.Run<SimpleLinearRegression_benchmark>();
 
@@ -16,5 +16,3 @@ using Vorcyc.Mathematics;
 
 //BenchmarkRunner.Run<SpanMathExtensionBenchmarks>();
 
-
-BenchmarkRunner.Run<Statistics_benchmark>();

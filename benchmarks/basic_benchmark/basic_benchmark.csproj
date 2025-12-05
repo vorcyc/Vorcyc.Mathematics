@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\targets\dotNET10_Portable\dotNET10_Portable.csproj" />
+    <ProjectReference Include="..\..\targets\dotNET10_Portable_Extensions_FFTW\dotNET10_Portable_Extensions_FFTW.csproj" />
   </ItemGroup>
 
 </Project>

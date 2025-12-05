@@ -17,13 +17,13 @@ public class FFT_new_old_benchmark
 {
 
 
-    [Params(256, 512, 1024, 2048, 4096, 8192, 16384, 32768)]
+    [Params(256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 63356, 1048576)]
     public int N;
 
 
     //public float[] _array;
-    private PinnableArray<float>? _array;
-    private ComplexFp32[] _out;
+    private PinnableArray<float>? _realArray;
+    private PinnableArray<ComplexFp32>? _complexArray;
 
 
     private RealFft _fft;
@@ -40,12 +40,13 @@ public class FFT_new_old_benchmark
         //{
         //    _array[i] = Random.Shared.NextSingle();
         //}
-        _array?.Dispose();
-        _array = null;
-        _array = new(N, false);
+        _realArray?.Dispose();
+        _realArray = null;
+        _realArray = new(N, true);
 
-
-        _out = new ComplexFp32[N];
+        _complexArray?.Dispose();
+        _complexArray = null;
+        _complexArray = new(N, true);
 
         _fft = new RealFft(N);
         _outReal = new float[N];
@@ -56,15 +57,19 @@ public class FFT_new_old_benchmark
 
 
     [Benchmark]
-    public bool my_method() => FastFourierTransformNormal.Forward(_array.AsSpan(), _out);
+    public bool my_method() => FastFourierTransformNormal.Forward(_realArray.AsSpan(), _complexArray);
 
 
     [Benchmark]
-    public void other_method() => _fft.Direct(_array, _outReal, _outImg);
+    public void realFFT() => _fft.Direct(_realArray, _outReal, _outImg);
 
 
     [Benchmark]
-    public void my_new() => _realOnly.Forward((Span<float>)_array, _out);
+    public void realFFT_new() => _realOnly.Forward(_realArray, _complexArray);
+
+
+    [Benchmark]
+    public void FFTW() => Vorcyc.Mathematics.Extensions.FFTW.Dft1D.Forward(_realArray, _complexArray);
 
 }
 
