@@ -57,7 +57,7 @@ public class FFT_new_old_benchmark
 
 
     [Benchmark]
-    public bool my_method() => FastFourierTransformNormal.Forward(_realArray.AsSpan(), _complexArray);
+    public bool my_method() => FastFourierTransformNormal.Forward(_realArray, _complexArray);
 
 
     [Benchmark]
