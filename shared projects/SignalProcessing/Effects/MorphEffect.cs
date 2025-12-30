@@ -193,7 +193,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
                 filtered[i] = Process(signal[i], mix[j]);
             }
 
-            return new DiscreteSignal(signal.SamplingRate, filtered , MemoryStrategy.Immediate);
+            return new DiscreteSignal(signal.SamplingRate, filtered , false);
         }
 
         /// <summary>

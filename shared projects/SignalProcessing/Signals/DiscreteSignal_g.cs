@@ -1,7 +1,5 @@
 ﻿namespace Vorcyc.Mathematics.SignalProcessing.Signals;
 
-using Vorcyc.Mathematics.Framework;
-
 /*
  * 与原版本的不同处：
  * 1. Samples 使用 PinnableArray<float> 替换原来的 float[] ，同时实现 IDispose 接口。
@@ -13,7 +11,21 @@ using Vorcyc.Mathematics.Framework;
  */
 
 using System.Numerics;
+using Vorcyc.Mathematics.Framework;
 
+/// <summary>
+/// Represents a finite real-valued discrete-time signal parameterized by sample type <typeparamref name="TSample"/>.
+/// Stores samples in a <see cref="PinnableArray{T}"/> and provides basic operations and measurements
+/// such as energy, RMS, zero-crossing rate, and entropy.
+/// </summary>
+/// <typeparam name="TSample">
+/// Unmanaged IEEE 754 floating-point sample type, e.g., <see cref="float"/> or <see cref="double"/>.
+/// Must implement <see cref="IFloatingPointIeee754{TSelf}"/>.
+/// </typeparam>
+/// <remarks>
+/// The total sample count is derived either from an explicit count or from the provided duration and sampling rate.
+/// The buffer can optionally be pinned to avoid GC relocation.
+/// </remarks>
 public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDisposable
     where TSample : unmanaged, IFloatingPointIeee754<TSample>
 {
@@ -25,17 +37,18 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
     //样本量
     internal int _numOfSample;
 
-    //有效样本量
-    internal int _validNumOfSample;
-
     internal TimeSpan _duration;
-
-    private MemoryStrategy _strategy;
-
 
     #region constructors
 
-    private DiscreteSignal(int samplingRate, int? count, TimeSpan? duration, MemoryStrategy strategy = MemoryStrategy.Immediate)
+    /// <summary>
+    /// Initializes a new instance using either a sample <paramref name="count"/> or a <paramref name="duration"/>.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second). Must be positive.</param>
+    /// <param name="count">Optional total sample count.</param>
+    /// <param name="duration">Optional signal duration. If set, sample count is derived from <c>duration * samplingRate</c>.</param>
+    /// <exception cref="ArgumentNullException">Thrown if both <paramref name="count"/> and <paramref name="duration"/> are <c>null</c>.</exception>
+    private DiscreteSignal(int samplingRate, int? count, TimeSpan? duration)
     {
         Guard.AgainstNonPositive(samplingRate, "Sampling rate");
 
@@ -43,174 +56,207 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
             throw new ArgumentNullException("Both paramaters of count and duration cannot null.");
 
         _samplingRate = samplingRate;
-        _strategy = strategy;
+        //_strategy = strategy;
 
         if (count is not null && duration is null)
         {
             _numOfSample = count.Value;
-            _validNumOfSample = count.Value;
             _duration = TimeSpan.FromSeconds((double)_numOfSample / samplingRate);
         }
         else if (duration is not null && count is null)
         {
-            // 此时这里 _frame 一定是空的
-            {
-                _duration = duration.Value;
-                _numOfSample = (int)(duration.Value.TotalSeconds * samplingRate);
-                _validNumOfSample = (int)(duration.Value.TotalSeconds * samplingRate);
-
-            }
+            _duration = duration.Value;
+            _numOfSample = (int)(duration.Value.TotalSeconds * samplingRate);
         }
     }
 
-    public DiscreteSignal(int samplingRate, TimeSpan duration, MemoryStrategy strategy = MemoryStrategy.Immediate)
-        : this(samplingRate, count: null, duration: duration, strategy)
+    /// <summary>
+    /// Initializes a new instance with specified <paramref name="samplingRate"/> and <paramref name="duration"/>.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="duration">Signal duration.</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    public DiscreteSignal(int samplingRate, TimeSpan duration, bool pinSamples = false)
+        : this(samplingRate, count: null, duration: duration)
     {
-        if (strategy == MemoryStrategy.Pre_Allocated)
-            _samples = new(_numOfSample);
-        else
-            _samples = new(_numOfSample, false);
+        _samples = new(_numOfSample, pinSamples);
     }
 
-    public DiscreteSignal(int samplingRate, int count, MemoryStrategy strategy = MemoryStrategy.Immediate)
-        : this(samplingRate, count: count, duration: null, strategy)
+    /// <summary>
+    /// Initializes a new instance with specified <paramref name="samplingRate"/> and sample <paramref name="count"/>.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="count">Total number of samples.</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    public DiscreteSignal(int samplingRate, int count, bool pinSamples = false)
+        : this(samplingRate, count: count, duration: null)
     {
-        if (strategy == MemoryStrategy.Pre_Allocated)
-            _samples = new(_numOfSample);
-        else
-            _samples = new(_numOfSample, false);
+        _samples = new(_numOfSample, pinSamples);
     }
 
-
-    public DiscreteSignal(int samplingRate, TSample[] samples, MemoryStrategy strategy = MemoryStrategy.Immediate)
-        : this(samplingRate, count: samples.Length, duration: null, strategy)
+    /// <summary>
+    /// Initializes a new instance that wraps an existing sample array.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="samples">Source sample array.</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    /// <remarks>
+    /// The array is wrapped by <see cref="PinnableArray{T}"/>. Copy semantics depend on <c>PinnableArray</c> implementation.
+    /// </remarks>
+    public DiscreteSignal(int samplingRate, TSample[] samples, bool pinSamples = false)
+        : this(samplingRate, count: samples.Length, duration: null)
     {
-        //if (strategy == PacketMemoryStrategy.Pre_Allocated)
-        //    _samples = new(samples, pin: true, copy: true);
-        //else
-        //    _samples = new(samples, false, copy: true);  
-
-        if (strategy == MemoryStrategy.Pre_Allocated)
-            _samples = new(samples, pin: true);
-        else
-            _samples = new(samples, false);
+        _samples = new(samples, pinSamples);
     }
 
-    public DiscreteSignal(int samplingRate, TSample[] samples, int offset, int count, MemoryStrategy strategy = MemoryStrategy.Immediate)
-         : this(samplingRate, count: count, duration: null, strategy)
+    /// <summary>
+    /// Initializes a new instance from a slice of an existing sample array.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="samples">Source sample array.</param>
+    /// <param name="offset">Start index within <paramref name="samples"/>.</param>
+    /// <param name="count">Number of samples to wrap.</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    public DiscreteSignal(int samplingRate, TSample[] samples, int offset, int count, bool pinSamples = false)
+         : this(samplingRate, count: count, duration: null)
     {
-        if (strategy == MemoryStrategy.Pre_Allocated)
-            _samples = new(samples, offset, count, pin: true);
-        else
-            _samples = new(samples, offset, count, false);
+        _samples = new(samples, offset, count, pinSamples);
     }
 
-
-    public DiscreteSignal(int samplingRate, IEnumerable<TSample> samples, MemoryStrategy strategy = MemoryStrategy.Immediate)
-        : this(samplingRate, samples.ToArray(), strategy)
+    /// <summary>
+    /// Initializes a new instance from an enumerable sequence of samples.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="samples">Sequence of samples.</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    public DiscreteSignal(int samplingRate, IEnumerable<TSample> samples, bool pinSamples = false)
+        : this(samplingRate, samples.ToArray(), pinSamples)
     { }
 
-    public DiscreteSignal(int samplingRate, ArraySegment<TSample> segment, MemoryStrategy strategy = MemoryStrategy.Immediate)
-        : this(samplingRate, count: segment.Count, duration: null, strategy)
+    /// <summary>
+    /// Initializes a new instance from an <see cref="ArraySegment{T}"/> of samples.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="segment">Segment of an array containing samples.</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    public DiscreteSignal(int samplingRate, ArraySegment<TSample> segment, bool pinSamples = false)
+        : this(samplingRate, count: segment.Count, duration: null)
     {
-        if (strategy == MemoryStrategy.Pre_Allocated)
-            _samples = new(segment, pin: true);
-        else
-            _samples = new(segment, false);
+        _samples = new(segment, pinSamples);
     }
 
-
-    public DiscreteSignal(int samplingRate, Span<TSample> span, MemoryStrategy strategy = MemoryStrategy.Immediate)
-         : this(samplingRate, count: span.Length, duration: null, strategy)
+    /// <summary>
+    /// Initializes a new instance from a <see cref="Span{T}"/> of samples.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="span">Span containing samples.</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    public DiscreteSignal(int samplingRate, Span<TSample> span, bool pinSamples = false)
+         : this(samplingRate, count: span.Length, duration: null)
     {
-        if (strategy == MemoryStrategy.Pre_Allocated)
-            _samples = new(span, pin: true);
-        else
-            _samples = new(span, false);
+        _samples = new(span, pinSamples);
     }
-
 
     #endregion
 
     #region 特殊常量信号
 
     /// <summary>
-    /// Generates unit impulse of given <paramref name="length"/> sampled at given <paramref name="samplingRate"/>.
+    /// Generates a unit impulse signal of the specified <paramref name="length"/> at <paramref name="samplingRate"/>.
+    /// The first sample is <see cref="TSample.One"/>, remaining samples are zero.
     /// </summary>
-    /// <param name="length">Length of unit impulse</param>
-    /// <param name="samplingRate">Sampling rate</param>
-    public static DiscreteSignal<TSample> Unit(int length, int samplingRate = 1, MemoryStrategy strategy = MemoryStrategy.Pre_Allocated)
+    /// <param name="length">Number of samples in the impulse signal.</param>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    /// <returns>A new unit impulse <see cref="DiscreteSignal{TSample}"/>.</returns>
+    public static DiscreteSignal<TSample> Unit(int length, int samplingRate = 1, bool pinSamples = false)
     {
         //var unit = new float[length];
         //unit[0] = 1;
 
         //return new DiscreteSignal(samplingRate, unit);
 
-        var result = new DiscreteSignal<TSample>(samplingRate, length, strategy);
+        var result = new DiscreteSignal<TSample>(samplingRate, length, pinSamples);
         result._samples[0] = TSample.One;
         return result;
     }
 
     /// <summary>
-    /// Generates constant signal of given <paramref name="length"/> sampled at given <paramref name="samplingRate"/>.
+    /// Generates a constant-valued signal of the specified <paramref name="length"/> at <paramref name="samplingRate"/>.
     /// </summary>
-    /// <param name="constant">Constant value</param>
-    /// <param name="length">Length of constant signal</param>
-    /// <param name="samplingRate">Sampling rate</param>
-    public static DiscreteSignal<TSample> Constant(TSample constant, int length, int samplingRate = 1, MemoryStrategy strategy = MemoryStrategy.Pre_Allocated)
+    /// <param name="constant">Constant value to assign to each sample.</param>
+    /// <param name="length">Number of samples in the signal.</param>
+    /// <param name="samplingRate">Sampling rate (samples per second).</param>
+    /// <param name="pinSamples">Whether to pin the underlying sample buffer.</param>
+    /// <returns>A new constant-valued <see cref="DiscreteSignal{TSample}"/>.</returns>
+    public static DiscreteSignal<TSample> Constant(TSample constant, int length, int samplingRate = 1, bool pinSamples = false)
     {
-        var result = new DiscreteSignal<TSample>(samplingRate, length, strategy);
+        var result = new DiscreteSignal<TSample>(samplingRate, length, pinSamples);
         result._samples.Fill(constant);
         return result;
     }
 
     #endregion
 
-
     #region properites
 
-
+    /// <summary>
+    /// Gets the sampling rate (samples per second).
+    /// </summary>
     public int SamplingRate => _samplingRate;
 
     /// <summary>
-    /// 样本量，分配后就不变。
+    /// Number of samples in the signal.
     /// </summary>
     public int SampleCount => _numOfSample;
 
     /// <summary>
-    /// The valid sample count.会依据<see cref="AudioFrame_old.BufferPacket.ValidSize"/>而变。
-    /// 有效样本量。
+    /// Gets the total duration of the signal.
     /// </summary>
-    public int ValidSampleCount => _validNumOfSample;
-
     public TimeSpan Duration => _duration;
 
-
+    /// <summary>
+    /// Gets the underlying sample buffer.
+    /// </summary>
+    /// <remarks>
+    /// The buffer is <see cref="PinnableArray{T}"/>, which can be pinned to avoid GC relocation if needed.
+    /// </remarks>
     public PinnableArray<TSample> Samples => _samples;
-
-    public MemoryStrategy MemoryStrategy => _strategy;
 
     #endregion
 
-
     #region ICloneable<T>
 
+    /// <summary>
+    /// Creates a copy of the current <see cref="DiscreteSignal{TSample}"/>.
+    /// </summary>
+    /// <returns>A new <see cref="DiscreteSignal{TSample}"/> with the same sampling rate and samples.</returns>
     public DiscreteSignal<TSample> Clone()
     {
-        return new( _samplingRate, _samples, _strategy);
+        return new(_samplingRate, _samples, false);
     }
 
     #endregion
 
-
     #region indexer
 
+    /// <summary>
+    /// Gets or sets the sample at the specified <paramref name="index"/>.
+    /// </summary>
+    /// <param name="index">Zero-based sample index.</param>
+    /// <returns>The sample value at the index.</returns>
     public TSample this[int index]
     {
         get => _samples[index];
         set => _samples[index] = value;
     }
 
+    /// <summary>
+    /// Returns a fragment of the signal between <paramref name="startPos"/> (inclusive) and <paramref name="endPos"/> (exclusive).
+    /// </summary>
+    /// <param name="startPos">Inclusive start index.</param>
+    /// <param name="endPos">Exclusive end index.</param>
+    /// <returns>A new <see cref="DiscreteSignal{TSample}"/> containing the fragment.</returns>
     public DiscreteSignal<TSample> this[int startPos, int endPos]
     {
         get
@@ -220,11 +266,15 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
             // Implementaion is LINQ-less, since Skip() would be less efficient:
             //     return new DiscreteSignal(SamplingRate, Samples.Skip(startPos).Take(endPos - startPos));
 
-            return new(_samplingRate, _samples.Values.FastCopyFragment(endPos - startPos, startPos), _strategy);
+            return new(_samplingRate, _samples.Values.FastCopyFragment(endPos - startPos, startPos), false);
         }
     }
 
-
+    /// <summary>
+    /// Returns a fragment of the signal defined by <see cref="Range"/>.
+    /// </summary>
+    /// <param name="range">Range specifying the fragment [start..end).</param>
+    /// <returns>A new <see cref="DiscreteSignal{TSample}"/> containing the fragment.</returns>
     public DiscreteSignal<TSample> this[Range range]
     {
         get
@@ -233,72 +283,74 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
             return new(
                 _samplingRate,
                 _samples.Values.FastCopyFragment(range.End.Value - range.Start.Value, range.Start.Value),
-                _strategy);
+                false);
         }
     }
 
     #endregion
 
-
     #region operators
 
-
     /// <summary>
-    /// Creates new signal by superimposing signals <paramref name="s1"/> and <paramref name="s2"/>. 
-    /// If sizes are different then the smaller signal is broadcast to fit the size of the larger signal.
+    /// Superimposes two signals sample-wise (addition). If sizes differ, the smaller signal is broadcast.
     /// </summary>
-    /// <param name="s1">First signal</param>
-    /// <param name="s2">Second signal</param>
+    /// <param name="s1">First signal.</param>
+    /// <param name="s2">Second signal.</param>
+    /// <returns>Resulting superimposed signal.</returns>
     public static DiscreteSignal<TSample> operator +(DiscreteSignal<TSample> s1, DiscreteSignal<TSample> s2)
     {
         return s1.Superimpose(s2);
     }
 
     /// <summary>
-    /// Creates negated copy of signal <paramref name="s"/>.
+    /// Returns a negated copy of the signal (sample-wise unary minus).
     /// </summary>
-    /// <param name="s">Signal</param>
+    /// <param name="s">Source signal.</param>
+    /// <returns>Negated signal.</returns>
     public static DiscreteSignal<TSample> operator -(DiscreteSignal<TSample> s)
     {
-        return new DiscreteSignal<TSample>(s._samplingRate, s._samples.Select(x => -x), MemoryStrategy.Immediate);
+        return new DiscreteSignal<TSample>(s._samplingRate, s._samples.Select(x => -x), false);
     }
 
     /// <summary>
-    /// Subtracts signal <paramref name="s2"/> from signal <paramref name="s1"/>. 
-    /// If sizes are different then the smaller signal is broadcast to fit the size of the larger signal.
+    /// Subtracts <paramref name="s2"/> from <paramref name="s1"/> sample-wise. If sizes differ, the smaller signal is broadcast.
     /// </summary>
-    /// <param name="s1">First signal</param>
-    /// <param name="s2">Second signal</param>
+    /// <param name="s1">Minuend signal.</param>
+    /// <param name="s2">Subtrahend signal.</param>
+    /// <returns>Difference signal.</returns>
     public static DiscreteSignal<TSample> operator -(DiscreteSignal<TSample> s1, DiscreteSignal<TSample> s2)
     {
         return s1.Subtract(s2);
     }
 
     /// <summary>
-    /// Creates new signal by adding <paramref name="constant"/> to signal <paramref name="s"/>.
+    /// Adds a constant to each sample.
     /// </summary>
-    /// <param name="s">Signal</param>
-    /// <param name="constant">Constant to add to each sample</param>
+    /// <param name="s">Source signal.</param>
+    /// <param name="constant">Constant value to add.</param>
+    /// <returns>Resulting signal.</returns>
     public static DiscreteSignal<TSample> operator +(DiscreteSignal<TSample> s, TSample constant)
     {
-        return new DiscreteSignal<TSample>(s.SamplingRate, s.Samples.Select(x => x + constant), MemoryStrategy.Immediate);
+        return new DiscreteSignal<TSample>(s.SamplingRate, s.Samples.Select(x => x + constant), false);
     }
 
     /// <summary>
-    /// Creates new signal by subtracting <paramref name="constant"/> from signal <paramref name="s"/>.
+    /// Subtracts a constant from each sample.
     /// </summary>
-    /// <param name="s">Signal</param>
-    /// <param name="constant">Constant to subtract from each sample</param>
+    /// <param name="s">Source signal.</param>
+    /// <param name="constant">Constant value to subtract.</param>
+    /// <returns>Resulting signal.</returns>
     public static DiscreteSignal<TSample> operator -(DiscreteSignal<TSample> s, TSample constant)
     {
-        return new DiscreteSignal<TSample>(s.SamplingRate, s.Samples.Select(x => x - constant), MemoryStrategy.Immediate);
+        return new DiscreteSignal<TSample>(s.SamplingRate, s.Samples.Select(x => x - constant), false);
     }
 
     /// <summary>
-    /// Creates new signal by multiplying <paramref name="s"/> by <paramref name="coeff"/> (amplification/attenuation).
+    /// Multiplies each sample by <paramref name="coeff"/> (amplification/attenuation).
     /// </summary>
-    /// <param name="s">Signal</param>
-    /// <param name="coeff">Amplification/attenuation coefficient</param>
+    /// <param name="s">Source signal.</param>
+    /// <param name="coeff">Scaling coefficient.</param>
+    /// <returns>Scaled signal.</returns>
     public static DiscreteSignal<TSample> operator *(DiscreteSignal<TSample> s, TSample coeff)
     {
         var signal = s.Clone();
@@ -306,18 +358,16 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
         return signal;
     }
 
-
     #endregion
-
-
 
     #region time-domain characteristics
 
     /// <summary>
-    /// Computes energy of a signal fragment.
+    /// Computes average energy of a signal fragment.
     /// </summary>
-    /// <param name="startPos">Index of the first sample (inclusive)</param>
-    /// <param name="endPos">Index of the last sample (exclusive)</param>
+    /// <param name="startPos">Index of the first sample (inclusive).</param>
+    /// <param name="endPos">Index of the last sample (exclusive).</param>
+    /// <returns>Average energy of the fragment.</returns>
     public TSample Energy(int startPos, int endPos)
     {
         var total = TSample.Zero;
@@ -329,36 +379,46 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
         return total / TSample.CreateChecked(endPos - startPos);
     }
 
+    /// <summary>
+    /// Computes average energy of a fragment defined by <paramref name="range"/>.
+    /// </summary>
+    /// <param name="range">Sample range.</param>
+    /// <returns>Average energy of the fragment.</returns>
     public TSample Energy(Range range) => Energy(range.Start.Value, range.End.Value);
 
     /// <summary>
-    /// Computes energy of entire signal.
+    /// Computes average energy of the entire signal.
     /// </summary>
+    /// <returns>Average energy.</returns>
     public TSample Energy() => Energy(..);
 
-
-
+    /// <summary>
+    /// Computes RMS value of a signal fragment.
+    /// </summary>
+    /// <param name="startPos">Index of the first sample (inclusive).</param>
+    /// <param name="endPos">Index of the last sample (exclusive).</param>
+    /// <returns>RMS of the fragment.</returns>
     public TSample Rms(int startPos, int endPos) => TSample.Sqrt(Energy(startPos, endPos));
 
     /// <summary>
-    /// Computes RMS of a signal fragment.
+    /// Computes RMS value of a fragment defined by <paramref name="range"/>.
     /// </summary>
-    /// <param name="startPos">Index of the first sample (inclusive)</param>
-    /// <param name="endPos">Index of the last sample (exclusive)</param>
+    /// <param name="range">Sample range.</param>
+    /// <returns>RMS of the fragment.</returns>
     public TSample Rms(Range range) => TSample.Sqrt(Energy(range));
 
     /// <summary>
-    /// Computes RMS of entire signal.
+    /// Computes RMS value of the entire signal.
     /// </summary>
+    /// <returns>RMS value.</returns>
     public TSample Rms() => TSample.Sqrt(Energy());
 
-
-
     /// <summary>
-    /// Computes Zero-crossing rate of a signal fragment.
+    /// Computes zero-crossing rate of a signal fragment.
     /// </summary>
-    /// <param name="startPos">Index of the first sample (inclusive)</param>
-    /// <param name="endPos">Index of the last sample (exclusive)</param>
+    /// <param name="startPos">Index of the first sample (inclusive).</param>
+    /// <param name="endPos">Index of the last sample (exclusive).</param>
+    /// <returns>Zero-crossing rate (normalized count).</returns>
     public TSample ZeroCrossingRate(int startPos, int endPos)
     {
         //const float disbalance = 1e-4f;
@@ -382,24 +442,26 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
         return TSample.CreateChecked(rate / (startPos - startPos - 1));
     }
 
-
+    /// <summary>
+    /// Computes zero-crossing rate of a fragment defined by <paramref name="range"/>.
+    /// </summary>
+    /// <param name="range">Sample range.</param>
+    /// <returns>Zero-crossing rate.</returns>
     public TSample ZeroCrossingRate(Range range) => ZeroCrossingRate(range.Start.Value, range.End.Value);
 
-
     /// <summary>
-    /// Computes Zero-crossing rate of entire signal.
+    /// Computes zero-crossing rate of the entire signal.
     /// </summary>
+    /// <returns>Zero-crossing rate.</returns>
     public TSample ZeroCrossingRate() => ZeroCrossingRate(..);
 
-
-
     /// <summary>
-    /// Computes Shannon entropy of a signal fragment 
-    /// (from bins distributed uniformly between the minimum and maximum values of samples).
+    /// Computes Shannon entropy of a fragment using uniformly distributed bins between min and max of absolute sample values.
     /// </summary>
-    /// <param name="startPos">Index of the first sample (inclusive)</param>
-    /// <param name="endPos">Index of the last sample (exclusive)</param>
-    /// <param name="binCount">Number of bins</param>
+    /// <param name="startPos">Index of the first sample (inclusive).</param>
+    /// <param name="endPos">Index of the last sample (exclusive).</param>
+    /// <param name="binCount">Number of histogram bins.</param>
+    /// <returns>Shannon entropy (in bits).</returns>
     public TSample Entropy(int startPos, int endPos, int binCount = 32)
     {
         var len = endPos - startPos;
@@ -453,29 +515,33 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
         return -entropy / TSample.Log(TSample.CreateChecked(binCount), TSample.CreateTruncating(2));
     }
 
-
+    /// <summary>
+    /// Computes Shannon entropy of a fragment defined by <paramref name="range"/>.
+    /// </summary>
+    /// <param name="range">Sample range.</param>
+    /// <param name="binCount">Number of histogram bins.</param>
+    /// <returns>Shannon entropy (in bits).</returns>
     public TSample Entropy(Range range, int binCount = 32) => Entropy(range.Start.Value, range.End.Value, binCount);
 
     /// <summary>
-    /// Computes Shannon entropy of entire signal 
-    /// (from bins distributed uniformly between the minimum and maximum values of samples).
+    /// Computes Shannon entropy of the entire signal using uniformly distributed bins.
     /// </summary>
-    /// <param name="binCount">Number of bins</param>
+    /// <param name="binCount">Number of histogram bins.</param>
+    /// <returns>Shannon entropy (in bits).</returns>
     public TSample Entropy(int binCount = 32) => Entropy(.., binCount);
 
-
-
     #endregion
-
-
-
-
-
 
     #region dispose pattern
 
     private bool disposedValue;
 
+    /// <summary>
+    /// Releases resources used by the signal.
+    /// </summary>
+    /// <param name="disposing">
+    /// <c>true</c> to release managed and unmanaged resources; <c>false</c> to release unmanaged only.
+    /// </param>
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)
@@ -499,13 +565,15 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
     //     Dispose(disposing: false);
     // }
 
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing resources.
+    /// </summary>
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
-
 
     #endregion
 

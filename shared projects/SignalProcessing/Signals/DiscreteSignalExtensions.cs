@@ -30,13 +30,13 @@ public static partial class DiscreteSignalExtensions
             return new DiscreteSignal(
                             signal.SamplingRate,
                             signal.Samples.Values.FastCopyFragment(length - delay, delay),
-                            MemoryStrategy.Immediate);
+                            false);
         }
 
         return new DiscreteSignal(
                         signal.SamplingRate,
                         signal.Samples.Values.FastCopyFragment(length, destinationOffset: delay),
-                        MemoryStrategy.Immediate);
+                        false);
     }
 
 
@@ -151,7 +151,7 @@ public static partial class DiscreteSignalExtensions
 
         var totalLength = Math.Max(signal1.SampleCount, signal2.SampleCount + positions.Max());
 
-        DiscreteSignal superimposed = new DiscreteSignal(signal1.SamplingRate, totalLength, MemoryStrategy.Immediate);
+        DiscreteSignal superimposed = new DiscreteSignal(signal1.SamplingRate, totalLength, false);
         signal1.Samples.Values.FastCopyTo(superimposed.Samples, signal1.SampleCount);
 
         for (var p = 0; p < positions.Length; p++)
@@ -231,7 +231,7 @@ public static partial class DiscreteSignalExtensions
         }
         else
         {
-            subtracted = new DiscreteSignal(signal2.SamplingRate, signal2.SampleCount, MemoryStrategy.Immediate);
+            subtracted = new DiscreteSignal(signal2.SamplingRate, signal2.SampleCount, false);
 
             for (var i = 0; i < signal1.SampleCount; i++)
             {
@@ -332,7 +332,7 @@ public static partial class DiscreteSignalExtensions
         return new DiscreteSignal(
                         signal.SamplingRate,
                         signal.Samples.Values.FastCopyFragment(n),
-                        MemoryStrategy.Immediate);
+                        false);
     }
 
     /// <summary>
@@ -348,7 +348,7 @@ public static partial class DiscreteSignalExtensions
         return new DiscreteSignal(
                         signal.SamplingRate,
                         signal.Samples.Values.FastCopyFragment(n, signal.SampleCount - n),
-                        MemoryStrategy.Immediate);
+                        false);
     }
 
     /// <summary>
@@ -524,7 +524,7 @@ public static partial class DiscreteSignalExtensions
         var minSignalLength = Math.Min(signal1.SampleCount, signal2.SampleCount);
         var crossfadeSampleCount = Math.Min((int)(signal1.SamplingRate * duration), minSignalLength);
 
-        var crossfaded = new DiscreteSignal(signal1.SamplingRate, signal1.SampleCount + signal2.SampleCount - crossfadeSampleCount, MemoryStrategy.Immediate);
+        var crossfaded = new DiscreteSignal(signal1.SamplingRate, signal1.SampleCount + signal2.SampleCount - crossfadeSampleCount, false);
 
         Array.Copy(signal1.Samples, crossfaded.Samples, signal1.SampleCount - crossfadeSampleCount);
         Array.Copy(signal2.Samples, crossfadeSampleCount, crossfaded.Samples, signal1.SampleCount, signal2.SampleCount - crossfadeSampleCount);
@@ -563,7 +563,7 @@ public static partial class DiscreteSignalExtensions
         var minSignalLength = Math.Min(signal1.SampleCount, signal2.SampleCount);
         var crossfadeSampleCount = Math.Min((int)(signal1.SamplingRate * duration.TotalSeconds), minSignalLength);
 
-        var crossfaded = new DiscreteSignal(signal1.SamplingRate, signal1.SampleCount + signal2.SampleCount - crossfadeSampleCount, MemoryStrategy.Immediate);
+        var crossfaded = new DiscreteSignal(signal1.SamplingRate, signal1.SampleCount + signal2.SampleCount - crossfadeSampleCount, false);
 
         Array.Copy(signal1.Samples, crossfaded.Samples, signal1.SampleCount - crossfadeSampleCount);
         Array.Copy(signal2.Samples, crossfadeSampleCount, crossfaded.Samples, signal1.SampleCount, signal2.SampleCount - crossfadeSampleCount);
