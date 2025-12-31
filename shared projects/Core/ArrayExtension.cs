@@ -368,16 +368,41 @@ public static partial class ArrayExtension
         return result;
     }
 
+    ///// <summary>
+    ///// 联接两个数组。
+    ///// </summary>
+    ///// <typeparam name="T">数组元素的类型。</typeparam>
+    ///// <param name="leading">前置数组。</param>
+    ///// <param name="following">后置数组。</param>
+    ///// <returns>返回联接后的新数组。</returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static T[] Merge<T>(this T[] leading, T[] following)
+    //{
+    //    var result = new T[leading.Length + following.Length];
+    //    Array.Copy(leading, result, leading.Length);
+    //    Array.Copy(following, 0, result, leading.Length, following.Length);
+    //    return result;
+    //}
+
     /// <summary>
     /// 联接两个数组。
     /// </summary>
     /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="leading">前置数组。</param>
-    /// <param name="following">后置数组。</param>
-    /// <returns>返回联接后的新数组。</returns>
+    /// <param name="leading">前置数组，不能为 null。</param>
+    /// <param name="following">后置数组，不能为 null。</param>
+    /// <returns>返回联接后的新数组。如果任一输入为 null，则抛出 <see cref="ArgumentNullException"/>。</returns>
+    /// <exception cref="ArgumentNullException">当 <paramref name="leading"/> 或 <paramref name="following"/> 为 null 时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Merge<T>(this T[] leading, T[] following)
     {
+        // 显式检查 null，更友好（尤其在调试时）
+        ArgumentNullException.ThrowIfNull(leading);
+        ArgumentNullException.ThrowIfNull(following);
+
+        // 如果任一数组为空，直接返回另一个的副本（避免分配 0 长数组）
+        if (leading.Length == 0) return following.ToArray();  // ToArray() 会返回克隆
+        if (following.Length == 0) return leading.ToArray();
+
         var result = new T[leading.Length + following.Length];
         Array.Copy(leading, result, leading.Length);
         Array.Copy(following, 0, result, leading.Length, following.Length);

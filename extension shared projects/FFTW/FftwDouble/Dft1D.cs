@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
 using Vorcyc.Mathematics.Extensions.FFTW.Interop;
 
@@ -38,7 +39,7 @@ public static partial class Dft1D
     /// <param name="input">复数输入数据。</param>
     /// <param name="output">复数输出数据缓冲区（长度须与输入相同）。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Forward(Span<Complex> input, Span<Complex> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void Forward(ReadOnlySpan<Complex> input, Span<Complex> output, fftw_flags flags = fftw_flags.Estimate)
         => Dft1DComplex(input, output, fftw_direction.Forward, flags);
 
     /// <summary>
@@ -58,7 +59,7 @@ public static partial class Dft1D
     /// <param name="input">复数输入数据。</param>
     /// <param name="output">复数输出数据缓冲区（长度须与输入相同）。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Inverse(Span<Complex> input, Span<Complex> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void Inverse(ReadOnlySpan<Complex> input, Span<Complex> output, fftw_flags flags = fftw_flags.Estimate)
         => Dft1DComplex(input, output, fftw_direction.Backward, flags);
 
     // Complex-to-Complex (In-Place)
@@ -101,25 +102,25 @@ public static partial class Dft1D
     /// 执行实数→复数的一维正向傅里叶变换（R2C，紧凑半谱输出）。
     /// </summary>
     /// <param name="realInput">已固定的实数输入缓冲区，长度为 N。</param>
-    /// <param name="complexOutput">已固定的复数输出缓冲区，长度应为 N/2+1（紧凑半谱）。</param>
+    /// <param name="complexOutput">已固定的复数输出缓冲区，长度应不小于 N/2+1（紧凑半谱）。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Forward(PinnableArray<float> realInput, PinnableArray<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
+    public static void Forward(PinnableArray<double> realInput, PinnableArray<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
         => Dft1DR2C(realInput, complexOutput, flags);
 
     /// <summary>
     /// 执行实数→复数的一维正向傅里叶变换（R2C，紧凑半谱输出）。
     /// </summary>
     /// <param name="realInput">实数输入数据，长度为 N。</param>
-    /// <param name="complexOutput">复数输出半谱缓冲区，长度应为 N/2+1（即 <c>realInput.Length == complexOutput.Length * 2 - 2</c>）。</param>
+    /// <param name="complexOutput">复数输出半谱缓冲区，长度应不小于 N/2+1。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Forward(Span<double> realInput, Span<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
+    public static void Forward(ReadOnlySpan<double> realInput, Span<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
         => Dft1DR2C(realInput, complexOutput, flags);
 
     // Complex-to-Real (Inverse)
     /// <summary>
     /// 执行复数半谱→实数的一维逆向傅里叶变换（C2R），可选按 1/N 自动归一化。
     /// </summary>
-    /// <param name="complexInput">已固定的复数输入半谱缓冲区，长度为 N/2+1。</param>
+    /// <param name="complexInput">已固定的复数输入半谱缓冲区，长度应不小于 N/2+1。</param>
     /// <param name="realOutput">已固定的实数输出缓冲区，长度为 N。</param>
     /// <param name="scale">是否按 1/N 归一化，默认 <c>true</c>。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
@@ -129,11 +130,11 @@ public static partial class Dft1D
     /// <summary>
     /// 执行复数半谱→实数的一维逆向傅里叶变换（C2R），可选按 1/N 自动归一化。
     /// </summary>
-    /// <param name="complexInput">复数输入半谱缓冲区，长度为 N/2+1。</param>
-    /// <param name="realOutput">实数输出缓冲区，长度为 N（即 <c>realOutput.Length == complexInput.Length * 2 - 2</c>）。</param>
+    /// <param name="complexInput">复数输入半谱缓冲区，长度应不小于 N/2+1。</param>
+    /// <param name="realOutput">实数输出缓冲区，长度为 N。</param>
     /// <param name="scale">是否进行按 1/N 的归一化，默认 <c>true</c>。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Inverse(Span<Complex> complexInput, Span<double> realOutput, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+    public static void Inverse(ReadOnlySpan<Complex> complexInput, Span<double> realOutput, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
         => Dft1DC2R(complexInput, realOutput, scale, flags);
 
     // ==========================
@@ -145,14 +146,6 @@ public static partial class Dft1D
     /// <summary>
     /// 对双精度复数缓冲区执行一维复数到复数 (C2C) DFT（原地变换）。
     /// </summary>
-    /// <param name="buffer">已固定的复数缓冲区；结果将覆盖原数据。</param>
-    /// <param name="direction">变换方向：<see cref="fftw_direction.Forward"/> 或 <see cref="fftw_direction.Backward"/>。</param>
-    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    /// <remarks>
-    /// - 逆向变换后通常需按 1/N 归一化（N 为长度）。<br/>
-    /// - 方法内部创建/执行/销毁计划。<br/>
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">当缓冲区未固定(Pinned)或计划创建失败时抛出。</exception>
     internal static void Dft1DComplexInPlace(PinnableArray<Complex> buffer, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(buffer);
@@ -173,15 +166,6 @@ public static partial class Dft1D
     /// <summary>
     /// 对双精度复数数据执行一维 C2C DFT（原地变换，Span 重载）。
     /// </summary>
-    /// <param name="buffer">复数输入与输出共享的缓冲区（原地）。</param>
-    /// <param name="direction">变换方向。</param>
-    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    /// <remarks>
-    /// - 输入数据在执行后被输出覆盖。<br/>
-    /// - 逆向变换的归一化需在外部处理。<br/>
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">当 <paramref name="buffer"/> 为空(Length==0)时抛出。</exception>
-    /// <exception cref="InvalidOperationException">当计划创建失败时抛出。</exception>
     internal static void Dft1DComplexInPlace(Span<Complex> buffer, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(buffer);
@@ -209,14 +193,6 @@ public static partial class Dft1D
     /// <summary>
     /// 计算双精度复数输入的一维 C2C DFT（非原地，已固定重载）。
     /// </summary>
-    /// <param name="input">已固定的复数输入缓冲区。</param>
-    /// <param name="output">已固定的复数输出缓冲区，长度须与输入相同。</param>
-    /// <param name="direction">变换方向。</param>
-    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    /// <remarks>
-    /// - 不执行归一化；逆向变换后需外部按 1/N 缩放。<br/>
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
     internal static void Dft1DComplex(PinnableArray<Complex> input, PinnableArray<Complex> output, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(input);
@@ -238,18 +214,7 @@ public static partial class Dft1D
     /// <summary>
     /// 执行双精度复数输入到双精度复数输出的一维 C2C DFT（非原地，Span 重载）。
     /// </summary>
-    /// <param name="input">复数输入数据。</param>
-    /// <param name="output">复数输出缓冲区，长度须与输入相同。</param>
-    /// <param name="direction">变换方向。</param>
-    /// <param name="flags">规划策略。</param>
-    /// <remarks>
-    /// - 方法内部固定指针并调用 FFTW。<br/>
-    /// - 逆向变换后通常需要外部归一化。<br/>
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">当输入或输出为空(Length==0)时抛出。</exception>
-    /// <exception cref="ArgumentException">当两者长度不一致时抛出。</exception>
-    /// <exception cref="InvalidOperationException">当计划创建失败时抛出。</exception>
-    internal static void Dft1DComplex(Span<Complex> input, Span<Complex> output, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft1DComplex(ReadOnlySpan<Complex> input, Span<Complex> output, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
@@ -281,18 +246,15 @@ public static partial class Dft1D
     /// <summary>
     /// 执行双精度实数输入到双精度复数输出的一维实数→复数 (R2C) DFT（已固定重载）。
     /// </summary>
-    /// <param name="realInput">已固定的实数输入缓冲区，长度为 N。</param>
-    /// <param name="complexOutput">已固定的复数输出缓冲区，长度应为 N/2+1（紧凑半谱）。</param>
-    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    /// <remarks>
-    /// - 输出采用半谱紧凑存储（含 DC 与 Nyquist）。<br/>
-    /// - 不执行归一化。<br/>
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
-    internal static void Dft1DR2C(PinnableArray<float> realInput, PinnableArray<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft1DR2C(PinnableArray<double> realInput, PinnableArray<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(realInput);
         InvalidOperationException.ThrowIfUnpinned(complexOutput);
+
+        // 允许输出长度不小于 N/2+1（紧凑半谱）
+        var required = (realInput.Length / 2) + 1;
+        if (complexOutput.Length < required)
+            throw new ArgumentException("For R2C: complexOutput.Length must be at least realInput.Length / 2 + 1 (compact half-spectrum).");
 
         var plan = fftw.dft_r2c_1d(realInput.Length, realInput, complexOutput, flags);
 
@@ -311,20 +273,15 @@ public static partial class Dft1D
     /// <summary>
     /// 执行双精度实数→复数的一维 R2C DFT（Span 重载）。
     /// </summary>
-    /// <param name="realInput">实数输入数据，长度 N。</param>
-    /// <param name="complexOutput">复数输出缓冲区，长度应为 N/2+1（即 <c>realInput.Length == complexOutput.Length * 2 - 2</c>）。</param>
-    /// <param name="flags">规划策略。</param>
-    /// <remarks>
-    /// - 输出为紧凑半谱格式。<br/>
-    /// - 不包含归一化步骤。<br/>
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">当输入或输出为空(Length==0)时抛出。</exception>
-    /// <exception cref="ArgumentException">当长度关系不满足要求时抛出。</exception>
-    /// <exception cref="InvalidOperationException">当计划创建失败时抛出。</exception>
-    internal static void Dft1DR2C(Span<double> realInput, Span<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft1DR2C(ReadOnlySpan<double> realInput, Span<Complex> complexOutput, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(realInput);
         ArgumentNullException.ThrowIfEmpty(complexOutput);
+
+        // 允许输出长度不小于 N/2+1（紧凑半谱）
+        var required = (realInput.Length / 2) + 1;
+        if (complexOutput.Length < required)
+            throw new ArgumentException("For R2C: complexOutput.Length must be at least realInput.Length / 2 + 1 (compact half-spectrum).");
 
         unsafe
         {
@@ -348,21 +305,17 @@ public static partial class Dft1D
     /// <summary>
     /// 执行双精度复数→实数的一维 C2R 逆变换（已固定重载），可选按 1/N 归一化。
     /// </summary>
-    /// <param name="complexInput">已固定的复数输入半谱缓冲区，长度为 N/2+1。</param>
-    /// <param name="realOutput">已固定的实数输出缓冲区，长度为 N。</param>
-    /// <param name="scale">是否按 1/N 归一化（N 为实数输出长度）。</param>
-    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    /// <remarks>
-    /// - 输入应为对应 R2C 的半谱紧凑格式。<br/>
-    /// - 启用缩放将对输出按 1/N 均匀缩放。<br/>
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
     internal static void Dft1DC2R(PinnableArray<Complex> complexInput, PinnableArray<double> realOutput, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(complexInput);
         InvalidOperationException.ThrowIfUnpinned(realOutput);
 
-        var plan = fftw.dft_c2r_1d(complexInput.Length, complexInput, realOutput, flags);
+        // 允许输入半谱长度不小于 N/2+1
+        var required = (realOutput.Length / 2) + 1;
+        if (complexInput.Length < required)
+            throw new ArgumentException("For C2R: complexInput.Length must be at least realOutput.Length / 2 + 1 (compact half-spectrum).");
+
+        var plan = fftw.dft_c2r_1d(realOutput.Length, complexInput, realOutput, flags);
 
         InvalidOperationException.ThrowIfZero(plan, "Failed to create 1D complex to real plan.");
 
@@ -377,40 +330,33 @@ public static partial class Dft1D
 
         if (scale)
         {
-            var count = complexInput.Length;
-            var factor = 1.0 / count;
-            for (var i = 0; i < count; i++)
-            {
-                realOutput[i] *= factor;
-            }
+            // N 是实数输出长度（输入实数长度）
+            var factor = 1.0 / realOutput.Length;
+
+            // PinnableArray 版本保守使用标量循环
+            ScaleInPlace(realOutput, factor);
         }
     }
 
     /// <summary>
     /// 执行双精度复数→实数的一维 C2R 逆变换（Span 重载），可选按 1/N 归一化。
     /// </summary>
-    /// <param name="complexInput">复数输入半谱缓冲区，长度为 N/2+1。</param>
-    /// <param name="realOutput">实数输出缓冲区，长度为 N（即 <c>realOutput.Length == complexInput.Length * 2 - 2</c>）。</param>
-    /// <param name="scale">是否进行按 1/N 的归一化。</param>
-    /// <param name="flags">规划策略。</param>
-    /// <remarks>
-    /// - 输入必须是对应 R2C 的半谱格式。<br/>
-    /// - 未缩放时输出为未归一化结果。<br/>
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">当输入或输出为空(Length==0)时抛出。</exception>
-    /// <exception cref="ArgumentException">当长度关系不满足要求时抛出。</exception>
-    /// <exception cref="InvalidOperationException">当计划创建失败时抛出。</exception>
-    internal static void Dft1DC2R(Span<Complex> complexInput, Span<double> realOutput, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft1DC2R(ReadOnlySpan<Complex> complexInput, Span<double> realOutput, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(complexInput);
         ArgumentNullException.ThrowIfEmpty(realOutput);
+
+        // 允许输入半谱长度不小于 N/2+1
+        var required = (realOutput.Length / 2) + 1;
+        if (complexInput.Length < required)
+            throw new ArgumentException("For C2R: complexInput.Length must be at least realOutput.Length / 2 + 1 (compact half-spectrum).");
 
         unsafe
         {
             fixed (Complex* pComplexInput = complexInput)
             fixed (double* pRealOutput = realOutput)
             {
-                var plan = fftw.dft_c2r_1d(complexInput.Length, (IntPtr)pComplexInput, (IntPtr)pRealOutput, flags);
+                var plan = fftw.dft_c2r_1d(realOutput.Length, (IntPtr)pComplexInput, (IntPtr)pRealOutput, flags);
                 InvalidOperationException.ThrowIfZero(plan, "Failed to create 1D complex to real plan.");
                 try
                 {
@@ -424,12 +370,48 @@ public static partial class Dft1D
         }
         if (scale)
         {
-            var count = complexInput.Length;
-            var factor = 1.0 / count;
-            for (var i = 0; i < count; i++)
+            // N 是实数输出长度（输入实数长度）
+            var factor = 1.0 / realOutput.Length;
+
+            // 使用 SIMD 加速的 Span<double> 缩放
+            ScaleInPlace(realOutput, factor);
+        }
+    }
+
+    // ==========================
+    // 缩放辅助（提取 + SIMD 优化）
+    // ==========================
+
+    /// <summary>
+    /// 对 <see cref="Span{Double}"/> 进行就地缩放；在可用时使用 <see cref="Vector{T}"/> SIMD。
+    /// </summary>
+    private static void ScaleInPlace(Span<double> data, double factor)
+    {
+        if (data.IsEmpty) return;
+
+        if (Vector.IsHardwareAccelerated && data.Length >= Vector<double>.Count)
+        {
+            var vFactor = new Vector<double>(factor);
+            var vecSpan = MemoryMarshal.Cast<double, Vector<double>>(data);
+
+            for (int i = 0; i < vecSpan.Length; i++)
             {
-                realOutput[i] *= factor;
+                vecSpan[i] *= vFactor;
+            }
+
+            int processed = vecSpan.Length * Vector<double>.Count;
+            for (int i = processed; i < data.Length; i++)
+            {
+                data[i] *= factor;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i] *= factor;
             }
         }
     }
+
 }

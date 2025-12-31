@@ -33,7 +33,7 @@ public static partial class RealToRealTransforms
     /// <param name="input">输入实数序列。</param>
     /// <param name="output">输出半复数紧凑谱（以实数形式存放）。</param>
     /// <param name="flags">FFTW 规划标志。</param>
-    public static void R2HC1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void R2HC1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.R2HC, flags);
 
     /// <summary>
@@ -46,7 +46,7 @@ public static partial class RealToRealTransforms
     /// <param name="input">输入半复数紧凑谱（以实数形式存放）。</param>
     /// <param name="output">输出实数序列。</param>
     /// <param name="flags">FFTW 规划标志。</param>
-    public static void HC2R1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void HC2R1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.HC2R, flags);
 
     /// <summary>
@@ -59,7 +59,7 @@ public static partial class RealToRealTransforms
     /// <param name="input">输入实数序列。</param>
     /// <param name="output">输出哈特利谱（实数）。</param>
     /// <param name="flags">FFTW 规划标志。</param>
-    public static void Dht1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void Dht1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.DHT, flags);
 
     /// <summary>
@@ -99,7 +99,7 @@ public static partial class RealToRealTransforms
     /// <param name="input">输入实数序列。</param>
     /// <param name="output">输出 DCT-I 结果。</param>
     /// <param name="flags">FFTW 规划标志。</param>
-    public static void DctI1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctI1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.REDFT00, flags);
 
     /// <summary>
@@ -108,7 +108,7 @@ public static partial class RealToRealTransforms
     /// <param name="input">输入实数序列。</param>
     /// <param name="output">输出 DCT-II 结果。</param>
     /// <param name="flags">FFTW 规划标志。</param>
-    public static void DctII1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctII1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.REDFT01, flags);
 
     /// <summary>
@@ -117,7 +117,7 @@ public static partial class RealToRealTransforms
     /// <param name="input">输入实数序列。</param>
     /// <param name="output">输出 DCT-III 结果。</param>
     /// <param name="flags">FFTW 规划标志。</param>
-    public static void DctIII1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIII1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.REDFT10, flags);
 
     /// <summary>
@@ -126,7 +126,7 @@ public static partial class RealToRealTransforms
     /// <param name="input">输入实数序列。</param>
     /// <param name="output">输出 DCT-IV 结果。</param>
     /// <param name="flags">FFTW 规划标志。</param>
-    public static void DctIV1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIV1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.REDFT11, flags);
 
     /// <summary>
@@ -160,25 +160,25 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行一维 DST-I (RODFT00)（Span 重载）。
     /// </summary>
-    public static void DstI1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstI1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.RODFT00, flags);
 
     /// <summary>
     /// 执行一维 DST-II (RODFT01)（Span 重载）。
     /// </summary>
-    public static void DstII1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstII1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.RODFT01, flags);
 
     /// <summary>
     /// 执行一维 DST-III (RODFT10)（Span 重载）。
     /// </summary>
-    public static void DstIII1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIII1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.RODFT10, flags);
 
     /// <summary>
     /// 执行一维 DST-IV (RODFT11)（Span 重载）。
     /// </summary>
-    public static void DstIV1D(Span<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIV1D(ReadOnlySpan<float> input, Span<float> output, fftw_flags flags = fftw_flags.Estimate)
         => R2R1D(input, output, fftw_kind.RODFT11, flags);
 
     /// <summary>
@@ -214,19 +214,20 @@ public static partial class RealToRealTransforms
     /// </summary>
     /// <param name="nx">X 维长度。</param>
     /// <param name="ny">Y 维长度。</param>
-    public static void R2HC2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    /// <param name="flags">规划标志。</param>
+    public static void R2HC2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.R2HC, fftw_kind.R2HC, flags);
 
     /// <summary>
     /// 执行二维 HC2R（两轴均为 HC2R）（Span 重载）。
     /// </summary>
-    public static void HC2R2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void HC2R2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.HC2R, fftw_kind.HC2R, flags);
 
     /// <summary>
     /// 执行二维 DHT（两轴均为 DHT）（Span 重载）。
     /// </summary>
-    public static void Dht2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void Dht2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.DHT, fftw_kind.DHT, flags);
 
     /// <summary>
@@ -250,25 +251,25 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行二维 DCT-I（两轴均为 REDFT00）（Span 重载）。
     /// </summary>
-    public static void DctI2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctI2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.REDFT00, fftw_kind.REDFT00, flags);
 
     /// <summary>
     /// 执行二维 DCT-II（两轴均为 REDFT01）（Span 重载）。
     /// </summary>
-    public static void DctII2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctII2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.REDFT01, fftw_kind.REDFT01, flags);
 
     /// <summary>
     /// 执行二维 DCT-III（两轴均为 REDFT10）（Span 重载）。
     /// </summary>
-    public static void DctIII2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIII2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.REDFT10, fftw_kind.REDFT10, flags);
 
     /// <summary>
     /// 执行二维 DCT-IV（两轴均为 REDFT11）（Span 重载）。
     /// </summary>
-    public static void DctIV2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIV2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.REDFT11, fftw_kind.REDFT11, flags);
 
     /// <summary>
@@ -298,25 +299,25 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行二维 DST-I（两轴均为 RODFT00）（Span 重载）。
     /// </summary>
-    public static void DstI2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstI2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.RODFT00, fftw_kind.RODFT00, flags);
 
     /// <summary>
     /// 执行二维 DST-II（两轴均为 RODFT01）（Span 重载）。
     /// </summary>
-    public static void DstII2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstII2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.RODFT01, fftw_kind.RODFT01, flags);
 
     /// <summary>
     /// 执行二维 DST-III（两轴均为 RODFT10）（Span 重载）。
     /// </summary>
-    public static void DstIII2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIII2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.RODFT10, fftw_kind.RODFT10, flags);
 
     /// <summary>
     /// 执行二维 DST-IV（两轴均为 RODFT11）（Span 重载）。
     /// </summary>
-    public static void DstIV2D(Span<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIV2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => R2R2D(input, output, nx, ny, fftw_kind.RODFT11, fftw_kind.RODFT11, flags);
 
     /// <summary>
@@ -350,19 +351,19 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行三维 R2HC（各轴均为 R2HC）（Span 重载）。
     /// </summary>
-    public static void R2HC3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void R2HC3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.R2HC, fftw_kind.R2HC, fftw_kind.R2HC, flags);
 
     /// <summary>
     /// 执行三维 HC2R（各轴均为 HC2R）（Span 重载）。
     /// </summary>
-    public static void HC2R3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void HC2R3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.HC2R, fftw_kind.HC2R, fftw_kind.HC2R, flags);
 
     /// <summary>
     /// 执行三维 DHT（各轴均为 DHT）（Span 重载）。
     /// </summary>
-    public static void Dht3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void Dht3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.DHT, fftw_kind.DHT, fftw_kind.DHT, flags);
 
     /// <summary>
@@ -386,25 +387,25 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行三维 DCT-I（各轴均为 REDFT00）（Span 重载）。
     /// </summary>
-    public static void DctI3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctI3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.REDFT00, fftw_kind.REDFT00, fftw_kind.REDFT00, flags);
 
     /// <summary>
     /// 执行三维 DCT-II（各轴均为 REDFT01）（Span 重载）。
     /// </summary>
-    public static void DctII3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctII3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.REDFT01, fftw_kind.REDFT01, fftw_kind.REDFT01, flags);
 
     /// <summary>
     /// 执行三维 DCT-III（各轴均为 REDFT10）（Span 重载）。
     /// </summary>
-    public static void DctIII3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIII3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.REDFT10, fftw_kind.REDFT10, fftw_kind.REDFT10, flags);
 
     /// <summary>
     /// 执行三维 DCT-IV（各轴均为 REDFT11）（Span 重载）。
     /// </summary>
-    public static void DctIV3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIV3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.REDFT11, fftw_kind.REDFT11, fftw_kind.REDFT11, flags);
 
     /// <summary>
@@ -434,25 +435,25 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行三维 DST-I（各轴均为 RODFT00）（Span 重载）。
     /// </summary>
-    public static void DstI3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstI3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.RODFT00, fftw_kind.RODFT00, fftw_kind.RODFT00, flags);
 
     /// <summary>
     /// 执行三维 DST-II（各轴均为 RODFT01）（Span 重载）。
     /// </summary>
-    public static void DstII3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstII3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.RODFT01, fftw_kind.RODFT01, fftw_kind.RODFT01, flags);
 
     /// <summary>
     /// 执行三维 DST-III（各轴均为 RODFT10）（Span 重载）。
     /// </summary>
-    public static void DstIII3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIII3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.RODFT10, fftw_kind.RODFT10, fftw_kind.RODFT10, flags);
 
     /// <summary>
     /// 执行三维 DST-IV（各轴均为 RODFT11）（Span 重载）。
     /// </summary>
-    public static void DstIV3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIV3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => R2R3D(input, output, nx, ny, nz, fftw_kind.RODFT11, fftw_kind.RODFT11, fftw_kind.RODFT11, flags);
 
     /// <summary>
@@ -487,68 +488,68 @@ public static partial class RealToRealTransforms
     /// 执行 n 维 DCT-I（各维度均为 REDFT00）（Span 重载）。
     /// </summary>
     /// <param name="dims">各维长度。</param>
-    public static void DctI(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctI(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.REDFT00, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DCT-II（各维度均为 REDFT01）（Span 重载）。
     /// </summary>
-    public static void DctII(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctII(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.REDFT01, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DCT-III（各维度均为 REDFT10）（Span 重载）。
     /// </summary>
-    public static void DctIII(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIII(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.REDFT10, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DCT-IV（各维度均为 REDFT11）（Span 重载）。
     /// </summary>
-    public static void DctIV(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DctIV(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.REDFT11, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DST-I（各维度均为 RODFT00）（Span 重载）。
     /// </summary>
-    public static void DstI(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstI(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.RODFT00, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DST-II（各维度均为 RODFT01）（Span 重载）。
     /// </summary>
-    public static void DstII(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstII(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.RODFT01, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DST-III（各维度均为 RODFT10）（Span 重载）。
     /// </summary>
-    public static void DstIII(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIII(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.RODFT10, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DST-IV（各维度均为 RODFT11）（Span 重载）。
     /// </summary>
-    public static void DstIV(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void DstIV(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.RODFT11, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 R2HC（各维度均为 R2HC）（Span 重载）。
     /// </summary>
-    public static void R2HC(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void R2HC(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.R2HC, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 HC2R（各维度均为 HC2R）（Span 重载）。
     /// </summary>
-    public static void HC2R(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+    public static void HC2R(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
         => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.HC2R, dims.Length).ToArray()), flags);
 
     /// <summary>
     /// 执行 n 维 DHT（各维度均为 DHT）（Span 重载）。
     /// </summary>
-    public static void Dht(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
-        => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>(Enumerable.Repeat(fftw_kind.DHT, dims.Length).ToArray()), flags);
+    public static void Dht(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, fftw_flags flags = fftw_flags.Estimate)
+        => R2RND(input, output, dims, new ReadOnlySpan<fftw_kind>([.. Enumerable.Repeat(fftw_kind.DHT, dims.Length)]), flags);
 
     /// <summary>
     /// 执行 n 维 DCT-I（各维度均为 REDFT00）（已固定数组重载）。
@@ -618,16 +619,6 @@ public static partial class RealToRealTransforms
 
     #endregion
 
-
-
-
-
-
-
-
-
-
-
     // ==========================
     // 原始实现（内部管线，设为 internal）
     // ==========================
@@ -659,7 +650,7 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行一维实数到实数 (R2R) 变换（Span 重载）。
     /// </summary>
-    internal static void R2R1D(Span<float> input, Span<float> output, fftw_kind kind, fftw_flags flags = fftw_flags.Estimate)
+    internal static void R2R1D(ReadOnlySpan<float> input, Span<float> output, fftw_kind kind, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
@@ -711,10 +702,16 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行二维实数到实数 (R2R) 变换（Span 重载）。
     /// </summary>
-    internal static void R2R2D(Span<float> input, Span<float> output, int nx, int ny, fftw_kind kindx, fftw_kind kindy, fftw_flags flags = fftw_flags.Estimate)
+    internal static void R2R2D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, fftw_kind kindx, fftw_kind kindy, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
+        if (input.Length != output.Length)
+            throw new ArgumentException("Input and output spans must have the same length.", nameof(output));
+        var total = nx * ny;
+        if (input.Length != total)
+            throw new ArgumentException("Input and output spans must have length nx * ny.", nameof(output));
+
         unsafe
         {
             fixed (float* inputPtr = input)
@@ -732,6 +729,12 @@ public static partial class RealToRealTransforms
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
+        if (input.Length != output.Length)
+            throw new ArgumentException("Input and output arrays must have the same length.", nameof(output));
+        var total = nx * ny;
+        if (input.Length != total)
+            throw new ArgumentException("Input and output arrays must have length nx * ny.", nameof(output));
+
         R2R2D_Single(input, output, nx, ny, kindx, kindy, flags);
     }
 
@@ -761,10 +764,16 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行三维实数到实数 (R2R) 变换（Span 重载）。
     /// </summary>
-    internal static void R2R3D(Span<float> input, Span<float> output, int nx, int ny, int nz, fftw_kind kindx, fftw_kind kindy, fftw_kind kindz, fftw_flags flags = fftw_flags.Estimate)
+    internal static void R2R3D(ReadOnlySpan<float> input, Span<float> output, int nx, int ny, int nz, fftw_kind kindx, fftw_kind kindy, fftw_kind kindz, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
+        if (input.Length != output.Length)
+            throw new ArgumentException("Input and output spans must have the same length.", nameof(output));
+        var total = nx * ny * nz;
+        if (input.Length != total)
+            throw new ArgumentException("Input and output spans must have length nx * ny * nz.", nameof(output));
+
         unsafe
         {
             fixed (float* inputPtr = input)
@@ -782,6 +791,12 @@ public static partial class RealToRealTransforms
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
+        if (input.Length != output.Length)
+            throw new ArgumentException("Input and output arrays must have the same length.", nameof(output));
+        var total = nx * ny * nz;
+        if (input.Length != total)
+            throw new ArgumentException("Input and output arrays must have length nx * ny * nz.", nameof(output));
+
         R2R3D_Single(input, output, nx, ny, nz, kindx, kindy, kindz, flags);
     }
 
@@ -814,11 +829,20 @@ public static partial class RealToRealTransforms
     /// <summary>
     /// 执行 n 维实数到实数 (R2R) 变换（Span 重载）。
     /// </summary>
-    internal static void R2RND(Span<float> input, Span<float> output, ReadOnlySpan<int> dims, ReadOnlySpan<fftw_kind> kinds, fftw_flags flags = fftw_flags.Estimate)
+    internal static void R2RND(ReadOnlySpan<float> input, Span<float> output, ReadOnlySpan<int> dims, ReadOnlySpan<fftw_kind> kinds, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
         if (dims.Length != kinds.Length) throw new ArgumentException("dims.Length must equal kinds.Length.", nameof(kinds));
+
+        // 强制验证：输入/输出长度相等，且等于 ∏dims
+        var total = 1;
+        for (int i = 0; i < dims.Length; i++) total *= dims[i];
+        if (input.Length != output.Length)
+            throw new ArgumentException("Input and output spans must have the same length.", nameof(output));
+        if (input.Length != total)
+            throw new ArgumentException("Input and output spans must both have length equal to the product of dims.", nameof(output));
+
         unsafe
         {
             fixed (float* inputPtr = input)
@@ -837,6 +861,15 @@ public static partial class RealToRealTransforms
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
         if (dims.Length != kinds.Length) throw new ArgumentException("dims.Length must equal kinds.Length.", nameof(kinds));
+
+        // 强制验证：输入/输出长度相等，且等于 ∏dims
+        var total = 1;
+        for (int i = 0; i < dims.Length; i++) total *= dims[i];
+        if (input.Length != output.Length)
+            throw new ArgumentException("Input and output arrays must have the same length.", nameof(output));
+        if (input.Length != total)
+            throw new ArgumentException("Input and output arrays must both have length equal to the product of dims.", nameof(output));
+
         R2RND_Single(input, output, dims, kinds, flags);
     }
 

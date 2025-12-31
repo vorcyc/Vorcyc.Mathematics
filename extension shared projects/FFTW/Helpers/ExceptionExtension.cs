@@ -87,6 +87,23 @@ public static class ArgumentNullExceptionExtension
         }
 
 
+        /// <summary>
+        /// Throws an exception if the specified span is empty.
+        /// </summary>
+        /// <remarks>Use this method to enforce that a span contains at least one element before
+        /// proceeding with operations that require non-empty data.</remarks>
+        /// <typeparam name="T">The type of elements contained in the span.</typeparam>
+        /// <param name="span">The span to check for emptiness. Must not be empty.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="span"/> is empty.</exception>
+        public static void ThrowIfEmpty<T>(ReadOnlySpan<T> span)
+        {
+            if (span.IsEmpty)
+            {
+                throw new ArgumentNullException(nameof(span), "Span is empty.");
+            }
+        }
+
+
 
     }
 }
@@ -155,6 +172,24 @@ public static class ArgumentExceptionExtension
         /// <param name="message">An optional custom error message to include in the exception. If null, a default message is used.</param>
         /// <exception cref="ArgumentException">Thrown if the lengths of <paramref name="arr1"/> and <paramref name="arr2"/> are not equal.</exception>
         public static void ThrowIfArrayLengthNotEqual<T1, T2>(Span<T1> arr1, Span<T2> arr2, string? message = null)
+        {
+            if (arr1.Length != arr2.Length)
+            {
+                throw new ArgumentException(message ?? $"Array lengths are not equal. {nameof(arr1)}.Length: {arr1.Length}, {nameof(arr2)}.Length: {arr2.Length}");
+            }
+        }
+
+
+        /// <summary>
+        /// Throws an exception if the lengths of the specified spans are not equal.
+        /// </summary>
+        /// <typeparam name="T1">The type of elements in the first span.</typeparam>
+        /// <typeparam name="T2">The type of elements in the second span.</typeparam>
+        /// <param name="arr1">The first span to compare for length equality.</param>
+        /// <param name="arr2">The second span to compare for length equality.</param>
+        /// <param name="message">An optional custom error message to include in the exception. If null, a default message is used.</param>
+        /// <exception cref="ArgumentException">Thrown if the lengths of <paramref name="arr1"/> and <paramref name="arr2"/> are not equal.</exception>
+        public static void ThrowIfArrayLengthNotEqual<T1, T2>(ReadOnlySpan<T1> arr1, ReadOnlySpan<T2> arr2, string? message = null)
         {
             if (arr1.Length != arr2.Length)
             {

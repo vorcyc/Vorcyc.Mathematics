@@ -28,3 +28,9 @@ PinnableArray<T>ÀàÀàÖÐµÄ Max() ¡¢Min() ·½·¨×ªÒÆµ½ PinnableArrayExtension ÀàÖÐ×÷Î
 0.8.3.0
 - 2025.12.05
 ¶Ô FFTW ¿âÖÐµÄ·½·¨½øÐÐÖØÃüÃû£¬Ê¹Æä¸üÓÑºÃ¡£
+
+26.1.11
+ÐÞÕý´°º¯ÊýÖÐ Èý½Ç´°Triangular µÄ¹«Ê½´íÎó¡¢ÐÞÕý´úÂëÂ©¶´¡¢Ôö¼ÓÕë¶ÔÊµÊýµÄSIMD°æ±¾£º
+
+26.1.22
+ÐÞ¸´ FFTWÖÐµÄÒ»Ð©Â©¶´£¬µ÷ÕûÁËÑéÖ¤ÖÐµÄ²»ºÏÀí´¦£¬¸ÄÓÃ¡°¿íÏÞÖÆ¡±¡£

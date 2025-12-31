@@ -16,19 +16,34 @@ public enum WindowType
     Triangular,
 
     /// <summary>
-    /// Hamming window.
+    /// Hamming window (symmetric; denominator N-1).
     /// </summary>
     Hamming,
 
     /// <summary>
-    /// Blackman window.
+    /// Hamming window (periodic; denominator N).
+    /// </summary>
+    HammingPeriodic,
+
+    /// <summary>
+    /// Blackman window (symmetric; denominator N-1).
     /// </summary>
     Blackman,
 
     /// <summary>
-    /// Hann window.
+    /// Blackman window (periodic; denominator N).
+    /// </summary>
+    BlackmanPeriodic,
+
+    /// <summary>
+    /// Hann window (symmetric; denominator N-1).
     /// </summary>
     Hann,
+
+    /// <summary>
+    /// Hann window (periodic; denominator N).
+    /// </summary>
+    HannPeriodic,
 
     /// <summary>
     /// Gaussian window.
@@ -69,7 +84,6 @@ public enum WindowType
     /// Window for cepstral liftering.
     /// </summary>
     Liftering,
-
 
     /// <summary>
     /// Blackman Harris window.

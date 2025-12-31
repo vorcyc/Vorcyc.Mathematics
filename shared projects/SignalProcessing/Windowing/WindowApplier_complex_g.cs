@@ -1,388 +1,448 @@
-﻿
-/*
+﻿/*
 * CreateChecked - 从值创建当前类型的实例，对超出当前类型的可表示范围的任何值引发溢出异常
 * CreateSaturating - 从值创建当前类型的实例，使属于当前类型的可表示范围之外的任何值饱和
 * CreateTruncating - 从值创建当前类型的实例，截断当前类型的可表示范围之外的任何值。
 */
 
-
 namespace Vorcyc.Mathematics.SignalProcessing.Windowing;
-
 
 using System.Numerics;
 using static System.MathF;
 using static Vorcyc.Mathematics.VMath;
 using static Vorcyc.Mathematics.TrigonometryHelper;
 
-
 public static partial class WindowApplier
 {
-
-
-
     #region Rectangular
 
     //tex:$$ w(n) = 1 $$
 
     /// <summary>
-    /// 计算矩形窗函数。
+    /// Applies a rectangular window (no-op).
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Rectangular<T>(Span<Complex<T>> values)
        where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
-    { }
+    {
+        int n = values.Length;
+        if (n <= 1) return;
+        // no-op
+    }
 
     #endregion
-
 
     #region Triangular
 
     //tex:$$ w(n) = 1 - \left| \frac{n - (N-1)/2}{(N-1)/2} \right| $$
 
-
     /// <summary>
-    /// 计算三角窗函数。
+    /// Applies a triangular window.
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Triangular<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = 2.0f / (values.Length - 1);
-        for (int i = 0; i < (values.Length - 1) / 2; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float half = (n - 1) * 0.5f;
+        for (int i = 0; i < n; i++)
         {
-            float tri = factor * i;
-            values[i] *= tri;
-        }
-        for (int i = 0; i < values.Length; i++)
-        {
-            float tri = 2.0f - (factor * i);
-            values[i] *= tri;
+            float w = 1f - Abs((i - half) / half);
+            values[i] *= w;
         }
     }
     #endregion
-
 
     #region Hamming
 
     //tex:$$ w(n) = 0.54 - 0.46 \cos\left( \frac{2\pi n}{N-1} \right) $$
 
     /// <summary>
-    /// 计算汉明窗函数。
+    /// Applies a symmetric Hamming window (denominator N-1).
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Hamming<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = ConstantsFp32.TWO_PI / (values.Length - 1);
-        for (int n = 0; n < values.Length; n++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.TWO_PI / (n - 1);
+        for (int i = 0; i < n; i++)
         {
-            float ham = 0.54f - 0.46f * Cos(factor * n);
-            values[n] *= ham;
+            float w = 0.54f - 0.46f * Cos(factor * i);
+            values[i] *= w;
+        }
+    }
+
+    /// <summary>
+    /// Applies a periodic Hamming window (denominator N).
+    /// </summary>
+    /// <param name="values">Input data to be windowed in-place.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Hamming_Periodic<T>(Span<Complex<T>> values)
+        where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.TWO_PI / n;
+        for (int i = 0; i < n; i++)
+        {
+            float w = 0.54f - 0.46f * Cos(factor * i);
+            values[i] *= w;
         }
     }
     #endregion
-
 
     #region Blackman
 
     //tex:$$ w(n) = 0.42 - 0.5 \cos\left( \frac{2\pi n}{N-1} \right) + 0.08 \cos\left( \frac{4\pi n}{N-1} \right) $$
 
-
     /// <summary>
-    /// 计算布莱克曼窗函数。
+    /// Applies a symmetric Blackman window (denominator N-1).
     /// </summary>
-    /// <param name="values">输入数据。</param> 
+    /// <param name="values">Input data to be windowed in-place.</param> 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Blackman<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = ConstantsFp32.TWO_PI / (values.Length - 1);
-        for (int i = 0; i < values.Length; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.TWO_PI / (n - 1);
+        for (int i = 0; i < n; i++)
         {
-            float black =
+            float w =
                  0.42f -
                  (0.5f * Cos(factor * i)) +
                  (0.08f * Cos(2 * factor * i));
 
-            values[i] *= black;
+            values[i] *= w;
+        }
+    }
+
+    /// <summary>
+    /// Applies a periodic Blackman window (denominator N).
+    /// </summary>
+    /// <param name="values">Input data to be windowed in-place.</param> 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Blackman_Periodic<T>(Span<Complex<T>> values)
+        where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.TWO_PI / n;
+        for (int i = 0; i < n; i++)
+        {
+            float w =
+                 0.42f -
+                 (0.5f * Cos(factor * i)) +
+                 (0.08f * Cos(2 * factor * i));
+
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Hann
-
 
     //tex:$$ w(n) = 0.5 \left( 1 - \cos\left( \frac{2\pi n}{N-1} \right) \right) $$
 
-
     /// <summary>
-    /// 计算汉宁窗函数。
+    /// Applies a symmetric Hann window (denominator N-1).
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Hann<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = ConstantsFp32.TWO_PI / (values.Length - 1);
-        for (int n = 0; n < values.Length; n++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.TWO_PI / (n - 1);
+        for (int i = 0; i < n; i++)
         {
-            float han = 0.5f * (1f - Cos(factor * n));
-            values[n] *= han;
+            float w = 0.5f * (1f - Cos(factor * i));
+            values[i] *= w;
+        }
+    }
+
+    /// <summary>
+    /// Applies a periodic Hann window (denominator N).
+    /// </summary>
+    /// <param name="values">Input data to be windowed in-place.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Hann_Periodic<T>(Span<Complex<T>> values)
+        where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.TWO_PI / n;
+        for (int i = 0; i < n; i++)
+        {
+            float w = 0.5f * (1f - Cos(factor * i));
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Gaussian
-
 
     //tex:$$ w(n) = \exp\left( -0.5 \left( \frac{n - (N-1)/2}{\sigma (N-1)/2} \right)^2 \right) $$
 
     /// <summary>
-    /// 计算高斯窗函数。
+    /// Applies a Gaussian window with fixed σ = 0.4.
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Gaussian<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = (values.Length - 1) * .5f;
-        for (int i = 0; i < values.Length; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float half = (n - 1) * .5f;
+        for (int i = 0; i < n; i++)
         {
-            float gaussian = Exp(-0.5f * Pow((i - factor) / (0.4f * factor), 2.0f));
-            values[i] *= gaussian;
+            float w = Exp(-0.5f * Pow((i - half) / (0.4f * half), 2.0f));
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Kaiser
-
 
     //tex:$$ w(n) = \frac{I_0\left( \alpha \sqrt{1 - \left( \frac{2n}{N-1} - 1 \right)^2} \right)}{I_0(\alpha)} $$
 
-
     /// <summary>
-    /// 计算凯撒窗函数。
+    /// Applies a Kaiser window with shape parameter alpha.
     /// </summary>
-    /// <param name="values">输入数据。</param>
-    /// <param name="alpha">Alpha参数。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
+    /// <param name="alpha">Shape parameter α.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Kaiser<T>(Span<Complex<T>> values, float alpha = 12f)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = 2.0f / (values.Length - 1);
-        for (int i = 0; i < values.Length; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = 2.0f / (n - 1);
+        float denom = I0(alpha);
+        for (int i = 0; i < n; i++)
         {
-            float kaiser = I0(alpha * Sqrt(1 - (i * factor - 1) * (i * factor - 1))) / I0(alpha);
-            values[i] *= kaiser;
+            float x = i * factor - 1f;
+            float w = I0(alpha * Sqrt(1 - x * x)) / denom;
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Kbd
-
 
     //tex:$$ w(n) = \sqrt{\frac{\sum_{k=0}^{n} I_0\left( \pi \alpha \sqrt{1 - \left( \frac{2k}{N} - 1 \right)^2} \right)}{\sum_{k=0}^{N/2} I_0\left( \pi \alpha \sqrt{1 - \left( \frac{2k}{N} - 1 \right)^2} \right)}} $$
 
-
     /// <summary>
-    /// 计算凯撒-贝塞尔派生窗函数。
+    /// Applies a KBD (Kaiser–Bessel derived) window with shape parameter alpha.
     /// </summary>
-    /// <param name="values">输入数据。</param>
-    /// <param name="alpha">Alpha参数。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
+    /// <param name="alpha">Shape parameter α.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Kbd<T>(Span<Complex<T>> values, float alpha = 4f)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        var window = new float[values.Length / 2 + 1];
+        int n = values.Length;
+        if (n <= 1) return;
 
-        float factor = 4.0f / values.Length;
+        var window = new float[n / 2 + 1];
+
+        float factor = 4.0f / n;
         float sum = 0f;
 
-        for (int i = 0; i <= values.Length / 2; i++)
+        for (int i = 0; i <= n / 2; i++)
         {
-            sum += I0(ConstantsFp32.PI * alpha * Sqrt(1 - (i * factor - 1) * (i * factor - 1)));
+            float x = i * factor - 1f;
+            sum += I0(ConstantsFp32.PI * alpha * Sqrt(1 - x * x));
             window[i] = sum;
         }
 
-        for (int i = 0; i < values.Length / 2; i++)
+        for (int i = 0; i < n / 2; i++)
         {
             var v = Sqrt(window[i] / sum);
             values[i] *= v;
 
-            var backwardIndex = values.Length - 1 - i;
+            var backwardIndex = n - 1 - i;
             values[backwardIndex] *= v;
         }
     }
     #endregion
 
-
     #region Bartlett_Hann
-
 
     //tex:$$ w(n) = 0.62 - 0.48 \left| \frac{n}{N-1} - 0.5 \right| - 0.38 \cos\left( \frac{2\pi n}{N-1} \right) $$
 
     /// <summary>
-    /// 计算巴特利特-汉宁窗函数。
+    /// Applies a Bartlett–Hann window.
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Bartlett_Hann<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = 1.0f / (values.Length - 1);
-        for (int i = 0; i < values.Length; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = 1.0f / (n - 1);
+        for (int i = 0; i < n; i++)
         {
-            var bh = 0.62f - 0.48f * Abs(i * factor - 0.5f) - 0.38f * Cos(ConstantsFp32.TWO_PI * i * factor);
-            values[i] *= bh;
+            var w = 0.62f - 0.48f * Abs(i * factor - 0.5f) - 0.38f * Cos(ConstantsFp32.TWO_PI * i * factor);
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Lanczos
-
 
     //tex:$$ w(n) = \text{sinc}\left( \frac{2n}{N-1} - 1 \right) $$
 
     /// <summary>
-    /// 计算兰索斯窗函数。
+    /// Applies a Lanczos window.
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Lanczos<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = 2.0f / (values.Length - 1);
-        for (int i = 0; i < values.Length; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = 2.0f / (n - 1);
+        for (int i = 0; i < n; i++)
         {
-            var lanczos = Sinc(i * factor - 1);
-            values[i] *= lanczos;
+            var w = Sinc(i * factor - 1);
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region PowerOfSine
-
 
     //tex:$$ w(n) = \sin^\alpha\left( \frac{\pi n}{N} \right) $$
 
-
     /// <summary>
-    /// 计算幂正弦窗函数。
+    /// Applies a power-of-sine window with exponent alpha.
     /// </summary>
-    /// <param name="values">输入数据。</param>
-    /// <param name="alpha">Alpha参数。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
+    /// <param name="alpha">Exponent α.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void PowerOfSine<T>(Span<Complex<T>> values, float alpha = 1.5f)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = ConstantsFp32.PI / values.Length;
-        for (int i = 0; i < values.Length; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.PI / n;
+        for (int i = 0; i < n; i++)
         {
-            var v = Pow(Sin(i * factor), alpha);
-            values[i] *= v;
+            var w = Pow(Sin(i * factor), alpha);
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Flattop
-
 
     //tex:$$ w(n) = 0.216 - 0.417 \cos\left( \frac{2\pi n}{N-1} \right) + 0.278 \cos\left( \frac{4\pi n}{N-1} \right) - 0.084 \cos\left( \frac{6\pi n}{N-1} \right) + 0.007 \cos\left( \frac{8\pi n}{N-1} \right) $$
 
-
     /// <summary>
-    /// 计算平顶窗函数。
+    /// Applies a flat-top window (five-term approximation, symmetric).
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Flattop<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = ConstantsFp32.TWO_PI / (values.Length - 1);
+        int n = values.Length;
+        if (n <= 1) return;
 
-        for (int i = 0; i < values.Length; i++)
+        float factor = ConstantsFp32.TWO_PI / (n - 1);
+
+        for (int i = 0; i < n; i++)
         {
-            var v = 0.216f - 0.417f * Cos(i * factor) + 0.278f * Cos(2 * i * factor) - 0.084f * Cos(3 * i * factor) + 0.007f * Cos(4 * i * factor);
-            values[i] *= v;
+            var w = 0.216f - 0.417f * Cos(i * factor) + 0.278f * Cos(2 * i * factor) - 0.084f * Cos(3 * i * factor) + 0.007f * Cos(4 * i * factor);
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Liftering
-
 
     //tex:$$ w(n) = 1 + \frac{L}{2} \sin\left( \frac{\pi n}{L} \right) $$
 
     /// <summary>
-    /// 计算升降窗函数。
+    /// Applies a cepstral liftering window with parameter L.
     /// </summary>
-    /// <param name="values">输入数据。</param>
-    /// <param name="l">L参数。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
+    /// <param name="l">Lifter parameter L (must be &gt; 0).</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Liftering<T>(Span<Complex<T>> values, int l = 22)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        if (l <= 0)
+        int n = values.Length;
+        if (n <= 1) return;
+        if (l <= 0) return;
+
+        for (int i = 0; i < n; i++)
         {
-            return;
-        }
-        for (int i = 0; i < values.Length; i++)
-        {
-            var v = 1 + l * Sin(ConstantsFp32.PI * i / l) / 2;
-            values[i] *= v;
+            var w = 1 + l * Sin(ConstantsFp32.PI * i / l) / 2;
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Blackman_Harris
-
 
     //tex:$$ w(n) = 0.35875 - 0.48829 \cos\left( \frac{2\pi n}{N} \right) + 0.14128 \cos\left( \frac{4\pi n}{N} \right) - 0.01168 \cos\left( \frac{6\pi n}{N} \right) $$
 
-
     /// <summary>
-    /// 计算布莱克曼-哈里斯窗函数。
+    /// Applies a 4-term Blackman–Harris window (denominator N).
     /// </summary>
-    /// <param name="values">输入数据。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Blackman_Harris<T>(Span<Complex<T>> values)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        float factor = ConstantsFp32.TWO_PI / values.Length;
-        for (int i = 0; i < values.Length; i++)
+        int n = values.Length;
+        if (n <= 1) return;
+
+        float factor = ConstantsFp32.TWO_PI / n;
+        for (int i = 0; i < n; i++)
         {
             float arg = factor * i;
-            float harris =
+            float w =
                 0.35875f -
                 0.48829f * Cos(arg) +
                 0.14128f * Cos(2 * arg) -
                 0.01168f * Cos(3 * arg);
 
-            values[i] *= harris;
+            values[i] *= w;
         }
     }
     #endregion
 
-
     #region Apply
 
     /// <summary>
-    /// 应用指定的窗函数。
+    /// Applies the specified window function to the input data in-place.
     /// </summary>
-    /// <param name="values">输入数据。</param>
-    /// <param name="windowType">窗函数类型。</param>
+    /// <param name="values">Input data to be windowed in-place.</param>
+    /// <param name="windowType">Window function type.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Apply<T>(Span<Complex<T>> values, WindowType windowType)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
@@ -398,11 +458,20 @@ public static partial class WindowApplier
             case WindowType.Hamming:
                 Hamming(values);
                 break;
+            case WindowType.HammingPeriodic:
+                Hamming_Periodic(values);
+                break;
             case WindowType.Blackman:
                 Blackman(values);
                 break;
+            case WindowType.BlackmanPeriodic:
+                Blackman_Periodic(values);
+                break;
             case WindowType.Hann:
                 Hann(values);
+                break;
+            case WindowType.HannPeriodic:
+                Hann_Periodic(values);
                 break;
             case WindowType.Gaussian:
                 Gaussian(values);
@@ -435,19 +504,7 @@ public static partial class WindowApplier
                 break;
         }
     }
+
+
     #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

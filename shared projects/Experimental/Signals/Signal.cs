@@ -286,28 +286,4 @@ public class Signal : ITimeDomainSignal, ICloneable<Signal>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

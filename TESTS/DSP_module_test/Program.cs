@@ -1,7 +1,8 @@
-﻿using Vorcyc.Mathematics;
-using Vorcyc.Mathematics.Experimental.Signals;
+﻿using System.Buffers;
+using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Extensions.FFTW;
 using Vorcyc.Mathematics.Framework.Utilities;
-using Vorcyc.Mathematics.SignalProcessing.Fourier;
+using Vorcyc.Mathematics.Numerics;
 
 namespace DSP_module_test;
 
@@ -11,28 +12,34 @@ internal class Program
     {
 
 
-        //var a = new float[100];
-        //a.Fill(1, 1f);
-        //var b = a.Copy();
-
-        //Vorcyc.Mathematics.SignalProcessing.Windowing.WindowApplier.Hamming(a);
-        //a.PrintLine( ConsoleColor.Green);
-
-
-        //Vorcyc.Mathematics.SignalProcessing.Windowing.WindowApplier.Hamming2(b);
-        //b.PrintLine(ConsoleColor.Blue);
-
-        var s = new Signal(10, 100);
-        s.Samples.Fill(1, 1f);
-        Console.WriteLine(s);
+        var input = new float[1024];
+        input.Fill(0, 1f);
+        var output = new ComplexFp32[500];//ArrayPool<ComplexFp32>.Shared.Rent(1024 / 2 + 1);
+        Dft1D.Forward(input, output);
+        output.PrintLine();
+        Dft1D.Inverse(output, input);
+        input.PrintLine();
 
 
-        var fd = s.TransformToFrequencyDomain();
+        FFTW_ALL.Run();
 
-        
 
-         FastFourierTransformNormal.Inverse(fd.Result);
 
-        fd.Result.PrintLine();
+        //var results = WindowApplier.CompareAllWindowPairs(1024);
+        //foreach (var result in results)
+        //{
+        //    if (result.Equal)
+        //        result.PrintLine(ConsoleColor.Green);
+        //    else
+        //        result.PrintLine(ConsoleColor.Red);
+
+        //}
+
+
+
+
+
+
+
     }
 }

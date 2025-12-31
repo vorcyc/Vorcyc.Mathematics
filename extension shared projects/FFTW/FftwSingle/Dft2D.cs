@@ -23,8 +23,8 @@ public static partial class Dft2D
     /// <summary>
     /// 执行二维复数到复数的正向傅里叶变换（C2C，PinnableArray 重载）。
     /// </summary>
-    /// <param name="input">已固定的输入缓冲区（线性展平二维 <see cref="ComplexFp32"/> 数据）。</param>
-    /// <param name="output">已固定的输出缓冲区（线性展平二维 <see cref="ComplexFp32"/> 数据）。</param>
+    /// <param name="input">已固定的输入缓冲区（线性展平二维 <see cref="ComplexFp32"/> 数据），长度至少为 nx*ny。</param>
+    /// <param name="output">已固定的输出缓冲区（线性展平二维 <see cref="ComplexFp32"/> 数据），长度至少为 nx*ny。</param>
     /// <param name="nx">X 维度长度。</param>
     /// <param name="ny">Y 维度长度。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
@@ -34,12 +34,12 @@ public static partial class Dft2D
     /// <summary>
     /// 执行二维复数到复数的正向傅里叶变换（C2C，Span 重载）。
     /// </summary>
-    /// <param name="input">输入数据（线性展平二维 <see cref="ComplexFp32"/> 数据）。</param>
-    /// <param name="output">输出数据（线性展平二维 <see cref="ComplexFp32"/> 数据）。</param>
+    /// <param name="input">输入数据（线性展平二维 <see cref="ComplexFp32"/> 数据），长度至少为 nx*ny。</param>
+    /// <param name="output">输出数据（线性展平二维 <see cref="ComplexFp32"/> 数据），长度至少为 nx*ny。</param>
     /// <param name="nx">X 维度长度。</param>
     /// <param name="ny">Y 维度长度。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Forward(Span<ComplexFp32> input, Span<ComplexFp32> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void Forward(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => Dft2DComplex(input, output, nx, ny, fftw_direction.Forward, flags);
 
     // Inverse: 复数→复数（非原地/原地取决于指针是否相同）
@@ -48,8 +48,8 @@ public static partial class Dft2D
     /// 执行二维复数到复数的逆向傅里叶变换（C2C，PinnableArray 重载）。
     /// 注意：FFTW 的逆变换不执行归一化；如需 1/(nx*ny) 缩放请在外部处理。
     /// </summary>
-    /// <param name="input">已固定的输入缓冲区。</param>
-    /// <param name="output">已固定的输出缓冲区。</param>
+    /// <param name="input">已固定的输入缓冲区，长度至少为 nx*ny。</param>
+    /// <param name="output">已固定的输出缓冲区，长度至少为 nx*ny。</param>
     /// <param name="nx">X 维度长度。</param>
     /// <param name="ny">Y 维度长度。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
@@ -60,12 +60,12 @@ public static partial class Dft2D
     /// 执行二维复数到复数的逆向傅里叶变换（C2C，Span 重载）。
     /// 注意：FFTW 的逆变换不执行归一化；如需 1/(nx*ny) 缩放请在外部处理。
     /// </summary>
-    /// <param name="input">输入数据。</param>
-    /// <param name="output">输出数据。</param>
+    /// <param name="input">输入数据，长度至少为 nx*ny。</param>
+    /// <param name="output">输出数据，长度至少为 nx*ny。</param>
     /// <param name="nx">X 维度长度。</param>
     /// <param name="ny">Y 维度长度。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Inverse(Span<ComplexFp32> input, Span<ComplexFp32> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
+    public static void Inverse(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, int nx, int ny, fftw_flags flags = fftw_flags.Estimate)
         => Dft2DComplex(input, output, nx, ny, fftw_direction.Backward, flags);
 
     // ==========================
@@ -76,7 +76,7 @@ public static partial class Dft2D
     /// 执行二维复数到复数 (C2C) DFT（指针重载）。支持原地/非原地（取决于指针是否相同）。
     /// </summary>
     /// <param name="input">输入缓冲区指针，指向包含二维 <see cref="ComplexFp32"/> 数据的连续内存，大小至少为 nx*ny。</param>
-    /// <param name="output">输出缓冲区指针，指向与输入同尺寸的连续 <see cref="ComplexFp32"/> 内存。</param>
+    /// <param name="output">输出缓冲区指针，指向包含二维 <see cref="ComplexFp32"/> 数据的连续内存，大小至少为 nx*ny。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="direction">变换方向，见 <see cref="fftw_direction"/>（前向或反向）。</param>
@@ -107,8 +107,8 @@ public static partial class Dft2D
     /// <summary>
     /// 执行二维复数到复数 (C2C) DFT（已固定的 <see cref="PinnableArray{T}"/> 重载）。
     /// </summary>
-    /// <param name="input">已固定的输入缓冲区，线性展平的二维 <see cref="ComplexFp32"/> 数据。</param>
-    /// <param name="output">已固定的输出缓冲区，线性展平的二维 <see cref="ComplexFp32"/> 数据。</param>
+    /// <param name="input">已固定的输入缓冲区，线性展平的二维 <see cref="ComplexFp32"/> 数据，长度至少为 nx*ny。</param>
+    /// <param name="output">已固定的输出缓冲区，线性展平的二维 <see cref="ComplexFp32"/> 数据，长度至少为 nx*ny。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="direction">变换方向，见 <see cref="fftw_direction"/>。</param>
@@ -118,12 +118,16 @@ public static partial class Dft2D
     /// - 输入与输出应至少包含 nx*ny 个元素；在允许的情形下可采用原地模式。<br/>
     /// </remarks>
     /// <exception cref="InvalidOperationException">当输入或输出未固定(Pinned)或计划创建失败时抛出。</exception>
-    /// <exception cref="ArgumentException">当输入与输出长度不一致时抛出。</exception>
     internal static void Dft2DComplex(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, int nx, int ny, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
-        ArgumentException.ThrowIfArrayLengthNotEqual(input, output, "Input and output PinnableArrays must have the same length.");
+
+        var total = nx * ny;
+        if (input.Length < total)
+            throw new ArgumentException("Input buffer length must be at least nx * ny.", nameof(input));
+        if (output.Length < total)
+            throw new ArgumentException("Output buffer length must be at least nx * ny.", nameof(output));
 
         var plan = fftwf.dft_2d(nx, ny, input, output, direction, flags);
         InvalidOperationException.ThrowIfZero(plan, "Failed to create 2D complex plan.");
@@ -140,23 +144,30 @@ public static partial class Dft2D
     /// <summary>
     /// 执行二维复数到复数 (C2C) DFT（Span 重载）。
     /// </summary>
-    /// <param name="input">输入数据缓冲区（线性展平的二维 <see cref="ComplexFp32"/> 数据）。</param>
-    /// <param name="output">输出数据缓冲区（线性展平的二维 <see cref="ComplexFp32"/> 数据）。</param>
+    /// <param name="input">输入数据缓冲区（线性展平的二维 <see cref="ComplexFp32"/> 数据），长度至少为 nx*ny。</param>
+    /// <param name="output">输出数据缓冲区（线性展平的二维 <see cref="ComplexFp32"/> 数据），长度至少为 nx*ny。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="direction">变换方向，见 <see cref="fftw_direction"/>。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
     /// <remarks>
     /// - 方法内部通过 <c>fixed</c> 固定内存并调用指针重载；不执行归一化。<br/>
-    /// - 建议确保 <paramref name="input"/> 与 <paramref name="output"/> 的长度均不小于 nx*ny，且二者长度一致。<br/>
+    /// - 输入/输出长度只需不小于 nx*ny。<br/>
     /// </remarks>
     /// <exception cref="ArgumentNullException">当 <paramref name="input"/> 或 <paramref name="output"/> 为空(Length==0)时抛出。</exception>
-    /// <exception cref="ArgumentException">当输入与输出长度不一致时抛出。</exception>
-    internal static void Dft2DComplex(Span<ComplexFp32> input, Span<ComplexFp32> output, int nx, int ny, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    /// <exception cref="ArgumentException">当输入或输出长度小于 nx*ny 时抛出。</exception>
+    /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
+    internal static void Dft2DComplex(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, int nx, int ny, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
-        if (input.Length != output.Length) throw new ArgumentException("Input and output spans must have the same length.", nameof(output));
+
+        var total = nx * ny;
+        if (input.Length < total)
+            throw new ArgumentException("Input span length must be at least nx * ny.", nameof(input));
+        if (output.Length < total)
+            throw new ArgumentException("Output span length must be at least nx * ny.", nameof(output));
+
         unsafe
         {
             fixed (ComplexFp32* inputPtr = input)

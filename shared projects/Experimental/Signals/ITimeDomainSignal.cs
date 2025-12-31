@@ -334,7 +334,7 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
         //if (windowingType is not null)
         //    Vorcyc.Mathematics.SignalProcessing.Windowing.WindowApplier.Apply(tempSamples.AsSpan(), 0, desiredLen, windowingType.Value);  
         if (windowingType is not null)
-            WindowApplier.Apply(tempSamples.AsSpan(), windowingType.Value);
+            WindowApplier.Apply(tempSamples, windowingType.Value, true);
 
         return tempSamples;
     }

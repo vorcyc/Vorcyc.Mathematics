@@ -590,6 +590,16 @@ public sealed class PinnableArray<T> : IDisposable, IEnumerable<T>
     public static implicit operator Span<T>(PinnableArray<T> pinableArray) => pinableArray._array.AsSpan(0, pinableArray._length);
 
     /// <summary>
+    /// Defines an implicit conversion from a <see cref="PinnableArray{T}"/> to a <see cref="ReadOnlySpan{T}"/> that provides a read-only view of
+    /// the array's contents.
+    /// </summary>
+    /// <remarks>This conversion allows a <see cref="PinnableArray{T}"/> to be used wherever a <see cref="ReadOnlySpan{T}"/> is expected,
+    /// enabling efficient, allocation-free access to the array's data. The resulting <see cref="ReadOnlySpan{T}"/> reflects the
+    /// current contents of the <see cref="PinnableArray{T}"/> at the time of conversion.</remarks>
+    /// <param name="pinableArray">The <see cref="PinnableArray{T}"/> instance to convert to a <see cref="ReadOnlySpan{T}"/>. Cannot be null.</param>
+    public static implicit operator ReadOnlySpan<T>(PinnableArray<T> pinableArray) => new(pinableArray, 0, pinableArray._length);
+
+    /// <summary>
     /// Implicit conversion to a native integer address. Returns <see cref="nint.Zero"/> if not pinned.
     /// </summary>
     /// <param name="pinableArray">The source pinnable array.</param>

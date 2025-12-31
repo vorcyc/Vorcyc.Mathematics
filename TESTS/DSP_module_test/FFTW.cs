@@ -6,38 +6,37 @@ using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
 using Vorcyc.Mathematics.Framework.Utilities;
 using Vorcyc.Mathematics.Numerics;
 
-namespace DSP_module_test
+namespace DSP_module_test;
+
+internal class FFTW
 {
-    internal class FFTW
+
+
+    public static void _2D_FFTW_Test()
     {
 
+        var input = new float[1024];
+        var input2 = new PinnableArray<ComplexFp32>(1024, true);
+        var output = new PinnableArray<ComplexFp32>(1024, true);
+        input.Fill(0, 1f);
+        input2.Fill(ComplexFp32.Zero, new ComplexFp32(1f, 0f));
 
-        public static void _2D_FFTW_Test()
-        {
+        Vorcyc.Mathematics.Extensions.FFTW.Dft2D.Forward(input2, output, 32, 32);
 
-            var input = new float[1024];
-            var input2 = new PinnableArray<ComplexFp32>(1024, true);
-            var output = new PinnableArray<ComplexFp32>(1024, true);
-            input.Fill(0, 1f);
-            input2.Fill(ComplexFp32.Zero, new ComplexFp32(1f, 0f));
+        Console.WriteLine("DFT computation completed.");
 
-            Vorcyc.Mathematics.Extensions.FFTW.Dft2D.Forward(input2, output, 32, 32);
-
-            Console.WriteLine("DFT computation completed.");
-
-            output.PrintLine();
+        output.PrintLine();
 
 
-            Vorcyc.Mathematics.Extensions.FFTW.Dft2D.Inverse(output, input2, 32, 32);
+        Vorcyc.Mathematics.Extensions.FFTW.Dft2D.Inverse(output, input2, 32, 32);
 
-            Console.WriteLine("Inverse DFT computation completed.");
+        Console.WriteLine("Inverse DFT computation completed.");
 
-            input2.ScaleInPlace();
+        input2.ScaleInPlace();
 
-            input2.PrintLine();
+        input2.PrintLine();
 
 
 
-        }
     }
 }

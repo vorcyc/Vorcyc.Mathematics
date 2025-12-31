@@ -4,4 +4,4 @@
 [assembly: InternalsVisibleTo("Vorcyc.SignalStudio.Shell")]
 [assembly: InternalsVisibleTo("Vorcyc.SignalStudio.DataVisualization")]
 [assembly: InternalsVisibleTo("Vorcyc.SignalStudio")]
-
+[assembly: InternalsVisibleTo("DSP_module_test")]

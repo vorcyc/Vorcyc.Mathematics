@@ -5,7 +5,7 @@ using Vorcyc.Mathematics.Extensions.FFTW.Interop;
 namespace Vorcyc.Mathematics.Extensions.FFTW;
 
 /// <summary>
-/// 基于 FFTW 双精度接口的三维复数到复数 (C2C) 离散傅里叶变换辅助类。
+/// 基于 FFTW 双精度接口的三维复数到复数(C2C) 离散傅里叶变换辅助类。
 /// 提供简洁公共 API：Forward / Inverse；原始实现改为 internal 并统一封装计划的创建、执行与销毁流程。
 /// </summary>
 /// <remarks>
@@ -23,20 +23,20 @@ public static partial class Dft3D
     /// <summary>
     /// 执行三维复数到复数的正向傅里叶变换（C2C，Span 重载）。
     /// </summary>
-    /// <param name="input">输入数据（线性展平的 3D <see cref="Complex"/>）。</param>
-    /// <param name="output">输出数据（线性展平的 3D <see cref="Complex"/>）。</param>
+    /// <param name="input">输入数据（线性展平的 3D <see cref="Complex"/>），长度至少为 nx*ny*nz。</param>
+    /// <param name="output">输出数据（线性展平的 3D <see cref="Complex"/>），长度至少为 nx*ny*nz。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="nz">Z 维度大小（第三维长度）。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Forward(Span<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void Forward(ReadOnlySpan<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => Dft3DComplex(input, output, nx, ny, nz, fftw_direction.Forward, flags);
 
     /// <summary>
     /// 执行三维复数到复数的正向傅里叶变换（C2C，PinnableArray 重载）。
     /// </summary>
-    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
-    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
+    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="nz">Z 维度大小（第三维长度）。</param>
@@ -49,20 +49,20 @@ public static partial class Dft3D
     /// <summary>
     /// 执行三维复数到复数的逆向傅里叶变换（C2C，Span 重载）。注意：FFTW 的逆变换不执行归一化。
     /// </summary>
-    /// <param name="input">输入数据（线性展平的 3D <see cref="Complex"/>）。</param>
-    /// <param name="output">输出数据（线性展平的 3D <see cref="Complex"/>）。</param>
+    /// <param name="input">输入数据（线性展平的 3D <see cref="Complex"/>），长度至少为 nx*ny*nz。</param>
+    /// <param name="output">输出数据（线性展平的 3D <see cref="Complex"/>），长度至少为 nx*ny*nz。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="nz">Z 维度大小（第三维长度）。</param>
     /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
-    public static void Inverse(Span<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
+    public static void Inverse(ReadOnlySpan<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_flags flags = fftw_flags.Estimate)
         => Dft3DComplex(input, output, nx, ny, nz, fftw_direction.Backward, flags);
 
     /// <summary>
     /// 执行三维复数到复数的逆向傅里叶变换（C2C，PinnableArray 重载）。注意：FFTW 的逆变换不执行归一化。
     /// </summary>
-    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
-    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
+    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="nz">Z 维度大小（第三维长度）。</param>
@@ -78,7 +78,7 @@ public static partial class Dft3D
     /// 执行三维复数到复数 (C2C) DFT（指针重载，支持原地/非原地）。
     /// </summary>
     /// <param name="input">输入缓冲区指针，指向至少 nx*ny*nz 个连续的 <see cref="Complex"/> 元素。</param>
-    /// <param name="output">输出缓冲区指针，指向与输入同尺寸的连续 <see cref="Complex"/> 元素。</param>
+    /// <param name="output">输出缓冲区指针，指向至少 nx*ny*nz 个连续的 <see cref="Complex"/> 元素。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="nz">Z 维度大小（第三维长度）。</param>
@@ -111,8 +111,8 @@ public static partial class Dft3D
     /// <summary>
     /// 执行三维复数到复数 (C2C) DFT（Span 重载）。
     /// </summary>
-    /// <param name="input">输入数据缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
-    /// <param name="output">输出数据缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="input">输入数据缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
+    /// <param name="output">输出数据缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="nz">Z 维度大小（第三维长度）。</param>
@@ -125,12 +125,17 @@ public static partial class Dft3D
     /// <exception cref="ArgumentNullException">当 <paramref name="input"/> 或 <paramref name="output"/> 为空(Length==0)时抛出。</exception>
     /// <exception cref="ArgumentException">当输入或输出长度小于指定维度总元素数时抛出。</exception>
     /// <exception cref="InvalidOperationException">当规划(plan)创建失败时抛出。</exception>
-    internal static void Dft3DComplex(Span<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    internal static void Dft3DComplex(ReadOnlySpan<Complex> input, Span<Complex> output, int nx, int ny, int nz, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
     {
         ArgumentNullException.ThrowIfEmpty(input);
         ArgumentNullException.ThrowIfEmpty(output);
-        if (input.Length < nx * ny * nz) throw new ArgumentException("Input span is too small for the specified dimensions.", nameof(input));
-        if (output.Length < nx * ny * nz) throw new ArgumentException("Output span is too small for the specified dimensions.", nameof(output));
+
+        var total = nx * ny * nz;
+        if (input.Length < total)
+            throw new ArgumentException("Input span length must be at least nx * ny * nz.", nameof(input));
+        if (output.Length < total)
+            throw new ArgumentException("Output span length must be at least nx * ny * nz.", nameof(output));
+
         unsafe
         {
             fixed (Complex* inputPtr = input)
@@ -144,8 +149,8 @@ public static partial class Dft3D
     /// <summary>
     /// 执行三维复数到复数 (C2C) DFT（已固定的 <see cref="PinnableArray{T}"/> 重载）。
     /// </summary>
-    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
-    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据）。</param>
+    /// <param name="input">已固定的输入缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
+    /// <param name="output">已固定的输出缓冲区（线性展平的 3D <see cref="Complex"/> 数据），长度至少为 nx*ny*nz。</param>
     /// <param name="nx">X 维度大小（第一维长度）。</param>
     /// <param name="ny">Y 维度大小（第二维长度）。</param>
     /// <param name="nz">Z 维度大小（第三维长度）。</param>
@@ -160,6 +165,13 @@ public static partial class Dft3D
     {
         InvalidOperationException.ThrowIfUnpinned(input);
         InvalidOperationException.ThrowIfUnpinned(output);
+
+        var total = nx * ny * nz;
+        if (input.Length < total)
+            throw new ArgumentException("Input buffer length must be at least nx * ny * nz.", nameof(input));
+        if (output.Length < total)
+            throw new ArgumentException("Output buffer length must be at least nx * ny * nz.", nameof(output));
+
         var plan = fftw.dft_3d(nx, ny, nz, input, output, direction, flags);
         InvalidOperationException.ThrowIfZero(plan, "Failed to create 3D complex plan.");
         try
