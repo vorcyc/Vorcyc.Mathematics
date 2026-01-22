@@ -27,6 +27,17 @@ public static partial class Dft1D
     // ==========================
 
     // Complex-to-Complex (Out-of-Place)
+
+
+    /// <summary>
+    /// 执行复数→复数的一维正向傅里叶变换（非原地）。
+    /// </summary>
+    /// <param name="input">复数输入缓冲区（已固定）。</param>
+    /// <param name="output">复数输出缓冲区（已固定，长度与输入相同）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, fftw_flags flags = fftw_flags.Estimate)
+        => Dft1DComplex(input, output, fftw_direction.Forward, flags);
+
     /// <summary>
     /// 执行复数→复数的一维正向傅里叶变换（非原地，输出写入独立缓冲区）。
     /// </summary>
@@ -35,6 +46,16 @@ public static partial class Dft1D
     /// <param name="flags">规划策略标志，默认 <see cref="fftw_flags.Estimate"/>。</param>
     public static void Forward(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, fftw_flags flags = fftw_flags.Estimate)
         => Dft1DComplex(input, output, fftw_direction.Forward, flags);
+
+    /// <summary>
+    /// 执行复数→复数的一维逆向傅里叶变换（非原地）。
+    /// 注意：FFTW 的逆变换默认不执行归一化，通常需在外部按 1/N 缩放。
+    /// </summary>
+    /// <param name="input">复数输入缓冲区（已固定）。</param>
+    /// <param name="output">复数输出缓冲区（已固定，长度与输入相同）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, fftw_flags flags = fftw_flags.Estimate)
+        => Dft1DComplex(input, output, fftw_direction.Backward, flags);
 
     /// <summary>
     /// 执行复数→复数的一维逆向傅里叶变换（非原地，输出写入独立缓冲区）。
@@ -47,6 +68,15 @@ public static partial class Dft1D
         => Dft1DComplex(input, output, fftw_direction.Backward, flags);
 
     // Complex-to-Complex (In-Place)
+
+    /// <summary>
+    /// 执行复数缓冲区一维正向傅里叶变换（原地，结果覆盖输入）。
+    /// </summary>
+    /// <param name="buffer">复数输入与输出共享的已固定缓冲区。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void ForwardInPlace(PinnableArray<ComplexFp32> buffer, fftw_flags flags = fftw_flags.Estimate)
+        => Dft1DComplexInPlace(buffer, fftw_direction.Forward, flags);
+
     /// <summary>
     /// 执行复数缓冲区的一维正向傅里叶变换（原地，结果覆盖输入）。
     /// </summary>
@@ -54,6 +84,15 @@ public static partial class Dft1D
     /// <param name="flags">规划策略标志，默认 <see cref="fftw_flags.Estimate"/>。</param>
     public static void ForwardInPlace(Span<ComplexFp32> buffer, fftw_flags flags = fftw_flags.Estimate)
         => Dft1DComplexInPlace(buffer, fftw_direction.Forward, flags);
+
+    /// <summary>
+    /// 执行复数缓冲区一维逆向傅里叶变换（原地，结果覆盖输入）。
+    /// 注意：FFTW 的逆变换默认不执行归一化，通常需在外部按 1/N 缩放。
+    /// </summary>
+    /// <param name="buffer">复数输入与输出共享的已固定缓冲区。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void InverseInPlace(PinnableArray<ComplexFp32> buffer, fftw_flags flags = fftw_flags.Estimate)
+        => Dft1DComplexInPlace(buffer, fftw_direction.Backward, flags);
 
     /// <summary>
     /// 执行复数缓冲区的一维逆向傅里叶变换（原地，结果覆盖输入）。
@@ -66,6 +105,15 @@ public static partial class Dft1D
 
     // Real-to-Complex (Forward)
     /// <summary>
+    /// 执行实数→复数的一维正向傅里叶变换（R2C，紧凑半谱输出）。
+    /// </summary>
+    /// <param name="realInput">已固定的实数输入缓冲区，长度为 N。</param>
+    /// <param name="complexOutput">已固定的复数输出缓冲区，长度应不小于 N/2+1（紧凑半谱）。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Forward(PinnableArray<float> realInput, PinnableArray<ComplexFp32> complexOutput, fftw_flags flags = fftw_flags.Estimate)
+        => Dft1DR2C(realInput, complexOutput, flags);
+
+    /// <summary>
     /// 执行实数→复数的一维正向傅里叶变换（紧凑半谱输出）。
     /// </summary>
     /// <param name="realInput">实数输入数据，长度为 N。</param>
@@ -75,6 +123,16 @@ public static partial class Dft1D
         => Dft1DR2C(realInput, complexOutput, flags);
 
     // Complex-to-Real (Inverse)
+    /// <summary>
+    /// 执行复数半谱→实数的一维逆向傅里叶变换（C2R），可选按 1/N 自动归一化。
+    /// </summary>
+    /// <param name="complexInput">已固定的复数输入半谱缓冲区，长度应不小于 N/2+1。</param>
+    /// <param name="realOutput">已固定的实数输出缓冲区，长度为 N。</param>
+    /// <param name="scale">是否按 1/N 归一化，默认 <c>true</c>。</param>
+    /// <param name="flags">规划策略，默认 <see cref="fftw_flags.Estimate"/>。</param>
+    public static void Inverse(PinnableArray<ComplexFp32> complexInput, PinnableArray<float> realOutput, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+        => Dft1DC2R(complexInput, realOutput, scale, flags);
+
     /// <summary>
     /// 执行复数半谱→实数的一维逆向傅里叶变换，可选按 1/N 自动归一化。
     /// </summary>
@@ -88,6 +146,25 @@ public static partial class Dft1D
     // ==========================
     // 原始实现（内部管线，设为 internal）
     // ==========================
+
+
+    internal static void Dft1DComplexInPlace(PinnableArray<ComplexFp32> buffer, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    {
+        InvalidOperationException.ThrowIfUnpinned(buffer);
+
+        var plan = fftwf.dft_1d(buffer.Length, buffer, buffer, direction, flags);
+        InvalidOperationException.ThrowIfZero(plan, "Failed to create in-place complex plan.");
+
+        try
+        {
+            fftwf.execute(plan);
+        }
+        finally
+        {
+            fftwf.destroy_plan(plan);
+        }
+    }
+
 
     /// <summary>
     /// 复数缓冲区原地一维 DFT，方向由 <paramref name="direction"/> 指定。
@@ -117,6 +194,27 @@ public static partial class Dft1D
                     fftwf.destroy_plan(plan);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// 计算单精度复数输入的一维 C2C DFT（非原地，已固定重载）。
+    /// </summary>
+    internal static void Dft1DComplex(PinnableArray<ComplexFp32> input, PinnableArray<ComplexFp32> output, fftw_direction direction, fftw_flags flags = fftw_flags.Estimate)
+    {
+        InvalidOperationException.ThrowIfUnpinned(input);
+        InvalidOperationException.ThrowIfUnpinned(output);
+
+        var plan = fftwf.dft_1d(input.Length, input, output, direction, flags);
+        InvalidOperationException.ThrowIfZero(plan, "Failed to create complex plan.");
+
+        try
+        {
+            fftwf.execute(plan);
+        }
+        finally
+        {
+            fftwf.destroy_plan(plan);
         }
     }
 
@@ -153,6 +251,37 @@ public static partial class Dft1D
         }
     }
 
+
+    // 1D real/complex
+
+    /// <summary>
+    /// 执行单精度实数输入到单精度复数输出的一维实数→复数 (R2C) DFT（已固定重载）。
+    /// </summary>
+    internal static void Dft1DR2C(PinnableArray<float> realInput, PinnableArray<ComplexFp32> complexOutput, fftw_flags flags = fftw_flags.Estimate)
+    {
+        InvalidOperationException.ThrowIfUnpinned(realInput);
+        InvalidOperationException.ThrowIfUnpinned(complexOutput);
+
+        // 允许输出长度不小于 N/2+1（紧凑半谱）
+        var required = (realInput.Length / 2) + 1;
+        if (complexOutput.Length < required)
+            throw new ArgumentException("For R2C: complexOutput.Length must be at least realInput.Length / 2 + 1 (compact half-spectrum).");
+
+        var plan = fftwf.dft_r2c_1d(realInput.Length, realInput, complexOutput, flags);
+
+        InvalidOperationExceptionExtension.ThrowIfZero(plan, "Failed to create 1D real to complex plan.");
+
+        try
+        {
+            fftwf.execute(plan);
+        }
+        finally
+        {
+            fftwf.destroy_plan(plan);
+        }
+    }
+
+
     /// <summary>
     /// 实数→复数的一维正向变换 (R2C)，输出为紧凑半谱（包含 DC 与 Nyquist）。
     /// </summary>
@@ -179,6 +308,43 @@ public static partial class Dft1D
                 try { fftwf.execute(plan); }
                 finally { fftwf.destroy_plan(plan); }
             }
+        }
+    }
+
+
+    /// <summary>
+    /// 执行单精度复数→实数的一维 C2R 逆变换（已固定重载），可选按 1/N 归一化。
+    /// </summary>
+    internal static void Dft1DC2R(PinnableArray<ComplexFp32> complexInput, PinnableArray<float> realOutput, bool scale = true, fftw_flags flags = fftw_flags.Estimate)
+    {
+        InvalidOperationException.ThrowIfUnpinned(complexInput);
+        InvalidOperationException.ThrowIfUnpinned(realOutput);
+
+        // 允许输入半谱长度不小于 N/2+1
+        var required = (realOutput.Length / 2) + 1;
+        if (complexInput.Length < required)
+            throw new ArgumentException("For C2R: complexInput.Length must be at least realOutput.Length / 2 + 1 (compact half-spectrum).");
+
+        var plan = fftwf.dft_c2r_1d(realOutput.Length, complexInput, realOutput, flags);
+
+        InvalidOperationException.ThrowIfZero(plan, "Failed to create 1D complex to real plan.");
+
+        try
+        {
+            fftwf.execute(plan);
+        }
+        finally
+        {
+            fftwf.destroy_plan(plan);
+        }
+
+        if (scale)
+        {
+            // N 是实数输出长度（输入实数长度）
+            var factor = 1.0f / realOutput.Length;
+
+            // PinnableArray 版本保守使用标量循环
+            ScaleInPlace(realOutput, factor);
         }
     }
 
