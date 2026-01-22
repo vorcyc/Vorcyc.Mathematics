@@ -9,7 +9,7 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Extensions.FFTW</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\ExceptionExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EnvelopeComputer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\Dft1D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\Dft2D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FftwDouble\Dft3D.cs" />
@@ -22,10 +22,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\DftND.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\RealToRealTransforms.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FftwSingle\Utilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HilbertTransform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interop\enums.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interop\fftw.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interop\fftwf.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\PinnableArraySignalExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SignalExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />

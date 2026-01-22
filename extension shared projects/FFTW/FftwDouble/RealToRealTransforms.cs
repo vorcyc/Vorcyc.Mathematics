@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
+﻿using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Extensions.FFTW.Interop;
 
 namespace Vorcyc.Mathematics.Extensions.FFTW;

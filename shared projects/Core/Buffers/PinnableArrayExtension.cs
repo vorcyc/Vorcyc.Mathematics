@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Vorcyc.Mathematics.Statistics;
 
-namespace Vorcyc.Mathematics;
+namespace Vorcyc.Mathematics.Buffers;
 
 
 /// <summary>
@@ -10,7 +10,7 @@ namespace Vorcyc.Mathematics;
 /// </summary>
 /// <remarks>
 /// - Designed for numeric types implementing <see cref="INumber{TSelf}"/>.
-/// - Methods operate directly on the underlying storage via <see cref="PinnableArray{T}.AsSpan()"/> to avoid extra allocations.
+/// - Methods operate directly on the underlying storage via <see cref="PinnableArray{T}.Span"/> to avoid extra allocations.
 /// - Async methods can utilize a configurable worker count or TPL-based strategy.
 /// </remarks>
 public static class PinnableArrayExtension
@@ -24,7 +24,7 @@ public static class PinnableArrayExtension
         /// Returns the maximum value in the current <see cref="PinnableArray{T}"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Max() => Statistics.INumberExtension.Max(array.AsSpan());
+        public T Max() => Statistics.INumberExtension.Max(array.Span);
 
         /// <summary>
         /// Returns the maximum value within the specified sub-range of the current <see cref="PinnableArray{T}"/>.
@@ -32,7 +32,7 @@ public static class PinnableArrayExtension
         /// <param name="start">Start index of the sub-range.</param>
         /// <param name="length">Number of elements in the sub-range.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Max(int start, int length) => Statistics.INumberExtension.Max(array.AsSpan(start, length));
+        public T Max(int start, int length) => Statistics.INumberExtension.Max(array[start, length]);
 
         /// <summary>
         /// Asynchronously computes the maximum value in the current <see cref="PinnableArray{T}"/>.
@@ -73,7 +73,7 @@ public static class PinnableArrayExtension
         /// </summary>
         /// <returns>The smallest element.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Min() => Statistics.INumberExtension.Min(array.AsSpan());
+        public T Min() => Statistics.INumberExtension.Min(array.Span);
 
         /// <summary>
         /// Returns the minimum value within the specified sub-range of the current <see cref="PinnableArray{T}"/>.
@@ -82,7 +82,7 @@ public static class PinnableArrayExtension
         /// <param name="length">Number of elements in the sub-range.</param>
         /// <returns>The smallest element in the sub-range.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Min(int start, int length) => Statistics.INumberExtension.Min(array.AsSpan(start, length));
+        public T Min(int start, int length) => Statistics.INumberExtension.Min(array[start, length]);
 
         /// <summary>
         /// Asynchronously computes the minimum value in the current <see cref="PinnableArray{T}"/>.

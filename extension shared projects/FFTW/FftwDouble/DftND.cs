@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
 using Vorcyc.Mathematics.Extensions.FFTW.Interop;
 

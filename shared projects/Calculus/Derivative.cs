@@ -23,7 +23,35 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     private readonly Dictionary<T, T> _singleCache;
     private readonly Dictionary<string, T> _multiCache;
 
-    public enum Method { Forward, Backward, Central, CentralFourthOrder }
+    /// <summary>
+    /// Specifies the finite difference method used for numerical differentiation.
+    /// </summary>
+    /// <remarks>Use this enumeration to select the desired finite difference scheme when performing numerical
+    /// differentiation. The available methods include forward, backward, central, and a higher-accuracy central
+    /// fourth-order approach. The choice of method affects the accuracy and stability of the derivative
+    /// calculation.</remarks>
+    public enum Method
+    {
+        /// <summary>
+        /// Represents the forward direction or movement.
+        /// </summary>
+        Forward,
+        /// <summary>
+        /// Represents the backward direction or movement.
+        /// </summary>
+        Backward,
+        /// <summary>
+        /// Represents the central entity or component within the context of the application.
+        /// </summary>
+        Central,
+        /// <summary>
+        /// Represents a central fourth-order finite difference scheme or operator.
+        /// </summary>
+        /// <remarks>This type is typically used in numerical analysis or scientific computing scenarios
+        /// where high-accuracy central difference approximations are required. It may be used for discretizing
+        /// derivatives in partial differential equations or similar applications.</remarks>
+        CentralFourthOrder
+    }
 
     /// <summary>
     /// 为单变量函数初始化 <see cref="Derivative{T}"/> 实例。

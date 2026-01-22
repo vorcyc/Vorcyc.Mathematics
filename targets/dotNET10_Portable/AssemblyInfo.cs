@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
+﻿[assembly: InternalsVisibleTo("Vorcyc.Mathematics.Extensions.FFTW")]
 [assembly: InternalsVisibleTo("Vorcyc.SignalStudio.Framework")]
 [assembly: InternalsVisibleTo("Vorcyc.SignalStudio.Shell")]
 [assembly: InternalsVisibleTo("Vorcyc.SignalStudio.DataVisualization")]

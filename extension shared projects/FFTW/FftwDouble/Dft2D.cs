@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
 using Vorcyc.Mathematics.Extensions.FFTW.Interop;
 

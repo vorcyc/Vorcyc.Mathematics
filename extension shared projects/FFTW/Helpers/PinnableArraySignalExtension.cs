@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Numerics;
 
 namespace Vorcyc.Mathematics.Extensions.FFTW.Helpers;
@@ -126,7 +127,7 @@ public static class PinnableArraySignalExtension
             int N = array.Length;
             if (N < 2) throw new ArgumentException("FFT length too small");
             int len = N / 2 + (N % 2);
-            return array.AsSpan(1, len);
+            return array[1, len];
         }
 
         /// <summary>
@@ -221,7 +222,7 @@ public static class PinnableArraySignalExtension
             int N = array.Length;
             if (N < 2) throw new ArgumentException("FFT length too small");
             int len = N / 2 + (N % 2);
-            return array.AsSpan(1, len);
+            return array[1, len];
         }
 
         /// <summary>

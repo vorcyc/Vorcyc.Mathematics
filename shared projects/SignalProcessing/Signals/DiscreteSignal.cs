@@ -1,5 +1,6 @@
 ﻿namespace Vorcyc.Mathematics.SignalProcessing.Signals;
 
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Framework;
 
 /*
@@ -230,7 +231,7 @@ public class DiscreteSignal : ICloneable<DiscreteSignal>, IDisposable
     /// <returns>A new <see cref="DiscreteSignal"/> that contains the same sampling rate and samples.</returns>
     public DiscreteSignal Clone()
     {
-        return new(_samplingRate, _samples, false);
+        return new(_samplingRate, _samples.Span, false);
     }
 
     #endregion
@@ -266,7 +267,7 @@ public class DiscreteSignal : ICloneable<DiscreteSignal>, IDisposable
             // Implementaion is LINQ-less, since Skip() would be less efficient:
             //     return new DiscreteSignal(SamplingRate, Samples.Skip(startPos).Take(endPos - startPos));
 
-            return new(_samplingRate, _samples.Values.FastCopyFragment(endPos - startPos, startPos), false);
+            return new(_samplingRate, ((float[]) _samples).FastCopyFragment(endPos - startPos, startPos), false);
         }
     }
 
@@ -282,7 +283,7 @@ public class DiscreteSignal : ICloneable<DiscreteSignal>, IDisposable
             //RuntimeHelpers.GetSubArray
             return new(
                 _samplingRate,
-                _samples.Values.FastCopyFragment(range.End.Value - range.Start.Value, range.Start.Value),
+                ((float[])_samples).FastCopyFragment(range.End.Value - range.Start.Value, range.Start.Value),
                 false);
         }
     }

@@ -165,7 +165,6 @@ public static class CurveFitter<T>
     /// <summary>
     /// 三次样条插值拟合：通过给定的点生成平滑曲线。
     /// </summary>
-    /// <typeparam name="T">浮点类型</typeparam>
     /// <param name="xData">X 数据点（必须单调递增）</param>
     /// <param name="yData">Y 数据点</param>
     /// <returns>拟合结果</returns>

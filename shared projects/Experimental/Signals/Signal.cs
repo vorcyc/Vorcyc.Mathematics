@@ -1,169 +1,270 @@
-﻿
-namespace Vorcyc.Mathematics.Experimental.Signals;
-
-using System.Runtime.CompilerServices;
+﻿using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Helpers;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
-using Vorcyc.Mathematics.Framework;
 
+namespace Vorcyc.Mathematics.Experimental.Signals;
 
 /// <summary>
-/// 表示一个信号类，包含信号样本和采样率，并提供计算信号属性的方法。
+/// Represents a single-threaded time-domain signal wrapper that provides sample storage,
+/// time/energy/power statistics, frequency-domain transforms, and resampling.
 /// </summary>
-public class Signal : ITimeDomainSignal, ICloneable<Signal>
+public class Signal : ISingleThreadTimeDomainSignal, ICloneable<Signal>, IDisposable, IEquatable<Signal>
 {
+    internal POHBuffer<float>? _buffer;
 
-    //internal float[] _samples;
-    internal PinnableArray<float> _samples;
-    private int _length;
-    private float _samplingRate;
+    private volatile int _length;
+    private readonly float _samplingRate;
 
-    public Signal(int count, float samplingRate)
+    /// <summary>
+    /// Initializes a signal with the specified sample count and sampling rate.
+    /// </summary>
+    /// <param name="sampleCount">The number of samples. Must be greater than 0.</param>
+    /// <param name="samplingRate">The sampling rate in Hz.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="sampleCount"/> or <paramref name="samplingRate"/> is less than or equal to 0.
+    /// </exception>
+    public Signal(int sampleCount, float samplingRate)
     {
-        _length = count;
-        //_samples = new float[count];
-        _samples = new PinnableArray<float>(count);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(sampleCount, 0, nameof(sampleCount));
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(samplingRate, 0f, nameof(samplingRate));
+
+        _length = sampleCount;
         _samplingRate = samplingRate;
+        _buffer = new(sampleCount);
     }
 
+    /// <summary>
+    /// Initializes a signal with the specified duration and sampling rate.
+    /// </summary>
+    /// <param name="duration">The signal duration.</param>
+    /// <param name="samplingRate">The sampling rate in Hz.</param>
     public Signal(TimeSpan duration, float samplingRate)
         : this(ITimeDomainSignal.TimeToArrayIndexOrLength(duration, samplingRate), samplingRate)
-    { }
+    {
+    }
 
 
-
-
-
-    /// <summary>
-    /// 获取信号样本数组。(实际长度，而非补 0 后的长度）
-    /// </summary>
-    //public Span<float> Samples => _samples.AsSpan(0, _length);
-    public Span<float> Samples => _samples;
-
-
-    internal PinnableArray<float> UnderlayingArray => _samples;
+    #region Signal Properties
 
     /// <summary>
-    /// 获取信号的采样率。
+    /// Gets the underlying pinned buffer.
     /// </summary>
-    public float SamplingRate => _samplingRate;
+    public POHBuffer<float> UnderlyingBuffer
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _buffer!;
+        }
+    }
 
     /// <summary>
-    /// 获取信号的持续时间。
+    /// Gets a <see cref="Span{T}"/> view over the sample data.
     /// </summary>
-    public TimeSpan Duration => TimeSpan.FromSeconds(1f / _samplingRate * _length);
+    public Span<float> Samples
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _buffer!.Span;
+        }
+    }
 
-    /// <summary>
-    /// 获取信号的长度。
-    /// </summary>
+    /// <inheritdoc cref="ITimeDomainSignal.Length"/>
     public int Length => _length;
 
+    /// <inheritdoc cref="ITimeDomainSignal.SamplingRate"/>
+    public float SamplingRate => _samplingRate;
+
+    /// <inheritdoc cref="ITimeDomainSignal.Duration"/>
+    public TimeSpan Duration => ITimeDomainSignal.ArrayIndexOrLengthToTime(_length, _samplingRate);
+
+    /// <inheritdoc cref="ITimeDomainSignal.NotifySamplesModified"/>
+    public void NotifySamplesModified()
+    {
+        ThrowIfDisposed();
+        // 清除所有延迟计算缓存
+        ClearAllCaches();
+    }
+
+    #endregion
 
 
-    //public float Amplitude => ITimeDomainSignal.Amplitude_Normal(this.ValidSamples);
+    #region Time-Domain Characteristics
 
-    /// <summary>
-    /// 获取信号的幅度（最大值与最小值之差）。
-    /// </summary>
-    public float Amplitude => ITimeDomainCharacteristics.GetAmplitude_SIMD(this.Samples);
+    private float? _amplitude = null;
 
-    /// <summary>
-    /// 获取信号的周期（采样率的倒数）。
-    /// </summary>
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Amplitude"/>
+    public float Amplitude => _amplitude ??= ITimeDomainCharacteristics.GetAmplitude_SIMD(Samples);
+
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Period"/>
     public float Period => 1f / _samplingRate;
 
+    private float? _totalPower = null;
 
-    //public float Power => ITimeDomainSignal.GetPower_Normal(this.ValidSamples);
+    /// <inheritdoc cref="ITimeDomainCharacteristics.TotalPower"/>
+    public float TotalPower => _totalPower ??= ITimeDomainCharacteristics.GetTotalPower_SIMD(Samples);
+
+    private float? _averagePower = null;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.AveragePower"/>
+    public float AveragePower => _averagePower ??= ITimeDomainCharacteristics.GetAveragePower_SIMD(Samples);
+
+    private float? _totalEnergy = null;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.TotalEnergy"/>
+    public float TotalEnergy => _totalEnergy ??= ITimeDomainCharacteristics.GetTotalEnergy_SIMD(Samples);
+
+    private float? _averageEnergy = null;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.AverageEnergy"/>
+    public float AverageEnergy => _averageEnergy ??= ITimeDomainCharacteristics.GetAverageEnergy_SIMD(Samples);
+
+    private float? _rms = null;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Rms"/>
+    public float Rms => _rms ??= ITimeDomainCharacteristics.GetRms_SIMD(Samples);
+
+    private float? _zeroCrossingRate = null;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.ZeroCrossingRate"/>
+    public float ZeroCrossingRate => _zeroCrossingRate ??= ITimeDomainCharacteristics.GetZeroCrossingRate_NEWSIMD_Grok(Samples);
+
+    private float? _entropy = null;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Entropy"/>
+    public float Entropy => _entropy ??= ITimeDomainCharacteristics.GetEntropy_SIMD(Samples);
+
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.GetEntropy(int)"/>
+    public float GetEntropy(int binCount = 32)
+    {
+        ThrowIfDisposed();
+        return ITimeDomainCharacteristics.GetEntropy_SIMD(Samples, binCount);
+    }
 
     /// <summary>
-    /// 获取信号的功率（样本平方和的平均值）。
+    /// Clears all lazily computed cached characteristic values.
     /// </summary>
-    public float Power => ITimeDomainCharacteristics.GetPower_SIMD(this.Samples);
+    protected void ClearAllCaches()
+    {
+        _amplitude = null;
+        _totalPower = null;
+        _averagePower = null;
+        _totalEnergy = null;
+        _averageEnergy = null;
+        _rms = null;
+        _zeroCrossingRate = null;
+        _entropy = null;
+    }
+
+    #endregion
 
 
-    //public float Energy => ITimeDomainSignal.GetEnergy_Normal(this.ValidSamples);
+    #region IClone<T>
 
     /// <summary>
-    /// 获取信号的能量（样本平方和）。
+    /// Creates a deep copy of this signal, including its sample buffer and metadata.
     /// </summary>
-    public float Energy => ITimeDomainCharacteristics.GetEnergy_SIMD(this.Samples);
-
-
-
+    /// <returns>A new <see cref="Signal"/> instance.</returns>
     public Signal Clone()
     {
+        ThrowIfDisposed();
         var result = new Signal(_length, _samplingRate);
-        this.Samples.CopyTo(result.Samples);
+        _buffer!.Span.CopyTo(result._buffer!.Span);
         return result;
     }
 
-    /// <summary>
-    /// 将信号段转换为频域信号。
-    /// </summary>
-    /// <param name="window">窗口类型，可选参数。</param>
-    /// <param name="fftVersion">FFT的执行方式。建议小规模数据用<see cref="FftVersion.Normal"/>，大规模数据用<see cref="FftVersion.Parallel"/>。默认为<see cref="FftVersion.Normal"/></param>
-    /// <returns>频域信号对象。</returns>
+    #endregion
+
+
+    #region To Frequency-domain
+
+    /// <inheritdoc cref="ITimeDomainSignal.TransformToFrequencyDomain(WindowType?, FftVersion)"/>
     public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)
     {
+        ThrowIfDisposed();
         FastFourierTransform.Version = fftVersion;
 
         if (window is null && _length.IsPowerOf2())//若不应用窗函数，则直接使用补过 0 后的样本进行变换
         {
-            FastFourierTransform.Forward(_samples, 0, out var result, _length);
+            var result = new ComplexFp32[_length];
+            FastFourierTransform.Forward(_buffer!.Span, result);
             return new FrequencyDomain(0, _length, _length, result, this, window);
         }
         else//由于窗函数需要修改样本值，所以只要使用窗函数都需要创建临时副本
         {
-            var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_samples, 0, _length.NextPowerOf2(), _length, window);
+            var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_buffer!.Span, _length.NextPowerOf2(), window);
             FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
             return new FrequencyDomain(0, windowedSamples.Length, _length, result, this, window);
         }
     }
 
-    public Signal Resample(
-        int destnationSamplingRate,
-        FirFilter? filter = null,
-        int order = 15)
+
+    #endregion
+
+
+    #region Resample
+
+    /// <inheritdoc cref="ITimeDomainSignal.Resample(int, FirFilter?, int)"/>
+    public Signal Resample(int destnationSamplingRate, FirFilter? filter = null, int order = 15)
     {
-        return ITimeDomainSignal.Resample(this, destnationSamplingRate, filter, order);
+        ThrowIfDisposed();
+        return SignalResamplingExtension.Resample(this, destnationSamplingRate, filter, order);
     }
 
-
+    #endregion
 
 
     #region Indexer
 
 
     /// <summary>
-    /// 获取或设置指定索引处的采样值。
+    /// Gets or sets the sample value at the specified index.
     /// </summary>
-    /// <param name="index">采样值的索引。</param>
-    /// <returns>指定索引处的采样值。</returns>
+    /// <param name="index">The zero-based index of the sample.</param>
+    /// <returns>The sample value at the specified index.</returns>
+    /// <exception cref="ObjectDisposedException">The signal has been disposed.</exception>
     public float this[int index]
     {
         [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-        get => Samples[index];
+        get
+        {
+            ThrowIfDisposed();
+            return Samples[index];
+        }
         [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-        set => Samples[index] = value;
+        set
+        {
+            ThrowIfDisposed();
+            Samples[index] = value;
+        }
     }
 
 
 
     /// <summary>
-    /// 以索引获取信号段的子段。
+    /// Gets a signal segment by index-based start position and length.
     /// </summary>
-    /// <param name="start">子段的起始索引。</param>
-    /// <param name="length">子段的长度。</param>
-    /// <param name="throwException">是否允许抛出异常</param>
-    /// <returns>指定起始位置和长度的信号子段。若索引超出边界则返回 null。</returns>
-    /// <exception cref="ArgumentOutOfRangeException">当起始位置或长度不在有效范围内时抛出。</exception>
+    /// <param name="start">The start index of the segment.</param>
+    /// <param name="length">The length of the segment.</param>
+    /// <param name="throwException">
+    /// If <see langword="true"/>, throws on out-of-range arguments;
+    /// if <see langword="false"/>, returns <see langword="null"/> instead.
+    /// </param>
+    /// <returns>A <see cref="SignalSegment"/> for the specified range, or <see langword="null"/> if out of bounds and <paramref name="throwException"/> is <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="start"/> or <paramref name="length"/> is out of range and <paramref name="throwException"/> is <see langword="true"/>.</exception>
+    /// <exception cref="ObjectDisposedException">The signal has been disposed.</exception>
     public SignalSegment? this[int start, int length, bool throwException = false]
     {
         [MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
         get
         {
+            ThrowIfDisposed();
+
             if (throwException)
             {
                 if (start < 0 || start >= _length)
@@ -186,12 +287,15 @@ public class Signal : ITimeDomainSignal, ICloneable<Signal>
     }
 
     /// <summary>
-    /// 以时间量获取信号的子段
+    /// Gets a signal segment by time-based start position and duration.
     /// </summary>
-    /// <param name="startTime">字段的起始时间</param>
-    /// <param name="duration">子段的时长</param>
-    /// <param name="throwException">是否允许抛出异常</param>
-    /// <returns>指定起始时间和时长的信号子段。若时间超出边界则返回 null。</returns>
+    /// <param name="startTime">The start time of the segment.</param>
+    /// <param name="duration">The duration of the segment.</param>
+    /// <param name="throwException">
+    /// If <see langword="true"/>, throws on out-of-range arguments;
+    /// if <see langword="false"/>, returns <see langword="null"/> instead.
+    /// </param>
+    /// <returns>A <see cref="SignalSegment"/> for the specified time range, or <see langword="null"/> if out of bounds and <paramref name="throwException"/> is <see langword="false"/>.</returns>
     public SignalSegment? this[TimeSpan startTime, TimeSpan duration, bool throwException = false]
         => this
         [
@@ -204,6 +308,67 @@ public class Signal : ITimeDomainSignal, ICloneable<Signal>
     #endregion
 
 
+    #region IEquatable<Signal>
+
+    /// <summary>
+    /// Determines whether this signal is equal to another by comparing the underlying
+    /// buffer pointer, length, and sampling rate.
+    /// </summary>
+    /// <param name="other">The signal to compare with.</param>
+    /// <returns><see langword="true"/> if the signals share the same buffer identity, length, and sampling rate; otherwise, <see langword="false"/>.</returns>
+    public unsafe bool Equals(Signal? other)
+    {
+        if (other is null) return false;
+        if (_length != other._length) return false;
+
+        return _buffer!.UnmanagedPointer == other._buffer!.UnmanagedPointer &&
+               _samplingRate == other._samplingRate;
+    }
+
+    /// <summary>
+    /// Determines whether two <see cref="Signal"/> instances are equal.
+    /// </summary>
+    public static bool operator ==(Signal? left, Signal? right)
+    {
+        if (ReferenceEquals(left, right)) return true;
+        if (left is null || right is null) return false;
+        return left.Equals(right);
+    }
+
+    /// <summary>
+    /// Determines whether two <see cref="Signal"/> instances are not equal.
+    /// </summary>
+    public static bool operator !=(Signal? left, Signal? right)
+    {
+        return !(left == right);
+    }
+
+    #endregion
+
+
+    #region overrides
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is Signal other && Equals(other);
+    }
+
+    /// <inheritdoc />
+    public override unsafe int GetHashCode()
+    {
+        ThrowIfDisposed();
+        return ((nint)_buffer!.UnmanagedPointer, _length, _samplingRate).GetHashCode();
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        ThrowIfDisposed();
+        return _buffer!.ToString();
+    }
+
+    #endregion
 
 
     #region Operators
@@ -268,22 +433,60 @@ public class Signal : ITimeDomainSignal, ICloneable<Signal>
     #endregion
 
 
+    #region Dispose pattern
 
+    private bool _isDisposed;
 
-
-
-
-    public override string ToString()
+    /// <summary>
+    /// Throws an <see cref="ObjectDisposedException"/> if this instance has been disposed.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void ThrowIfDisposed()
     {
-        return _samples.ToString();
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
     }
 
+    /// <summary>
+    /// Releases resources used by this instance.
+    /// </summary>
+    /// <param name="disposing">
+    /// <see langword="true"/> to release both managed and unmanaged resources;
+    /// <see langword="false"/> to release only unmanaged resources.
+    /// </param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_isDisposed)
+        {
+            if (disposing)
+            {
+                // 释放托管资源
+                _buffer?.Dispose();
+                _buffer = null;
 
+            }
 
+            _isDisposed = true;
+        }
+    }
 
+    /// <summary>
+    /// Releases all managed and unmanaged resources and suppresses finalization.
+    /// </summary>
+    public void Dispose()
+    {
+        // 请勿修改此方法，清理代码应放入 'Dispose(bool disposing)' 中
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 
+    /// <summary>
+    /// Finalizer. Releases unmanaged resources if <see cref="Dispose()"/> was not called explicitly.
+    /// </summary>
+    ~Signal()
+    {
+        Dispose(disposing: false);
+    }
 
-
-
+    #endregion
 
 }

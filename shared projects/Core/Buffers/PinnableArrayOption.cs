@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics;
+﻿namespace Vorcyc.Mathematics.Buffers;
 
 /// <summary>
 /// The options for <see cref="PinnableArray{T}"/>.

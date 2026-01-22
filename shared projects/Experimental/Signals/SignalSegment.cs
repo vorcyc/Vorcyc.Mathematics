@@ -1,130 +1,162 @@
-﻿using Vorcyc.Mathematics.Helpers;
+﻿using System.Diagnostics.CodeAnalysis;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.Experimental.Signals;
 
+
 /// <summary>
-/// 表示一个信号段的类，实现了 ITimeDomainSignal 接口。
+/// Represents a read-only view over a contiguous segment of a <see cref="Signal"/>,
+/// providing lazily computed time-domain characteristics and frequency-domain transforms.
 /// </summary>
-public class SignalSegment : ITimeDomainSignal
+public readonly struct SignalSegment : ITimeDomainSignal, ISingleThreadTimeDomainSignal
 {
+
     private readonly Signal _signal;
     private readonly int _start, _length;
+    private readonly TimeSpan _startTime, _duration;
+    private readonly Lazy<float> _lazyAmplitude;
+    private readonly Lazy<float> _lazyTotalPower;
+    private readonly Lazy<float> _lazyAveragePower;
+    private readonly Lazy<float> _lazyTotalEnergy;
+    private readonly Lazy<float> _lazyAverageEnergy;
+    private readonly Lazy<float> _lazyRms;
+    private readonly Lazy<float> _lazyZeroCrossingRate;
+    private readonly Lazy<float> _lazyEntropy;
 
-    /// <summary>
-    /// 内部构造函数，用于初始化 SignalSegment 类的新实例。
-    /// </summary>
-    /// <param name="signal">信号对象。</param>
-    /// <param name="start">信号段的起始位置。</param>
-    /// <param name="length">信号段的长度。</param>
     internal SignalSegment(Signal signal, int start, int length)
     {
         _signal = signal;
-        _start = start;
-        _length = length;
+        _start = start; _length = length;
+        _startTime = ITimeDomainSignal.ArrayIndexOrLengthToTime(_start, _signal.SamplingRate);
+        _duration = ITimeDomainSignal.ArrayIndexOrLengthToTime(_length, _signal.SamplingRate);
+
+        //var span = signal._baseSamples!.AsSpan(_start, _length);
+        _lazyAmplitude = new Lazy<float>(() => ITimeDomainCharacteristics.GetAmplitude_SIMD(signal._buffer![start, length]), isThreadSafe: true);
+        _lazyTotalPower = new Lazy<float>(() => ITimeDomainCharacteristics.GetTotalPower_SIMD(signal._buffer![start, length]), isThreadSafe: true);
+        _lazyAveragePower = new Lazy<float>(() => ITimeDomainCharacteristics.GetAveragePower_SIMD(signal._buffer![start, length]), isThreadSafe: true);
+        _lazyTotalEnergy = new Lazy<float>(() => ITimeDomainCharacteristics.GetTotalEnergy_SIMD(signal._buffer![start, length]), isThreadSafe: true);
+        _lazyAverageEnergy = new Lazy<float>(() => ITimeDomainCharacteristics.GetAverageEnergy_SIMD(signal._buffer![start, length]), isThreadSafe: true);
+        _lazyRms = new Lazy<float>(() => ITimeDomainCharacteristics.GetRms_SIMD(signal._buffer![start, length]), isThreadSafe: true);
+        _lazyZeroCrossingRate = new Lazy<float>(() => ITimeDomainCharacteristics.GetZeroCrossingRate_NEWSIMD_Grok(signal._buffer![start, length]), isThreadSafe: true);
+        _lazyEntropy = new Lazy<float>(() => ITimeDomainCharacteristics.GetEntropy_SIMD(signal._buffer![start, length]), isThreadSafe: true);
+
     }
 
     /// <summary>
-    /// 获取信号段的起始位置。
+    /// Gets the parent <see cref="Signals.Signal"/> that this segment belongs to.
+    /// </summary>
+    public Signal Signal => _signal;
+
+    /// <summary>
+    /// Gets the starting index of this segment within the parent signal's sample buffer.
     /// </summary>
     public int Start => _start;
 
     /// <summary>
-    /// 当前信号段的起始时间
+    /// Gets the start time of this segment relative to the beginning of the parent signal.
     /// </summary>
-    public TimeSpan StartTime => ITimeDomainSignal.ArrayIndexOrLengthToTime(_start, _signal.SamplingRate);
+    public TimeSpan StartTime => _startTime;
+
+
+    #region Signal Properties
+
 
     /// <summary>
-    /// 获取信号段的长度。
+    /// Gets a <see cref="Span{T}"/> view over the sample data of this segment.
     /// </summary>
+    public Span<float> Samples => _signal._buffer![_start, _length];
+
+    /// <inheritdoc cref="ITimeDomainSignal.Length"/>
     public int Length => _length;
 
-
-    /// <summary>
-    /// 获取信号段的持续时间。
-    /// </summary>
-    public TimeSpan Duration => ITimeDomainSignal.ArrayIndexOrLengthToTime(_length, _signal.SamplingRate);// TimeSpan.FromSeconds(1f / (float)_signal.SamplingRate * _length);
-
-    /// <summary>
-    /// 获取信号段的采样数据。
-    /// </summary>
-    //public Span<float> Samples => new(_signal._samples, _start, _length);
-    public Span<float> Samples => _signal._samples.AsSpan(_start, _length);
-
-
-    /// <summary>
-    /// 获取信号的采样率。
-    /// </summary>
+    /// <inheritdoc cref="ITimeDomainSignal.SamplingRate"/>
     public float SamplingRate => _signal.SamplingRate;
 
-    /// <summary>
-    /// 获取信号段的振幅。
-    /// </summary>
-    public float Amplitude => ITimeDomainCharacteristics.GetAmplitude_SIMD(this.Samples);
+    /// <inheritdoc cref="ITimeDomainSignal.Duration"/>
+    public TimeSpan Duration => _duration;
 
-    /// <summary>
-    /// 获取信号的周期。
-    /// </summary>
+    /// <inheritdoc cref="ITimeDomainSignal.NotifySamplesModified"/>
+    public void NotifySamplesModified()
+    {
+        // 清除所有延迟计算缓存
+        _signal.NotifySamplesModified();
+    }
+
+    #endregion
+
+
+    #region Time-Domain Characteristics
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.Amplitude"/>
+    //public float Amplitude => ITimeDomainCharacteristics.GetAmplitude_SIMD(Samples);
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.Period"/>
+    //public float Period => _signal.Period;
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.TotalPower"/>
+    //public float TotalPower => ITimeDomainCharacteristics.GetTotalPower_SIMD(Samples);
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.AveragePower"/>
+    //public float AveragePower => ITimeDomainCharacteristics.GetAveragePower_SIMD(Samples);
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.TotalEnergy"/>
+    //public float TotalEnergy => ITimeDomainCharacteristics.GetTotalEnergy_SIMD(Samples);
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.AverageEnergy"/>
+    //public float AverageEnergy => ITimeDomainCharacteristics.GetAverageEnergy_SIMD(Samples);
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.Rms"/>
+    //public float Rms => ITimeDomainCharacteristics.GetRms_SIMD(Samples);
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.ZeroCrossingRate"/>
+    //public float ZeroCrossingRate => ITimeDomainCharacteristics.GetZeroCrossingRate_NEWSIMD_Grok(Samples);
+
+    ///// <inheritdoc cref="ITimeDomainCharacteristics.Entropy"/>
+    //public float Entropy => ITimeDomainCharacteristics.GetEntropy_SIMD(Samples);
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Amplitude"/>
+    public float Amplitude => _lazyAmplitude.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Period"/>
     public float Period => _signal.Period;
 
+    /// <inheritdoc cref="ITimeDomainCharacteristics.TotalPower"/>
+    public float TotalPower => _lazyTotalPower.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.AveragePower"/>
+    public float AveragePower => _lazyAveragePower.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.TotalEnergy"/>
+    public float TotalEnergy => _lazyTotalEnergy.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.AverageEnergy"/>
+    public float AverageEnergy => _lazyAverageEnergy.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Rms"/>
+    public float Rms => _lazyRms.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.ZeroCrossingRate"/>
+    public float ZeroCrossingRate => _lazyZeroCrossingRate.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.Entropy"/>
+    public float Entropy => _lazyEntropy.Value;
+
+    /// <inheritdoc cref="ITimeDomainCharacteristics.GetEntropy(int)"/>
+    public float GetEntropy(int binCount = 32) => ITimeDomainCharacteristics.GetEntropy_SIMD(Samples, binCount);
+
+
+    #endregion
+
+
+    #region Decouple
+    
     /// <summary>
-    /// 获取信号段的功率。
+    /// Decouples this segment from its parent signal and returns an independent <see cref="Signal"/>
+    /// containing a copy of the segment's sample data.
     /// </summary>
-    public float Power => ITimeDomainCharacteristics.GetPower_SIMD(this.Samples);
-
-    /// <summary>
-    /// 获取信号段的能量。
-    /// </summary>
-    public float Energy => ITimeDomainCharacteristics.GetEnergy_SIMD(this.Samples);
-
-
-
-
-
-    /// <summary>
-    /// 将信号段转换为频域信号。
-    /// </summary>
-    /// <param name="window">窗口类型，可选参数。</param>
-    /// <param name="fftVersion">FFT的执行方式。建议小规模数据用<see cref="FftVersion.Normal"/>，大规模数据用<see cref="FftVersion.Parallel"/>。默认为<see cref="FftVersion.Normal"/></param>
-    /// <returns>频域信号对象。</returns>
-    public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)
-    {
-        FastFourierTransform.Version = fftVersion;
-        if (window is null && _length.IsPowerOf2())
-        {
-            FastFourierTransform.Forward(_signal._samples, _start, out var result, _length);
-            return new FrequencyDomain(_start, _length, _length, result, this, null);
-        }
-        else
-        {
-            var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_signal._samples, _start, _length.NextPowerOf2(), _length, window);
-            FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
-            return new FrequencyDomain(_start, windowedSamples.Length, _length, result, this, window);
-        }
-    }
-
-    /// <summary>
-    /// 重采样并返回新的信号。
-    /// </summary>
-    /// <param name="destnationSamplingRate"></param>
-    /// <param name="filter"></param>
-    /// <param name="order"></param>
-    /// <returns></returns>
-    public Signal Resample(
-            int destnationSamplingRate,
-            FirFilter? filter = null,
-            int order = 15)
-    {
-        return ITimeDomainSignal.Resample(this, destnationSamplingRate, filter, order);
-    }
-
-
-    /// <summary>
-    /// 从所在信号中脱离成为单独的信号。
-    /// </summary>
-    /// <returns></returns>
+    /// <returns>A new standalone <see cref="Signal"/> instance.</returns>
     public Signal Decouple()
     {
         var result = new Signal(this._length, this._signal.SamplingRate);
@@ -132,112 +164,98 @@ public class SignalSegment : ITimeDomainSignal
         return result;
     }
 
+    #endregion
 
 
+    #region To Frequency-domain    
 
-    #region Operators
-
-    /// <summary>
-    /// 将信号段与一个浮点数相加。
-    /// </summary>
-    /// <param name="left">信号段。</param>
-    /// <param name="right">浮点数。</param>
-    /// <returns>相加后的新信号。</returns>
-    public static Signal operator +(SignalSegment left, float right)
+    /// <inheritdoc cref="ITimeDomainSignal.TransformToFrequencyDomain(WindowType?, FftVersion)"/>
+    public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)
     {
-        var result = left.Decouple();
-        result.Samples.Add(right);
-        return result;
+        FastFourierTransform.Version = fftVersion;
+        if (window is null && _length.IsPowerOf2())
+        {
+            var result = new Vorcyc.Mathematics.Numerics.ComplexFp32[_length];
+            FastFourierTransform.Forward(Samples, result);
+            return new FrequencyDomain(_start, _length, _length, result, this, null);
+        }
+        else
+        {
+            var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_signal._buffer!.Span, _length.NextPowerOf2(), window);
+            FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
+            return new FrequencyDomain(_start, windowedSamples.Length, _length, result, this, window);
+        }
     }
-
-    /// <summary>
-    /// 将两个信号段相加。
-    /// </summary>
-    /// <param name="left">左侧信号段。</param>
-    /// <param name="right">右侧信号段。</param>
-    /// <returns>相加后的新信号，如果长度或采样率不匹配则返回 null。</returns>
-    public static Signal? operator +(SignalSegment left, SignalSegment right)
-    {
-        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
-            return null;
-        var result = left.Decouple();
-        result.Samples.Add(right.Samples);
-        return result;
-    }
-
-    /// <summary>
-    /// 将信号段与一个浮点数相减。
-    /// </summary>
-    /// <param name="left">信号段。</param>
-    /// <param name="right">浮点数。</param>
-    /// <returns>相减后的新信号。</returns>
-    public static Signal operator -(SignalSegment left, float right)
-    {
-        var result = left.Decouple();
-        result.Samples.Subtract(right);
-        return result;
-    }
-
-    /// <summary>
-    /// 将两个信号段相减。
-    /// </summary>
-    /// <param name="left">左侧信号段。</param>
-    /// <param name="right">右侧信号段。</param>
-    /// <returns>相减后的新信号，如果长度或采样率不匹配则返回 null。</returns>
-    public static Signal? operator -(SignalSegment left, SignalSegment right)
-    {
-        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
-            return null;
-        var result = left.Decouple();
-        result.Samples.Subtract(right.Samples);
-        return result;
-    }
-
-    /// <summary>
-    /// 将信号段与一个浮点数相乘。
-    /// </summary>
-    /// <param name="left">信号段。</param>
-    /// <param name="right">浮点数。</param>
-    /// <returns>相乘后的新信号。</returns>
-    public static Signal operator *(SignalSegment left, float right)
-    {
-        var result = left.Decouple();
-        result.Samples.Multiply(right);
-        return result;
-    }
-
-    /// <summary>
-    /// 将两个信号段相乘。
-    /// </summary>
-    /// <param name="left">左侧信号段。</param>
-    /// <param name="right">右侧信号段。</param>
-    /// <returns>相乘后的新信号，如果长度或采样率不匹配则返回 null。</returns>
-    public static Signal? operator *(SignalSegment left, SignalSegment right)
-    {
-        if (left.Length != right.Length || left.SamplingRate != right.SamplingRate)
-            return null;
-        var result = left.Decouple();
-        result.Samples.Multiply(right.Samples);
-        return result;
-    }
-
-    /// <summary>
-    /// 将信号段与一个浮点数相除。
-    /// </summary>
-    /// <param name="left">信号段。</param>
-    /// <param name="right">浮点数。</param>
-    /// <returns>相除后的新信号。</returns>
-    public static Signal operator /(SignalSegment left, float right)
-    {
-        var result = left.Decouple();
-        result.Samples.Divide(right);
-        return result;
-    }
-
 
     #endregion
 
 
+    #region Resample    
 
+    /// <summary>
+    /// Resamples this segment to the specified sampling rate and returns a new independent <see cref="Signal"/>.
+    /// </summary>
+    /// <param name="destnationSamplingRate">The target sampling rate in Hz.</param>
+    /// <param name="filter">An optional FIR anti-aliasing filter. If <see langword="null"/>, one is created automatically when downsampling.</param>
+    /// <param name="order">The sinc interpolation kernel half-width. Defaults to 15.</param>
+    /// <returns>A new <see cref="Signal"/> resampled at the target rate.</returns>
+    public Signal Resample(
+            int destnationSamplingRate,
+            FirFilter? filter = null,
+            int order = 15)
+    {
+        return SignalResamplingExtension.Resample(this, destnationSamplingRate, filter, order);
+    }
+
+    #endregion
+
+
+    #region overrides
+
+    /// <summary>
+    /// Determines whether the specified object is equal to the current SignalSegment instance.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current SignalSegment instance.</param>
+    /// <returns>true if the specified object is a SignalSegment and has the same signal, start, and length as the current
+    /// instance; otherwise, false.</returns>
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        return obj is SignalSegment segment &&
+               EqualityComparer<Signal>.Default.Equals(_signal, segment._signal) &&
+               _start == segment._start &&
+               _length == segment._length;
+    }
+
+    /// <summary>
+    /// Returns a string that represents the current object, including a comma-separated list of sample values and the total
+    /// item count.
+    /// </summary>
+    /// <remarks>If the collection contains more than 50 items, only the first 50 are included in the output, followed
+    /// by an ellipsis to indicate additional items.</remarks>
+    /// <returns>A string representation of the object that lists up to 50 sample values, followed by the total number of items in
+    /// the collection.</returns>
+    public override string ToString()
+    {
+        const int Max = 50;
+        var sb = new System.Text.StringBuilder("[");
+        int count = Math.Min(_length, Max);
+        for (int i = 0; i < count; i++)
+        {
+            sb.Append(Samples[i]);
+            if (i < count - 1) sb.Append(", ");
+        }
+        if (_length > Max) sb.Append("... ");
+        sb.Append($"({_length} items)]");
+        return sb.ToString();
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        //return (_signal.GetHashCode(), _start, _length).GetHashCode();
+        return HashCode.Combine(_signal.GetHashCode(), _start, _length);
+    }
+
+    #endregion
 
 }

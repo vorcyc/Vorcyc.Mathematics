@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.Buffers;
 
-namespace Vorcyc.Mathematics.Extensions.FFTW.Helpers;
+namespace Vorcyc.Mathematics;
 
 /// <summary>
 /// Provides extension methods for validating arguments and throwing <see cref="ArgumentNullException"/> when null,

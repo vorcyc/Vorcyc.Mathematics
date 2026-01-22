@@ -14,19 +14,25 @@
     <Compile Include="$(MSBuildThisFileDirectory)ArrayExtension_Advanced.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BaseConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BitMathExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\IPinnedBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\IPinnedBufferExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\NativeBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\PinnableArray.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\PinnableArrayOption.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\PinnedArrayPool.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\POHBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\PooledPinnedBuffer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Combinatorics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Constants_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstantsFp32.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\SpanMathExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\StringExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NumberMapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PinnableArrayBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PinnableArrayExtension.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PinnableArrayOption.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Buffers\PinnableArrayExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SimpleRNG.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TrigonometryHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VMath.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PinnableArray.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VMath2.cs" />
   </ItemGroup>
 </Project>

@@ -11,6 +11,7 @@
  */
 
 using System.Numerics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Framework;
 
 /// <summary>
@@ -266,7 +267,7 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
             // Implementaion is LINQ-less, since Skip() would be less efficient:
             //     return new DiscreteSignal(SamplingRate, Samples.Skip(startPos).Take(endPos - startPos));
 
-            return new(_samplingRate, _samples.Values.FastCopyFragment(endPos - startPos, startPos), false);
+            return new(_samplingRate, ((TSample[])_samples).FastCopyFragment(endPos - startPos, startPos), false);
         }
     }
 
@@ -279,10 +280,9 @@ public class DiscreteSignal<TSample> : ICloneable<DiscreteSignal<TSample>>, IDis
     {
         get
         {
-            //RuntimeHelpers.GetSubArray
             return new(
                 _samplingRate,
-                _samples.Values.FastCopyFragment(range.End.Value - range.Start.Value, range.Start.Value),
+                ((TSample[])_samples).FastCopyFragment(range.End.Value - range.Start.Value, range.Start.Value),
                 false);
         }
     }

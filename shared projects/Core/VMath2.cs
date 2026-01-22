@@ -24,7 +24,7 @@ public static partial class VMath
     //    return ((a % b) + b) % b;
     //}
 
-   
+
 
     ///// <summary>
     ///// Computes factorial <paramref name="n"/>!.
@@ -349,47 +349,46 @@ public static partial class VMath
     }
 
     /// <summary>
-    /// Finds the n-th order statistic (n-th smallest value) in the array <paramref name="a"/>.
+    /// Finds the element at the specified zero-based index in the sorted order of the span, without fully sorting the span.
     /// </summary>
-    /// <param name="a">The array to search.</param>
-    /// <param name="n">The order of the statistic to find (0-based index).</param>
-    /// <param name="start">The starting index of the range to search.</param>
-    /// <param name="end">The ending index of the range to search.</param>
-    /// <returns>The n-th smallest value in the array <paramref name="a"/>.</returns>
-    /// <remarks>
-    /// This method uses a partitioning approach similar to the quickselect algorithm to find the n-th smallest value.
-    /// </remarks>
+    /// <remarks>This method modifies the order of elements in the provided span. The operation is performed in-place
+    /// and does not allocate additional memory. The method is efficient for finding the nth element without sorting the
+    /// entire span.</remarks>
+    /// <typeparam name="T">The type of elements in the span. Must implement the INumber<T> interface.</typeparam>
+    /// <param name="span">The span of elements to search. The elements must be comparable using the less than or equal to operator.</param>
+    /// <param name="n">The zero-based index of the element to find in the sorted order. Must be between 0 and span.Length - 1.</param>
+    /// <returns>The element at the specified index in the sorted order of the span.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T FindNth<T>(Span<T> values, int n)
+    public static T FindNth<T>(Span<T> span, int n)
         where T : INumber<T>
     {
         int start = 0;
-        int end = values.Length - 1;
+        int end = span.Length - 1;
 
         while (true)
         {
             // ============== Partitioning =============
-            var pivotElem = values[end];
+            var pivotElem = span[end];
             var pivot = start - 1;
             for (var i = start; i < end; i++)
             {
-                if (values[i] <= pivotElem)
+                if (span[i] <= pivotElem)
                 {
                     pivot++;
-                    var temp = values[i];
-                    values[i] = values[pivot];
-                    values[pivot] = temp;
+                    var temp = span[i];
+                    span[i] = span[pivot];
+                    span[pivot] = temp;
                 }
             }
             pivot++;
-            var tmp = values[end];
-            values[end] = values[pivot];
-            values[pivot] = tmp;
+            var tmp = span[end];
+            span[end] = span[pivot];
+            span[pivot] = tmp;
             // ========================================
 
             if (pivot == n)
             {
-                return values[pivot];
+                return span[pivot];
             }
             if (n < pivot)
             {

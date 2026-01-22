@@ -16,7 +16,7 @@ namespace Vorcyc.Mathematics;
  */
 
 /// <summary>
-/// Simple random number generator for 64-bit floating-point number.
+/// Simple random number generator for 64-bit floating-point numbers.
 /// </summary>
 public static class SimpleRNG_Fp64
 {
@@ -36,17 +36,29 @@ public static class SimpleRNG_Fp64
     // 2) specifying one non-zero unsigned integer and taking a default value for the second
     // 3) setting the seed from the system time
 
+    /// <summary>
+    /// Sets the seed using two unsigned integer values.
+    /// </summary>
+    /// <param name="u">The first seed value.</param>
+    /// <param name="v">The second seed value.</param>
     public static void SetSeed(uint u, uint v)
     {
         if (u != 0) m_w = u;
         if (v != 0) m_z = v;
     }
 
+    /// <summary>
+    /// Sets the seed using a single unsigned integer value.
+    /// </summary>
+    /// <param name="u">The seed value.</param>
     public static void SetSeed(uint u)
     {
         m_w = u;
     }
 
+    /// <summary>
+    /// Sets the seed from the current system time.
+    /// </summary>
     public static void SetSeedFromSystemTime()
     {
         System.DateTime dt = System.DateTime.Now;
@@ -56,6 +68,12 @@ public static class SimpleRNG_Fp64
 
     // Produce a uniform random sample from the open interval (0, 1).
     // The method will not return either end point.
+    /// <summary>
+    /// Produces a uniform random sample from the open interval (0, 1).
+    /// </summary>
+    /// <returns>
+    /// A uniformly distributed random <see cref="double"/> greater than 0 and less than 1.
+    /// </returns>
     public static double GetUniform()
     {
         // 0 <= u < 2^32
@@ -68,6 +86,13 @@ public static class SimpleRNG_Fp64
     // This is the heart of the generator.
     // It uses George Marsaglia's MWC algorithm to produce an unsigned integer.
     // See http://www.bobwheeler.com/statistics/Password/MarsagliaPost.txt
+    /// <summary>
+    /// Generates the next unsigned integer using Marsaglia's MWC algorithm.
+    /// </summary>
+    /// <returns>The next pseudo-random unsigned integer.</returns>
+    /// <remarks>
+    /// See http://www.bobwheeler.com/statistics/Password/MarsagliaPost.txt
+    /// </remarks>
     private static uint GetUint()
     {
         m_z = 36969 * (m_z & 65535) + (m_z >> 16);
@@ -76,6 +101,10 @@ public static class SimpleRNG_Fp64
     }
 
     // Get normal (Gaussian) random sample with mean 0 and standard deviation 1
+    /// <summary>
+    /// Returns a normally distributed random sample with mean 0 and standard deviation 1.
+    /// </summary>
+    /// <returns>A standard normal random sample.</returns>
     public static double GetNormal()
     {
         // Use Box-Muller algorithm
@@ -87,6 +116,15 @@ public static class SimpleRNG_Fp64
     }
 
     // Get normal (Gaussian) random sample with specified mean and standard deviation
+    /// <summary>
+    /// Returns a normally distributed random sample with the specified mean and standard deviation.
+    /// </summary>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <param name="standardDeviation">The standard deviation of the distribution.</param>
+    /// <returns>A normally distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="standardDeviation"/> is less than or equal to 0.
+    /// </exception>
     public static double GetNormal(double mean, double standardDeviation)
     {
         if (standardDeviation <= 0.0)
@@ -98,12 +136,24 @@ public static class SimpleRNG_Fp64
     }
 
     // Get exponential random sample with mean 1
+    /// <summary>
+    /// Returns an exponentially distributed random sample with mean 1.
+    /// </summary>
+    /// <returns>An exponential random sample.</returns>
     public static double GetExponential()
     {
         return -Math.Log(GetUniform());
     }
 
     // Get exponential random sample with specified mean
+    /// <summary>
+    /// Returns an exponentially distributed random sample with the specified mean.
+    /// </summary>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <returns>An exponential random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="mean"/> is less than or equal to 0.
+    /// </exception>
     public static double GetExponential(double mean)
     {
         if (mean <= 0.0)
@@ -114,6 +164,20 @@ public static class SimpleRNG_Fp64
         return mean * GetExponential();
     }
 
+    /// <summary>
+    /// Returns a gamma-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter of the gamma distribution.</param>
+    /// <param name="scale">The scale parameter of the gamma distribution.</param>
+    /// <returns>A gamma-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="shape"/> is less than or equal to 0.
+    /// </exception>
+    /// <remarks>
+    /// Implementation based on "A Simple Method for Generating Gamma Variables"
+    /// by George Marsaglia and Wai Wan Tsang. ACM Transactions on Mathematical Software,
+    /// Vol 26, No 3, September 2000, pages 363-372.
+    /// </remarks>
     public static double GetGamma(double shape, double scale)
     {
         // Implementation based on "A Simple Method for Generating Gamma Variables"
@@ -154,6 +218,11 @@ public static class SimpleRNG_Fp64
         }
     }
 
+    /// <summary>
+    /// Returns a chi-square distributed random sample with the specified degrees of freedom.
+    /// </summary>
+    /// <param name="degreesOfFreedom">The number of degrees of freedom.</param>
+    /// <returns>A chi-square distributed random sample.</returns>
     public static double GetChiSquare(double degreesOfFreedom)
     {
         // A chi squared distribution with n degrees of freedom
@@ -161,6 +230,12 @@ public static class SimpleRNG_Fp64
         return GetGamma(0.5 * degreesOfFreedom, 2.0);
     }
 
+    /// <summary>
+    /// Returns an inverse gamma-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>An inverse gamma-distributed random sample.</returns>
     public static double GetInverseGamma(double shape, double scale)
     {
         // If X is gamma(shape, scale) then
@@ -168,6 +243,15 @@ public static class SimpleRNG_Fp64
         return 1.0 / GetGamma(shape, 1.0 / scale);
     }
 
+    /// <summary>
+    /// Returns a Weibull-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Weibull-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="shape"/> or <paramref name="scale"/> is less than or equal to 0.
+    /// </exception>
     public static double GetWeibull(double shape, double scale)
     {
         if (shape <= 0.0 || scale <= 0.0)
@@ -178,6 +262,15 @@ public static class SimpleRNG_Fp64
         return scale * Math.Pow(-Math.Log(GetUniform()), 1.0 / shape);
     }
 
+    /// <summary>
+    /// Returns a Cauchy-distributed random sample with the specified median and scale.
+    /// </summary>
+    /// <param name="median">The median of the distribution.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Cauchy-distributed random sample.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="scale"/> is less than or equal to 0.
+    /// </exception>
     public static double GetCauchy(double median, double scale)
     {
         if (scale <= 0)
@@ -192,6 +285,14 @@ public static class SimpleRNG_Fp64
         return median + scale * Math.Tan(Math.PI * (p - 0.5));
     }
 
+    /// <summary>
+    /// Returns a Student's t-distributed random sample with the specified degrees of freedom.
+    /// </summary>
+    /// <param name="degreesOfFreedom">The number of degrees of freedom.</param>
+    /// <returns>A Student's t-distributed random sample.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="degreesOfFreedom"/> is less than or equal to 0.
+    /// </exception>
     public static double GetStudentT(double degreesOfFreedom)
     {
         if (degreesOfFreedom <= 0)
@@ -207,6 +308,12 @@ public static class SimpleRNG_Fp64
     }
 
     // The Laplace distribution is also known as the double exponential distribution.
+    /// <summary>
+    /// Returns a Laplace-distributed random sample with the specified mean and scale.
+    /// </summary>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Laplace-distributed random sample.</returns>
     public static double GetLaplace(double mean, double scale)
     {
         double u = GetUniform();
@@ -215,11 +322,26 @@ public static class SimpleRNG_Fp64
             mean - scale * Math.Log(2 * (1 - u));
     }
 
+    /// <summary>
+    /// Returns a log-normal distributed random sample with the specified parameters.
+    /// </summary>
+    /// <param name="mu">The mean of the underlying normal distribution.</param>
+    /// <param name="sigma">The standard deviation of the underlying normal distribution.</param>
+    /// <returns>A log-normal distributed random sample.</returns>
     public static double GetLogNormal(double mu, double sigma)
     {
         return Math.Exp(GetNormal(mu, sigma));
     }
 
+    /// <summary>
+    /// Returns a beta-distributed random sample with the specified parameters.
+    /// </summary>
+    /// <param name="a">The first shape parameter.</param>
+    /// <param name="b">The second shape parameter.</param>
+    /// <returns>A beta-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="a"/> or <paramref name="b"/> is less than or equal to 0.
+    /// </exception>
     public static double GetBeta(double a, double b)
     {
         if (a <= 0.0 || b <= 0.0)
@@ -237,12 +359,10 @@ public static class SimpleRNG_Fp64
         double v = GetGamma(b, 1.0);
         return u / (u + v);
     }
-
-
 }
 
 /// <summary>
-/// Simple random number generator for 32-bit floating-point number.
+/// Simple random number generator for 32-bit floating-point numbers.
 /// </summary>
 public static class SimpleRNG_Fp32
 {
@@ -262,17 +382,29 @@ public static class SimpleRNG_Fp32
     // 2) specifying one non-zero unsigned integer and taking a default value for the second
     // 3) setting the seed from the system time
 
+    /// <summary>
+    /// Sets the seed using two unsigned integer values.
+    /// </summary>
+    /// <param name="u">The first seed value.</param>
+    /// <param name="v">The second seed value.</param>
     public static void SetSeed(uint u, uint v)
     {
         if (u != 0) m_w = u;
         if (v != 0) m_z = v;
     }
 
+    /// <summary>
+    /// Sets the seed using a single unsigned integer value.
+    /// </summary>
+    /// <param name="u">The seed value.</param>
     public static void SetSeed(uint u)
     {
         m_w = u;
     }
 
+    /// <summary>
+    /// Sets the seed from the current system time.
+    /// </summary>
     public static void SetSeedFromSystemTime()
     {
         System.DateTime dt = System.DateTime.Now;
@@ -282,6 +414,12 @@ public static class SimpleRNG_Fp32
 
     // Produce a uniform random sample from the open interval (0, 1).
     // The method will not return either end point.
+    /// <summary>
+    /// Produces a uniform random sample from the open interval (0, 1).
+    /// </summary>
+    /// <returns>
+    /// A uniformly distributed random <see cref="float"/> greater than 0 and less than 1.
+    /// </returns>
     public static float GetUniform()
     {
         // 0 <= u < 2^32
@@ -294,6 +432,13 @@ public static class SimpleRNG_Fp32
     // This is the heart of the generator.
     // It uses George Marsaglia's MWC algorithm to produce an unsigned integer.
     // See http://www.bobwheeler.com/statistics/Password/MarsagliaPost.txt
+    /// <summary>
+    /// Generates the next unsigned integer using Marsaglia's MWC algorithm.
+    /// </summary>
+    /// <returns>The next pseudo-random unsigned integer.</returns>
+    /// <remarks>
+    /// See http://www.bobwheeler.com/statistics/Password/MarsagliaPost.txt
+    /// </remarks>
     private static uint GetUint()
     {
         m_z = 36969 * (m_z & 65535) + (m_z >> 16);
@@ -302,6 +447,10 @@ public static class SimpleRNG_Fp32
     }
 
     // Get normal (Gaussian) random sample with mean 0 and standard deviation 1
+    /// <summary>
+    /// Returns a normally distributed random sample with mean 0 and standard deviation 1.
+    /// </summary>
+    /// <returns>A standard normal random sample.</returns>
     public static float GetNormal()
     {
         // Use Box-Muller algorithm
@@ -313,6 +462,15 @@ public static class SimpleRNG_Fp32
     }
 
     // Get normal (Gaussian) random sample with specified mean and standard deviation
+    /// <summary>
+    /// Returns a normally distributed random sample with the specified mean and standard deviation.
+    /// </summary>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <param name="standardDeviation">The standard deviation of the distribution.</param>
+    /// <returns>A normally distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="standardDeviation"/> is less than or equal to 0.
+    /// </exception>
     public static float GetNormal(float mean, float standardDeviation)
     {
         if (standardDeviation <= 0.0f)
@@ -324,6 +482,10 @@ public static class SimpleRNG_Fp32
     }
 
     // Get exponential random sample with mean 1
+    /// <summary>
+    /// Returns an exponentially distributed random sample with mean 1.
+    /// </summary>
+    /// <returns>An exponential random sample.</returns>
     public static float GetExponential()
     {
 
@@ -331,6 +493,14 @@ public static class SimpleRNG_Fp32
     }
 
     // Get exponential random sample with specified mean
+    /// <summary>
+    /// Returns an exponentially distributed random sample with the specified mean.
+    /// </summary>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <returns>An exponential random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="mean"/> is less than or equal to 0.
+    /// </exception>
     public static float GetExponential(float mean)
     {
         if (mean <= 0.0f)
@@ -341,6 +511,20 @@ public static class SimpleRNG_Fp32
         return mean * GetExponential();
     }
 
+    /// <summary>
+    /// Returns a gamma-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter of the gamma distribution.</param>
+    /// <param name="scale">The scale parameter of the gamma distribution.</param>
+    /// <returns>A gamma-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="shape"/> is less than or equal to 0.
+    /// </exception>
+    /// <remarks>
+    /// Implementation based on "A Simple Method for Generating Gamma Variables"
+    /// by George Marsaglia and Wai Wan Tsang. ACM Transactions on Mathematical Software,
+    /// Vol 26, No 3, September 2000, pages 363-372.
+    /// </remarks>
     public static float GetGamma(float shape, float scale)
     {
         // Implementation based on "A Simple Method for Generating Gamma Variables"
@@ -381,6 +565,11 @@ public static class SimpleRNG_Fp32
         }
     }
 
+    /// <summary>
+    /// Returns a chi-square distributed random sample with the specified degrees of freedom.
+    /// </summary>
+    /// <param name="degreesOfFreedom">The number of degrees of freedom.</param>
+    /// <returns>A chi-square distributed random sample.</returns>
     public static float GetChiSquare(float degreesOfFreedom)
     {
         // A chi squared distribution with n degrees of freedom
@@ -388,6 +577,12 @@ public static class SimpleRNG_Fp32
         return GetGamma(0.5f * degreesOfFreedom, 2.0f);
     }
 
+    /// <summary>
+    /// Returns an inverse gamma-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>An inverse gamma-distributed random sample.</returns>
     public static float GetInverseGamma(float shape, float scale)
     {
         // If X is gamma(shape, scale) then
@@ -395,6 +590,15 @@ public static class SimpleRNG_Fp32
         return 1.0f / GetGamma(shape, 1.0f / scale);
     }
 
+    /// <summary>
+    /// Returns a Weibull-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Weibull-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="shape"/> or <paramref name="scale"/> is less than or equal to 0.
+    /// </exception>
     public static float GetWeibull(float shape, float scale)
     {
         if (shape <= 0.0f || scale <= 0.0f)
@@ -405,6 +609,15 @@ public static class SimpleRNG_Fp32
         return scale * MathF.Pow(-MathF.Log(GetUniform()), 1.0f / shape);
     }
 
+    /// <summary>
+    /// Returns a Cauchy-distributed random sample with the specified median and scale.
+    /// </summary>
+    /// <param name="median">The median of the distribution.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Cauchy-distributed random sample.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="scale"/> is less than or equal to 0.
+    /// </exception>
     public static float GetCauchy(float median, float scale)
     {
         if (scale <= 0)
@@ -419,6 +632,14 @@ public static class SimpleRNG_Fp32
         return median + scale * MathF.Tan(ConstantsFp32.PI * (p - 0.5f));
     }
 
+    /// <summary>
+    /// Returns a Student's t-distributed random sample with the specified degrees of freedom.
+    /// </summary>
+    /// <param name="degreesOfFreedom">The number of degrees of freedom.</param>
+    /// <returns>A Student's t-distributed random sample.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="degreesOfFreedom"/> is less than or equal to 0.
+    /// </exception>
     public static float GetStudentT(float degreesOfFreedom)
     {
         if (degreesOfFreedom <= 0.0f)
@@ -434,6 +655,12 @@ public static class SimpleRNG_Fp32
     }
 
     // The Laplace distribution is also known as the double exponential distribution.
+    /// <summary>
+    /// Returns a Laplace-distributed random sample with the specified mean and scale.
+    /// </summary>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Laplace-distributed random sample.</returns>
     public static float GetLaplace(float mean, float scale)
     {
         float u = GetUniform();
@@ -442,11 +669,26 @@ public static class SimpleRNG_Fp32
             mean - scale * MathF.Log(2 * (1 - u));
     }
 
+    /// <summary>
+    /// Returns a log-normal distributed random sample with the specified parameters.
+    /// </summary>
+    /// <param name="mu">The mean of the underlying normal distribution.</param>
+    /// <param name="sigma">The standard deviation of the underlying normal distribution.</param>
+    /// <returns>A log-normal distributed random sample.</returns>
     public static float GetLogNormal(float mu, float sigma)
     {
         return MathF.Exp(GetNormal(mu, sigma));
     }
 
+    /// <summary>
+    /// Returns a beta-distributed random sample with the specified parameters.
+    /// </summary>
+    /// <param name="a">The first shape parameter.</param>
+    /// <param name="b">The second shape parameter.</param>
+    /// <returns>A beta-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="a"/> or <paramref name="b"/> is less than or equal to 0.
+    /// </exception>
     public static float GetBeta(float a, float b)
     {
         if (a <= 0.0 || b <= 0.0)
@@ -464,18 +706,17 @@ public static class SimpleRNG_Fp32
         float v = GetGamma(b, 1.0f);
         return u / (u + v);
     }
-
-
 }
 
 /// <summary>
-/// Simple random number generator for floating generic type number.
+/// Simple random number generator for floating generic type numbers.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">
+/// The floating-point type used by this generator. The type must implement <see cref="IFloatingPointIeee754{TSelf}"/>.
+/// </typeparam>
 public static class RandomNumberGenerator<T>
     where T : IFloatingPointIeee754<T>
 {
-
     private static uint m_w;
     private static uint m_z;
 
@@ -492,17 +733,29 @@ public static class RandomNumberGenerator<T>
     // 2) specifying one non-zero unsigned integer and taking a default value for the second
     // 3) setting the seed from the system time
 
+    /// <summary>
+    /// Sets the seed using two unsigned integer values.
+    /// </summary>
+    /// <param name="u">The first seed value.</param>
+    /// <param name="v">The second seed value.</param>
     public static void SetSeed(uint u, uint v)
     {
         if (u != 0) m_w = u;
         if (v != 0) m_z = v;
     }
 
+    /// <summary>
+    /// Sets the seed using a single unsigned integer value.
+    /// </summary>
+    /// <param name="u">The seed value.</param>
     public static void SetSeed(uint u)
     {
         m_w = u;
     }
 
+    /// <summary>
+    /// Sets the seed from the current system time.
+    /// </summary>
     public static void SetSeedFromSystemTime()
     {
         System.DateTime dt = System.DateTime.Now;
@@ -510,12 +763,12 @@ public static class RandomNumberGenerator<T>
         SetSeed((uint)(x >> 16), (uint)(x % 4294967296));
     }
 
-
     /// <summary>
-    /// <para>Produce a uniform random sample from the open interval (0, 1).</para>
-    /// <para> The method will not return either end point.</para>
+    /// Produces a uniform random sample from the open interval (0, 1).
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A uniformly distributed random value greater than 0 and less than 1.
+    /// </returns>
     public static T GetUniform()
     {
         // 0 <= u < 2^32
@@ -526,10 +779,9 @@ public static class RandomNumberGenerator<T>
     }
 
     /// <summary>
-    /// <para>This is the heart of the generator.</para>
-    /// <para>It uses George Marsaglia's MWC algorithm to produce an unsigned integer.</para>
+    /// Generates the next unsigned integer using Marsaglia's MWC algorithm.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The next pseudo-random unsigned integer.</returns>
     /// <remarks>
     /// See http://www.bobwheeler.com/statistics/Password/MarsagliaPost.txt
     /// </remarks>
@@ -540,11 +792,10 @@ public static class RandomNumberGenerator<T>
         return (m_z << 16) + m_w;
     }
 
-
     /// <summary>
-    /// Get normal (Gaussian) random sample with mean 0 and standard deviation 1
+    /// Returns a normally distributed random sample with mean 0 and standard deviation 1.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A standard normal random sample.</returns>
     public static T GetNormal()
     {
         // Use Box-Muller algorithm
@@ -556,6 +807,15 @@ public static class RandomNumberGenerator<T>
     }
 
     // Get normal (Gaussian) random sample with specified mean and standard deviation
+    /// <summary>
+    /// Returns a normally distributed random sample with the specified mean and standard deviation.
+    /// </summary>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <param name="standardDeviation">The standard deviation of the distribution.</param>
+    /// <returns>A normally distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="standardDeviation"/> is less than or equal to 0.
+    /// </exception>
     public static T GetNormal(T mean, T standardDeviation)
     {
         if (standardDeviation <= T.Zero)
@@ -567,20 +827,22 @@ public static class RandomNumberGenerator<T>
     }
 
     /// <summary>
-    /// Get exponential random sample with mean 1
+    /// Returns an exponentially distributed random sample with mean 1.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An exponential random sample.</returns>
     public static T GetExponential()
     {
         return -T.Log(GetUniform());
     }
 
     /// <summary>
-    /// Get exponential random sample with specified mean
+    /// Returns an exponentially distributed random sample with the specified mean.
     /// </summary>
-    /// <param name="mean"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <returns>An exponential random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="mean"/> is less than or equal to 0.
+    /// </exception>
     public static T GetExponential(T mean)
     {
         if (mean <= T.Zero)
@@ -592,15 +854,17 @@ public static class RandomNumberGenerator<T>
     }
 
     /// <summary>
-    /// 
+    /// Returns a gamma-distributed random sample with the specified shape and scale.
     /// </summary>
-    /// <param name="shape"></param>
-    /// <param name="scale"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <param name="shape">The shape parameter of the gamma distribution.</param>
+    /// <param name="scale">The scale parameter of the gamma distribution.</param>
+    /// <returns>A gamma-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="shape"/> is less than or equal to 0.
+    /// </exception>
     /// <remarks>
     /// Implementation based on "A Simple Method for Generating Gamma Variables"
-    /// by George Marsaglia and Wai Wan Tsang.  ACM Transactions on Mathematical Software
+    /// by George Marsaglia and Wai Wan Tsang. ACM Transactions on Mathematical Software
     /// Vol 26, No 3, September 2000, pages 363-372.
     /// </remarks>
     public static T GetGamma(T shape, T scale)
@@ -643,6 +907,11 @@ public static class RandomNumberGenerator<T>
         }
     }
 
+    /// <summary>
+    /// Returns a chi-square distributed random sample with the specified degrees of freedom.
+    /// </summary>
+    /// <param name="degreesOfFreedom">The number of degrees of freedom.</param>
+    /// <returns>A chi-square distributed random sample.</returns>
     public static T GetChiSquare(T degreesOfFreedom)
     {
         // A chi squared distribution with n degrees of freedom
@@ -650,6 +919,12 @@ public static class RandomNumberGenerator<T>
         return GetGamma(T.CreateTruncating(0.5) * degreesOfFreedom, T.CreateTruncating(2.0));
     }
 
+    /// <summary>
+    /// Returns an inverse gamma-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>An inverse gamma-distributed random sample.</returns>
     public static T GetInverseGamma(T shape, T scale)
     {
         // If X is gamma(shape, scale) then
@@ -657,6 +932,15 @@ public static class RandomNumberGenerator<T>
         return T.One / GetGamma(shape, T.One / scale);
     }
 
+    /// <summary>
+    /// Returns a Weibull-distributed random sample with the specified shape and scale.
+    /// </summary>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Weibull-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="shape"/> or <paramref name="scale"/> is less than or equal to 0.
+    /// </exception>
     public static T GetWeibull(T shape, T scale)
     {
         if (shape <= T.Zero || scale <= T.Zero)
@@ -667,6 +951,15 @@ public static class RandomNumberGenerator<T>
         return scale * T.Pow(-T.Log(GetUniform()), T.One / shape);
     }
 
+    /// <summary>
+    /// Returns a Cauchy-distributed random sample with the specified median and scale.
+    /// </summary>
+    /// <param name="median">The median of the distribution.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Cauchy-distributed random sample.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="scale"/> is less than or equal to 0.
+    /// </exception>
     public static T GetCauchy(T median, T scale)
     {
         if (scale <= T.Zero)
@@ -681,6 +974,14 @@ public static class RandomNumberGenerator<T>
         return median + scale * T.Tan(T.Pi * (p - T.CreateTruncating(0.5)));
     }
 
+    /// <summary>
+    /// Returns a Student's t-distributed random sample with the specified degrees of freedom.
+    /// </summary>
+    /// <param name="degreesOfFreedom">The number of degrees of freedom.</param>
+    /// <returns>A Student's t-distributed random sample.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="degreesOfFreedom"/> is less than or equal to 0.
+    /// </exception>
     public static T GetStudentT(T degreesOfFreedom)
     {
         if (degreesOfFreedom <= T.Zero)
@@ -696,11 +997,11 @@ public static class RandomNumberGenerator<T>
     }
 
     /// <summary>
-    /// The Laplace distribution is also known as the double exponential distribution.
+    /// Returns a Laplace-distributed random sample with the specified mean and scale.
     /// </summary>
-    /// <param name="mean"></param>
-    /// <param name="scale"></param>
-    /// <returns></returns>
+    /// <param name="mean">The mean of the distribution.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>A Laplace-distributed random sample.</returns>
     public static T GetLaplace(T mean, T scale)
     {
         T u = GetUniform();
@@ -709,11 +1010,26 @@ public static class RandomNumberGenerator<T>
             mean - scale * T.Log(T.CreateTruncating(2) * (T.One - u));
     }
 
+    /// <summary>
+    /// Returns a log-normal distributed random sample with the specified parameters.
+    /// </summary>
+    /// <param name="mu">The mean of the underlying normal distribution.</param>
+    /// <param name="sigma">The standard deviation of the underlying normal distribution.</param>
+    /// <returns>A log-normal distributed random sample.</returns>
     public static T GetLogNormal(T mu, T sigma)
     {
         return T.Exp(GetNormal(mu, sigma));
     }
 
+    /// <summary>
+    /// Returns a beta-distributed random sample with the specified parameters.
+    /// </summary>
+    /// <param name="a">The first shape parameter.</param>
+    /// <param name="b">The second shape parameter.</param>
+    /// <returns>A beta-distributed random sample.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="a"/> or <paramref name="b"/> is invalid.
+    /// </exception>
     public static T GetBeta(T a, T b)
     {
         if (a <= T.One || b <= T.One)
@@ -731,8 +1047,4 @@ public static class RandomNumberGenerator<T>
         var v = GetGamma(b, T.One);
         return u / (u + v);
     }
-
-
-
-
 }

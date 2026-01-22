@@ -118,14 +118,17 @@ internal class CubicSplineInterpolation<T>
         return parameters;
     }
 
-
     /// <summary>
-    /// 三次样条插值拟合：通过给定的点生成平滑曲线。
+    /// Fits a cubic spline interpolation to the specified data points and returns the resulting prediction function, spline
+    /// coefficients, and mean squared error.
     /// </summary>
-    /// <typeparam name="T">浮点类型</typeparam>
-    /// <param name="xData">X 数据点（必须单调递增）</param>
-    /// <param name="yData">Y 数据点</param>
-    /// <returns>拟合结果</returns>
+    /// <remarks>The returned prediction function can be used to estimate output values for new inputs within the
+    /// range of the provided data. Extrapolation outside the input range may produce unreliable results.</remarks>
+    /// <param name="xData">The span of input values representing the independent variable. The values must be sorted in ascending order and
+    /// contain at least two elements.</param>
+    /// <param name="yData">The span of output values representing the dependent variable. Must have the same length as xData.</param>
+    /// <returns>A <see cref="FitResult{T}"/> containing the prediction function, the coefficients of the fitted cubic spline, and the mean squared
+    /// error of the fit.</returns>
     public static FitResult<T> Fit_CubicSpline(Span<T> xData, Span<T> yData)
     {
         // 创建样条插值实例

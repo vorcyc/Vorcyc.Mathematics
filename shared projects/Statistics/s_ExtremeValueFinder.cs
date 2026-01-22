@@ -223,7 +223,7 @@ public static class ExtremeValueFinder
     /// <returns>A tuple containing the maximum and minimum values in the span.</returns>
     /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static (T max, T min) FindExtremeValue_Normal<T>(this Span<T> span)
+    internal static (T max, T min) FindExtremeValue_Normal<T>(this ReadOnlySpan<T> span)
         where T : unmanaged, INumber<T>
     {
         var max = span[0];
@@ -416,15 +416,23 @@ public static class ExtremeValueFinder
     public static (float max, float min) FindExtremeValue(this Span<float> segment)
     {
         // 如果硬件支持 AVX512，则使用 AVX512 方法
-        if (Vector512.IsHardwareAccelerated)
+        //if (Vector512.IsHardwareAccelerated)
+        //    return FindExtremeValue_Vector512(segment);
+        //// 如果硬件支持 AVX2，则使用 AVX2 方法
+        //else if (Vector256.IsHardwareAccelerated)
+        //    return FindExtremeValue_Vector256(segment);
+        //// 如果硬件支持 SSE2，则使用 SSE2 方法
+        //else if (Vector128.IsHardwareAccelerated)
+        //    return FindExtremeValue_Vector128(segment);
+        //// 否则，使用普通方法
+        //else
+        //    return FindExtremeValue_Normal(segment);
+        if (Avx512F.IsSupported)   // 更精确：检查具体指令集，而非 Vector512
             return FindExtremeValue_Vector512(segment);
-        // 如果硬件支持 AVX2，则使用 AVX2 方法
-        else if (Vector256.IsHardwareAccelerated)
+        else if (Avx2.IsSupported) // AVX2 比单纯 Vector256 更明确
             return FindExtremeValue_Vector256(segment);
-        // 如果硬件支持 SSE2，则使用 SSE2 方法
-        else if (Vector128.IsHardwareAccelerated)
+        else if (Sse2.IsSupported)
             return FindExtremeValue_Vector128(segment);
-        // 否则，使用普通方法
         else
             return FindExtremeValue_Normal(segment);
     }
