@@ -1,5 +1,4 @@
 ﻿using Vorcyc.Mathematics.Experimental.Signals;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
 
 namespace core_module_test;
 
@@ -11,12 +10,16 @@ internal class signal_test
     {
 
         var s = new Signal(100, 8000);
+        Console.WriteLine(s.AveragePower);
+
         var seg = s[10, 50];
-        seg.GenerateWave(WaveShape.Square, 800);
-        Console.WriteLine(s.Power);
-        Console.WriteLine(seg.Power);
-        foreach (var ele in seg.Samples)
-            Console.WriteLine(  ele);
+        seg?.GenerateWave(WaveShape.Square, 800);
+        Console.WriteLine(seg?.AveragePower);
+        if (seg is not null)
+        {
+            foreach (var ele in seg.Value.Samples)
+                Console.WriteLine(ele);
+        }
         //Console.WriteLine(  s.UnderlayingArray.ToString());
         //for (int i = 0; i < s.Length; i++)
         //{

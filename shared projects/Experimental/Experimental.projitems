@@ -47,6 +47,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ITimeDomainSignal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ModifiableTimeDomainSignal.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Signal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalGeneratingExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalResamplingExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\SignalSegment.cs" />
   </ItemGroup>
