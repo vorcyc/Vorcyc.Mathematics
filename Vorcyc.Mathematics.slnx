@@ -9,6 +9,7 @@
     <File Path="docs/Module_Core.md" />
     <File Path="docs/Module_DeepLearning.md" />
     <File Path="docs/Module_Experimental.md" />
+    <File Path="docs/Module_Extensions_FFTW.md" />
     <File Path="docs/Module_LinearAlgebra.md" />
     <File Path="docs/Module_MachineLearning.md" />
     <File Path="docs/Module_Numerics.md" />

@@ -21,16 +21,36 @@
 
 ---
 
-`Vorcyc.Mathematics.Experimental.Signals` 命名空间包含多种信号处理类，包括 `FrequencyDomain`、`Signal`、`SignalExtension` 和 `SignalSegment`。`FrequencyDomain` 类用于表示频域信号，提供了频率转换、逆变换等方法。`Signal` 类用于表示时域信号，包含信号样本和采样率，并提供计算信号属性的方法。`SignalExtension` 类提供了生成各种波形的方法，如正弦波、余弦波、方波、锯齿波、三角波、白噪声和粉红噪声。`SignalSegment` 类用于表示信号段，实现了 `ITimeDomainSignal` 接口，提供了信号段的频域转换、重采样等方法。
+`Vorcyc.Mathematics.Experimental.Signals` 命名空间包含多种信号处理接口、类和结构体。`ITimeDomainCharacteristics` 接口定义了时域特征属性（周期、幅度、总功率、平均功率、总能量、平均能量、RMS、过零率、熵）。`ITimeDomainSignal` 接口继承自 `ITimeDomainCharacteristics`，定义时域信号的基础契约。`ISingleThreadTimeDomainSignal` 接口提供单线程场景下的采样数据访问和重采样。`IModifiableTimeDomainSignal` 接口扩展了信号修改能力（追加、插入、删除、重采样），支持异步追加。`Signal` 类实现 `ISingleThreadTimeDomainSignal`，用于表示单线程时域信号，包含信号样本和采样率，并提供频域变换、重采样等方法。`ModifiableTimeDomainSignal` 类实现 `IModifiableTimeDomainSignal`，支持运行时安全的采样修改，提供锁保护的读写视图和异步批量追加。`FrequencyDomain` 只读结构体用于表示频域信号，提供频率转换、逆变换等方法。`SignalSegment` 只读结构体用于表示信号段，提供延迟计算的时域特征和频域转换。`SignalGeneratingExtension` 类提供了生成各种波形的方法，如正弦波、余弦波、方波、锯齿波、三角波、白噪声和粉红噪声。`IFrequencyDomain` 和 `IFrequencyDomainCharacteristics` 接口定义了频域信号的属性和频谱特征。
 
 
 > 以下类型都位于 Vorcyc.Mathematics.Experimental.Signals 命名空间
 
 :ledger:目录  
-- :bookmark: [FrequencyDomain 类](#frequencydomain-类)
+- :bookmark: [ITimeDomainCharacteristics 接口](#itimedomaincharacteristics-接口)
+- :bookmark: [ITimeDomainSignal 接口](#itimedomainsignal-接口)
+- :bookmark: [ISingleThreadTimeDomainSignal 接口](#isinglethreadtimedomainsignal-接口)
+- :bookmark: [IModifiableTimeDomainSignal 接口](#imodifiabletimedomainsignal-接口)
+- :bookmark: [IFrequencyDomainCharacteristics 接口](#ifrequencydomaincharacteristics-接口)
+- :bookmark: [IFrequencyDomain 接口](#ifrequencydomain-接口)
+- :bookmark: [FrequencyDomain 结构体](#frequencydomain-结构体)
 - :bookmark: [Signal 类](#signal-类)
-- :bookmark: [SignalExtension 类](#signalextension-类)
-- :bookmark: [SignalSegment 类](#signalsegment-类)
+- :bookmark: [ModifiableTimeDomainSignal 类](#modifiabletimedomainsignal-类)
+- :bookmark: [SignalSegment 结构体](#signalsegment-结构体)
+- :bookmark: [SignalGeneratingExtension 类](#signalgeneratingextension-类)
+
+---
+
+`Vorcyc.Mathematics.Experimental.CurveFitting` 命名空间提供了多种曲线拟合方法，通过 `CurveFitter<T>` 静态类统一访问。支持线性回归、多项式回归、指数回归、对数回归、幂回归、正弦回归、三次样条插值、局部加权回归 (LOWESS)、移动平均、非线性回归（Levenberg-Marquardt）、高斯过程回归 (GPR)、神经网络回归和贝叶斯线性回归等方法。所有拟合方法返回 `FitResult<T>` 或 `MultiColumnFitResult<T>`，包含预测函数、拟合参数和均方误差。支持 SIMD 优化（`float` 和 `double`）以及标准托管代码两种模式。
+
+> 以下类型都位于 Vorcyc.Mathematics.Experimental.CurveFitting 命名空间
+
+:ledger:目录  
+- :bookmark: [CurveFitter&lt;T> 类](#curvefittert-类)
+- :bookmark: [CurveFittingMethod 枚举](#curvefittingmethod-枚举)
+- :bookmark: [FitResult&lt;T> 类](#fitresultt-类)
+- :bookmark: [DataRow&lt;T> 结构体](#datarowt-结构体)
+- :bookmark: [OptimizationMode 枚举](#optimizationmode-枚举)
 
 ---
 
@@ -773,9 +793,153 @@ public class UnscentedKalmanFilter1DExample
 
 > 以下类型都位于 Vorcyc.Mathematics.Experimental.Signals 命名空间
 
-## FrequencyDomain 类
+## ITimeDomainCharacteristics 接口
 
-Vorcyc.Mathematics.Experimental.Signals.FrequencyDomain 是一个用于表示频域信号的类。
+`Vorcyc.Mathematics.Experimental.Signals.ITimeDomainCharacteristics` 定义了时域信号的关键特征属性接口，用于分析信号在时域中的统计和结构特征。
+
+### 属性
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `Period` | `float` | 信号周期 |
+| `Amplitude` | `float` | 信号幅度（最大值与最小值之差） |
+| `TotalPower` | `float` | 总功率（样本平方和） |
+| `AveragePower` | `float` | 平均功率（样本平方和 / 样本数） |
+| `TotalEnergy` | `float` | 总能量（等同于总功率） |
+| `AverageEnergy` | `float` | 平均能量（样本平方均值） |
+| `Rms` | `float` | 均方根值（平均能量的平方根） |
+| `ZeroCrossingRate` | `float` | 过零率，值范围 [0, 1] |
+| `Entropy` | `float` | 归一化 Shannon 熵，值范围 [0, 1] |
+
+### 方法
+
+#### 1. GetEntropy
+- `float GetEntropy(int binCount = 32)`
+  - 使用指定的 bin 数量计算 Shannon 熵。
+  - 参数:
+    - `binCount`: 用于划分数据的 bin 数量，默认为 32。
+  - 返回值: 计算得到的熵值。
+
+---
+
+## ITimeDomainSignal 接口
+
+`Vorcyc.Mathematics.Experimental.Signals.ITimeDomainSignal` 继承自 `ITimeDomainCharacteristics`，定义了时域信号的基础契约。
+
+### 属性
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `Duration` | `TimeSpan` | 信号持续时间 |
+| `SamplingRate` | `float` | 采样率 |
+| `Length` | `int` | 信号长度 |
+
+### 方法
+
+#### 1. NotifySamplesModified
+- `void NotifySamplesModified()`
+  - 在修改采样值后调用此方法，通知信号对象样本已被修改。
+
+#### 2. TransformToFrequencyDomain
+- `FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)`
+  - 将时域信号转换为频域信号。
+  - 参数:
+    - `window`: 可选的窗函数类型。
+    - `fftVersion`: FFT 执行模式，默认为 `FftVersion.Normal`。
+  - 返回值: `FrequencyDomain` 对象。
+
+---
+
+## ISingleThreadTimeDomainSignal 接口
+
+`Vorcyc.Mathematics.Experimental.Signals.ISingleThreadTimeDomainSignal` 继承自 `ITimeDomainSignal`，提供单线程场景下的采样数据访问。
+
+### 属性
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `Samples` | `Span<float>` | 信号采样数据 |
+
+### 方法
+
+#### 1. Resample
+- `Signal Resample(int destnationSamplingRate, FirFilter? filter = null, int order = 15)`
+  - 重采样信号到新的采样率。
+  - 参数:
+    - `destnationSamplingRate`: 目标采样率。
+    - `filter`: 可选的 FIR 滤波器。
+    - `order`: 滤波器阶数，默认为 15。
+  - 返回值: 重采样后的 `Signal` 对象。
+
+---
+
+## IModifiableTimeDomainSignal 接口
+
+`Vorcyc.Mathematics.Experimental.Signals.IModifiableTimeDomainSignal` 继承自 `ITimeDomainSignal`，支持运行时修改采样数据，包括追加、插入、删除和重采样操作。
+
+### 属性
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `Samples` | `ModifiableTimeDomainSignal.LockedSamplesView` | 锁保护的采样数据视图 |
+
+### 方法
+
+| 方法 | 说明 |
+|------|------|
+| `AppendAsync(float[], CancellationToken)` | 异步追加采样数据（可从其他线程调用） |
+| `FlushPendingAppends()` | 刷新待追加的采样数据，返回实际追加的数量 |
+| `Insert(int, float[])` | 在指定索引处插入采样数据 |
+| `Insert(TimeSpan, float[])` | 在指定时间点处插入采样数据 |
+| `RemoveRange(int, int)` | 移除指定索引开始的指定数量的采样数据 |
+| `RemoveRange(TimeSpan, TimeSpan)` | 移除指定时间段的采样数据 |
+| `Resample(int, FirFilter?, int)` | 重采样信号，返回 `ModifiableTimeDomainSignal` |
+
+---
+
+## IFrequencyDomainCharacteristics 接口
+
+`Vorcyc.Mathematics.Experimental.Signals.IFrequencyDomainCharacteristics` 定义了频域分析的常用属性。
+
+### 属性
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `Magnitudes` | `float[]` | 频域信号的幅度数组 |
+| `Centroid` | `float` | 频谱质心 |
+| `Frequency` | `float` | 频域信号的频率 |
+| `Phases` | `float[]` | 频域信号的相位数组 |
+| `AngularVelocities` | `float[]` | 根据相位计算的角速度数组 |
+
+---
+
+## IFrequencyDomain 接口
+
+`Vorcyc.Mathematics.Experimental.Signals.IFrequencyDomain` 继承自 `IFrequencyDomainCharacteristics`，定义了完整的频域信号接口。
+
+### 属性
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `Offset` | `int` | 频域变换在时域信号中的偏移量 |
+| `TransformLength` | `int` | FFT 变换长度（2 的幂次） |
+| `ActualLength` | `int` | 实际有效数据长度 |
+| `Resolution` | `float` | 频率分辨率 |
+| `WindowApplied` | `WindowType?` | 所使用的窗函数类型 |
+| `Result` | `ComplexFp32[]` | FFT 变换结果的复数数组 |
+| `Signal` | `ITimeDomainSignal` | 关联的原始时域信号 |
+
+### 方法
+
+#### 1. Inverse
+- `void Inverse()`
+  - 对 FFT 结果执行逆变换，将结果写回原始时域信号的采样数据中。
+
+---
+
+## FrequencyDomain 结构体
+
+`Vorcyc.Mathematics.Experimental.Signals.FrequencyDomain` 是一个**只读结构体**（`readonly struct`），实现了 `IFrequencyDomain` 接口，用于表示频域信号。该结构体封装了傅里叶变换的结果，包括原始信号、窗函数信息和计算得到的频域特征。
 
 ### 属性
 
@@ -836,111 +1000,49 @@ Vorcyc.Mathematics.Experimental.Signals.FrequencyDomain 是一个用于表示频
 #### 1. IndexToFrequency
 - `public static float IndexToFrequency(int index, int samplingRate, int fftLen)`
   - 将索引转换为频率。
-  - 参数:
-    - `index`: 索引。
-    - `samplingRate`: 采样率。
-    - `fftLen`: FFT长度。
-  - 返回值: 对应的频率。
-
 - `public float IndexToFrequency(int index)`
-  - 将索引转换为频率。
-  - 参数:
-    - `index`: 索引。
-  - 返回值: 对应的频率。
+  - 将索引转换为频率（实例方法）。
 
 #### 2. FrequencyToIndex
 - `public int FrequencyToIndex(float frequency)`
   - 将频率转换为索引。
-  - 参数:
-    - `frequency`: 频率。
-  - 返回值: 对应的索引。
 
 #### 3. Inverse
 - `public void Inverse()`
   - 对FFT结果进行逆变换，并将结果写回信号的采样数据中。
 
 ### 代码示例
-以下是一个使用 FrequencyDomain 类中多个方法的示例，并在示例中加入了注释：
 ```csharp
 using System;
 using Vorcyc.Mathematics.Experimental.Signals;
-using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
+
 public class FrequencyDomainExample
 {
     public static void Main()
-    { 
+    {
         // 定义时域信号
-        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
-        var samplingRate = 1000;
-        var signal = new Signal(samples, samplingRate);
+        var signal = new Signal(1000, 44100);
+        signal.GenerateWave(WaveShape.Sine, 440, Behaviour.Replace);
+
         // 将时域信号转换为频域信号
         var frequencyDomain = signal.TransformToFrequencyDomain(WindowType.Hamming);
 
         // 输出频域信号的属性
-        Console.WriteLine($"Offset: {frequencyDomain.Offset}");
         Console.WriteLine($"ActualLength: {frequencyDomain.ActualLength}");
         Console.WriteLine($"TransformLength: {frequencyDomain.TransformLength}");
         Console.WriteLine($"Resolution: {frequencyDomain.Resolution}");
-        Console.WriteLine($"WindowApplied: {frequencyDomain.WindowApplied}");
-
-        // 输出频域信号的结果
-        Console.WriteLine("FFT Result:");
-        foreach (var value in frequencyDomain.Result)
-        {
-            Console.WriteLine(value);
-        }
-
-        // 输出幅度
-        Console.WriteLine("Magnitudes:");
-        foreach (var magnitude in frequencyDomain.Magnitudes)
-        {
-            Console.WriteLine(magnitude);
-        }
-
-        // 输出质心
         Console.WriteLine($"Centroid: {frequencyDomain.Centroid}");
-
-        // 输出频率
         Console.WriteLine($"Frequency: {frequencyDomain.Frequency}");
-
-        // 输出相位
-        Console.WriteLine("Phases:");
-        foreach (var phase in frequencyDomain.Phases)
-        {
-            Console.WriteLine(phase);
-        }
-
-        // 输出角速度
-        Console.WriteLine("AngularVelocities:");
-        foreach (var angularVelocity in frequencyDomain.AngularVelocities)
-        {
-            Console.WriteLine(angularVelocity);
-        }
-
-        // 输出功率谱密度
-        Console.WriteLine("PowerSpectralDensity:");
-        foreach (var psd in frequencyDomain.PowerSpectralDensity)
-        {
-            Console.WriteLine(psd);
-        }
-
-        // 执行逆变换
-        frequencyDomain.Inverse();
-        Console.WriteLine("Inverse FFT Result:");
-        foreach (var sample in signal.Samples)
-        {
-            Console.WriteLine(sample);
-        }
     }
 }
 ```
 
-
+---
 
 ## Signal 类
 
-Vorcyc.Mathematics.Experimental.Signals.Signal 是一个用于表示信号的类，包含信号样本和采样率，并提供计算信号属性的方法。
+`Vorcyc.Mathematics.Experimental.Signals.Signal` 是一个用于表示单线程时域信号的类，实现了 `ISingleThreadTimeDomainSignal`、`ICloneable<Signal>`、`IDisposable` 和 `IEquatable<Signal>` 接口。内部使用 `POHBuffer<float>` 存储采样数据。
 
 ### 属性
 
@@ -968,436 +1070,428 @@ Vorcyc.Mathematics.Experimental.Signals.Signal 是一个用于表示信号的类
 - `public float Period { get; }`
   - 获取信号的周期（采样率的倒数）。
 
-#### 7. Power
-- `public float Power { get; }`
-  - 获取信号的功率（样本平方和的平均值）。
+#### 7. TotalPower
+- `public float TotalPower { get; }`
+  - 获取信号的总功率（样本平方和）。
 
-#### 8. Energy
-- `public float Energy { get; }`
-  - 获取信号的能量（样本平方和）。
+#### 8. AveragePower
+- `public float AveragePower { get; }`
+  - 获取信号的平均功率（样本平方和 / 样本数）。
+
+#### 9. TotalEnergy
+- `public float TotalEnergy { get; }`
+  - 获取信号的总能量（样本平方和）。
+
+#### 10. AverageEnergy
+- `public float AverageEnergy { get; }`
+  - 获取信号的平均能量（样本平方均值）。
+
+#### 11. Rms
+- `public float Rms { get; }`
+  - 获取信号的均方根值。
+
+#### 12. ZeroCrossingRate
+- `public float ZeroCrossingRate { get; }`
+  - 获取信号的过零率。
+
+#### 13. Entropy
+- `public float Entropy { get; }`
+  - 获取信号的归一化 Shannon 熵。
+
+#### 14. UnderlyingBuffer
+- `public POHBuffer<float> UnderlyingBuffer { get; }`
+  - 获取底层的固定缓冲区。
+
+### 构造器
+
+#### 1. Signal(int sampleCount, float samplingRate)
+- 根据采样数量和采样率初始化信号。
+
+#### 2. Signal(TimeSpan duration, float samplingRate)
+- 根据时间长度和采样率初始化信号。
 
 ### 方法
 
 #### 1. Clone
 - `public Signal Clone()`
   - 创建信号的副本。
-  - 返回值: 信号的副本。
 
 #### 2. TransformToFrequencyDomain
-- `public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null)`
+- `public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)`
   - 将时域信号转换为频域信号。
-  - 参数:
-    - `window`: 加窗类型（可选）。
-  - 返回值: 频域信号的 `FrequencyDomain` 对象。
 
 #### 3. Resample
 - `public Signal Resample(int destnationSamplingRate, FirFilter? filter = null, int order = 15)`
   - 重采样信号。
-  - 参数:
-    - `destnationSamplingRate`: 目标采样率。
-    - `filter`: 可选的 FIR 滤波器。
-    - `order`: 滤波器阶数，默认为 15。
-  - 返回值: 重采样后的 `Signal` 对象。
 
 #### 4. Indexer
 - `public float this[int index] { get; set; }`
   - 获取或设置指定索引处的采样值。
-  - 参数:
-    - `index`: 采样值的索引。
-  - 返回值: 指定索引处的采样值。
 
 - `public SignalSegment? this[int start, int length, bool throwException = false] { get; }`
   - 以索引获取信号段的子段。
-  - 参数:
-    - `start`: 子段的起始索引。
-    - `length`: 子段的长度。
-    - `throwException`: 是否允许抛出异常。
-  - 返回值: 指定起始位置和长度的信号子段。若索引超出边界则返回 null。
 
 - `public SignalSegment? this[TimeSpan startTime, TimeSpan duration, bool throwException = false] { get; }`
   - 以时间量获取信号的子段。
-  - 参数:
-    - `startTime`: 子段的起始时间。
-    - `duration`: 子段的时长。
-    - `throwException`: 是否允许抛出异常。
-  - 返回值: 指定起始时间和时长的信号子段。若时间超出边界则返回 null。
 
 #### 5. Operators
-- `public static Signal operator +(Signal left, float right)`
-  - 将信号与浮点数相加。
-  - 参数:
-    - `left`: 信号。
-    - `right`: 浮点数。
-  - 返回值: 相加后的信号。
-
-- `public static Signal? operator +(Signal left, Signal right)`
-  - 将两个信号相加。
-  - 参数:
-    - `left`: 左侧信号。
-    - `right`: 右侧信号。
-  - 返回值: 相加后的信号。若信号长度或采样率不匹配则返回 null。
-
-- `public static Signal operator -(Signal left, float right)`
-  - 将信号与浮点数相减。
-  - 参数:
-    - `left`: 信号。
-    - `right`: 浮点数。
-  - 返回值: 相减后的信号。
-
-- `public static Signal? operator -(Signal left, Signal right)`
-  - 将两个信号相减。
-  - 参数:
-    - `left`: 左侧信号。
-    - `right`: 右侧信号。
-  - 返回值: 相减后的信号。若信号长度或采样率不匹配则返回 null。
-
-- `public static Signal operator *(Signal left, float right)`
-  - 将信号与浮点数相乘。
-  - 参数:
-    - `left`: 信号。
-    - `right`: 浮点数。
-  - 返回值: 相乘后的信号。
-
-- `public static Signal? operator *(Signal left, Signal right)`
-  - 将两个信号相乘。
-  - 参数:
-    - `left`: 左侧信号。
-    - `right`: 右侧信号。
-  - 返回值: 相乘后的信号。若信号长度或采样率不匹配则返回 null。
-
-- `public static Signal operator /(Signal left, float right)`
-  - 将信号与浮点数相除。
-  - 参数:
-    - `left`: 信号。
-    - `right`: 浮点数。
-  - 返回值: 相除后的信号。
+- `+`, `-`, `*`, `/` 运算符支持 Signal 与 float 及 Signal 与 Signal 之间的运算。
 
 ### 代码示例
-以下是一个使用 Signal 类中多个方法的示例，并在示例中加入了注释：
 ```csharp
 using System;
 using Vorcyc.Mathematics.Experimental.Signals;
-using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
+
 public class SignalExample
 {
     public static void Main()
     {
-        // 定义时域信号
-        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f };
-        var samplingRate = 1000; 
-        var signal = new Signal(samples, samplingRate);
+        // 创建信号（1000 个采样，采样率 44100）
+        var signal = new Signal(1000, 44100);
 
-      // 输出时域信号的属性
+        // 生成正弦波
+        signal.GenerateWave(WaveShape.Sine, 440, Behaviour.Replace);
+
+        // 输出时域信号的属性
         Console.WriteLine($"Duration: {signal.Duration}");
-        Console.WriteLine($"SamplingRate: {signal.SamplingRate}");
         Console.WriteLine($"Length: {signal.Length}");
         Console.WriteLine($"Amplitude: {signal.Amplitude}");
-        Console.WriteLine($"Period: {signal.Period}");
-        Console.WriteLine($"Power: {signal.Power}");
-        Console.WriteLine($"Energy: {signal.Energy}");
+        Console.WriteLine($"TotalPower: {signal.TotalPower}");
+        Console.WriteLine($"AveragePower: {signal.AveragePower}");
+        Console.WriteLine($"Rms: {signal.Rms}");
+        Console.WriteLine($"ZeroCrossingRate: {signal.ZeroCrossingRate}");
+        Console.WriteLine($"Entropy: {signal.Entropy}");
 
-        // 将时域信号转换为频域信号
+        // 转换为频域
         var frequencyDomain = signal.TransformToFrequencyDomain(WindowType.Hamming);
+        Console.WriteLine($"Frequency: {frequencyDomain.Frequency}");
 
-        // 输出频域信号的属性
-        Console.WriteLine($"Offset: {frequencyDomain.Offset}");
-        Console.WriteLine($"ActualLength: {frequencyDomain.ActualLength}");
-        Console.WriteLine($"TransformLength: {frequencyDomain.TransformLength}");
-        Console.WriteLine($"Resolution: {frequencyDomain.Resolution}");
-        Console.WriteLine($"WindowApplied: {frequencyDomain.WindowApplied}");
+        // 重采样
+        var resampled = signal.Resample(22050);
+        Console.WriteLine($"Resampled Length: {resampled.Length}");
 
-        // 重采样信号
-        var resampledSignal = signal.Resample(2000);
-
-        // 输出重采样后的信号属性
-        Console.WriteLine($"Resampled Duration: {resampledSignal.Duration}");
-        Console.WriteLine($"Resampled SamplingRate: {resampledSignal.SamplingRate}");
-        Console.WriteLine($"Resampled Length: {resampledSignal.Length}");
+        signal.Dispose();
     }
 }
 ```
-## SignalExtension 类
 
-Vorcyc.Mathematics.Experimental.Signals.SignalExtension 是一个用于扩展信号类功能的静态类，提供了生成各种波形的方法。
+---
 
-### 方法
+## ModifiableTimeDomainSignal 类
 
-#### 1. GenerateWave
-- `public static void GenerateWave(this ITimeDomainSignal signal, WaveShape shape, float frequency, Behaviour behaviour = Behaviour.Replace)`
-  - 生成指定波形，并根据行为对信号进行处理。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `shape`: 波形类型。
-    - `frequency`: 波形的频率。
-    - `behaviour`: 处理行为，默认为 `Behaviour.Replace`。
+`Vorcyc.Mathematics.Experimental.Signals.ModifiableTimeDomainSignal` 是一个支持运行时安全修改采样数据的时域信号类，实现了 `IModifiableTimeDomainSignal` 和 `IDisposable` 接口。提供锁保护的可写和只读视图、异步追加（通过 Channel）和批量刷新。
 
-#### 2. GenerateSineWave
-- `internal static void GenerateSineWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)`
-  - 生成正弦波，并对每个生成的值执行指定操作。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `frequency`: 正弦波的频率。
-    - `action`: 对每个生成的值执行的操作。
+### 构造器
 
-#### 3. GenerateCosineWave
-- `internal static void GenerateCosineWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)`
-  - 生成余弦波，并对每个生成的值执行指定操作。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `frequency`: 余弦波的频率。
-    - `action`: 对每个生成的值执行的操作。
+#### 1. ModifiableTimeDomainSignal(int sampleCount, float samplingRate)
+- 根据采样数量和采样率初始化。
 
-#### 4. GenerateSquareWave
-- `internal static void GenerateSquareWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)`
-  - 生成方波，并对每个生成的值执行指定操作。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `frequency`: 方波的频率。
-    - `action`: 对每个生成的值执行的操作。
-
-#### 5. GenerateSawtoothWave
-- `internal static void GenerateSawtoothWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)`
-  - 生成锯齿波，并对每个生成的值执行指定操作。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `frequency`: 锯齿波的频率。
-    - `action`: 对每个生成的值执行的操作。
-
-#### 6. GenerateTriangleWave
-- `internal static void GenerateTriangleWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)`
-  - 生成三角波，并对每个生成的值执行指定操作。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `frequency`: 三角波的频率。
-    - `action`: 对每个生成的值执行的操作。
-
-#### 7. GenerateWhiteNoise
-- `internal static void GenerateWhiteNoise(ITimeDomainSignal signal, Action<int, float> action)`
-  - 生成白噪声，并对每个生成的值执行指定操作。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `action`: 对每个生成的值执行的操作。
-
-#### 8. GeneratePinkNoise
-- `internal static void GeneratePinkNoise(ITimeDomainSignal signal, Action<int, float> action)`
-  - 生成粉红噪声，并对每个生成的值执行指定操作。
-  - 参数:
-    - `signal`: 表示信号的对象。
-    - `action`: 对每个生成的值执行的操作。
-
-### 代码示例
-以下是一个使用 SignalExtension 类中多个方法的示例，并在示例中加入了注释：
-```csharp
-using System;
-using Vorcyc.Mathematics.Experimental.Signals;
-public class SignalExtensionExample
-{
-    public static void Main()
-    {
-        // 定义时域信号
-        float[] samples = new float[1000];
-        var samplingRate = 1000;
-        var signal = new Signal(samples.Length, samplingRate);
-
-        // 生成正弦波并替换现有信号
-        signal.GenerateWave(WaveShape.Sine, 50, Behaviour.Replace);
-
-        // 输出生成的信号样本
-        Console.WriteLine("Generated Sine Wave:");
-        foreach (var sample in signal.Samples)
-        {
-            Console.WriteLine(sample);
-        }
-
-        // 生成方波并与现有信号逐元素相加
-        signal.GenerateWave(WaveShape.Square, 50, Behaviour.ElementWiseAdd);
-
-        // 输出生成的信号样本
-        Console.WriteLine("Generated Square Wave (ElementWiseAdd):");
-        foreach (var sample in signal.Samples)
-        {
-            Console.WriteLine(sample);
-        }
-    }
-}
-```
-## SignalSegment 类
-
-Vorcyc.Mathematics.Experimental.Signals.SignalSegment 是一个用于表示信号段的类，实现了 ITimeDomainSignal 接口。
+#### 2. ModifiableTimeDomainSignal(TimeSpan duration, float samplingRate)
+- 根据时间长度和采样率初始化。
 
 ### 属性
 
-#### 1. Start
+与 `Signal` 类类似，包含 `Samples`（返回 `LockedSamplesView`）、`SamplingRate`、`Duration`、`Length`，以及所有 `ITimeDomainCharacteristics` 属性。
+
+### 方法
+
+| 方法 | 说明 |
+|------|------|
+| `AppendAsync(float[], CancellationToken)` | 异步追加采样数据（线程安全） |
+| `FlushPendingAppends()` | 刷新待追加的采样数据 |
+| `Insert(int, float[])` | 在指定索引处插入 |
+| `Insert(TimeSpan, float[])` | 在指定时间点处插入 |
+| `RemoveRange(int, int)` | 移除指定范围 |
+| `RemoveRange(TimeSpan, TimeSpan)` | 移除指定时间段 |
+| `Resample(int, FirFilter?, int)` | 重采样 |
+| `TransformToFrequencyDomain(WindowType?, FftVersion)` | 转换到频域 |
+| `Dispose()` | 释放资源 |
+
+---
+
+## SignalSegment 结构体
+
+`Vorcyc.Mathematics.Experimental.Signals.SignalSegment` 是一个**只读结构体**（`readonly struct`），实现了 `ITimeDomainSignal` 和 `ISingleThreadTimeDomainSignal` 接口，用于表示信号的只读连续子段。时域特征属性采用延迟计算（`Lazy<T>`）。
+
+### 属性
+
+#### 1. Signal
+- `public Signal Signal { get; }`
+  - 获取所属的父信号。
+
+#### 2. Start
 - `public int Start { get; }`
   - 获取信号段的起始位置。
 
-#### 2. StartTime
+#### 3. StartTime
 - `public TimeSpan StartTime { get; }`
   - 获取当前信号段的起始时间。
 
-#### 3. Length
+#### 4. Length
 - `public int Length { get; }`
   - 获取信号段的长度。
 
-#### 4. Duration
+#### 5. Duration
 - `public TimeSpan Duration { get; }`
   - 获取信号段的持续时间。
 
-#### 5. Samples
+#### 6. Samples
 - `public Span<float> Samples { get; }`
   - 获取信号段的采样数据。
 
-#### 6. SamplingRate
+#### 7. SamplingRate
 - `public float SamplingRate { get; }`
   - 获取信号的采样率。
 
-#### 7. Amplitude
-- `public float Amplitude { get; }`
-  - 获取信号段的振幅。
-
-#### 8. Period
-- `public float Period { get; }`
-  - 获取信号的周期。
-
-#### 9. Power
-- `public float Power { get; }`
-  - 获取信号段的功率。
-
-#### 10. Energy
-- `public float Energy { get; }`
-  - 获取信号段的能量。
+#### 8. Amplitude / Period / TotalPower / AveragePower / TotalEnergy / AverageEnergy / Rms / ZeroCrossingRate / Entropy
+- 所有 `ITimeDomainCharacteristics` 属性均可用，采用延迟计算 + SIMD 优化。
 
 ### 方法
 
 #### 1. TransformToFrequencyDomain
-- `public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null)`
+- `public FrequencyDomain TransformToFrequencyDomain(WindowType? window = null, FftVersion fftVersion = FftVersion.Normal)`
   - 将信号段转换为频域信号。
-  - 参数:
-    - `window`: 窗口类型，可选参数。
-  - 返回值: 频域信号对象。
 
 #### 2. Resample
 - `public Signal Resample(int destnationSamplingRate, FirFilter? filter = null, int order = 15)`
   - 重采样并返回新的信号。
-  - 参数:
-    - `destnationSamplingRate`: 目标采样率。
-    - `filter`: 可选的 FIR 滤波器。
-    - `order`: 滤波器阶数，默认为 15。
-  - 返回值: 重采样后的 `Signal` 对象。
 
 #### 3. Decouple
 - `public Signal Decouple()`
   - 从所在信号中脱离成为单独的信号。
-  - 返回值: 脱离后的 `Signal` 对象。
 
-### 运算符
-
-#### 1. 加法运算符
-- `public static Signal operator +(SignalSegment left, float right)`
-  - 将信号段与一个浮点数相加。
-  - 参数:
-    - `left`: 信号段。
-    - `right`: 浮点数。
-  - 返回值: 相加后的新信号。
-
-- `public static Signal? operator +(SignalSegment left, SignalSegment right)`
-  - 将两个信号段相加。
-  - 参数:
-    - `left`: 左侧信号段。
-    - `right`: 右侧信号段。
-  - 返回值: 相加后的新信号，如果长度或采样率不匹配则返回 null。
-
-#### 2. 减法运算符
-- `public static Signal operator -(SignalSegment left, float right)`
-  - 将信号段与一个浮点数相减。
-  - 参数:
-    - `left`: 信号段。
-    - `right`: 浮点数。
-  - 返回值: 相减后的新信号。
-
-- `public static Signal? operator -(SignalSegment left, SignalSegment right)`
-  - 将两个信号段相减。
-  - 参数:
-    - `left`: 左侧信号段。
-    - `right`: 右侧信号段。
-  - 返回值: 相减后的新信号，如果长度或采样率不匹配则返回 null。
-
-#### 3. 乘法运算符
-- `public static Signal operator *(SignalSegment left, float right)`
-  - 将信号段与一个浮点数相乘。
-  - 参数:
-    - `left`: 信号段。
-    - `right`: 浮点数。
-  - 返回值: 相乘后的新信号。
-
-- `public static Signal? operator *(SignalSegment left, SignalSegment right)`
-  - 将两个信号段相乘。
-  - 参数:
-    - `left`: 左侧信号段。
-    - `right`: 右侧信号段。
-  - 返回值: 相乘后的新信号，如果长度或采样率不匹配则返回 null。
-
-#### 4. 除法运算符
-- `public static Signal operator /(SignalSegment left, float right)`
-  - 将信号段与一个浮点数相除。
-  - 参数:
-    - `left`: 信号段。
-    - `right`: 浮点数。
-  - 返回值: 相除后的新信号。
+#### 4. Operators
+- `+`, `-`, `*`, `/` 运算符支持 SignalSegment 与 float 及 SignalSegment 与 SignalSegment 之间的运算。
 
 ### 代码示例
-以下是一个使用 SignalSegment 类中多个方法的示例，并在示例中加入了注释：
 ```csharp
 using System;
 using Vorcyc.Mathematics.Experimental.Signals;
+
 public class SignalSegmentExample
 {
     public static void Main()
     {
-        // 定义时域信号
-        float[] samples = { 0.5f, 0.6f, 0.55f, 0.7f, 0.65f, 0.8f, 0.75f, 0.9f, 0.85f, 1.0f };
-        var samplingRate = 1000;
-        var signal = new Signal(samples.Length, samplingRate);
+        var signal = new Signal(10000, 44100);
+        signal.GenerateWave(WaveShape.Sine, 440, Behaviour.Replace);
 
-        // 创建信号段
-        var segment = new SignalSegment(signal, 2, 5);
+        // 获取信号段（第 1000 个采样开始，取 5000 个采样）
+        var segment = signal[1000, 5000];
+        if (segment is SignalSegment seg)
+        {
+            Console.WriteLine($"Start: {seg.Start}");
+            Console.WriteLine($"Length: {seg.Length}");
+            Console.WriteLine($"Amplitude: {seg.Amplitude}");
+            Console.WriteLine($"TotalPower: {seg.TotalPower}");
+            Console.WriteLine($"Rms: {seg.Rms}");
+            Console.WriteLine($"ZeroCrossingRate: {seg.ZeroCrossingRate}");
 
-        // 输出信号段的属性
-        Console.WriteLine($"Start: {segment.Start}");
-        Console.WriteLine($"StartTime: {segment.StartTime}");
-        Console.WriteLine($"Length: {segment.Length}");
-        Console.WriteLine($"Duration: {segment.Duration}");
-        Console.WriteLine($"Amplitude: {segment.Amplitude}");
-        Console.WriteLine($"Period: {segment.Period}");
-        Console.WriteLine($"Power: {segment.Power}");
-        Console.WriteLine($"Energy: {segment.Energy}");
+            // 脱离为独立信号
+            var decoupled = seg.Decouple();
+            Console.WriteLine($"Decoupled Length: {decoupled.Length}");
+            decoupled.Dispose();
+        }
 
-        // 将信号段转换为频域信号
-        var frequencyDomain = segment.TransformToFrequencyDomain();
-
-        // 输出频域信号的属性
-        Console.WriteLine($"Offset: {frequencyDomain.Offset}");
-        Console.WriteLine($"ActualLength: {frequencyDomain.ActualLength}");
-        Console.WriteLine($"TransformLength: {frequencyDomain.TransformLength}");
-        Console.WriteLine($"Resolution: {frequencyDomain.Resolution}");
-        Console.WriteLine($"WindowApplied: {frequencyDomain.WindowApplied}");
-
-        // 重采样信号段
-        var resampledSignal = segment.Resample(2000);
-
-        // 输出重采样后的信号属性
-        Console.WriteLine($"Resampled Duration: {resampledSignal.Duration}");
-        Console.WriteLine($"Resampled SamplingRate: {resampledSignal.SamplingRate}");
-        Console.WriteLine($"Resampled Length: {resampledSignal.Length}");
+        signal.Dispose();
     }
 }
 ```
 
+---
 
+## SignalGeneratingExtension 类
 
+`Vorcyc.Mathematics.Experimental.Signals.SignalGeneratingExtension` 是一个用于扩展信号类功能的静态类，提供了生成各种波形的方法。
 
+### WaveShape 枚举
 
+| 值 | 说明 |
+|----|------|
+| `Sine` | 正弦波 |
+| `Cosine` | 余弦波 |
+| `Square` | 方波 |
+| `Sawtooth` | 锯齿波 |
+| `Triangle` | 三角波 |
+| `WhiteNoise` | 白噪声 |
+| `PinkNoise` | 粉红噪声 |
+
+### Behaviour 枚举
+
+| 值 | 说明 |
+|----|------|
+| `Replace` | 替换现有信号 |
+| `ElementWiseAdd` | 与现有信号逐元素相加 |
+| `ElementWiseSubtract` | 与现有信号逐元素相减 |
+| `ElementWiseMultiply` | 与现有信号逐元素相乘 |
+| `ElementWiseDivide` | 与现有信号逐元素相除 |
+
+### 方法
+
+#### 1. GenerateWave
+- `public static void GenerateWave(this ISingleThreadTimeDomainSignal signal, WaveShape shape, float frequency, Behaviour behaviour = Behaviour.Replace)`
+  - 生成指定波形，并根据行为对信号进行处理。
+  - 参数:
+    - `signal`: 实现 `ISingleThreadTimeDomainSignal` 的信号对象。
+    - `shape`: 波形类型。
+    - `frequency`: 波形的频率。
+    - `behaviour`: 处理行为，默认为 `Behaviour.Replace`。
+
+### 代码示例
+```csharp
+using System;
+using Vorcyc.Mathematics.Experimental.Signals;
+
+public class SignalGeneratingExtensionExample
+{
+    public static void Main()
+    {
+        var signal = new Signal(1000, 44100);
+
+        // 生成正弦波并替换现有信号
+        signal.GenerateWave(WaveShape.Sine, 440, Behaviour.Replace);
+
+        // 叠加方波
+        signal.GenerateWave(WaveShape.Square, 220, Behaviour.ElementWiseAdd);
+
+        // 叠加白噪声
+        signal.GenerateWave(WaveShape.WhiteNoise, 0, Behaviour.ElementWiseAdd);
+
+        Console.WriteLine($"Amplitude: {signal.Amplitude}");
+        Console.WriteLine($"Rms: {signal.Rms}");
+
+        signal.Dispose();
+    }
+}
+```
+
+---
+
+> 以下类型都位于 Vorcyc.Mathematics.Experimental.CurveFitting 命名空间
+
+## CurveFitter&lt;T> 类
+
+`Vorcyc.Mathematics.Experimental.CurveFitting.CurveFitter<T>` 是一个泛型静态类，提供多种曲线拟合方法的统一入口。类型参数 `T` 约束为 `unmanaged, IFloatingPointIeee754<T>`。
+
+### 方法
+
+| 方法 | 说明 | 模型 |
+|------|------|------|
+| `Linear(xData, yData, optimizationMode)` | 线性回归 | y = ax + b |
+| `Polynomial(xData, yData, degree, optimizationMode)` | 多项式回归 | y = a₀ + a₁x + ... + aₙxⁿ |
+| `Exponential(xData, yData, optimizationMode)` | 指数回归 | y = a·e^(bx) |
+| `Logarithmic(xData, yData, optimizationMode)` | 对数回归 | y = a + b·ln(x) |
+| `Power(xData, yData, optimizationMode)` | 幂回归 | y = a·x^b |
+| `Sinusoidal(xData, yData, maxIterations)` | 正弦回归 | y = A·sin(Bx + C) + D |
+| `CubicSpline(xData, yData)` | 三次样条插值 | 分段三次多项式 |
+| `LocallyWeighted(xData, yData, bandwidth)` | 局部加权回归 (LOWESS) | 局部线性 |
+| `MovingAverage(xData, yData, windowSize)` | 移动平均 | 窗口平均 |
+| `Nonlinear(xData, yData, model, initialParams, ...)` | 非线性回归 (LM 算法) | 自定义 f(x, params) |
+| `Nonlinear(DataRow[] xData, yData, model, initialParams, ...)` | 多变量非线性回归 | 自定义 f(xVector, params) |
+| `GaussianProcess(xData, yData, ...)` | 高斯过程回归 (GPR) | 核函数 |
+| `GaussianProcess(DataRow[] xData, yData, ...)` | 多变量 GPR | 核函数 |
+| `NeuralNetwork(xData, yData, epochs, hiddenNodes, ...)` | 神经网络回归 | MLP |
+| `NeuralNetwork(DataRow[] xData, yData, epochs, hiddenNodes, ...)` | 多变量神经网络回归 | MLP |
+| `BayesianLinear(DataRow[] xData, yData, alpha, beta)` | 贝叶斯线性回归 | 带先验线性 |
+
+> `optimizationMode` 参数默认为 `OptimizationMode.SIMD`，仅支持 `float` 和 `double`。使用其他类型时请选择 `OptimizationMode.Normal`。
+
+### 代码示例
+```csharp
+using System;
+using Vorcyc.Mathematics.Experimental.CurveFitting;
+
+public class CurveFitterExample
+{
+    public static void Main()
+    {
+        float[] xData = { 1, 2, 3, 4, 5 };
+        float[] yData = { 2.1f, 4.0f, 5.9f, 8.1f, 10.0f };
+
+        // 线性回归
+        var linear = CurveFitter<float>.Linear(xData, yData);
+        Console.WriteLine($"Linear MSE: {linear.MeanSquaredError}");
+        Console.WriteLine($"Predict(6): {linear.Predict(6)}");
+
+        // 多项式回归
+        var poly = CurveFitter<float>.Polynomial(xData, yData, degree: 2);
+        Console.WriteLine($"Polynomial MSE: {poly.MeanSquaredError}");
+
+        // 指数回归
+        float[] yExp = { 1.0f, 2.7f, 7.4f, 20.1f, 54.6f };
+        var exp = CurveFitter<float>.Exponential(xData, yExp);
+        Console.WriteLine($"Exponential Predict(6): {exp.Predict(6)}");
+    }
+}
+```
+
+---
+
+## CurveFittingMethod 枚举
+
+`Vorcyc.Mathematics.Experimental.CurveFitting.CurveFittingMethod` 枚举定义了所有支持的曲线拟合方法。
+
+| 值 | 说明 |
+|----|------|
+| `LinearRegression` | 线性回归 |
+| `PolynomialRegression` | 多项式回归 |
+| `ExponentialRegression` | 指数回归 |
+| `LogarithmicRegression` | 对数回归 |
+| `PowerRegression` | 幂回归 |
+| `SinusoidalRegression` | 正弦回归 |
+| `CubicSplineInterpolation` | 三次样条插值 |
+| `LocallyWeightedRegression` | 局部加权回归 |
+| `MovingAverage` | 移动平均 |
+| `NonlinearRegression` | 非线性回归 |
+| `GaussianProcessRegression` | 高斯过程回归 |
+| `NeuralNetworkRegression` | 神经网络回归 |
+| `SupportVectorRegression` | 支持向量回归 |
+| `BayesianRegression` | 贝叶斯回归 |
+
+---
+
+## FitResult&lt;T> 类
+
+`Vorcyc.Mathematics.Experimental.CurveFitting.FitResult<T>` 表示曲线拟合的结果。
+
+### 属性
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `Predict` | `Func<T, T>` | 拟合后的预测函数 |
+| `Parameters` | `T[]` | 拟合参数（斜率、截距或系数等） |
+| `MeanSquaredError` | `T` | 均方误差 (MSE) |
+
+> `MultiColumnFitResult<T>` 用于多变量输入场景，其 `MultiPredict` 属性类型为 `Func<DataRow<T>, T>`。
+
+---
+
+## DataRow&lt;T> 结构体
+
+`Vorcyc.Mathematics.Experimental.CurveFitting.DataRow<T>` 是一个只读结构体，表示一行多列的数据，用于多变量输入的拟合方法。
+
+### 构造器
+
+- `public DataRow(params T[] columns)`
+  - 初始化一行数据。
+
+### 属性
+
+- `public T this[int index]` — 获取指定列的值。
+- `public int ColumnCount` — 获取列数。
+
+---
+
+## OptimizationMode 枚举
+
+`Vorcyc.Mathematics.Experimental.CurveFitting.OptimizationMode` 枚举定义了拟合算法的优化模式。
+
+| 值 | 说明 |
+|----|------|
+| `Normal` | 使用标准托管代码，支持所有 `IFloatingPointIeee754<T>` 类型 |
+| `SIMD` | 使用 SIMD 优化，仅支持 `float` 和 `double` |
+
+---
 
 
 

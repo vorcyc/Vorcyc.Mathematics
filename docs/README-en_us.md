@@ -32,9 +32,9 @@ The main significance is:
 - GPU computation (unfinished)
 
 ## Dependencies
-- ILGPU: Version 1.5.1  
-- ILGPU.Algorithms: Version 1.5.1  
-- System.Numerics.Tensors: Version 9.0.0  
+- ILGPU: Version 1.5.3  
+- ILGPU.Algorithms: Version 1.5.3  
+- System.Numerics.Tensors: Version 10.0.5  
 
 ---
 
@@ -48,7 +48,7 @@ The main significance is:
 
 ---
 
-***Experimental Module***: Contains some experimental features that may be changed or removed in future versions.  
+***Experimental Module***: Contains experimental features that may be changed or removed in future versions. Includes various Kalman filters, experimental signal processing classes (with the signal interface hierarchy `ITimeDomainCharacteristics` / `ITimeDomainSignal` / `ISingleThreadTimeDomainSignal` / `IModifiableTimeDomainSignal`, types such as `Signal`, `ModifiableTimeDomainSignal`, `FrequencyDomain`, `SignalSegment`, etc.), and curve fitting tools (unified via `CurveFitter<T>`, supporting linear, polynomial, exponential, logarithmic, power, sinusoidal, cubic spline interpolation, locally weighted, moving average, nonlinear, Gaussian process, neural network, and Bayesian regression methods, with SIMD optimization support).  
 :blue_book:[Manual](Module_Experimental.md)
 
 ---
@@ -58,7 +58,7 @@ The main significance is:
 
 ---
 
-***Machine Learning Module***: Contains various machine learning algorithms and utility classes, including decision trees, K-nearest neighbors, multiple linear regression, random forests, simple linear regression, support vector machines, naive Bayes classifiers, DBSCAN clustering, expectation-maximization, Gaussian mixture models, hierarchical clustering, K-means clustering, vector quantization, factor analysis, principal component analysis (PCA), t-SNE dimensionality reduction algorithms, and more. Additionally, it includes various distance metric classes such as Angular, ArgMax, BrayCurtis, Canberra, Chebyshev, Cosine, Dice, Euclidean, Hamming, Hellinger, Jaccard, Kulczynski, Levenshtein, Manhattan, Matching, Minkowski, PearsonCorrelation, RogersTanimoto, RusselRao, SokalMichener, SokalSneath, WeightedEuclidean, WeightedSquareEuclidean, and Yule. These classes provide rich machine learning and data analysis functions, suitable for various classification, regression, clustering, and dimensionality reduction tasks.    
+***Machine Learning Module***: Contains various machine learning algorithms and utility classes, including decision trees, K-nearest neighbors, multiple linear regression, polynomial regression, ridge regression, random forests, simple linear regression, support vector machines, naive Bayes classifiers, DBSCAN clustering, expectation-maximization, Gaussian mixture models, hierarchical clustering, K-means clustering, vector quantization, factor analysis, principal component analysis (PCA), t-SNE dimensionality reduction algorithms, and more. Additionally, it includes various distance metric classes such as Angular, ArgMax, BrayCurtis, Canberra, Chebyshev, Cosine, Dice, Euclidean, Hamming, Hellinger, Jaccard, Kulczynski, Levenshtein, Manhattan, Matching, Minkowski, PearsonCorrelation, RogersTanimoto, RusselRao, SokalMichener, SokalSneath, WeightedEuclidean, WeightedSquareEuclidean, and Yule. These classes provide rich machine learning and data analysis functions, suitable for various classification, regression, clustering, and dimensionality reduction tasks.    
 :blue_book:[Manual](Module_MachineLearning.md)
 
 ---
@@ -81,6 +81,13 @@ The main significance is:
 
 **Calculus Module**: Provides comprehensive computational tools, including limit calculation, integration, derivative calculation, Taylor series expansion, Fourier series expansion, Runge-Kutta method for solving differential equations, and Newton-Raphson method for solving nonlinear equations.   
 :blue_book:[Manual](Module_Calculus.md)
+
+---
+
+## Extension Libraries
+
+***FFTW Extension*** (separate NuGet package: `Vorcyc.Mathematics.Extensions.FFTW`): A .NET binding for the native FFTW library, providing high-performance discrete Fourier transforms. Supports single- and double-precision 1D / 2D / 3D / N-D complex-to-complex (C2C), real-to-complex (R2C), complex-to-real (C2R), and real-to-real (R2R) transforms. Also includes FFT-based Hilbert transform, envelope computation, and extension methods for converting experimental signal types to the frequency domain.  
+:blue_book:[Manual](Module_Extensions_FFTW.md)
 
 ---
 

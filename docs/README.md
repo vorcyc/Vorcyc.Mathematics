@@ -34,9 +34,9 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 
 
 ## 依赖项
-- ILGPU: 版本 1.5.1  
-- ILGPU.Algorithms: 版本 1.5.1  
-- System.Numerics.Tensors: 版本 9.0.0  
+- ILGPU: 版本 1.5.3  
+- ILGPU.Algorithms: 版本 1.5.3  
+- System.Numerics.Tensors: 版本 10.0.5  
 
 
 
@@ -52,7 +52,7 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 
 ---
 
-***实验性模块***：包含一些实验性的功能，可能会在未来版本中更改或删除。  
+***实验性模块***：包含一些实验性的功能，可能会在未来版本中更改或删除。包括多种卡尔曼滤波器、实验性信号处理类（含信号接口体系 `ITimeDomainCharacteristics` / `ITimeDomainSignal` / `ISingleThreadTimeDomainSignal` / `IModifiableTimeDomainSignal`，`Signal`、`ModifiableTimeDomainSignal`、`FrequencyDomain`、`SignalSegment` 等类型）以及曲线拟合工具（通过 `CurveFitter<T>` 统一入口，支持线性、多项式、指数、对数、幂、正弦、三次样条插值、局部加权、移动平均、非线性、高斯过程、神经网络、贝叶斯等回归方法，支持 SIMD 优化）。  
 :blue_book:[手册](Module_Experimental.md)
 
 ---
@@ -62,7 +62,7 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 
 ---
 
-***机器学习模块***: 包含多种机器学习算法和工具类，包括决策树、K 最近邻、多元线性回归、随机森林、简单线性回归、支持向量机、朴素贝叶斯分类器、DBSCAN 聚类、期望最大化、高斯混合模型、层次聚类、K 均值聚类、矢量量化、因子分析、主成分分析 (PCA)、t-SNE 降维算法等。此外，还包括多种距离度量类，如 Angular、ArgMax、BrayCurtis、Canberra、Chebyshev、Cosine、Dice、Euclidean、Hamming、Hellinger、Jaccard、Kulczynski、Levenshtein、Manhattan、Matching、Minkowski、PearsonCorrelation、RogersTanimoto、RusselRao、SokalMichener、SokalSneath、WeightedEuclidean、WeightedSquareEuclidean 和 Yule。这些类提供了丰富的机器学习和数据分析功能，适用于各种分类、回归、聚类和降维任务。  
+***机器学习模块***: 包含多种机器学习算法和工具类，包括决策树、K 最近邻、多元线性回归、多项式回归、岭回归、随机森林、简单线性回归、支持向量机、朴素贝叶斯分类器、DBSCAN 聚类、期望最大化、高斯混合模型、层次聚类、K 均值聚类、矢量量化、因子分析、主成分分析 (PCA)、t-SNE 降维算法等。此外，还包括多种距离度量类，如 Angular、ArgMax、BrayCurtis、Canberra、Chebyshev、Cosine、Dice、Euclidean、Hamming、Hellinger、Jaccard、Kulczynski、Levenshtein、Manhattan、Matching、Minkowski、PearsonCorrelation、RogersTanimoto、RusselRao、SokalMichener、SokalSneath、WeightedEuclidean、WeightedSquareEuclidean 和 Yule。这些类提供了丰富的机器学习和数据分析功能，适用于各种分类、回归、聚类和降维任务。  
 :blue_book:[手册](Module_MachineLearning.md)
 
 ---
@@ -84,6 +84,13 @@ Vorcyc® Mathematics 是一套主要面向.NET的数学库，旨在充分利用.
 
 **微积分模块**：提供了全面的计算工具，包括极限计算、积分计算、导数计算、泰勒级数展开、傅里叶级数展开、龙格-库塔法求解微分方程和牛顿-拉夫逊法求解非线性方程。   
 :blue_book:[手册](Module_Calculus.md)
+
+---
+
+## 扩展库
+
+***FFTW 扩展***（独立 NuGet 包：`Vorcyc.Mathematics.Extensions.FFTW`）：基于 FFTW 本地库的 .NET 封装，提供高性能的离散傅里叶变换。支持单精度与双精度的 1D / 2D / 3D / N-D 复数到复数 (C2C)、实数到复数 (R2C)、复数到实数 (C2R) 以及实数到实数 (R2R) 变换。还包括基于 FFT 的希尔伯特变换、包络计算以及将实验性信号类型转换到频域的扩展方法。  
+:blue_book:[手册](Module_Extensions_FFTW.md)
 
 ---
 
