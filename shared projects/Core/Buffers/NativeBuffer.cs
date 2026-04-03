@@ -172,7 +172,7 @@ public unsafe class NativeBuffer<T> : System.Buffers.MemoryManager<T>, IPinnedBu
 
     #region Core Properties
 
-    /// <inheritdoc cref="IPinnedBuffer{T}.AsSpan" />
+    /// <inheritdoc cref="IPinnedBuffer{T}.Span" />
     public Span<T> Span
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

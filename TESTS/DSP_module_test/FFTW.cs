@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Extensions.FFTW.Helpers;
 using Vorcyc.Mathematics.Framework.Utilities;
 using Vorcyc.Mathematics.Numerics;

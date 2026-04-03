@@ -181,7 +181,7 @@ public readonly struct SignalSegment : ITimeDomainSignal, ISingleThreadTimeDomai
         }
         else
         {
-            var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(_signal._buffer!.Span, _length.NextPowerOf2(), window);
+            var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(Samples, _length.NextPowerOf2(), window);
             FastFourierTransform.Forward(windowedSamples, 0, out var result, windowedSamples.Length);
             return new FrequencyDomain(_start, windowedSamples.Length, _length, result, this, window);
         }

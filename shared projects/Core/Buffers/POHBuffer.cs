@@ -313,10 +313,23 @@ public unsafe class POHBuffer<T> : IPinnedBuffer<T>
     /// <remarks>This operator enables seamless use of <see cref="POHBuffer{T}"/> instances in APIs that accept <see cref="Span{T}"/>
     /// parameters. The returned span reflects the current contents of the buffer.</remarks>
     /// <param name="buffer">The <see cref="POHBuffer{T}"/> instance to convert to a <see cref="Span{T}"/>. Cannot be null.</param>
-    public static implicit operator Span<T> (POHBuffer<T> buffer)
+    public static implicit operator Span<T>(POHBuffer<T> buffer)
     {
         ArgumentNullException.ThrowIfNull(buffer);
         return buffer.Span;
+    }
+
+    /// <summary>
+    /// Defines an implicit conversion from a <see cref="POHBuffer{T}"/> to an array of type T.
+    /// </summary>
+    /// <remarks>The returned array represents the underlying buffer managed by the <see cref="POHBuffer{T}"/> instance. The buffer
+    /// must not be disposed prior to conversion.</remarks>
+    /// <param name="buffer">The <see cref="POHBuffer{T}"/> instance to convert to an array. Cannot be null.</param>
+    public static implicit operator T[](POHBuffer<T> buffer)
+    {
+        ArgumentNullException.ThrowIfNull(buffer);
+        buffer.ThrowIfDisposed();
+        return buffer._buffer!;
     }
 
     #endregion
