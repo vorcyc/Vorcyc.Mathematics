@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Basic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distribution.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic_FloatingPointNumberExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StatisticsComputingContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension_Max_Parallel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension_Min_Parallel.cs" />
@@ -20,6 +21,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)s_ExtremeValueFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)s_INumberExtension_Max_Min.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TimeSeriesAnalysis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StatisticsOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HypothesisTestResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StatisticalMath.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RunningMoments.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Basic_Options.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Basic_Weighted.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Robust.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Advanced_Results.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Advanced_NonParametric.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Distribution_InverseSampling.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TimeSeriesAnalysis_Extended.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TensorStatistics.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)contents.txt" />

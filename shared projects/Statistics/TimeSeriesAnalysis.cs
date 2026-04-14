@@ -14,7 +14,7 @@ using System.Numerics;
 /// <summary>
 /// 提供时间序列分析的各种方法，包括平滑、分解、预测、自相关、偏自相关、移动平均和指数平滑。
 /// </summary>
-public static class TimeSeriesAnalysis
+public static partial class TimeSeriesAnalysis
 {
     /// <summary>
     /// 实现时间序列的平滑。

@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
@@ -8,29 +9,13 @@ namespace Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 /// </summary>
 public class Convolver
 {
-    /// <summary>
-    /// FFT size.
-    /// </summary>
     private int _fftSize;
-
-    /// <summary>
-    /// Internal FFT transformer.
-    /// </summary>
     private RealFft _fft;
-
-    // internal reusable buffers
-
     private float[] _real1;
     private float[] _imag1;
     private float[] _real2;
     private float[] _imag2;
 
-    /// <summary>
-    /// Constructs <see cref="Convolver"/>. 
-    /// Allocates necessary memory according to <paramref name="fftSize"/>. 
-    /// If <paramref name="fftSize"/> is not set then the memory will be allocated 
-    /// during the first call of Convolve() method based on input signals.
-    /// </summary>
     public Convolver(int fftSize = 0)
     {
         if (fftSize > 0)
@@ -39,9 +24,6 @@ public class Convolver
         }
     }
 
-    /// <summary>
-    /// Prepares all necessary arrays for calculations.
-    /// </summary>
     private void PrepareMemory(int fftSize)
     {
         _fftSize = fftSize;
@@ -54,12 +36,11 @@ public class Convolver
     }
 
     /// <summary>
-    /// Does fast convolution of <paramref name="signal"/> with <paramref name="kernel"/> via FFT. 
-    /// Returns signal of length: signal.Length + kernel.Length - 1.
+    /// Does fast convolution via FFT. Returns length signal.Length + kernel.Length - 1.
     /// </summary>
-    public DiscreteSignal Convolve(DiscreteSignal signal, DiscreteSignal kernel)
+    public Signal Convolve(Signal signal, Signal kernel)
     {
-        var length = signal.SampleCount + kernel.SampleCount - 1;
+        var length = signal.Length + kernel.Length - 1;
 
         if (_fft is null)
         {
@@ -67,33 +48,27 @@ public class Convolver
         }
 
         var output = new float[_fftSize];
-
         Convolve(signal.Samples, kernel.Samples, output);
 
-        return new DiscreteSignal(signal.SamplingRate, output).First(length);
+        return Signal.FromCopy(output.AsSpan(0, length), signal.SamplingRate);
     }
 
-    /// <summary>
-    /// Does fast convolution of <paramref name="input"/> with <paramref name="kernel"/> via FFT (maximally in-place). 
-    /// The result is stored in <paramref name="output"/> array. 
-    /// This version is best suited for block processing when memory needs to be reused. 
-    /// Input arrays must have size equal to the size of FFT. 
-    /// FFT size MUST be set explicitly and properly in constructor!
-    /// </summary>
     public void Convolve(float[] input, float[] kernel, float[] output)
+        => Convolve(input.AsSpan(), kernel.AsSpan(), output);
+
+    /// <summary>
+    /// Does fast convolution via FFT from sample spans.
+    /// </summary>
+    public void Convolve(ReadOnlySpan<float> input, ReadOnlySpan<float> kernel, float[] output)
     {
         Array.Clear(_real1, 0, _fftSize);
         Array.Clear(_real2, 0, _fftSize);
 
-        input.FastCopyTo(_real1, input.Length);
-        kernel.FastCopyTo(_real2, kernel.Length);
-
-        // 1) do FFT of both signals
+        input.Slice(0, input.Length).CopyTo(_real1.AsSpan(0, input.Length));
+        kernel.Slice(0, kernel.Length).CopyTo(_real2.AsSpan(0, kernel.Length));
 
         _fft.Direct(_real1, _real1, _imag1);
         _fft.Direct(_real2, _real2, _imag2);
-
-        // 2) do complex multiplication of spectra and normalize
 
         for (var i = 0; i <= _fftSize / 2; i++)
         {
@@ -103,32 +78,26 @@ public class Convolver
             _imag1[i] = im / _fftSize;
         }
 
-        // 3) do inverse FFT of resulting spectrum
-
         _fft.Inverse(_real1, _imag1, output);
     }
 
-    /// <summary>
-    /// Does fast cross-correlation between <paramref name="signal1"/> and <paramref name="signal2"/> via FFT.
-    /// </summary>
-    public DiscreteSignal CrossCorrelate(DiscreteSignal signal1, DiscreteSignal signal2)
+    public Signal CrossCorrelate(Signal signal1, Signal signal2)
     {
-        var reversedKernel = new DiscreteSignal(signal2.SamplingRate, signal2.Samples.Reverse());
+        var length = signal1.Length + signal2.Length - 1;
 
-        return Convolve(signal1, reversedKernel);
+        if (_fft is null)
+        {
+            PrepareMemory(length.NextPowerOf2());
+        }
+
+        var output = new float[_fftSize];
+        CrossCorrelate(signal1.Samples, signal2.Samples, output);
+
+        return Signal.FromCopy(output.AsSpan(0, length), signal1.SamplingRate);
     }
 
-    /// <summary>
-    /// Does fast cross-correlation between <paramref name="input1"/> and <paramref name="input2"/> via FFT (maximally in-place). 
-    /// The result is stored in <paramref name="output"/> array. 
-    /// This version is best suited for block processing when memory needs to be reused. 
-    /// Input arrays must have size equal to the size of FFT. 
-    /// FFT size MUST be set explicitly and properly in constructor!
-    /// </summary>
     public void CrossCorrelate(float[] input1, float[] input2, float[] output)
     {
-        // reverse second signal
-
         var kernelLength = input2.Length - 1;
 
         for (var i = 0; i < kernelLength / 2; i++)
@@ -139,5 +108,19 @@ public class Convolver
         }
 
         Convolve(input1, input2, output);
+    }
+
+    /// <summary>
+    /// Cross-correlates sample spans without mutating the inputs.
+    /// </summary>
+    public void CrossCorrelate(ReadOnlySpan<float> input1, ReadOnlySpan<float> input2, float[] output)
+    {
+        var reversed = new float[input2.Length];
+        for (var i = 0; i < input2.Length; i++)
+        {
+            reversed[i] = input2[input2.Length - 1 - i];
+        }
+
+        Convolve(input1, reversed, output);
     }
 }

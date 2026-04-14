@@ -22,6 +22,7 @@ using Vorcyc.Mathematics.Framework;
 /// See also <c>DiscreteSignalExtensions</c> for extension functionality.
 /// The sample count is determined by either a specified count or derived from the duration and sampling rate.
 /// </remarks>
+[Obsolete("Use Signal instead.")]
 public class DiscreteSignal : ICloneable<DiscreteSignal>, IDisposable
 {
     private PinnableArray<float> _samples;
@@ -233,6 +234,11 @@ public class DiscreteSignal : ICloneable<DiscreteSignal>, IDisposable
     {
         return new(_samplingRate, _samples.Span, false);
     }
+
+    /// <summary>
+    /// Converts this legacy signal to <see cref="Signal"/>.
+    /// </summary>
+    public Signal ToSignal() => Signal.FromCopy(_samples.Span, _samplingRate);
 
     #endregion
 
@@ -526,35 +532,6 @@ public class DiscreteSignal : ICloneable<DiscreteSignal>, IDisposable
     /// <param name="binCount">The number of bins used to estimate the distribution.</param>
     /// <returns>The Shannon entropy in bits.</returns>
     public float Entropy(int binCount = 32) => Entropy(0, SampleCount, binCount);
-
-    #endregion
-
-    #region Conversion with DiscreteSignal<float>
-
-    /// <summary>
-    /// Converts a <see cref="DiscreteSignal{T}"/> specialized for <see cref="float"/> to <see cref="DiscreteSignal"/>.
-    /// </summary>
-    /// <param name="signal">The source signal.</param>
-    /// <returns>A <see cref="DiscreteSignal"/> with equivalent sampling rate and samples.</returns>
-    public static DiscreteSignal From(DiscreteSignal<float> signal) => signal;
-
-    /// <summary>
-    /// Implicitly converts a <see cref="DiscreteSignal{T}"/> specialized for <see cref="float"/> to <see cref="DiscreteSignal"/>.
-    /// </summary>
-    /// <param name="signal">The source signal.</param>
-    public static implicit operator DiscreteSignal(DiscreteSignal<float> signal)
-    {
-        return new(signal.SamplingRate, signal.Samples, signal.Samples.IsPinned);
-    }
-
-    /// <summary>
-    /// Implicitly converts a <see cref="DiscreteSignal"/> to <see cref="DiscreteSignal{T}"/> specialized for <see cref="float"/>.
-    /// </summary>
-    /// <param name="signal">The source signal.</param>
-    public static implicit operator DiscreteSignal<float>(DiscreteSignal signal)
-    {
-        return new(signal.SamplingRate, signal.Samples, signal.Samples.IsPinned);
-    }
 
     #endregion
 

@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Operations;
@@ -19,15 +20,20 @@ public class Modulator
     /// </summary>
     /// <param name="carrier">Carrier signal</param>
     /// <param name="modulator">Modulator signal</param>
-    public static DiscreteSignal Ring(DiscreteSignal carrier, DiscreteSignal modulator)
+    public static Signal Ring(Signal carrier, Signal modulator)
     {
-        if (carrier.SamplingRate != modulator.SamplingRate)
+        if (MathF.Abs(carrier.SamplingRate - modulator.SamplingRate) > 1e-5f)
         {
             throw new ArgumentException("Sampling rates must be the same!");
         }
 
-        return new DiscreteSignal(carrier.SamplingRate,
-                                  carrier.Samples.Zip(modulator.Samples, (c, m) => c * m));
+        var output = new float[carrier.Length];
+        for (var i = 0; i < carrier.Length; i++)
+        {
+            output[i] = carrier[i] * modulator[i];
+        }
+
+        return Signal.FromCopy(output, carrier.SamplingRate);
     }
 
     /// <summary>
@@ -36,18 +42,21 @@ public class Modulator
     /// <param name="carrier">Carrier signal</param>
     /// <param name="modulatorFrequency">Modulator frequency</param>
     /// <param name="modulationIndex">Modulation index (depth)</param>
-    public static DiscreteSignal Amplitude(DiscreteSignal carrier, 
-                                           float modulatorFrequency = 20/*Hz*/,
-                                           float modulationIndex = 0.5f)
+    public static Signal Amplitude(Signal carrier,
+                                   float modulatorFrequency = 20/*Hz*/,
+                                   float modulationIndex = 0.5f)
     {
         var fs = carrier.SamplingRate;
-        var mf = modulatorFrequency;          // just short aliases //
+        var mf = modulatorFrequency;
         var mi = modulationIndex;
 
-        var output = Enumerable.Range(0, carrier.SampleCount)
-                               .Select(i => carrier[i] * (1 + mi * Math.Cos(2 * Math.PI * mf / fs * i)));
+        var output = new float[carrier.Length];
+        for (var i = 0; i < carrier.Length; i++)
+        {
+            output[i] = carrier[i] * (1 + mi * MathF.Cos(2 * MathF.PI * mf / fs * i));
+        }
 
-        return new DiscreteSignal(fs, output.ToFloats());
+        return Signal.FromCopy(output, fs);
     }
 
     /// <summary>
@@ -57,21 +66,24 @@ public class Modulator
     /// <param name="carrierAmplitude">Carrier amplitude</param>
     /// <param name="carrierFrequency">Carrier frequency</param>
     /// <param name="deviation">Frequency deviation</param>
-    public static DiscreteSignal Frequency(DiscreteSignal baseband,
-                                          float carrierAmplitude,
-                                          float carrierFrequency,
-                                          float deviation = 0.1f/*Hz*/)
+    public static Signal Frequency(Signal baseband,
+                                   float carrierAmplitude,
+                                   float carrierFrequency,
+                                   float deviation = 0.1f/*Hz*/)
     {
         var fs = baseband.SamplingRate;
-        var ca = carrierAmplitude;          // just short aliases //
+        var ca = carrierAmplitude;
         var cf = carrierFrequency;
 
         var integral = 0.0;
-        var output = Enumerable.Range(0, baseband.SampleCount)
-                               .Select(i => ca * Math.Cos(2 * Math.PI * cf / fs * i +
-                                             2 * Math.PI * deviation * (integral += baseband[i])));
+        var output = new float[baseband.Length];
+        for (var i = 0; i < baseband.Length; i++)
+        {
+            integral += baseband[i];
+            output[i] = (float)(ca * Math.Cos(2 * Math.PI * cf / fs * i + 2 * Math.PI * deviation * integral));
+        }
 
-        return new DiscreteSignal(fs, output.ToFloats());
+        return Signal.FromCopy(output, fs);
     }
 
     /// <summary>
@@ -83,25 +95,28 @@ public class Modulator
     /// <param name="modulationIndex">Modulation index (depth)</param>
     /// <param name="length">Length of FM signal</param>
     /// <param name="samplingRate">Sampling rate</param>
-    public static DiscreteSignal FrequencySinusoidal(
+    public static Signal FrequencySinusoidal(
                                     float carrierFrequency,
                                     float carrierAmplitude,
                                     float modulatorFrequency,
                                     float modulationIndex,
                                     int length,
-                                    int samplingRate = 1)
+                                    float samplingRate = 1f)
     {
         var fs = samplingRate;
         var ca = carrierAmplitude;
-        var cf = carrierFrequency;          // just short aliases //
+        var cf = carrierFrequency;
         var mf = modulatorFrequency;
         var mi = modulationIndex;
 
-        var output = Enumerable.Range(0, length)
-                               .Select(i => ca * Math.Cos(2 * Math.PI * cf / fs * i + 
-                                            mi * Math.Sin(2 * Math.PI * mf / fs * i)));
+        var output = new float[length];
+        for (var i = 0; i < length; i++)
+        {
+            output[i] = ca * MathF.Cos(2 * MathF.PI * cf / fs * i +
+                                       mi * MathF.Sin(2 * MathF.PI * mf / fs * i));
+        }
 
-        return new DiscreteSignal(samplingRate, output.ToFloats());
+        return Signal.FromCopy(output, fs);
     }
 
     /// <summary>
@@ -112,22 +127,25 @@ public class Modulator
     /// <param name="modulationIndex">Modulation index (depth)</param>
     /// <param name="length">Length of FM signal</param>
     /// <param name="samplingRate">Sampling rate</param>
-    public static DiscreteSignal FrequencyLinear(
+    public static Signal FrequencyLinear(
                                     float carrierFrequency,
                                     float carrierAmplitude,
                                     float modulationIndex,
                                     int length,
-                                    int samplingRate = 1)
+                                    float samplingRate = 1f)
     {
         var fs = samplingRate;
-        var ca = carrierAmplitude;          // just short aliases //
+        var ca = carrierAmplitude;
         var cf = carrierFrequency;
         var mi = modulationIndex;
 
-        var output = Enumerable.Range(0, length)
-                               .Select(i => ca * Math.Cos(2 * Math.PI * (cf / fs + mi * i) * i / fs));
+        var output = new float[length];
+        for (var i = 0; i < length; i++)
+        {
+            output[i] = ca * MathF.Cos(2 * MathF.PI * (cf / fs + mi * i) * i / fs);
+        }
 
-        return new DiscreteSignal(fs, output.ToFloats());
+        return Signal.FromCopy(output, fs);
     }
 
     /// <summary>
@@ -137,44 +155,46 @@ public class Modulator
     /// <param name="carrierAmplitude">Carrier amplitude</param>
     /// <param name="carrierFrequency">Carrier frequency</param>
     /// <param name="deviation">Frequency deviation</param>
-    public static DiscreteSignal Phase(DiscreteSignal baseband,
-                                       float carrierAmplitude,
-                                       float carrierFrequency,
-                                       float deviation = 0.8f)
+    public static Signal Phase(Signal baseband,
+                               float carrierAmplitude,
+                               float carrierFrequency,
+                               float deviation = 0.8f)
     {
         var fs = baseband.SamplingRate;
-        var ca = carrierAmplitude;          // just short aliases //
+        var ca = carrierAmplitude;
         var cf = carrierFrequency;
 
-        var output = Enumerable.Range(0, baseband.SampleCount)
-                               .Select(i => ca * Math.Cos(2 * Math.PI * cf / fs * i + deviation * baseband[i]));
+        var output = new float[baseband.Length];
+        for (var i = 0; i < baseband.Length; i++)
+        {
+            output[i] = ca * MathF.Cos(2 * MathF.PI * cf / fs * i + deviation * baseband[i]);
+        }
 
-        return new DiscreteSignal(fs, output.ToFloats());
+        return Signal.FromCopy(output, fs);
     }
 
     /// <summary>
     /// Does simple amplitude demodulation of <paramref name="signal"/> based on Hilbert transform.
     /// </summary>
-    public static DiscreteSignal DemodulateAmplitude(DiscreteSignal signal)
+    public static Signal DemodulateAmplitude(Signal signal)
     {
-        var ht = new HilbertTransform(signal.SampleCount);
-        var mag = ht.AnalyticSignal(signal.Samples).Magnitude;
+        var mag = new float[signal.Length];
+        new HilbertTransform(signal.Length).AnalyticMagnitude(signal.Samples, mag);
 
-        return new DiscreteSignal(signal.SamplingRate, mag) - 1.0f;
+        return Signal.FromCopy(mag, signal.SamplingRate) - 1.0f;
     }
 
     /// <summary>
     /// Does simple frequency demodulation pf <paramref name="signal"/> based on Hilbert transform.
     /// </summary>
-    public static DiscreteSignal DemodulateFrequency(DiscreteSignal signal)
+    public static Signal DemodulateFrequency(Signal signal)
     {
-        var diff = new float[signal.SampleCount];
-
+        var diff = new float[signal.Length];
         VMath.Diff(signal.Samples, diff);
 
-        var ht = new HilbertTransform(signal.SampleCount);
-        var mag = ht.AnalyticSignal(diff).Magnitude;
+        var mag = new float[signal.Length];
+        new HilbertTransform(signal.Length).AnalyticMagnitude(diff, mag);
 
-        return new DiscreteSignal(signal.SamplingRate, mag) - 1.0f;
+        return Signal.FromCopy(mag, signal.SamplingRate) - 1.0f;
     }
 }

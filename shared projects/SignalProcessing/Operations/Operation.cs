@@ -1,6 +1,7 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Tsm;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
@@ -27,7 +28,7 @@ public static class Operation
     /// <summary>
     /// Does fast convolution of <paramref name="signal"/> with <paramref name="kernel"/> via FFT.
     /// </summary>
-    public static DiscreteSignal Convolve(DiscreteSignal signal, DiscreteSignal kernel)
+    public static Signal Convolve(Signal signal, Signal kernel)
     {
         return new Convolver().Convolve(signal, kernel);
     }
@@ -45,14 +46,16 @@ public static class Operation
     /// </summary>
     public static float[] Convolve(float[] signal, float[] kernel)
     {
-        return Convolve(new ComplexDiscreteSignal(1, signal), 
-                        new ComplexDiscreteSignal(1, kernel)).Real;
+        var length = signal.Length + kernel.Length - 1;
+        var output = new float[length];
+        new Convolver().Convolve(signal, kernel, output);
+        return output;
     }
 
     /// <summary>
     /// Does fast cross-correlation between <paramref name="signal1"/> and <paramref name="signal2"/> via FFT.
     /// </summary>
-    public static DiscreteSignal CrossCorrelate(DiscreteSignal signal1, DiscreteSignal signal2)
+    public static Signal CrossCorrelate(Signal signal1, Signal signal2)
     {
         return new Convolver().CrossCorrelate(signal1, signal2);
     }
@@ -73,8 +76,8 @@ public static class Operation
     /// <param name="kernel">Convolution kernel</param>
     /// <param name="fftSize">FFT size</param>
     /// <param name="method">Block convolution method (OverlapAdd / OverlapSave)</param>
-    public static DiscreteSignal BlockConvolve(DiscreteSignal signal,
-                                               DiscreteSignal kernel,
+    public static Signal BlockConvolve(Signal signal,
+                                               Signal kernel,
                                                int fftSize,
                                                FilteringMethod method = FilteringMethod.OverlapSave)
     {
@@ -108,7 +111,7 @@ public static class Operation
     /// <param name="signal">Signal</param>
     /// <param name="factor">Interpolation factor (e.g. factor=2 if 8000 Hz -> 16000 Hz)</param>
     /// <param name="filter">Lowpass anti-aliasing filter</param>
-    public static DiscreteSignal Interpolate(DiscreteSignal signal, int factor, FirFilter? filter = null)
+    public static Signal Interpolate(Signal signal, int factor, FirFilter? filter = null)
     {
         return new Resampler().Interpolate(signal, factor, filter);
     }
@@ -119,7 +122,7 @@ public static class Operation
     /// <param name="signal">Signal</param>
     /// <param name="factor">Decimation factor (e.g. factor=2 if 16000 Hz -> 8000 Hz)</param>
     /// <param name="filter">Lowpass anti-aliasing filter</param>
-    public static DiscreteSignal Decimate(DiscreteSignal signal, int factor, FirFilter? filter = null)
+    public static Signal Decimate(Signal signal, int factor, FirFilter? filter = null)
     {
         return new Resampler().Decimate(signal, factor, filter);
     }
@@ -131,7 +134,7 @@ public static class Operation
     /// <param name="newSamplingRate">Desired sampling rate</param>
     /// <param name="filter">Lowpass anti-aliasing filter</param>
     /// <param name="order">Order</param>
-    public static DiscreteSignal Resample(DiscreteSignal signal, int newSamplingRate, FirFilter? filter = null, int order = 15)
+    public static Signal Resample(Signal signal, float newSamplingRate, FirFilter? filter = null, int order = 15)
     {
         return new Resampler().Resample(signal, newSamplingRate, filter, order);
     }
@@ -143,7 +146,7 @@ public static class Operation
     /// <param name="up">Interpolation factor</param>
     /// <param name="down">Decimation factor</param>
     /// <param name="filter">Lowpass anti-aliasing filter</param>
-    public static DiscreteSignal ResampleUpDown(DiscreteSignal signal, int up, int down, FirFilter? filter = null)
+    public static Signal ResampleUpDown(Signal signal, int up, int down, FirFilter? filter = null)
     {
         return new Resampler().ResampleUpDown(signal, up, down, filter);
     }
@@ -156,7 +159,7 @@ public static class Operation
     /// <param name="windowSize">Window size (for vocoders - FFT size)</param>
     /// <param name="hopSize">Hop length</param>
     /// <param name="algorithm">Algorithm for TSM</param>
-    public static DiscreteSignal TimeStretch(DiscreteSignal signal,
+    public static Signal TimeStretch(Signal signal,
                                              float stretch,
                                              int windowSize,
                                              int hopSize,
@@ -194,7 +197,7 @@ public static class Operation
     /// <param name="signal">Signal</param>
     /// <param name="stretch">Stretch factor (ratio)</param>
     /// <param name="algorithm">Algorithm for TSM</param>
-    public static DiscreteSignal TimeStretch(DiscreteSignal signal,
+    public static Signal TimeStretch(Signal signal,
                                              double stretch,
                                              TsmAlgorithm algorithm = TsmAlgorithm.PhaseVocoderPhaseLocking)
     {
@@ -205,7 +208,7 @@ public static class Operation
 
         IFilter stretchFilter;
 
-        var frameSize = (1024 * signal.SamplingRate / 16000).NextPowerOf2();
+        var frameSize = ((int)(1024 * signal.SamplingRate / 16000)).NextPowerOf2();
 
         switch (algorithm)
         {
@@ -232,29 +235,49 @@ public static class Operation
     /// <param name="signal">Signal</param>
     /// <param name="attackTime">Attack time (in seconds)</param>
     /// <param name="releaseTime">Release time (in seconds)</param>
-    public static DiscreteSignal Envelope(DiscreteSignal signal, float attackTime = 0.01f, float releaseTime = 0.05f)
+    public static Signal Envelope(Signal signal, float attackTime = 0.01f, float releaseTime = 0.05f)
     {
-        var envelopeFollower = new EnvelopeFollower(signal.SamplingRate, attackTime, releaseTime);
+        var envelopeFollower = new EnvelopeFollower((int)signal.SamplingRate, attackTime, releaseTime);
+        var output = new float[signal.Length];
+        var samples = signal.Samples;
+        for (var i = 0; i < output.Length; i++)
+        {
+            output[i] = envelopeFollower.Process(samples[i]);
+        }
 
-        return new DiscreteSignal(signal.SamplingRate, signal.Samples.Select(s => envelopeFollower.Process(s)));
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>
     /// Full-rectifies <paramref name="signal"/>.
     /// </summary>
-    public static DiscreteSignal FullRectify(DiscreteSignal signal)
+    public static Signal FullRectify(Signal signal)
     {
-        return new DiscreteSignal(signal.SamplingRate,
-                                  signal.Samples.Select(s => s < 0 ? -s : s));
+        var samples = signal.Samples;
+        var output = new float[signal.Length];
+        for (var i = 0; i < output.Length; i++)
+        {
+            var sample = samples[i];
+            output[i] = sample < 0 ? -sample : sample;
+        }
+
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>
     /// Half-rectifies <paramref name="signal"/>.
     /// </summary>
-    public static DiscreteSignal HalfRectify(DiscreteSignal signal)
+    public static Signal HalfRectify(Signal signal)
     {
-        return new DiscreteSignal(signal.SamplingRate,
-                                  signal.Samples.Select(s => s < 0 ? 0 : s));
+        var samples = signal.Samples;
+        var output = new float[signal.Length];
+        for (var i = 0; i < output.Length; i++)
+        {
+            var sample = samples[i];
+            output[i] = sample < 0 ? 0 : sample;
+        }
+
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>
@@ -265,8 +288,8 @@ public static class Operation
     /// <param name="noise">Noise signal</param>
     /// <param name="fftSize">FFT size</param>
     /// <param name="hopSize">Hop size (number of samples)</param>
-    public static DiscreteSignal SpectralSubtract(DiscreteSignal signal,
-                                                  DiscreteSignal noise,
+    public static Signal SpectralSubtract(Signal signal,
+                                                  Signal noise,
                                                   int fftSize = 1024,
                                                   int hopSize = 256)
     {
@@ -278,10 +301,20 @@ public static class Operation
     /// </summary>
     /// <param name="samples">Samples</param>
     /// <param name="peakDb">Peak level in decibels (dbFS), e.g. -1dB, -3dB, etc.</param>
-    public static void NormalizePeak(float[] samples, float peakDb)
-    {
-        var norm = Scale.FromDecibel(peakDb) / samples.Max(x => Math.Abs(x));
+    public static void NormalizePeak(float[] samples, float peakDb) => NormalizePeak(samples.AsSpan(), peakDb);
 
+    /// <summary>
+    /// Normalizes peak level in-place.
+    /// </summary>
+    public static void NormalizePeak(Span<float> samples, float peakDb)
+    {
+        var peak = 0f;
+        for (var i = 0; i < samples.Length; i++)
+        {
+            peak = Math.Max(peak, Math.Abs(samples[i]));
+        }
+
+        var norm = Scale.FromDecibel(peakDb) / peak;
         for (var i = 0; i < samples.Length; i++)
         {
             samples[i] *= norm;
@@ -293,10 +326,11 @@ public static class Operation
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="peakDb">Peak level in decibels (dBFS), e.g. -1dB, -3dB, etc.</param>
-    public static DiscreteSignal NormalizePeak(DiscreteSignal signal, float peakDb)
+    public static Signal NormalizePeak(Signal signal, float peakDb)
     {
         var normalized = signal.Clone();
         NormalizePeak(normalized.Samples, peakDb);
+        normalized.NotifySamplesModified();
         return normalized;
     }
 
@@ -305,10 +339,14 @@ public static class Operation
     /// </summary>
     /// <param name="samples">Samples</param>
     /// <param name="peakDb">Peak change in decibels, e.g. -6dB - decrease peak level twice</param>
-    public static void ChangePeak(float[] samples, float peakDb)
+    public static void ChangePeak(float[] samples, float peakDb) => ChangePeak(samples.AsSpan(), peakDb);
+
+    /// <summary>
+    /// Changes peak level in-place.
+    /// </summary>
+    public static void ChangePeak(Span<float> samples, float peakDb)
     {
         var norm = Scale.FromDecibel(peakDb);
-
         for (var i = 0; i < samples.Length; i++)
         {
             samples[i] *= norm;
@@ -320,10 +358,11 @@ public static class Operation
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="peakDb">Peak change in decibels, e.g. -6dB - decrease peak level twice</param>
-    public static DiscreteSignal ChangePeak(DiscreteSignal signal, float peakDb)
+    public static Signal ChangePeak(Signal signal, float peakDb)
     {
         var modified = signal.Clone();
-        ChangeRms(modified.Samples, peakDb);
+        ChangePeak(modified.Samples, peakDb);
+        modified.NotifySamplesModified();
         return modified;
     }
 
@@ -332,17 +371,20 @@ public static class Operation
     /// </summary>
     /// <param name="samples">Samples</param>
     /// <param name="rmsDb">RMS in decibels (dBFS), e.g. -6dB, -18dB, -26dB, etc.</param>
-    public static void NormalizeRms(float[] samples, float rmsDb)
+    public static void NormalizeRms(float[] samples, float rmsDb) => NormalizeRms(samples.AsSpan(), rmsDb);
+
+    /// <summary>
+    /// Normalizes RMS in-place.
+    /// </summary>
+    public static void NormalizeRms(Span<float> samples, float rmsDb)
     {
         var sum = 0f;
-
         for (var i = 0; i < samples.Length; i++)
         {
             sum += samples[i] * samples[i];
         }
 
         var norm = MathF.Sqrt(samples.Length * MathF.Pow(10, rmsDb / 10) / sum);
-
         for (var i = 0; i < samples.Length; i++)
         {
             samples[i] *= norm;
@@ -354,10 +396,11 @@ public static class Operation
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="rmsDb">RMS in decibels (dBFS), e.g. -6dB, -18dB, -26dB, etc.</param>
-    public static DiscreteSignal NormalizeRms(DiscreteSignal signal, float rmsDb)
+    public static Signal NormalizeRms(Signal signal, float rmsDb)
     {
         var normalized = signal.Clone();
         NormalizeRms(normalized.Samples, rmsDb);
+        normalized.NotifySamplesModified();
         return normalized;
     }
 
@@ -366,21 +409,23 @@ public static class Operation
     /// </summary>
     /// <param name="samples">Samples</param>
     /// <param name="rmsDb">RMS change in decibels, e.g. -6dB - decrease RMS twice</param>
-    public static void ChangeRms(float[] samples, float rmsDb)
+    public static void ChangeRms(float[] samples, float rmsDb) => ChangeRms(samples.AsSpan(), rmsDb);
+
+    /// <summary>
+    /// Changes RMS in-place.
+    /// </summary>
+    public static void ChangeRms(Span<float> samples, float rmsDb)
     {
         var sum = 0f;
-
         for (var i = 0; i < samples.Length; i++)
         {
             sum += samples[i] * samples[i];
         }
 
         var rmsDbActual = -20 * MathF.Log10(MathF.Sqrt(sum / samples.Length));
-
         rmsDb -= rmsDbActual;
 
         var norm = MathF.Sqrt(samples.Length * MathF.Pow(10, rmsDb / 10) / sum);
-        
         for (var i = 0; i < samples.Length; i++)
         {
             samples[i] *= norm;
@@ -392,10 +437,11 @@ public static class Operation
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="rmsDb">RMS change in decibels, e.g. -6dB - decrease RMS twice</param>
-    public static DiscreteSignal ChangeRms(DiscreteSignal signal, float rmsDb)
+    public static Signal ChangeRms(Signal signal, float rmsDb)
     {
         var modified = signal.Clone();
         ChangeRms(modified.Samples, rmsDb);
+        modified.NotifySamplesModified();
         return modified;
     }
 
@@ -409,7 +455,7 @@ public static class Operation
     /// <param name="window">Windowing function</param>
     /// <param name="fftSize">FFT size</param>
     /// <param name="samplingRate">If sampling rate=0 then power spectrum is evaluated, otherwise power spectral density is evaluated</param>
-    public static float[] Welch(DiscreteSignal signal,
+    public static float[] Welch(Signal signal,
                                 int windowSize = 1024,
                                 int hopSize = 256,
                                 WindowType window = WindowType.Hann,
@@ -418,7 +464,7 @@ public static class Operation
     {
         var stft = new Stft(windowSize, hopSize, window, fftSize);
 
-        var periodogram = stft.AveragePeriodogram(signal.Samples);
+        var periodogram = stft.AveragePeriodogram(signal);
 
         // scaling is compliant with sciPy function welch():
 
@@ -528,7 +574,7 @@ public static class Operation
     /// <summary>
     /// Direct convolution by formula in time domain
     /// </summary>
-    public static DiscreteSignal ConvolveDirect(DiscreteSignal signal1, DiscreteSignal signal2)
+    public static Signal ConvolveDirect(Signal signal1, Signal signal2)
     {
         var a = signal1.Samples;
         var b = signal2.Samples;
@@ -547,13 +593,13 @@ public static class Operation
             }
         }
 
-        return new DiscreteSignal(signal1.SamplingRate, conv);
+        return Signal.FromCopy(conv, signal1.SamplingRate);
     }
 
     /// <summary>
     /// Direct cross-correlation by formula in time domain
     /// </summary>
-    public static DiscreteSignal CrossCorrelateDirect(DiscreteSignal signal1, DiscreteSignal signal2)
+    public static Signal CrossCorrelateDirect(Signal signal1, Signal signal2)
     {
         var a = signal1.Samples;
         var b = signal2.Samples;
@@ -574,7 +620,7 @@ public static class Operation
             }
         }
 
-        return new DiscreteSignal(signal1.SamplingRate, corr);
+        return Signal.FromCopy(corr, signal1.SamplingRate);
     }
 #endif
 }

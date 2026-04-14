@@ -1,5 +1,6 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
@@ -27,6 +28,14 @@ public static class Pitch
                                             int endPos = -1,
                                             float low = 80/*Hz*/,
                                             float high = 400/*Hz*/)
+        => FromAutoCorrelation(samples.AsSpan(), samplingRate, startPos, endPos, low, high);
+
+    public static float FromAutoCorrelation(ReadOnlySpan<float> samples,
+                                            int samplingRate,
+                                            int startPos = 0,
+                                            int endPos = -1,
+                                            float low = 80/*Hz*/,
+                                            float high = 400/*Hz*/)
     {
         if (endPos == -1)
         {
@@ -36,13 +45,14 @@ public static class Pitch
         var pitch1 = (int)(1.0 * samplingRate / high);    // 2,5 ms = 400Hz
         var pitch2 = (int)(1.0 * samplingRate / low);     // 12,5 ms = 80Hz
 
-        var block = new DiscreteSignal(samplingRate, samples)[startPos, endPos].Samples;
+        var blockLength = endPos - startPos;
+        var block = new float[blockLength];
+        samples.Slice(startPos, blockLength).CopyTo(block);
 
-        var fftSize = (2 * block.Length - 1).NextPowerOf2();// MathUtils.NextPowerOfTwo(;
+        var fftSize = (2 * block.Length - 1).NextPowerOf2();
 
         var cc = new float[fftSize];
-
-        new Convolver(fftSize).CrossCorrelate(block, block.Values.FastCopy(), cc);
+        new Convolver(fftSize).CrossCorrelate(block, block, cc);
 
         var start = pitch1 + block.Length - 1;
         var end = Math.Min(start + pitch2, cc.Length);
@@ -70,13 +80,13 @@ public static class Pitch
     /// <param name="endPos">Index of the last sample in signal for processing</param>
     /// <param name="low">Lower frequency of expected pitch range</param>
     /// <param name="high">Upper frequency of expected pitch range</param>
-    public static float FromAutoCorrelation(DiscreteSignal signal,
+    public static float FromAutoCorrelation(Signal signal,
                                             int startPos = 0,
                                             int endPos = -1,
                                             float low = 80,
                                             float high = 400)
     {
-        return FromAutoCorrelation(signal.Samples, signal.SamplingRate, startPos, endPos, low, high);
+        return FromAutoCorrelation(signal.Samples, (int)signal.SamplingRate, startPos, endPos, low, high);
     }
 
     /// <summary>
@@ -89,6 +99,14 @@ public static class Pitch
     /// <param name="lowSchmittThreshold">Lower threshold in Schmitt trigger</param>
     /// <param name="highSchmittThreshold">Upper threshold in Schmitt trigger</param>
     public static float FromZeroCrossingsSchmitt(float[] samples,
+                                                 int samplingRate,
+                                                 int startPos = 0,
+                                                 int endPos = -1,
+                                                 float lowSchmittThreshold = -1e10f,
+                                                 float highSchmittThreshold = 1e10f)
+        => FromZeroCrossingsSchmitt(samples.AsSpan(), samplingRate, startPos, endPos, lowSchmittThreshold, highSchmittThreshold);
+
+    public static float FromZeroCrossingsSchmitt(ReadOnlySpan<float> samples,
                                                  int samplingRate,
                                                  int startPos = 0,
                                                  int endPos = -1,
@@ -164,14 +182,14 @@ public static class Pitch
     /// <param name="endPos">Index of the last sample in array for processing</param>
     /// <param name="lowSchmittThreshold">Lower threshold in Schmitt trigger</param>
     /// <param name="highSchmittThreshold">Upper threshold in Schmitt trigger</param>
-    public static float FromZeroCrossingsSchmitt(DiscreteSignal signal,
+    public static float FromZeroCrossingsSchmitt(Signal signal,
                                                  int startPos = 0,
                                                  int endPos = -1,
                                                  float lowSchmittThreshold = -1e10f,
                                                  float highSchmittThreshold = 1e10f)
     {
         return FromZeroCrossingsSchmitt(signal.Samples,
-                                        signal.SamplingRate,
+                                        (int)signal.SamplingRate,
                                         startPos,
                                         endPos,
                                         lowSchmittThreshold,
@@ -193,6 +211,15 @@ public static class Pitch
     /// <param name="high">Upper frequency of expected pitch range</param>
     /// <param name="cmdfThreshold">CMDF threshold</param>
     public static float FromYin(float[] samples,
+                                int samplingRate,
+                                int startPos = 0,
+                                int endPos = -1,
+                                float low = 80/*Hz*/,
+                                float high = 400/*Hz*/,
+                                float cmdfThreshold = 0.2f)
+        => FromYin(samples.AsSpan(), samplingRate, startPos, endPos, low, high, cmdfThreshold);
+
+    public static float FromYin(ReadOnlySpan<float> samples,
                                 int samplingRate,
                                 int startPos = 0,
                                 int endPos = -1,
@@ -288,14 +315,14 @@ public static class Pitch
     /// <param name="low">Lower frequency of expected pitch range</param>
     /// <param name="high">Upper frequency of expected pitch range</param>
     /// <param name="cmdfThreshold">CMDF threshold</param>
-    public static float FromYin(DiscreteSignal signal,
+    public static float FromYin(Signal signal,
                                 int startPos = 0,
                                 int endPos = -1,
                                 float low = 80/*Hz*/,
                                 float high = 400/*Hz*/,
                                 float cmdfThreshold = 0.2f)
     {
-        return FromYin(signal.Samples, signal.SamplingRate, startPos, endPos, low, high, cmdfThreshold);
+        return FromYin(signal.Samples, (int)signal.SamplingRate, startPos, endPos, low, high, cmdfThreshold);
     }
 
     #endregion
@@ -311,31 +338,16 @@ public static class Pitch
     /// <param name="low">Lower frequency of expected pitch range</param>
     /// <param name="high">Upper frequency of expected pitch range</param>
     /// <param name="fftSize">FFT size</param>
-    public static float FromHss(DiscreteSignal signal,
+    public static float FromHss(Signal signal,
                                 int startPos = 0,
                                 int endPos = -1,
                                 float low = 80/*Hz*/,
                                 float high = 400/*Hz*/,
                                 int fftSize = 0)
     {
-        if (endPos == -1)
-        {
-            endPos = signal.SampleCount;
-        }
-
-        if (startPos != 0 || endPos != signal.SampleCount)
-        {
-            signal = signal[startPos, endPos];
-        }
-
-        signal.ApplyWindow(WindowType.Hann);
-
-        var size = fftSize > 0 ? fftSize : signal.SampleCount.NextPowerOf2();//  BitMathExtension.NextPowerOfTwo(signal.Length);
-        var fft = new RealFft(size);
-
-        var spectrum = fft.PowerSpectrum(signal, false).Samples;
-
-        return FromHss(spectrum, signal.SamplingRate, low, high);
+        endPos = ResolveEndPos(signal, endPos);
+        var spectrum = ComputeWindowedPowerSpectrum(signal, startPos, endPos, fftSize);
+        return FromHss(spectrum, (int)signal.SamplingRate, low, high);
     }
 
     /// <summary>
@@ -389,31 +401,16 @@ public static class Pitch
     /// <param name="low">Lower frequency of expected pitch range</param>
     /// <param name="high">Upper frequency of expected pitch range</param>
     /// <param name="fftSize">FFT size</param>
-    public static float FromHps(DiscreteSignal signal,
+    public static float FromHps(Signal signal,
                                 int startPos = 0,
                                 int endPos = -1,
                                 float low = 80/*Hz*/,
                                 float high = 400/*Hz*/,
                                 int fftSize = 0)
     {
-        if (endPos == -1)
-        {
-            endPos = signal.SampleCount;
-        }
-
-        if (startPos != 0 || endPos != signal.SampleCount)
-        {
-            signal = signal[startPos, endPos];
-        }
-
-        signal.ApplyWindow(WindowType.Hann);
-
-        var size = fftSize > 0 ? fftSize : signal.SampleCount.NextPowerOf2();// MathUtils.NextPowerOfTwo(signal.Length);
-        var fft = new RealFft(size);
-
-        var spectrum = fft.PowerSpectrum(signal, false).Samples;
-
-        return FromHps(spectrum, signal.SamplingRate, low, high);
+        endPos = ResolveEndPos(signal, endPos);
+        var spectrum = ComputeWindowedPowerSpectrum(signal, startPos, endPos, fftSize);
+        return FromHps(spectrum, (int)signal.SamplingRate, low, high);
     }
 
     /// <summary>
@@ -465,31 +462,16 @@ public static class Pitch
     /// <param name="low">Lower frequency of expected pitch range</param>
     /// <param name="high">Upper frequency of expected pitch range</param>
     /// <param name="fftSize">FFT size</param>
-    public static float FromSpectralPeaks(DiscreteSignal signal,
+    public static float FromSpectralPeaks(Signal signal,
                                           int startPos = 0,
                                           int endPos = -1,
                                           float low = 80/*Hz*/,
                                           float high = 400/*Hz*/,
                                           int fftSize = 0)
     {
-        if (endPos == -1)
-        {
-            endPos = signal.SampleCount;
-        }
-
-        if (startPos != 0 || endPos != signal.SampleCount)
-        {
-            signal = signal[startPos, endPos];
-        }
-
-        signal.ApplyWindow(WindowType.Hann);
-
-        var size = fftSize > 0 ? fftSize : signal.SampleCount.NextPowerOf2();// MathUtils.NextPowerOfTwo(signal.Length);
-        var fft = new RealFft(size);
-
-        var spectrum = fft.PowerSpectrum(signal, false).Samples;
-
-        return FromSpectralPeaks(spectrum, signal.SamplingRate, low, high);
+        endPos = ResolveEndPos(signal, endPos);
+        var spectrum = ComputeWindowedPowerSpectrum(signal, startPos, endPos, fftSize);
+        return FromSpectralPeaks(spectrum, (int)signal.SamplingRate, low, high);
     }
 
     /// <summary>
@@ -531,7 +513,7 @@ public static class Pitch
     /// <param name="high">Upper frequency of expected pitch range</param>
     /// <param name="cepstrumSize">Size of cepstrum</param>
     /// <param name="fftSize">FFT size</param>
-    public static float FromCepstrum(DiscreteSignal signal,
+    public static float FromCepstrum(Signal signal,
                                      int startPos = 0,
                                      int endPos = -1,
                                      float low = 80/*Hz*/,
@@ -539,25 +521,16 @@ public static class Pitch
                                      int cepstrumSize = 256,
                                      int fftSize = 1024)
     {
+        endPos = ResolveEndPos(signal, endPos);
+        var frame = CopyAnalysisFrame(signal, startPos, endPos);
         var samplingRate = signal.SamplingRate;
-
-        if (endPos == -1)
-        {
-            endPos = signal.SampleCount;
-        }
-
-        if (startPos != 0 || endPos != signal.SampleCount)
-        {
-            signal = signal[startPos, endPos];
-        }
-
-        var pitch1 = (int)(1.0 * samplingRate / high);                              // 2,5 ms = 400Hz
-        var pitch2 = Math.Min(cepstrumSize - 1, (int)(1.0 * samplingRate / low));   // 12,5 ms = 80Hz
+        var pitch1 = (int)(samplingRate / high);
+        var pitch2 = Math.Min(cepstrumSize - 1, (int)(samplingRate / low));
 
         var cepstrum = new float[cepstrumSize];
 
         var cepstralTransform = new CepstralTransform(cepstrumSize, fftSize);
-        cepstralTransform.RealCepstrum(signal.Samples, cepstrum);
+        cepstralTransform.RealCepstrum(frame, cepstrum);
 
         var max = cepstrum[pitch1];
         var peakIndex = pitch1;
@@ -570,7 +543,46 @@ public static class Pitch
             }
         }
 
-        return (float)samplingRate / peakIndex;
+        return samplingRate / peakIndex;
+    }
+
+    private static int ResolveEndPos(Signal signal, int endPos)
+        => endPos == -1 ? signal.Length : endPos;
+
+    private static float[] CopyAnalysisFrame(Signal signal, int startPos, int endPos)
+    {
+        var length = endPos - startPos;
+        var frame = new float[length];
+        signal.Samples.Slice(startPos, length).CopyTo(frame);
+        return frame;
+    }
+
+    private static float[] GetWindowedAnalysisFrame(Signal signal, int startPos, int endPos)
+    {
+        var frame = CopyAnalysisFrame(signal, startPos, endPos);
+        frame.ApplyWindow(WindowType.Hann);
+        return frame;
+    }
+
+    private static float[] ComputeWindowedPowerSpectrum(Signal signal, int startPos, int endPos, int fftSize)
+    {
+        var frame = GetWindowedAnalysisFrame(signal, startPos, endPos);
+        var size = fftSize > 0 ? fftSize : frame.Length.NextPowerOf2();
+        var fft = new RealFft(size);
+        var spectrum = new float[size / 2 + 1];
+
+        if (frame.Length < size)
+        {
+            var padded = new float[size];
+            frame.CopyTo(padded);
+            fft.PowerSpectrum(padded, spectrum, false);
+        }
+        else
+        {
+            fft.PowerSpectrum(frame.AsSpan(0, size), spectrum, false);
+        }
+
+        return spectrum;
     }
 
     #endregion

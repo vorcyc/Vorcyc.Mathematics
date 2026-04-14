@@ -19,9 +19,12 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     private readonly T _defaultH;
     private readonly T _minH;
 
-    // 实例级缓存
-    private readonly Dictionary<T, T> _singleCache;
-    private readonly Dictionary<string, T> _multiCache;
+    private T[]? _pt;
+    private T[]? _ptPlus;
+    private T[]? _ptMinus;
+    private T[]? _ptPlus2;
+    private T[]? _ptMinus2;
+    private int _ptDim;
 
     /// <summary>
     /// Specifies the finite difference method used for numerical differentiation.
@@ -67,8 +70,6 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         _isMultiVariable = false;
         _defaultH = defaultH;
         _minH = T.CreateChecked(1e-15);
-        _singleCache = new Dictionary<T, T>(EqualityComparer<T>.Default);
-        _multiCache = new Dictionary<string, T>();
     }
 
     /// <summary>
@@ -85,8 +86,6 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         _isMultiVariable = true;
         _defaultH = defaultH;
         _minH = T.CreateChecked(1e-15);
-        _singleCache = new Dictionary<T, T>(EqualityComparer<T>.Default);
-        _multiCache = new Dictionary<string, T>();
     }
 
     /// <summary>
@@ -102,8 +101,6 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         _isMultiVariable = false;
         _defaultH = T.CreateChecked(1e-7);
         _minH = T.CreateChecked(1e-15);
-        _singleCache = new Dictionary<T, T>(EqualityComparer<T>.Default);
-        _multiCache = new Dictionary<string, T>();
     }
 
     /// <summary>
@@ -119,8 +116,6 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         _isMultiVariable = true;
         _defaultH = T.CreateChecked(1e-7);
         _minH = T.CreateChecked(1e-15);
-        _singleCache = new Dictionary<T, T>(EqualityComparer<T>.Default);
-        _multiCache = new Dictionary<string, T>();
     }
 
     /// <summary>
@@ -136,40 +131,70 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         if (_isMultiVariable || _singleADFunc != null || _multiADFunc != null)
             throw new InvalidOperationException("此实例不支持数值单变量导数计算");
         if (order < 1) throw new ArgumentException("导数阶数必须大于等于 1", nameof(order));
-        T step = h ?? _defaultH;
-        if (step <= _minH) throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+        T floor = NumericalStep.Optimal(x, order);
+        T step = h ?? floor;
+        if (step < floor)
+            step = floor;
+        if (step <= _minH)
+            step = T.Max(_defaultH, floor);
+        if (step <= _minH)
+            throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+
+        if (order == 1 && method == Method.Central && h is null)
+            return NumericalStep.RichardsonFirstOrder(x, _singleFunc!, step);
+
+        if (order == 2 && method == Method.Central && h is null)
+            return NumericalStep.RichardsonSecondOrder(x, _singleFunc!, step);
+
+        if (order == 3 && method == Method.Central && h is null)
+            return NumericalStep.RichardsonThirdOrder(x, _singleFunc!, step);
+
+        if (order == 4 && method == Method.Central && h is null)
+            return NumericalStep.RichardsonFourthOrder(x, _singleFunc!, step);
+
         return CalculateSingleDerivative(x, order, step, method);
     }
 
     private T CalculateSingleDerivative(T x, int order, T h, Method method)
     {
-        T GetValue(T point)
+        SingleVariableFunction<T> func = _singleFunc!;
+
+        if (method == Method.Central && order is >= 2 and <= 4)
         {
-            if (!_singleCache.TryGetValue(point, out T value))
+            T two = T.CreateChecked(2);
+            T h2 = h * h;
+            return order switch
             {
-                value = _singleFunc(point);
-                _singleCache[point] = value;
-            }
-            return value;
+                2 => (func(x + h) - two * func(x) + func(x - h)) / h2,
+                3 => (func(x + two * h) - two * func(x + h) + two * func(x - h) - func(x - two * h))
+                     / (two * h2 * h),
+                4 => (func(x + two * h) - T.CreateChecked(4) * func(x + h) + T.CreateChecked(6) * func(x)
+                     - T.CreateChecked(4) * func(x - h) + func(x - two * h)) / (h2 * h2),
+                _ => throw new ArgumentException("不支持的导数阶数")
+            };
         }
 
         if (order == 1)
-        {
-            T two = T.CreateChecked(2);
-            T eight = T.CreateChecked(8);
-            T twelve = T.CreateChecked(12);
+            return DifferentiateFirstOrder(x, func, h, method);
 
-            return method switch
-            {
-                Method.Forward => (GetValue(x + h) - GetValue(x)) / h,
-                Method.Backward => (GetValue(x) - GetValue(x - h)) / h,
-                Method.Central => (GetValue(x + h) - GetValue(x - h)) / (two * h),
-                Method.CentralFourthOrder => (-GetValue(x + two * h) + eight * GetValue(x + h) - eight * GetValue(x - h) + GetValue(x - two * h)) / (twelve * h),
-                _ => throw new ArgumentException("不支持的数值方法")
-            };
-        }
-        return new Derivative<T>(t => CalculateSingleDerivative(t, order - 1, h, method), _defaultH)
-            .Calculate(x, 1, h, method);
+        SingleVariableFunction<T> lowerOrder = t => CalculateSingleDerivative(t, order - 1, h, method);
+        return DifferentiateFirstOrder(x, lowerOrder, h, method);
+    }
+
+    private static T DifferentiateFirstOrder(T x, SingleVariableFunction<T> func, T h, Method method)
+    {
+        T two = T.CreateChecked(2);
+        T eight = T.CreateChecked(8);
+        T twelve = T.CreateChecked(12);
+
+        return method switch
+        {
+            Method.Forward => (func(x + h) - func(x)) / h,
+            Method.Backward => (func(x) - func(x - h)) / h,
+            Method.Central => (func(x + h) - func(x - h)) / (two * h),
+            Method.CentralFourthOrder => (-func(x + two * h) + eight * func(x + h) - eight * func(x - h) + func(x - two * h)) / (twelve * h),
+            _ => throw new ArgumentException("不支持的数值方法")
+        };
     }
 
     /// <summary>
@@ -188,51 +213,99 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         if (point.IsEmpty) throw new ArgumentNullException(nameof(point));
         if (variableIndex < 0 || variableIndex >= point.Length) throw new ArgumentException("变量索引超出范围", nameof(variableIndex));
         if (order < 1) throw new ArgumentException("偏导数阶数必须大于等于 1", nameof(order));
-        T step = h ?? _defaultH;
-        if (step <= _minH) throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+        T floor = NumericalStep.Optimal(point[variableIndex], order);
+        T step = h ?? floor;
+        if (step < floor)
+            step = floor;
+        if (step <= _minH)
+            step = T.Max(_defaultH, floor);
+        if (step <= _minH)
+            throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
         return CalculatePartialDerivative(point, variableIndex, order, step, method);
     }
 
     private T CalculatePartialDerivative(Span<T> point, int variableIndex, int order, T h, Method method)
     {
-        T GetValue(Span<T> p)
-        {
-            string key = string.Join(",", p.ToArray().Select(v => v.ToString()));
-            if (!_multiCache.TryGetValue(key, out T value))
-            {
-                value = _multiFunc(p);
-                _multiCache[key] = value;
-            }
-            return value;
-        }
+        int n = point.Length;
+        EnsurePartialBuffers(n);
+        T Eval(Span<T> p) => _multiFunc!(p);
 
         if (order == 1)
         {
-            T[] pointPlusH = point.ToArray();
-            T[] pointMinusH = point.ToArray();
-            pointPlusH[variableIndex] += h;
-            if (method == Method.Central || method == Method.CentralFourthOrder) pointMinusH[variableIndex] -= h;
+            point.CopyTo(_ptPlus!);
+            point.CopyTo(_ptMinus!);
+            _ptPlus![variableIndex] += h;
+            if (method == Method.Central || method == Method.CentralFourthOrder)
+                _ptMinus![variableIndex] -= h;
 
             T two = T.CreateChecked(2);
             T eight = T.CreateChecked(8);
             T twelve = T.CreateChecked(12);
 
+            if (method == Method.CentralFourthOrder)
+            {
+                point.CopyTo(_ptPlus2!);
+                point.CopyTo(_ptMinus2!);
+                _ptPlus2![variableIndex] += two * h;
+                _ptMinus2![variableIndex] -= two * h;
+                return (-Eval(_ptPlus2) + eight * Eval(_ptPlus)
+                        - eight * Eval(_ptMinus) + Eval(_ptMinus2)) / (twelve * h);
+            }
+
             return method switch
             {
-                Method.Forward => (GetValue(pointPlusH) - GetValue(point)) / h,
-                Method.Backward => (GetValue(point) - GetValue(pointMinusH)) / h,
-                Method.Central => (GetValue(pointPlusH) - GetValue(pointMinusH)) / (two * h),
-                Method.CentralFourthOrder => (-GetValue(pointPlusH) + eight * GetValue(pointPlusH) - eight * GetValue(pointMinusH) + GetValue(pointMinusH)) / (twelve * h),
+                Method.Forward => (Eval(_ptPlus) - Eval(point)) / h,
+                Method.Backward => (Eval(point) - Eval(_ptMinus)) / h,
+                Method.Central => (Eval(_ptPlus) - Eval(_ptMinus)) / (two * h),
                 _ => throw new ArgumentException("不支持的数值方法")
             };
         }
 
-        T[] newPoint = point.ToArray();
-        return new Derivative<T>(t =>
+        if (method == Method.Central && order is >= 2 and <= 4)
         {
-            newPoint[variableIndex] = t;
-            return CalculatePartialDerivative(newPoint, variableIndex, order - 1, h, method);
-        }, _defaultH).Calculate(point[variableIndex], 1, h, method);
+            T two = T.CreateChecked(2);
+            T h2 = h * h;
+            point.CopyTo(_pt!);
+            point.CopyTo(_ptPlus!);
+            point.CopyTo(_ptMinus!);
+            _ptPlus![variableIndex] += h;
+            _ptMinus![variableIndex] -= h;
+
+            point.CopyTo(_ptPlus2!);
+            point.CopyTo(_ptMinus2!);
+            _ptPlus2![variableIndex] += two * h;
+            _ptMinus2![variableIndex] -= two * h;
+
+            return order switch
+            {
+                2 => (Eval(_ptPlus) - two * Eval(_pt) + Eval(_ptMinus)) / h2,
+                3 => (Eval(_ptPlus2) - two * Eval(_ptPlus) + two * Eval(_ptMinus) - Eval(_ptMinus2)) / (two * h2 * h),
+                4 => (Eval(_ptPlus2) - T.CreateChecked(4) * Eval(_ptPlus) + T.CreateChecked(6) * Eval(_pt)
+                     - T.CreateChecked(4) * Eval(_ptMinus) + Eval(_ptMinus2)) / (h2 * h2),
+                _ => throw new ArgumentException("不支持的导数阶数")
+            };
+        }
+
+        T xi = point[variableIndex];
+        point.CopyTo(_pt!);
+        return NumericalStep.CentralFirst(xi, h, t =>
+        {
+            _pt![variableIndex] = t;
+            return CalculatePartialDerivative(_pt, variableIndex, order - 1, h, method);
+        });
+    }
+
+    private void EnsurePartialBuffers(int n)
+    {
+        if (n <= _ptDim && _pt is not null)
+            return;
+
+        _ptDim = n;
+        _pt = new T[n];
+        _ptPlus = new T[n];
+        _ptMinus = new T[n];
+        _ptPlus2 = new T[n];
+        _ptMinus2 = new T[n];
     }
 
     /// <summary>
@@ -245,6 +318,15 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         if (_singleADFunc == null) throw new InvalidOperationException("此实例不支持单变量自动微分");
         DualNumber<T> input = new DualNumber<T>(x, T.One);
         return _singleADFunc(input).Deriv;
+    }
+
+    /// <summary>
+    /// 使用超对偶数自动微分计算单变量二阶导数 f''(x)。
+    /// </summary>
+    public static T SecondDerivativeAD(T x, Func<HyperDualNumber<T>, HyperDualNumber<T>> func)
+    {
+        var input = new HyperDualNumber<T>(x, T.One, T.One, T.Zero);
+        return func(input).E12;
     }
 
     /// <summary>
@@ -268,6 +350,83 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     }
 
     /// <summary>
+    /// 计算多变量标量函数的数值梯度。
+    /// </summary>
+    /// <param name="point">计算梯度的点。</param>
+    /// <param name="h">步长，默认为构造时的默认步长。</param>
+    /// <param name="method">数值差分方法。</param>
+    /// <returns>梯度向量。</returns>
+    public T[] Gradient(Span<T> point, T? h = null, Method method = Method.Central)
+    {
+        if (point.IsEmpty) throw new ArgumentException("输入点不能为空", nameof(point));
+        T[] gradient = new T[point.Length];
+        Gradient(point, gradient, h, method);
+        return gradient;
+    }
+
+    /// <summary>
+    /// 将梯度写入 <paramref name="destination"/>，避免额外分配。
+    /// </summary>
+    public void Gradient(Span<T> point, Span<T> destination, T? h = null, Method method = Method.Central)
+    {
+        if (!_isMultiVariable || _multiFunc == null || _singleADFunc != null || _multiADFunc != null)
+            throw new InvalidOperationException("此实例不支持数值梯度计算");
+        if (point.IsEmpty) throw new ArgumentException("输入点不能为空", nameof(point));
+        if (destination.Length < point.Length)
+            throw new ArgumentException("目标缓冲区长度不足", nameof(destination));
+
+        if (method == Method.Central)
+        {
+            GradientCentral(point, destination, h);
+            return;
+        }
+
+        for (int i = 0; i < point.Length; i++)
+            destination[i] = CalculatePartial(point, i, 1, h, method);
+    }
+
+    private void GradientCentral(Span<T> point, Span<T> destination, T? h)
+    {
+        int n = point.Length;
+        EnsurePartialBuffers(n);
+        MultiVariableFunction<T> eval = _multiFunc!;
+
+        T step;
+        if (h is not null)
+        {
+            step = h.GetValueOrDefault();
+            if (step <= _minH)
+                throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+        }
+        else
+        {
+            T scale = T.One;
+            for (int i = 0; i < n; i++)
+            {
+                T ax = T.Abs(point[i]);
+                if (ax > scale) scale = ax;
+            }
+            T floor = NumericalStep.OptimalMagnitude(scale, 1);
+            step = floor;
+            if (step <= _minH)
+                step = T.Max(_defaultH, floor);
+        }
+
+        T invTwoStep = T.One / (T.CreateChecked(2) * step);
+        T[] ptPlus = _ptPlus!;
+        T[] ptMinus = _ptMinus!;
+
+        for (int i = 0; i < n; i++)
+        {
+            point.CopyTo(ptPlus);
+            point.CopyTo(ptMinus);
+            ptPlus[i] += step;
+            ptMinus[i] -= step;
+            destination[i] = (eval(ptPlus) - eval(ptMinus)) * invTwoStep;
+        }
+    }
+
+    /// <summary>
     /// 获取梯度（仅限自动微分）。
     /// </summary>
     /// <param name="point">计算梯度的点。</param>
@@ -284,49 +443,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     }
 
     /// <summary>
-    /// 清空实例的缓存。
+    /// 清空实例的缓存（保留 API；当前无数值导数结果缓存）。
     /// </summary>
-    public void ClearCache()
-    {
-        _singleCache.Clear();
-        _multiCache.Clear();
-    }
+    public void ClearCache() { }
 }
-
-
-//public static class DerivativeExample
-//{
-//    public static void Demo()
-//    {
-//        Console.WriteLine("=== 使用 double 测试 ===");
-//        var deriv1 = new Derivative<double>(x => x * x, 1e-7);
-//        Console.WriteLine($"f'(2) = {deriv1.Calculate(2.0)}");
-
-//        var deriv2 = new Derivative<double>(x => x * x);
-//        Console.WriteLine($"f'(2) with AD = {deriv2.CalculateAD(2.0)}");
-
-//        var deriv3 = new Derivative<double>(args => args[0] * args[0] + args[1] * args[1], 1e-7);
-//        double[] pointDArray = { 2.0, 3.0 };
-//        Span<double> pointD = pointDArray.AsSpan();
-//        Console.WriteLine($"∂f/∂x at (2,3) = {deriv3.CalculatePartial(pointD, 0)}");
-
-//        var deriv4 = new Derivative<double>(args => args[0] * args[0] + args[1] * args[1]);
-//        Console.WriteLine($"∂f/∂x at (2,3) with AD = {deriv4.CalculatePartialAD(pointD, 0)}");
-//        Console.WriteLine($"∂f/∂y at (2,3) with AD = {deriv4.CalculatePartialAD(pointD, 1)}");
-
-//        var gradD = deriv4.GradientAD(pointD);
-//        Console.WriteLine($"Gradient at (2,3) with AD: ({gradD[0]}, {gradD[1]})");
-
-//        Console.WriteLine("\n=== 使用 float 测试 ===");
-//        var deriv5 = new Derivative<float>(x => x * x, 1e-4f);
-//        Console.WriteLine($"f'(2) = {deriv5.Calculate(2.0f)}");
-
-//        var deriv6 = new Derivative<float>(x => x * x);
-//        Console.WriteLine($"f'(2) with AD = {deriv6.CalculateAD(2.0f)}");
-
-//        var deriv7 = new Derivative<float>(args => args[0] * args[0] + args[1] * args[1], 1e-4f);
-//        float[] pointFArray = { 2.0f, 3.0f };
-//        Span<float> pointF = pointFArray.AsSpan();
-//        Console.WriteLine($"∂f/∂x at (2,3) = {deriv7.CalculatePartial(pointF, 0)}");
-//    }
-//}

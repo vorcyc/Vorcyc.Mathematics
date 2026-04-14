@@ -1,100 +1,122 @@
 ﻿namespace Vorcyc.Mathematics.Calculus.NumericalMethods;
 
-using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 /// <summary>
 /// 使用龙格-库塔法（RK4）求解常微分方程 dy/dx = f(x,y) 的实例类，支持泛型浮点类型。
 /// </summary>
 /// <typeparam name="T">浮点类型，必须实现 <see cref="IFloatingPointIeee754{T}"/></typeparam>
-public class RungeKutta<T> where T : struct, IFloatingPointIeee754<T>
+public sealed class RungeKutta<T> where T : struct, IFloatingPointIeee754<T>
 {
+    private readonly DifferentialFunction<T> _func;
+    private readonly T _two;
+    private readonly T _invSix;
+    private readonly T _endTol;
 
-
-    private readonly DifferentialFunction<T> _func; // 微分方程 f(x,y)
-    private readonly T _defaultH;                // 默认步长
-
-    // 缓存函数值，避免重复计算
-    private readonly Dictionary<(T x, T y), T> _cache;
-
-    /// <summary>
-    /// 初始化 <see cref="RungeKutta{T}"/> 实例。
-    /// </summary>
-    /// <param name="func">微分方程 dy/dx = f(x,y)</param>
-    /// <param name="defaultH">默认步长</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="func"/> 为 null 时抛出</exception>
     public RungeKutta(DifferentialFunction<T> func, T defaultH)
     {
+        _ = defaultH;
         _func = func ?? throw new ArgumentNullException(nameof(func));
-        _defaultH = defaultH;
-        _cache = new Dictionary<(T, T), T>();
+        _two = T.CreateChecked(2);
+        _invSix = T.One / T.CreateChecked(6);
+        _endTol = T.CreateChecked(1e-15);
     }
 
-    /// <summary>
-    /// 使用四阶龙格-库塔法（RK4）求解微分方程。
-    /// </summary>
-    /// <param name="x0">初始 x 值</param>
-    /// <param name="y0">初始 y 值</param>
-    /// <param name="xEnd">目标 x 值</param>
-    /// <param name="steps">步数，决定步长 h = (xEnd - x0) / steps</param>
-    /// <param name="h">步长，可选，优先级高于默认步长</param>
-    /// <returns>在 <paramref name="xEnd"/> 处的 y 值</returns>
-    /// <exception cref="ArgumentException">当 <paramref name="steps"/> 小于 1 时抛出</exception>
     public T Solve(T x0, T y0, T xEnd, int steps = 100, T? h = null)
     {
         if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
+        if (x0 == xEnd) return y0;
 
-        T step = h ?? (xEnd - x0) / T.CreateChecked(steps); // 使用指定步长或计算步长
+        T step = h ?? (xEnd - x0) / T.CreateChecked(steps);
         T x = x0;
         T y = y0;
 
-        // 迭代直到 x 达到 xEnd
-        while (x < xEnd)
+        while (T.Abs(xEnd - x) > _endTol)
         {
-            T k1 = GetValue(x, y);
-            T k2 = GetValue(x + step / T.CreateChecked(2), y + k1 * step / T.CreateChecked(2));
-            T k3 = GetValue(x + step / T.CreateChecked(2), y + k2 * step / T.CreateChecked(2));
-            T k4 = GetValue(x + step, y + k3 * step);
-
-            // RK4 更新公式：y_{n+1} = y_n + (h/6)(k1 + 2k2 + 2k3 + k4)
-            T dy = step * (k1 + T.CreateChecked(2) * k2 + T.CreateChecked(2) * k3 + k4) / T.CreateChecked(6);
-            y += dy;
-            x += step;
-
-            // 如果超过 xEnd，调整最后一步
-            if (x > xEnd)
-            {
-                step = xEnd - (x - step);
-                x = xEnd;
-                y -= dy; // 回退一步，重新计算
-                k1 = GetValue(x - step, y);
-                k2 = GetValue(x - step / T.CreateChecked(2), y + k1 * step / T.CreateChecked(2));
-                k3 = GetValue(x - step / T.CreateChecked(2), y + k2 * step / T.CreateChecked(2));
-                k4 = GetValue(x, y + k3 * step);
-                y += step * (k1 + T.CreateChecked(2) * k2 + T.CreateChecked(2) * k3 + k4) / T.CreateChecked(6);
-            }
+            T remaining = xEnd - x;
+            T currentStep = T.Abs(remaining) < T.Abs(step) ? remaining : step;
+            y = Rk4Step(x, y, currentStep);
+            x += currentStep;
         }
+
         return y;
     }
 
-    // 获取缓存中的函数值
-    private T GetValue(T x, T y)
+    public OdeTrajectory<T> SolveTrajectory(
+        T x0, T y0, T xEnd,
+        int steps = 100,
+        T? h = null,
+        OdeEvent<T>? odeEvent = null,
+        int maxPoints = 10_000)
     {
-        var key = (x, y);
-        if (!_cache.TryGetValue(key, out T value))
+        if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
+
+        int cap = Math.Min(maxPoints, steps + 1);
+        var xs = new T[cap];
+        var ys = new T[cap];
+        int count = 0;
+
+        xs[count] = x0;
+        ys[count] = y0;
+        count++;
+
+        if (x0 == xEnd)
+            return TrimTrajectory(xs, ys, count);
+
+        if (odeEvent != null && odeEvent(x0, y0))
+            return TrimTrajectory(xs, ys, count);
+
+        T step = h ?? (xEnd - x0) / T.CreateChecked(steps);
+        T x = x0;
+        T y = y0;
+
+        while (T.Abs(xEnd - x) > _endTol)
         {
-            value = _func(x, y);
-            _cache[key] = value;
+            if (count >= cap)
+                break;
+
+            T remaining = xEnd - x;
+            T currentStep = T.Abs(remaining) < T.Abs(step) ? remaining : step;
+            y = Rk4Step(x, y, currentStep);
+            x += currentStep;
+
+            xs[count] = x;
+            ys[count] = y;
+            count++;
+
+            if (odeEvent != null && odeEvent(x, y))
+                break;
         }
-        return value;
+
+        return TrimTrajectory(xs, ys, count);
     }
 
-    /// <summary>
-    /// 清空函数值缓存。
-    /// </summary>
-    public void ClearCache()
+    public T Step(T x, T y, T step) => Rk4Step(x, y, step);
+
+    private T Rk4Step(T x, T y, T step)
     {
-        _cache.Clear();
+        T half = step / _two;
+        T stepOverSix = step * _invSix;
+        T twoStepOverSix = _two * stepOverSix;
+
+        T k1 = _func(x, y);
+        T k2 = _func(x + half, y + k1 * half);
+        T k3 = _func(x + half, y + k2 * half);
+        T k4 = _func(x + step, y + k3 * step);
+        return y + stepOverSix * (k1 + k4) + twoStepOverSix * (k2 + k3);
     }
+
+    private static OdeTrajectory<T> TrimTrajectory(T[] xs, T[] ys, int count)
+    {
+        if (count == xs.Length)
+            return new OdeTrajectory<T>(xs, ys);
+
+        var xTrim = new T[count];
+        var yTrim = new T[count];
+        Array.Copy(xs, xTrim, count);
+        Array.Copy(ys, yTrim, count);
+        return new OdeTrajectory<T>(xTrim, yTrim);
+    }
+
+    public void ClearCache() { }
 }

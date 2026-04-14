@@ -2,6 +2,7 @@
 
 using System;
 using System.Numerics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 
 /// <summary>
@@ -363,12 +364,14 @@ public static class CurveFitter<T>
     /// </remarks>
     public static FitResult<T> NeuralNetwork(Span<T> xData, Span<T> yData,
         int epochs = 5000, int hiddenNodes = 10, T? learningRate = null,
-        TrainingProgressHandler<T>? trainingProgressCallback = null)
+        TrainingProgressHandler<T>? trainingProgressCallback = null,
+        NeuralNetworkTrainingOptions? trainingOptions = null)
     {
         ValidateInput(xData, yData);
         // 建议使用 Accord.NET 或 ML.NET
         ValidateType();
-        return NeuralNetworkFitter.Fit_SingleColumn(xData, yData, epochs, hiddenNodes, learningRate, trainingProgressCallback);
+        return NeuralNetworkFitter.Fit_SingleColumn(
+            xData, yData, epochs, hiddenNodes, learningRate, trainingProgressCallback, trainingOptions);
     }
 
     /// <summary>
@@ -419,13 +422,63 @@ public static class CurveFitter<T>
     /// </remarks>
     public static MultiColumnFitResult<T> NeuralNetwork(DataRow<T>[] xData, Span<T> yData,
         int epochs = 5000, int hiddenNodes = 10, T? learningRate = null,
-        TrainingProgressHandler<T>? trainingProgressCallback = null)
+        TrainingProgressHandler<T>? trainingProgressCallback = null,
+        NeuralNetworkTrainingOptions? trainingOptions = null)
     {
         ValidateInput(xData, yData);
         // 建议使用 Accord.NET 或 ML.NET
         ValidateType();
-        return NeuralNetworkFitter.Fit_MultiColumn(xData, yData, epochs, hiddenNodes, learningRate, trainingProgressCallback);
+        return NeuralNetworkFitter.Fit_MultiColumn(
+            xData, yData, epochs, hiddenNodes, learningRate, trainingProgressCallback, trainingOptions);
     }
+
+    /// <summary>
+    /// 使用神经网络对 <see cref="Signal"/> 特征进行回归拟合。
+    /// 每个信号经 DSP 特征打包后送入 <see cref="Vorcyc.Mathematics.DeepLearning.Training.MlpRegressor"/>。
+    /// </summary>
+    /// <param name="signals">等长、同采样率的输入信号。</param>
+    /// <param name="yData">与 <paramref name="signals"/> 一一对应的目标值。</param>
+    /// <param name="signalOptions">特征模式（波形 / 周期图 / 帧特征均值）。</param>
+    public static SignalFitResult<T> NeuralNetwork(
+        IReadOnlyList<Signal> signals,
+        Span<T> yData,
+        SignalNeuralNetworkOptions? signalOptions = null,
+        int epochs = 5000,
+        int hiddenNodes = 10,
+        T? learningRate = null,
+        TrainingProgressHandler<T>? trainingProgressCallback = null,
+        NeuralNetworkTrainingOptions? trainingOptions = null)
+    {
+        if (signals.Count != yData.Length || signals.Count == 0)
+        {
+            throw new ArgumentException("signals and yData must have the same non-zero length.");
+        }
+
+        ValidateType();
+        return SignalNeuralNetworkFitter.Fit(
+            signals,
+            yData,
+            signalOptions,
+            epochs,
+            hiddenNodes,
+            learningRate,
+            trainingProgressCallback,
+            trainingOptions);
+    }
+
+    /// <summary>
+    /// <see cref="NeuralNetwork(IReadOnlyList{Signal}, Span{T}, SignalNeuralNetworkOptions?, int, int, T?, TrainingProgressHandler{T}?, NeuralNetworkTrainingOptions?)"/> 的便捷重载。
+    /// </summary>
+    public static SignalFitResult<T> NeuralNetwork(
+        Signal signal,
+        T target,
+        SignalNeuralNetworkOptions? signalOptions = null,
+        int epochs = 5000,
+        int hiddenNodes = 10,
+        T? learningRate = null,
+        TrainingProgressHandler<T>? trainingProgressCallback = null,
+        NeuralNetworkTrainingOptions? trainingOptions = null)
+        => NeuralNetwork([signal], [target], signalOptions, epochs, hiddenNodes, learningRate, trainingProgressCallback, trainingOptions);
 
 
 

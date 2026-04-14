@@ -1,9 +1,11 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+﻿using Vorcyc.Mathematics.SignalProcessing.Signals;
+
+namespace Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 
 /// <summary>
 /// <see cref="ZiFilter"/> is the special implementation of an LTI filter based on state vector (instead of delay lines). 
 /// <see cref="ZiFilter"/> allows setting initial state (initial conditions for filter delays) and 
-/// provides additional method for zero-phase filtering <see cref="ZeroPhase(DiscreteSignal, int)"/>.
+/// provides additional method for zero-phase filtering <see cref="ZeroPhase(Signal, int)"/>.
 /// </summary>
 public class ZiFilter : LtiFilter
 {
@@ -138,17 +140,17 @@ public class ZiFilter : LtiFilter
     /// Number of elements by which to extend <paramref name="signal"/> at both ends before applying the filter. 
     /// The default value is 3 * (max{len(numerator), len(denominator)} - 1).
     /// </param>
-    public DiscreteSignal ZeroPhase(DiscreteSignal signal, int padLength = 0)
+    public Signal ZeroPhase(Signal signal, int padLength = 0)
     {
         if (padLength <= 0)
         {
             padLength = 3 * (Math.Max(_a.Length, _b.Length) - 1);
         }
 
-        Guard.AgainstInvalidRange(padLength, signal.SampleCount, "pad length", "Signal length");
+        Guard.AgainstInvalidRange(padLength, signal.Length, "pad length", "Signal length");
 
         var input = signal.Samples;
-        var output = new float[signal.SampleCount];
+        var output = new float[signal.Length];
         var edgeLeft = new float[padLength];
         var edgeRight = new float[padLength];
 
@@ -174,7 +176,7 @@ public class ZiFilter : LtiFilter
             output[i] = Process(input[i]);
         }
         
-        baseSample = input.Last();
+        baseSample = input[^1];
 
         for (int k = 0, i = input.Length - 2; i > input.Length - 2 - padLength; k++, i--)
         {
@@ -203,7 +205,7 @@ public class ZiFilter : LtiFilter
             Process(edgeLeft[i]);
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>
@@ -264,17 +266,17 @@ public class ZiFilter : LtiFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
+    public override Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
 
 
 #if DEBUG
     /// <summary>
     /// Offline filtering with initial conditions (for tests)
     /// </summary>
-    public DiscreteSignal FilterIc(DiscreteSignal signal)
+    public Signal FilterIc(Signal signal)
     {
         var input = signal.Samples;
-        var output = new float[signal.SampleCount];
+        var output = new float[signal.Length];
 
         for (var i = 0; i < output.Length; i++)
         {
@@ -286,7 +288,7 @@ public class ZiFilter : LtiFilter
             }
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 #endif
 }

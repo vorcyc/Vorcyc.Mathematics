@@ -12,14 +12,6 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Base
         /// </summary>
         /// <param name="signal">Signal</param>
         /// <param name="method">Filtering method</param>
-        DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto);
-
-
-        ///// <summary>
-        ///// Applies effect to entire <paramref name="signal"/> (in-place).
-        ///// </summary>
-        ///// <param name="signal">Signal</param>
-        ///// <param name="method">Filtering method</param>
-        //void Apply(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto);
+        Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto);
     }
 }

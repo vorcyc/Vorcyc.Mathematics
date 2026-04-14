@@ -39,7 +39,7 @@ public class MedianFilter2 : IFilter, IOnlineFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         var input = signal.Samples;
         var output = new float[input.Length];
@@ -61,7 +61,7 @@ public class MedianFilter2 : IFilter, IOnlineFilter
             output[j] = Process(0);
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

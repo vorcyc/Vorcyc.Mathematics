@@ -27,6 +27,10 @@ public class Regression_test
 
         new string('-', 30).PrintLine(ConsoleColor.Green);
 
+        TestMultivariateRidgeRegression();
+
+        new string('-', 30).PrintLine(ConsoleColor.Green);
+
         TestLinearEquationSolver();
 
         new string('-', 30).PrintLine(ConsoleColor.Green);
@@ -127,6 +131,35 @@ public class Regression_test
 
             Console.WriteLine($"Coefficients: {string.Join(", ", regression.Coefficients)} (Expected ~0.0, 0.0, 1.0)");
             Console.WriteLine($"Predicted value for x=6: {prediction} (Expected ~36.0)");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed: {ex.Message}");
+        }
+    }
+
+    static void TestMultivariateRidgeRegression()
+    {
+        Console.WriteLine("Testing MultivariateRidgeRegression...");
+        try
+        {
+            var x = new double[,]
+            {
+                { 1, 2 },
+                { 2, 3 },
+                { 3, 1 },
+                { 4, 5 },
+                { 5, 4 }
+            };
+            var y = new double[] { 2, 4, 3, 8, 8 };
+            var regression = new MultivariateRidgeRegression<double>(0.1);
+            regression.Fit(x, y);
+            var prediction = regression.Predict(new double[] { 6, 7 });
+
+            Console.WriteLine($"Intercept: {regression.Intercept}");
+            Console.WriteLine($"Coefficients: {string.Join(", ", regression.Coefficients)}");
+            Console.WriteLine($"Predicted value for [6, 7]: {prediction}");
+            Console.WriteLine($"R²: {regression.RSquared}");
         }
         catch (Exception ex)
         {

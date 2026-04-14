@@ -43,6 +43,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// </summary>
         /// <param name="input">Input data</param>
         public ComplexDiscreteSignal AnalyticSignal(float[] input)
+            => AnalyticSignal(input.AsSpan());
+
+        /// <summary>
+        /// Computes complex analytic signal (real and imaginary parts) from <paramref name="input"/>.
+        /// </summary>
+        public ComplexDiscreteSignal AnalyticSignal(ReadOnlySpan<float> input)
         {
             Direct(input, _im);
 
@@ -56,11 +62,33 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         }
 
         /// <summary>
+        /// Computes magnitudes of the analytic signal without allocating a <see cref="ComplexDiscreteSignal"/>.
+        /// </summary>
+        public void AnalyticMagnitude(ReadOnlySpan<float> input, Span<float> magnitude)
+        {
+            Direct(input, _im);
+
+            var n = Math.Min(Size, magnitude.Length);
+            for (var i = 0; i < n; i++)
+            {
+                var re = _re[i] / Size;
+                var im = _im[i] / Size;
+                magnitude[i] = MathF.Sqrt(re * re + im * im);
+            }
+        }
+
+        /// <summary>
         /// Does Fast Hilbert Transform.
         /// </summary>
         /// <param name="input">Input data</param>
         /// <param name="output">Output data</param>
         public void Direct(float[] input, float[] output)
+            => Direct(input.AsSpan(), output);
+
+        /// <summary>
+        /// Does Fast Hilbert Transform from sample span.
+        /// </summary>
+        public void Direct(ReadOnlySpan<float> input, float[] output)
         {
             // just here, for code brevity, use alias _im for output (i.e. it's not internal _im)
             var _im = output;
@@ -68,7 +96,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             Array.Clear(_re, 0, _re.Length);
             Array.Clear(_im, 0, _im.Length);
 
-            input.FastCopyTo(_re, input.Length);
+            input.Slice(0, Math.Min(input.Length, Size)).CopyTo(_re);
 
             _fft.Direct(_re, _im);
 

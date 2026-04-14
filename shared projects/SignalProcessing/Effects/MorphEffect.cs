@@ -177,15 +177,15 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         /// </summary>
         /// <param name="signal">Input signal</param>
         /// <param name="mix">Signal to mix with input signal</param>
-        public DiscreteSignal ApplyTo(DiscreteSignal signal, DiscreteSignal mix)
+        public Signal ApplyTo(Signal signal, Signal mix)
         {
             Guard.AgainstInequality(signal.SamplingRate, mix.SamplingRate, "Input signal sampling rate", "Mix signal sampling rate");
 
-            var filtered = new float[signal.SampleCount];
+            var filtered = new float[signal.Length];
 
             for (int i = 0, j = 0; i < filtered.Length; i++, j++)
             {
-                if (j == mix.SampleCount)
+                if (j == mix.Length)
                 {
                     j = 0;
                 }
@@ -193,7 +193,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
                 filtered[i] = Process(signal[i], mix[j]);
             }
 
-            return new DiscreteSignal(signal.SamplingRate, filtered , false);
+            return Signal.FromCopy(filtered, signal.SamplingRate);
         }
 
         /// <summary>

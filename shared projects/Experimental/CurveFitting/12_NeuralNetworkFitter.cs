@@ -1,240 +1,275 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
+using Vorcyc.Mathematics.DeepLearning;
+using Vorcyc.Mathematics.DeepLearning.Optimizers;
+using Vorcyc.Mathematics.DeepLearning.Serialization;
+using Vorcyc.Mathematics.DeepLearning.Training;
 
 namespace Vorcyc.Mathematics.Experimental.CurveFitting;
 
 internal static class NeuralNetworkFitter
 {
-    private static T ComputeMeanSquaredError<T>(NeuralNetwork_Parallel<T> nn, T[,,] inputs, T[][] targets)
-        where T : unmanaged, IFloatingPointIeee754<T>
-    {
-        T totalError = T.Zero;
-        int sampleSize = inputs.GetLength(0);
-        for (int i = 0; i < sampleSize; i++)
-        {
-            T[,] sample = nn.GetSample(inputs, i);
-            T[] output = nn.Forward(sample);
-            totalError += (targets[i][0] - output[0]) * (targets[i][0] - output[0]);
-        }
-        return totalError / T.CreateChecked(sampleSize);
-    }    
-    
-    private static T ComputeMeanSquaredError<T>(NeuralNetwork_Sequential<T> nn, T[,,] inputs, T[][] targets)
-        where T : unmanaged, IFloatingPointIeee754<T>
-    {
-        T totalError = T.Zero;
-        int sampleSize = inputs.GetLength(0);
-        for (int i = 0; i < sampleSize; i++)
-        {
-            T[,] sample = nn.GetSample(inputs, i);
-            T[] output = nn.Forward(sample);
-            totalError += (targets[i][0] - output[0]) * (targets[i][0] - output[0]);
-        }
-        return totalError / T.CreateChecked(sampleSize);
-    }
-
     internal static FitResult<T> Fit_SingleColumn<T>(
         Span<T> xData, Span<T> yData, int epochs = 5000, int hiddenNodes = 10, T? learningRate = null,
-        TrainingProgressHandler<T>? trainingProgressCallback = null)
+        TrainingProgressHandler<T>? trainingProgressCallback = null,
+        NeuralNetworkTrainingOptions? trainingOptions = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        if (xData.Length != yData.Length)
-            throw new ArgumentException("xData and yData must have the same length");
-
-        int sampleSize = xData.Length;
-        T[] xArray = xData.ToArray(); // 转换为数组以重复使用
-        T[] yArray = yData.ToArray();
-        T[,,] inputs = new T[sampleSize, 1, 1];
-        T[][] targets = new T[sampleSize][];
-        for (int i = 0; i < sampleSize; i++)
+        if (typeof(T) == typeof(float))
         {
-            inputs[i, 0, 0] = xArray[i];
-            targets[i] = [yArray[i]]; // C# 12 集合表达式
+            var x = MemoryMarshal.Cast<T, float>(xData);
+            var y = MemoryMarshal.Cast<T, float>(yData);
+            TrainingProgressHandler<float>? callback = trainingProgressCallback is null
+                ? null
+                : (epoch, total, error) => trainingProgressCallback(epoch, total, T.CreateChecked(error));
+            var options = BuildFloatOptions(learningRate, trainingOptions);
+            var result = Fit_SingleColumnFloat(x, y, epochs, hiddenNodes, options, callback);
+            return ToGenericFromFloat<T>(result);
         }
 
-        var nn = new NeuralNetwork_Sequential<T>(1, 1, hiddenNodes, 1);
-        T lr = learningRate ?? T.CreateChecked(0.1);
-        nn.Train(inputs, targets, lr, epochs, trainingProgressCallback);
-
-        Func<T, T> predict = x =>
+        if (typeof(T) == typeof(double))
         {
-            T[,] input = new T[1, 1] { { x } };
-            return nn.Forward(input)[0];
-        };
+            var x = MemoryMarshal.Cast<T, double>(xData);
+            var y = MemoryMarshal.Cast<T, double>(yData);
+            TrainingProgressHandler<double>? callback = trainingProgressCallback is null
+                ? null
+                : (epoch, total, error) => trainingProgressCallback(epoch, total, T.CreateChecked(error));
+            var options = BuildDoubleOptions(learningRate, trainingOptions);
+            var result = Fit_SingleColumnDouble(x, y, epochs, hiddenNodes, options, callback);
+            return ToGenericFromDouble<T>(result);
+        }
 
-        T mse = ComputeMeanSquaredError(nn, inputs, targets);
-        return new FitResult<T>(predict, nn.GetParameters(), mse);
+        throw new NotSupportedException("Only float and double are supported for neural network fitting.");
     }
 
-    /// <summary>
-    /// 使用神经网络拟合多列输入数据到单值输出。
-    /// </summary>
-    /// <param name="xData">输入数据，每行为多列数据，形状为[样本数]。</param>
-    /// <param name="yData">目标数据，形状为[样本数]。</param>
-    /// <param name="epochs">训练轮数，默认为5000。</param>
-    /// <param name="hiddenNodes">隐藏层节点数，默认为10。</param>
-    /// <param name="trainingProgressCallback">训练进度回调，可为空。</param>
-    /// <returns>多列输入拟合结果，包括预测函数、参数和均方误差。</returns>
     internal static MultiColumnFitResult<T> Fit_MultiColumn<T>(
         DataRow<T>[] xData, Span<T> yData, int epochs = 5000, int hiddenNodes = 10, T? learningRate = null,
-        TrainingProgressHandler<T>? trainingProgressCallback = null)
+        TrainingProgressHandler<T>? trainingProgressCallback = null,
+        NeuralNetworkTrainingOptions? trainingOptions = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
+        if (typeof(T) == typeof(float))
+        {
+            var rows = Array.ConvertAll(xData, row => new DataRow<float>(
+                Array.ConvertAll(row.ToArray(), v => float.CreateTruncating(v))));
+            var y = MemoryMarshal.Cast<T, float>(yData);
+            TrainingProgressHandler<float>? callback = trainingProgressCallback is null
+                ? null
+                : (epoch, total, error) => trainingProgressCallback(epoch, total, T.CreateChecked(error));
+            var options = BuildFloatOptions(learningRate, trainingOptions);
+            var result = Fit_MultiColumnFloat(rows, y, epochs, hiddenNodes, options, callback);
+            return ToGenericMultiFromFloat<T>(result);
+        }
+
+        if (typeof(T) == typeof(double))
+        {
+            var rows = Array.ConvertAll(xData, row => new DataRow<double>(
+                Array.ConvertAll(row.ToArray(), v => double.CreateTruncating(v))));
+            var y = MemoryMarshal.Cast<T, double>(yData);
+            TrainingProgressHandler<double>? callback = trainingProgressCallback is null
+                ? null
+                : (epoch, total, error) => trainingProgressCallback(epoch, total, T.CreateChecked(error));
+            var options = BuildDoubleOptions(learningRate, trainingOptions);
+            var result = Fit_MultiColumnDouble(rows, y, epochs, hiddenNodes, options, callback);
+            return ToGenericMultiFromDouble<T>(result);
+        }
+
+        throw new NotSupportedException("Only float and double are supported for neural network fitting.");
+    }
+
+    private static MlpTrainingOptions<float> BuildFloatOptions(float? learningRate, NeuralNetworkTrainingOptions? trainingOptions)
+    {
+        var options = trainingOptions?.ToFloatOptions() ?? new MlpTrainingOptions<float>();
+        if (learningRate is not null)
+        {
+            options.InitialLearningRate = learningRate.Value;
+            options.LearningRateScheduler = new ConstantLearningRateScheduler<float>(learningRate.Value);
+        }
+
+        return options;
+    }
+
+    private static MlpTrainingOptions<double> BuildDoubleOptions(double? learningRate, NeuralNetworkTrainingOptions? trainingOptions)
+    {
+        var options = trainingOptions?.ToDoubleOptions() ?? new MlpTrainingOptions<double>();
+        if (learningRate is not null)
+        {
+            options.InitialLearningRate = learningRate.Value;
+            options.LearningRateScheduler = new ConstantLearningRateScheduler<double>(learningRate.Value);
+        }
+
+        return options;
+    }
+
+    private static MlpTrainingOptions<float> BuildFloatOptions<T>(T? learningRate, NeuralNetworkTrainingOptions? trainingOptions)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => BuildFloatOptions(learningRate is null ? null : float.CreateTruncating(learningRate.Value), trainingOptions);
+
+    private static MlpTrainingOptions<double> BuildDoubleOptions<T>(T? learningRate, NeuralNetworkTrainingOptions? trainingOptions)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => BuildDoubleOptions(learningRate is null ? null : double.CreateTruncating(learningRate.Value), trainingOptions);
+
+    private static Random? CreateRandom<T>(MlpTrainingOptions<T> options)
+        where T : unmanaged, IBinaryFloatingPointIeee754<T>
+        => options.RandomSeed is int seed ? new Random(seed) : null;
+
+    private static FitResult<float> Fit_SingleColumnFloat(
+        Span<float> xData, Span<float> yData, int epochs, int hiddenNodes, MlpTrainingOptions<float> options,
+        TrainingProgressHandler<float>? trainingProgressCallback)
+    {
         if (xData.Length != yData.Length)
+        {
             throw new ArgumentException("xData and yData must have the same length");
+        }
+
+        int sampleSize = xData.Length;
+        var inputs = TensorUtilities.FromBatchVectors(xData, sampleSize, 1);
+        var targets = TensorUtilities.FromBatchVectors(yData, sampleSize, 1);
+        var model = MlpRegressor.CreateRegressionNetwork<float>(1, hiddenNodes, 1, CreateRandom(options));
+        MlpRegressor.TrainBatched(model, inputs, targets, epochs, options,
+            (epoch, total, error) => trainingProgressCallback?.Invoke(epoch, total, error));
+
+        Func<float, float> predict = x => model.Forward(TensorUtilities.FromVector(x), training: false)[0, 0, 0];
+        float mse = float.CreateTruncating(MlpRegressor.ComputeMeanSquaredError(model, inputs, targets));
+        return new FitResult<float>(predict, ModelSerializer.FlattenParameters(model), mse);
+    }
+
+    private static FitResult<double> Fit_SingleColumnDouble(
+        Span<double> xData, Span<double> yData, int epochs, int hiddenNodes, MlpTrainingOptions<double> options,
+        TrainingProgressHandler<double>? trainingProgressCallback)
+    {
+        if (xData.Length != yData.Length)
+        {
+            throw new ArgumentException("xData and yData must have the same length");
+        }
+
+        int sampleSize = xData.Length;
+        var inputs = TensorUtilities.FromBatchVectors(xData, sampleSize, 1);
+        var targets = TensorUtilities.FromBatchVectors(yData, sampleSize, 1);
+        var model = MlpRegressor.CreateRegressionNetwork<double>(1, hiddenNodes, 1, CreateRandom(options));
+        MlpRegressor.TrainBatched(model, inputs, targets, epochs, options,
+            (epoch, total, error) => trainingProgressCallback?.Invoke(epoch, total, error));
+
+        Func<double, double> predict = x => double.CreateTruncating(model.Forward(TensorUtilities.FromVector(x), training: false)[0, 0, 0]);
+        double mse = double.CreateTruncating(MlpRegressor.ComputeMeanSquaredError(model, inputs, targets));
+        return new FitResult<double>(predict, ModelSerializer.FlattenParameters(model), mse);
+    }
+
+    private static MultiColumnFitResult<float> Fit_MultiColumnFloat(
+        DataRow<float>[] xData, Span<float> yData, int epochs, int hiddenNodes, MlpTrainingOptions<float> options,
+        TrainingProgressHandler<float>? trainingProgressCallback)
+    {
+        if (xData.Length != yData.Length)
+        {
+            throw new ArgumentException("xData and yData must have the same length");
+        }
 
         int sampleSize = xData.Length;
         int features = xData[0].ColumnCount;
-        if (xData.Any(row => row.ColumnCount != features))
-            throw new ArgumentException("All rows must have the same number of columns");
-
-        T[,,] inputs = new T[sampleSize, 1, features];
-        T[][] targets = new T[sampleSize][];
+        var flatInputs = new float[sampleSize * features];
         for (int i = 0; i < sampleSize; i++)
         {
             for (int f = 0; f < features; f++)
-                inputs[i, 0, f] = xData[i][f];
-            targets[i] = new T[] { yData[i] };
+            {
+                flatInputs[i * features + f] = xData[i][f];
+            }
         }
 
-        var nn = new NeuralNetwork_Sequential<T>(1, features, hiddenNodes, 1);
-        T lr = learningRate ?? T.CreateChecked(0.1);
-        nn.Train(inputs, targets, lr, epochs, trainingProgressCallback);
+        var inputs = TensorUtilities.FromBatchVectors(flatInputs, sampleSize, features);
+        var targets = TensorUtilities.FromBatchVectors(yData, sampleSize, 1);
+        var model = MlpRegressor.CreateRegressionNetwork<float>(features, hiddenNodes, 1, CreateRandom(options));
+        MlpRegressor.TrainBatched(model, inputs, targets, epochs, options,
+            (epoch, total, error) => trainingProgressCallback?.Invoke(epoch, total, error));
 
-        Func<DataRow<T>, T> multiPredict = row =>
+        Func<DataRow<float>, float> multiPredict = row =>
         {
-            if (row.ColumnCount != features)
-                throw new ArgumentException($"Row column count ({row.ColumnCount}) must match feature count ({features})");
-            T[,] input = new T[1, features];
+            var vector = new float[features];
             for (int f = 0; f < features; f++)
-                input[0, f] = row[f];
-            return nn.Forward(input)[0];
+            {
+                vector[f] = row[f];
+            }
+
+            return model.Forward(TensorUtilities.FromVector(vector), training: false)[0, 0, 0];
         };
 
-        T mse = ComputeMeanSquaredError(nn, inputs, targets);
-        return new MultiColumnFitResult<T>(multiPredict, nn.GetParameters(), mse );
+        float mse = float.CreateTruncating(MlpRegressor.ComputeMeanSquaredError(model, inputs, targets));
+        return new MultiColumnFitResult<float>(multiPredict, ModelSerializer.FlattenParameters(model), mse);
     }
 
-
-    internal static void TEST()
+    private static MultiColumnFitResult<double> Fit_MultiColumnDouble(
+        DataRow<double>[] xData, Span<double> yData, int epochs, int hiddenNodes, MlpTrainingOptions<double> options,
+        TrainingProgressHandler<double>? trainingProgressCallback)
     {
-        Random rand = new Random();
+        if (xData.Length != yData.Length)
+        {
+            throw new ArgumentException("xData and yData must have the same length");
+        }
 
-        int DATA_AMOUNT = 500;
+        int sampleSize = xData.Length;
+        int features = xData[0].ColumnCount;
+        var flatInputs = new double[sampleSize * features];
+        for (int i = 0; i < sampleSize; i++)
+        {
+            for (int f = 0; f < features; f++)
+            {
+                flatInputs[i * features + f] = xData[i][f];
+            }
+        }
 
-        // 1. 拟合二次函数 (y = x²)
-        Console.WriteLine("拟合单列数据 (y = x²)：");
-        double[] xData1 = new double[DATA_AMOUNT]; // 数据量增加到 1000
-        double[] yData1 = new double[DATA_AMOUNT];
-        for (int i = 0; i < DATA_AMOUNT; i++)
-        {
-            double x = rand.NextDouble() * 2 - 1; // [-1, 1]
-            xData1[i] = (x + 1) / 2; // 归一化到 [0, 1]
-            yData1[i] = (x * x + 1) / 2; // 归一化到 [0, 1]
-        }
-        var result1 = NeuralNetworkFitter.Fit_SingleColumn(xData1.AsSpan(), yData1.AsSpan(), 200000, 10,
-            trainingProgressCallback: (epoch, total, error) => { if (epoch % 20000 == 0) Console.WriteLine($"Epoch {epoch}/{total}, Error: {error:F6}"); });
-        Console.WriteLine($"Mean Squared Error: {result1.MeanSquaredError:F6}");
-        Console.WriteLine("\nTest Results (Quadratic):");
-        for (int i = 0; i < 5; i++)
-        {
-            double x = (xData1[i] * 2) - 1;
-            double predicted = result1.Predict(xData1[i]);
-            Console.WriteLine($"x: {x:F3}, Predicted: {predicted:F3}, Actual: {yData1[i]:F3}");
-        }
-        Console.WriteLine();
+        var inputs = TensorUtilities.FromBatchVectors(flatInputs, sampleSize, features);
+        var targets = TensorUtilities.FromBatchVectors(yData, sampleSize, 1);
+        var model = MlpRegressor.CreateRegressionNetwork<double>(features, hiddenNodes, 1, CreateRandom(options));
+        MlpRegressor.TrainBatched(model, inputs, targets, epochs, options,
+            (epoch, total, error) => trainingProgressCallback?.Invoke(epoch, total, error));
 
-        // 2. 拟合正弦函数 (y = sin(x))
-        Console.WriteLine("拟合单列数据 (y = sin(x))：");
-        double[] xData2 = new double[DATA_AMOUNT];
-        double[] yData2 = new double[DATA_AMOUNT];
-        for (int i = 0; i < DATA_AMOUNT; i++)
+        Func<DataRow<double>, double> multiPredict = row =>
         {
-            double x = rand.NextDouble() * 2 * Math.PI; // [0, 2π]
-            xData2[i] = x / (2 * Math.PI); // 归一化到 [0, 1]
-            yData2[i] = (Math.Sin(x) + 1) / 2; // 归一化到 [0, 1]
-        }
-        var result2 = NeuralNetworkFitter.Fit_SingleColumn(xData2.AsSpan(), yData2.AsSpan(), 200000, 15,
-            trainingProgressCallback: (epoch, total, error) => { if (epoch % 20000 == 0) Console.WriteLine($"Epoch {epoch}/{total}, Error: {error:F6}"); });
-        Console.WriteLine($"Mean Squared Error: {result2.MeanSquaredError:F6}");
-        Console.WriteLine("\nTest Results (Sine):");
-        for (int i = 0; i < 5; i++)
-        {
-            double x = xData2[i] * 2 * Math.PI;
-            double predicted = result2.Predict(xData2[i]);
-            Console.WriteLine($"x: {x:F3}, Predicted: {predicted:F3}, Actual: {yData2[i]:F3}");
-        }
-        Console.WriteLine();
+            var vector = new double[features];
+            for (int f = 0; f < features; f++)
+            {
+                vector[f] = row[f];
+            }
 
-        // 3. 拟合指数衰减 (y = e^(-x))
-        Console.WriteLine("拟合单列数据 (y = e^(-x))：");
-        double[] xData3 = new double[DATA_AMOUNT];
-        double[] yData3 = new double[DATA_AMOUNT];
-        for (int i = 0; i < DATA_AMOUNT; i++)
-        {
-            double x = rand.NextDouble() * 5; // [0, 5]
-            xData3[i] = x / 5; // 归一化到 [0, 1]
-            yData3[i] = Math.Exp(-x); // 自然范围 [0, 1]
-        }
-        var result3 = NeuralNetworkFitter.Fit_SingleColumn(xData3.AsSpan(), yData3.AsSpan(), 200000, 12,
-            trainingProgressCallback: (epoch, total, error) => { if (epoch % 20000 == 0) Console.WriteLine($"Epoch {epoch}/{total}, Error: {error:F6}"); });
-        Console.WriteLine($"Mean Squared Error: {result3.MeanSquaredError:F6}");
-        Console.WriteLine("\nTest Results (Exponential Decay):");
-        for (int i = 0; i < 5; i++)
-        {
-            double x = xData3[i] * 5;
-            double predicted = result3.Predict(xData3[i]);
-            Console.WriteLine($"x: {x:F3}, Predicted: {predicted:F3}, Actual: {yData3[i]:F3}");
-        }
-        Console.WriteLine();
+            return double.CreateTruncating(model.Forward(TensorUtilities.FromVector(vector), training: false)[0, 0, 0]);
+        };
 
-        // 4. 拟合多列加权和 (y = 0.3*col1 + 0.5*col2 + 0.2*col3)
-        Console.WriteLine("拟合多列数据 (y = 0.3*col1 + 0.5*col2 + 0.2*col3)：");
-        DataRow<double>[] multiXData1 = new DataRow<double>[DATA_AMOUNT]; // 数据量增加到 1000
-        double[] multiYData1 = new double[DATA_AMOUNT];
-        for (int i = 0; i < DATA_AMOUNT; i++)
-        {
-            double col1 = rand.NextDouble();
-            double col2 = rand.NextDouble();
-            double col3 = rand.NextDouble();
-            multiXData1[i] = new DataRow<double>(col1, col2, col3);
-            multiYData1[i] = 0.3 * col1 + 0.5 * col2 + 0.2 * col3; // 范围 [0, 1]
-        }
-        var result4 = NeuralNetworkFitter.Fit_MultiColumn(multiXData1, multiYData1.AsSpan(), 200000, 20,
-            trainingProgressCallback: (epoch, total, error) => { if (epoch % 20000 == 0) Console.WriteLine($"Epoch {epoch}/{total}, Error: {error:F6}"); });
-        Console.WriteLine($"Mean Squared Error: {result4.MeanSquaredError:F6}");
-        Console.WriteLine("\nTest Results (Multi-Column Weighted Sum):");
-        for (int i = 0; i < 5; i++)
-        {
-            DataRow<double> input = multiXData1[i];
-            double predicted = result4.Predict!(input);
-            double actual = multiYData1[i];
-            double[] cols = input.ToArray();
-            Console.WriteLine($"Input: [{cols[0]:F3}, {cols[1]:F3}, {cols[2]:F3}], Predicted: {predicted:F3}, Actual: {actual:F3}");
-        }
-        Console.WriteLine();
-
-        // 5. 拟合多项式组合 (y = col1² + 2*col2)
-        Console.WriteLine("拟合多列数据 (y = col1² + 2*col2)：");
-        DataRow<double>[] multiXData2 = new DataRow<double>[DATA_AMOUNT]; // 数据量增加到 1000
-        double[] multiYData2 = new double[DATA_AMOUNT];
-        for (int i = 0; i < DATA_AMOUNT; i++)
-        {
-            double col1 = rand.NextDouble(); // [0, 1]
-            double col2 = rand.NextDouble(); // [0, 1]
-            multiXData2[i] = new DataRow<double>(col1, col2);
-            multiYData2[i] = (col1 * col1 + 2 * col2) / 3; // 范围 [0, 3] 归一化到 [0, 1]
-        }
-        var result5 = NeuralNetworkFitter.Fit_MultiColumn(multiXData2, multiYData2.AsSpan(), 200000, 15,
-            trainingProgressCallback: (epoch, total, error) => { if (epoch % 20000 == 0) Console.WriteLine($"Epoch {epoch}/{total}, Error: {error:F6}"); });
-        Console.WriteLine($"Mean Squared Error: {result5.MeanSquaredError:F6}");
-        Console.WriteLine("\nTest Results (Polynomial Combination):");
-        for (int i = 0; i < 5; i++)
-        {
-            DataRow<double> input = multiXData2[i];
-            double predicted = result5.Predict!(input);
-            double actual = multiYData2[i];
-            double[] cols = input.ToArray();
-            Console.WriteLine($"Input: [{cols[0]:F3}, {cols[1]:F3}], Predicted: {predicted:F3}, Actual: {actual:F3}");
-        }
+        double mse = double.CreateTruncating(MlpRegressor.ComputeMeanSquaredError(model, inputs, targets));
+        return new MultiColumnFitResult<double>(multiPredict, ModelSerializer.FlattenParameters(model), mse);
     }
+
+    private static FitResult<T> ToGenericFromFloat<T>(FitResult<float> result)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => new(
+            x => T.CreateChecked(result.Predict(float.CreateTruncating(x))),
+            Array.ConvertAll(result.Parameters, p => T.CreateChecked(p)),
+            T.CreateChecked(result.MeanSquaredError));
+
+    private static FitResult<T> ToGenericFromDouble<T>(FitResult<double> result)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => new(
+            x => T.CreateChecked(result.Predict(double.CreateTruncating(x))),
+            Array.ConvertAll(result.Parameters, p => T.CreateChecked(p)),
+            T.CreateChecked(result.MeanSquaredError));
+
+    private static MultiColumnFitResult<T> ToGenericMultiFromFloat<T>(MultiColumnFitResult<float> result)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => new(
+            row =>
+            {
+                var floatRow = new DataRow<float>(Array.ConvertAll(row.ToArray(), v => float.CreateTruncating(v)));
+                return T.CreateChecked(result.Predict!(floatRow));
+            },
+            Array.ConvertAll(result.Parameters, p => T.CreateChecked(p)),
+            T.CreateChecked(result.MeanSquaredError));
+
+    private static MultiColumnFitResult<T> ToGenericMultiFromDouble<T>(MultiColumnFitResult<double> result)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => new(
+            row =>
+            {
+                var doubleRow = new DataRow<double>(Array.ConvertAll(row.ToArray(), v => double.CreateTruncating(v)));
+                return T.CreateChecked(result.Predict!(doubleRow));
+            },
+            Array.ConvertAll(result.Parameters, p => T.CreateChecked(p)),
+            T.CreateChecked(result.MeanSquaredError));
 }

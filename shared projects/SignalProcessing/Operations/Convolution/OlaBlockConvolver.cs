@@ -54,6 +54,11 @@ public class OlaBlockConvolver : IFilter, IOnlineFilter
     /// Constructs <see cref="OlaBlockConvolver"/> with given <paramref name="kernel"/> and <paramref name="fftSize"/>.
     /// </summary>
     public OlaBlockConvolver(IEnumerable<float> kernel, int fftSize)
+        : this(kernel is float[] array ? array.AsSpan() : kernel.ToArray().AsSpan(), fftSize)
+    {
+    }
+
+    public OlaBlockConvolver(ReadOnlySpan<float> kernel, int fftSize)
     {
         _kernel = kernel.ToArray();
 
@@ -157,9 +162,9 @@ public class OlaBlockConvolver : IFilter, IOnlineFilter
     /// </summary>
     /// <param name="signal">Input signal</param>
     /// <param name="method">Filtering method</param>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
-        var firstCount = Math.Min(HopSize - 1, signal.SampleCount);
+        var firstCount = Math.Min(HopSize - 1, signal.Length);
 
         int i = 0, j = 0;
 
@@ -168,9 +173,9 @@ public class OlaBlockConvolver : IFilter, IOnlineFilter
             Process(signal[i]);
         }
 
-        var filtered = new float[signal.SampleCount + _kernel.Length - 1];
+        var filtered = new float[signal.Length + _kernel.Length - 1];
 
-        for (; i < signal.SampleCount; i++, j++)    // process
+        for (; i < signal.Length; i++, j++)    // process
         {
             filtered[j] = Process(signal[i]);
         }
@@ -182,7 +187,7 @@ public class OlaBlockConvolver : IFilter, IOnlineFilter
             filtered[j] = Process(0.0f);
         }
 
-        return new DiscreteSignal(signal.SamplingRate, filtered);
+        return Signal.FromCopy(filtered, signal.SamplingRate);
     }
 
     /// <summary>

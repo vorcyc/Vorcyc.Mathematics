@@ -42,7 +42,9 @@ public class FactorAnalysis<T> :IMachineLearning
         var covarianceMatrix = CalculateCovarianceMatrix(standardizedData);
 
         // 计算特征值和特征向量
-        var (eigenvalues, eigenvectors) = EigenDecomposition(covarianceMatrix);
+        var eig = MatrixDecomposition.SymmetricEigendecomposition(covarianceMatrix);
+        var eigenvalues = eig.Eigenvalues;
+        var eigenvectors = eig.Eigenvectors;
 
         // 选择前 numFactors 个特征向量
         var selectedEigenvectors = SelectTopEigenvectors(eigenvectors, numFactors);
@@ -117,77 +119,6 @@ public class FactorAnalysis<T> :IMachineLearning
         }
 
         return covarianceMatrix;
-    }
-
-    /// <summary>
-    /// 计算特征值和特征向量。
-    /// </summary>
-    /// <param name="matrix">协方差矩阵。</param>
-    /// <returns>特征值和特征向量的元组。</returns>
-    private (T[], Matrix<T>) EigenDecomposition(Matrix<T> matrix)
-    {
-        // 这里我们使用一个简单的特征值分解算法（如幂迭代法），但在实际应用中，建议使用更高效和稳定的算法。
-        int n = matrix.Rows;
-        T[] eigenvalues = new T[n];
-        Matrix<T> eigenvectors = new(n, n);
-
-        // 初始化特征向量为单位矩阵
-        for (int i = 0; i < n; i++)
-        {
-            eigenvectors[i, i] = T.One;
-        }
-
-        // 简单的幂迭代法
-        for (int k = 0; k < n; k++)
-        {
-            T[] b = new T[n];
-            b[k] = T.One;
-            T[] bNext = new T[n];
-            T lambda = T.Zero;
-
-            for (int iter = 0; iter < 100; iter++)
-            {
-                // 计算 bNext = matrix * b
-                for (int i = 0; i < n; i++)
-                {
-                    bNext[i] = T.Zero;
-                    for (int j = 0; j < n; j++)
-                    {
-                        bNext[i] += matrix[i, j] * b[j];
-                    }
-                }
-
-                // 归一化 bNext
-                T norm = T.Zero;
-                for (int i = 0; i < n; i++)
-                {
-                    norm += bNext[i] * bNext[i];
-                }
-                norm = T.Sqrt(norm);
-                for (int i = 0; i < n; i++)
-                {
-                    bNext[i] /= norm;
-                }
-
-                // 计算特征值
-                lambda = T.Zero;
-                for (int i = 0; i < n; i++)
-                {
-                    lambda += bNext[i] * b[i];
-                }
-
-                // 更新 b
-                Array.Copy(bNext, b, n);
-            }
-
-            eigenvalues[k] = lambda;
-            for (int i = 0; i < n; i++)
-            {
-                eigenvectors[i, k] = b[i];
-            }
-        }
-
-        return (eigenvalues, eigenvectors);
     }
 
     /// <summary>

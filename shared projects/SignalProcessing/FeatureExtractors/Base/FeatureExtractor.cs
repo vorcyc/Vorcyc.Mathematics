@@ -1,4 +1,6 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Options;
+﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Options;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Base;
@@ -139,6 +141,18 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
     /// <param name="endSample">Index of the last sample (exclusive) in array for processing</param>
     /// <param name="vectors">Pre-allocated sequence for storing the resulting feature vectors</param>
     public virtual int ComputeFrom(float[] samples, int startSample, int endSample, IList<float[]> vectors)
+        => ComputeFrom(samples.AsSpan(), startSample, endSample, vectors);
+
+    /// <summary>
+    /// Computes feature vectors from <paramref name="signal"/> without copying the full sample buffer.
+    /// </summary>
+    public virtual int ComputeFrom(Signal signal, int startSample, int endSample, IList<float[]> vectors)
+        => ComputeFrom(signal.Samples, startSample, endSample, vectors);
+
+    /// <summary>
+    /// Computes feature vectors from a sample span (shared core for array and <see cref="Signal"/> inputs).
+    /// </summary>
+    protected virtual int ComputeFrom(ReadOnlySpan<float> samples, int startSample, int endSample, IList<float[]> vectors)
     {
         Guard.AgainstInvalidRange(startSample, endSample, "starting pos", "ending pos");
 
@@ -149,29 +163,13 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
 
         var block = new float[_blockSize];
 
-
-        // Main processing loop:
-
-        // at each iteration one frame is processed;
-        // the frame is contained within a block which, in general, can have larger size
-        // (usually it's a zero-padded frame for radix-2 FFT);
-        // this block array is reused so the frame needs to be zero-padded at each iteration.
-        // Array.Clear() is quite slow for *small* arrays compared to zero-fill in a for-loop.
-        // Since usually the frame size is chosen to be close to block (FFT) size 
-        // we don't need to pad very big number of zeros, so we use for-loop here.
-
         var i = 0;
 
         for (int sample = startSample; sample <= lastSample; sample += hopSize, i++)
         {
-            // prepare new block for processing ======================================================
+            samples.Slice(sample, frameSize).CopyTo(block);
 
-            samples.FastCopyTo(block, frameSize, sample);  // copy FrameSize samples to 'block' buffer
-
-            for (var k = frameSize; k < block.Length; block[k++] = 0) { }    // pad zeros to blockSize
-
-
-            // (optionally) do pre-emphasis ==========================================================
+            for (var k = frameSize; k < block.Length; block[k++] = 0) { }
 
             if (_preEmphasis > 1e-10f)
             {
@@ -184,15 +182,10 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
                 prevSample = samples[sample + hopSize - 1];
             }
 
-            // (optionally) apply window
-
             if (_windowSamples != null)
             {
                 block.ApplyWindow(_windowSamples);
             }
-
-
-            // process this block and compute features =============================================
 
             ProcessFrame(block, vectors[i]);
         }
@@ -289,22 +282,37 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
     /// <para>Computes feature vectors from <paramref name="signal"/>.</para>
     /// <para>Returns the list of computed feature vectors or empty list, if the signal length is less than the size of analysis frame.</para>
     /// </summary>
-    /// <param name="signal">Discrete signal</param>
+    /// <param name="signal">Input signal</param>
     /// <param name="startSample">Index of the first sample in signal for processing</param>
     /// <param name="endSample">Index of the last sample (exclusive) in signal for processing</param>
-    public List<float[]> ComputeFrom(DiscreteSignal signal, int startSample, int endSample)
+    public virtual List<float[]> ComputeFrom(Signal signal, int startSample, int endSample)
     {
-        return ComputeFrom(signal.Samples, startSample, endSample);
+        Guard.AgainstInvalidRange(startSample, endSample, "starting pos", "ending pos");
+
+        if (endSample - startSample < FrameSize)
+        {
+            return new List<float[]>();
+        }
+
+        var totalCount = (endSample - FrameSize - startSample) / HopSize + 1;
+        var featureVectors = new List<float[]>(totalCount);
+        for (var i = 0; i < totalCount; i++)
+        {
+            featureVectors.Add(new float[FeatureCount]);
+        }
+
+        ComputeFrom(signal, startSample, endSample, featureVectors);
+        return featureVectors;
     }
 
     /// <summary>
     /// <para>Computes feature vectors from <paramref name="signal"/>.</para>
     /// <para>Returns the list of computed feature vectors or empty list, if the signal length is less than the size of analysis frame.</para>
     /// </summary>
-    /// <param name="signal">Discrete signal</param>
-    public List<float[]> ComputeFrom(DiscreteSignal signal)
+    /// <param name="signal">Input signal</param>
+    public virtual List<float[]> ComputeFrom(Signal signal)
     {
-        return ComputeFrom(signal.Samples, 0, signal.SampleCount);
+        return ComputeFrom(signal, 0, signal.Length);
     }
 
     /// <summary>
@@ -335,14 +343,15 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
     /// <param name="startSample">Index of the first sample in array for processing</param>
     /// <param name="endSample">Index of the last sample in array for processing</param>
     /// <param name="parallelThreads">Number of threads (all available processors, by default)</param>
-    public virtual List<float[]>[] ParallelChunksComputeFrom(float[] samples, int startSample, int endSample, int parallelThreads = 0)
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public virtual List<float[]>[] ParallelChunksComputeFrom(float[] samples, int startSample, int endSample, int parallelThreads = 0, ComputingContext? context = null)
     {
         if (!IsParallelizable())
         {
             throw new NotImplementedException("Current configuration of the extractor does not support parallel computation");
         }
 
-        var threadCount = parallelThreads > 0 ? parallelThreads : Environment.ProcessorCount;
+        var threadCount = parallelThreads > 0 ? parallelThreads : ComputingContextExecution.ParallelWorkerCount(context);
         var chunkSize = (endSample - startSample) / threadCount;
 
         if (chunkSize < FrameSize)  // don't parallelize too short signals
@@ -378,10 +387,10 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
 
         var featureVectors = new List<float[]>[threadCount];
 
-        Parallel.For(0, threadCount, i =>
+        ComputingContextExecution.ForEach(context, 0, threadCount, i =>
         {
             featureVectors[i] = extractors[i].ComputeFrom(samples, startPositions[i], endPositions[i]);
-        });
+        }, FrameSize);
 
         return featureVectors;
     }
@@ -394,9 +403,10 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
     /// <param name="startSample">Index of the first sample in array for processing</param>
     /// <param name="endSample">Index of the last sample in array for processing</param>
     /// <param name="parallelThreads">Number of threads (all available processors, by default)</param>
-    public virtual List<float[]> ParallelComputeFrom(float[] samples, int startSample, int endSample, int parallelThreads = 0)
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public virtual List<float[]> ParallelComputeFrom(float[] samples, int startSample, int endSample, int parallelThreads = 0, ComputingContext? context = null)
     {
-        var chunks = ParallelChunksComputeFrom(samples, startSample, endSample, parallelThreads);
+        var chunks = ParallelChunksComputeFrom(samples, startSample, endSample, parallelThreads, context);
 
         var featureVectors = new List<float[]>();
 
@@ -414,34 +424,101 @@ public abstract class FeatureExtractor : IFeatureExtractor, IParallelFeatureExtr
     /// </summary>
     /// <param name="samples">Array of samples</param>
     /// <param name="parallelThreads">Number of threads (all available processors, by default)</param>
-    public virtual List<float[]> ParallelComputeFrom(float[] samples, int parallelThreads = 0)
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public virtual List<float[]> ParallelComputeFrom(float[] samples, int parallelThreads = 0, ComputingContext? context = null)
     {
-        return ParallelComputeFrom(samples, 0, samples.Length, parallelThreads);
+        return ParallelComputeFrom(samples, 0, samples.Length, parallelThreads, context);
     }
 
     /// <summary>
     /// <para>Computes parallelly feature vectors from <paramref name="signal"/>.</para>
     /// <para>Returns the list of computed feature vectors or empty list, if the number of samples is less than the size of analysis frame.</para>
     /// </summary>
-    /// <param name="signal">Discrete signal</param>
+    /// <param name="signal">Input signal</param>
     /// <param name="startSample">Index of the first sample in signal for processing</param>
     /// <param name="endSample">Index of the last sample in signal for processing</param>
     /// <param name="parallelThreads">Number of threads (all available processors, by default)</param>
-    public List<float[]> ParallelComputeFrom(DiscreteSignal signal, int startSample, int endSample, int parallelThreads = 0)
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public virtual List<float[]> ParallelComputeFrom(Signal signal, int startSample, int endSample, int parallelThreads = 0, ComputingContext? context = null)
     {
-        return ParallelComputeFrom(signal.Samples, startSample, endSample, parallelThreads);
+        var chunks = ParallelChunksComputeFrom(signal, startSample, endSample, parallelThreads, context);
+
+        var featureVectors = new List<float[]>();
+        foreach (var vectors in chunks)
+        {
+            featureVectors.AddRange(vectors);
+        }
+
+        return featureVectors;
     }
 
     /// <summary>
     /// <para>Computes parallelly feature vectors from <paramref name="signal"/>.</para>
     /// <para>Returns the list of computed feature vectors or empty list, if the number of samples is less than the size of analysis frame.</para>
     /// </summary>
-    /// <param name="signal">Discrete signal</param>
+    /// <param name="signal">Input signal</param>
     /// <param name="parallelThreads">Number of threads (all available processors, by default)</param>
-    public List<float[]> ParallelComputeFrom(DiscreteSignal signal, int parallelThreads = 0)
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public virtual List<float[]> ParallelComputeFrom(Signal signal, int parallelThreads = 0, ComputingContext? context = null)
     {
-        return ParallelComputeFrom(signal.Samples, 0, signal.SampleCount, parallelThreads);
+        return ParallelComputeFrom(signal, 0, signal.Length, parallelThreads, context);
     }
+
+    /// <summary>
+    /// Computes chunks of feature vectors from <paramref name="signal"/> in parallel without copying the full buffer.
+    /// </summary>
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public virtual List<float[]>[] ParallelChunksComputeFrom(Signal signal, int startSample, int endSample, int parallelThreads = 0, ComputingContext? context = null)
+    {
+        if (!IsParallelizable())
+        {
+            throw new NotImplementedException("Current configuration of the extractor does not support parallel computation");
+        }
+
+        var threadCount = parallelThreads > 0 ? parallelThreads : ComputingContextExecution.ParallelWorkerCount(context);
+        var chunkSize = (endSample - startSample) / threadCount;
+
+        if (chunkSize < FrameSize)
+        {
+            return new List<float[]>[] { ComputeFrom(signal, startSample, endSample) };
+        }
+
+        var extractors = new FeatureExtractor[threadCount];
+        extractors[0] = this;
+        for (var i = 1; i < threadCount; i++)
+        {
+            extractors[i] = ParallelCopy();
+        }
+
+        var startPositions = new int[threadCount];
+        var endPositions = new int[threadCount];
+
+        var hopCount = (chunkSize - FrameSize) / HopSize;
+        var lastPosition = startSample - 1;
+        for (var i = 0; i < threadCount; i++)
+        {
+            startPositions[i] = lastPosition + 1;
+            endPositions[i] = lastPosition + hopCount * HopSize + FrameSize;
+            lastPosition = endPositions[i] - FrameSize;
+        }
+
+        endPositions[threadCount - 1] = endSample;
+
+        var featureVectors = new List<float[]>[threadCount];
+
+        ComputingContextExecution.ForEach(context, 0, threadCount, i =>
+        {
+            featureVectors[i] = extractors[i].ComputeFrom(signal, startPositions[i], endPositions[i]);
+        }, FrameSize);
+
+        return featureVectors;
+    }
+
+    List<float[]> IParallelFeatureExtractor.ParallelComputeFrom(float[] samples, int parallelThreads)
+        => ParallelComputeFrom(samples, parallelThreads, context: null);
+
+    List<float[]> IParallelFeatureExtractor.ParallelComputeFrom(float[] samples, int startSample, int endSample, int parallelThreads)
+        => ParallelComputeFrom(samples, startSample, endSample, parallelThreads, context: null);
 
     #endregion
 }

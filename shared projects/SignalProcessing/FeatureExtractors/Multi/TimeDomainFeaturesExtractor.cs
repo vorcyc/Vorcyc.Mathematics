@@ -1,5 +1,6 @@
 using Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Base;
 using Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Options;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Multi;
 
@@ -19,9 +20,9 @@ public class TimeDomainFeaturesExtractor : FeatureExtractor
     public override List<string> FeatureDescriptions { get; }
 
     /// <summary>
-    /// Extractor functions.
+    /// Per-frame extractors operating on <see cref="SignalSegment"/> views.
     /// </summary>
-    protected List<Func<DiscreteSignal, int, int, float>> _extractors;
+    protected List<Func<SignalSegment, float>> _segmentExtractors;
 
     /// <summary>
     /// Parameters.
@@ -45,29 +46,16 @@ public class TimeDomainFeaturesExtractor : FeatureExtractor
                                   .ToList();
 
         _parameters = options.Parameters;
-
-        _extractors = features.Select<string, Func<DiscreteSignal, int, int, float>>(feature =>
+        _segmentExtractors = features.Select<string, Func<SignalSegment, float>>(feature =>
         {
-            switch (feature)
+            return feature switch
             {
-                case "e":
-                case "en":
-                case "energy":
-                    return (signal, start, end) => signal.Energy(start, end);
-
-                case "rms":
-                    return (signal, start, end) => signal.Rms(start, end);
-
-                case "zcr":
-                case "zero-crossing-rate":
-                    return (signal, start, end) => signal.ZeroCrossingRate(start, end);
-
-                case "entropy":
-                    return (signal, start, end) => signal.Entropy(start, end);
-
-                default:
-                    return (signal, start, end) => 0;
-            }
+                "e" or "en" or "energy" => frame => frame.AverageEnergy,
+                "rms" => frame => frame.Rms,
+                "zcr" or "zero-crossing-rate" => frame => frame.ZeroCrossingRate,
+                "entropy" => frame => frame.Entropy,
+                _ => _ => 0
+            };
         }).ToList();
 
         FeatureCount = features.Count;
@@ -75,51 +63,53 @@ public class TimeDomainFeaturesExtractor : FeatureExtractor
     }
 
     /// <summary>
-    /// Adds user-defined feature to extractor's list (and the routine for its calculation).
+    /// Adds a user-defined feature based on a <see cref="SignalSegment"/> frame view.
     /// </summary>
-    /// <param name="name">Feature name/annotation</param>
-    /// <param name="algorithm">Routine for calculation of the feature</param>
-    public void AddFeature(string name, Func<DiscreteSignal, int, int, float> algorithm)
+    public void AddFeature(string name, Func<SignalSegment, float> algorithm)
     {
         FeatureCount++;
         FeatureDescriptions.Add(name);
-        _extractors.Add(algorithm);
+        _segmentExtractors.Add(algorithm);
     }
 
     /// <summary>
-    /// <para>Computes feature vectors from <paramref name="samples"/> and stores them in <paramref name="vectors"/>.</para>
-    /// <para>Returns the number of actually computed feature vectors.</para>
+    /// Adds a user-defined feature based on a sample span (applied to each frame segment).
     /// </summary>
-    /// <param name="samples">Array of samples</param>
-    /// <param name="startSample">Index of the first sample in array for processing</param>
-    /// <param name="endSample">Index of the last sample in array for processing</param>
-    /// <param name="vectors">Pre-allocated sequence for storing the resulting feature vectors</param>
-    public override int ComputeFrom(float[] samples, int startSample, int endSample, IList<float[]> vectors)
+    public void AddFeature(string name, Func<ReadOnlySpan<float>, int, int, float> algorithm)
     {
-        var ds = new DiscreteSignal(SamplingRate, samples);
+        AddFeature(name, frame => algorithm(frame.Samples, 0, frame.Length));
+    }
 
+    /// <inheritdoc />
+    public override int ComputeFrom(Signal signal, int startSample, int endSample, IList<float[]> vectors)
+    {
         var fv = 0;
 
         for (var sample = startSample; sample + FrameSize < endSample; sample += HopSize, fv++)
         {
+            var frame = signal[sample, FrameSize, throwException: true]!.Value;
             var featureVector = vectors[fv];
 
             for (var j = 0; j < featureVector.Length; j++)
             {
-                featureVector[j] = _extractors[j](ds, sample, sample + FrameSize);
+                featureVector[j] = _segmentExtractors[j](frame);
             }
         }
 
         return fv;
     }
 
+    /// <inheritdoc />
+    public override int ComputeFrom(float[] samples, int startSample, int endSample, IList<float[]> vectors)
+    {
+        var signal = Signal.FromCopy(samples, SamplingRate);
+        return ComputeFrom(signal, startSample, endSample, vectors);
+    }
+
     /// <summary>
     /// <para>Processes one frame in block of data at each step.</para>
     /// <para><see cref="TimeDomainFeaturesExtractor"/> does not provide this function.</para>
-    /// <para>Call <see cref="ComputeFrom(float[], int, int, IList{float[]})"/> method instead.</para>
     /// </summary>
-    /// <param name="block">Block of data</param>
-    /// <param name="features">Features (one feature vector) computed in the block</param>
     public override void ProcessFrame(float[] block, float[] features)
     {
         throw new NotImplementedException("TimeDomainFeaturesExtractor does not provide this function. Please call ComputeFrom() method");
@@ -144,6 +134,9 @@ public class TimeDomainFeaturesExtractor : FeatureExtractor
             Parameters = _parameters
         };
 
-        return new TimeDomainFeaturesExtractor(options) { _extractors = _extractors };
+        return new TimeDomainFeaturesExtractor(options)
+        {
+            _segmentExtractors = _segmentExtractors
+        };
     }
 }

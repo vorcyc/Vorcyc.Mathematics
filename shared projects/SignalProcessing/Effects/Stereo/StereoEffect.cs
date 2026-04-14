@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects.Stereo
 {
@@ -96,16 +97,16 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects.Stereo
         /// Applies effect to entire <paramref name="signal"/> and returns tuple of output signals [left signal, right signal].
         /// </summary>
         /// <param name="signal">Input signal</param>
-        public virtual (DiscreteSignal, DiscreteSignal) ApplyTo(DiscreteSignal signal)
+        public virtual (Signal, Signal) ApplyTo(Signal signal)
         {
             var sr = signal.SamplingRate;
 
-            var left = new float[signal.SampleCount];
-            var right = new float[signal.SampleCount];
-            
+            var left = new float[signal.Length];
+            var right = new float[signal.Length];
+
             Process(signal.Samples, left, right);
 
-            return (new DiscreteSignal(sr, left), new DiscreteSignal(sr, right));
+            return (Signal.FromCopy(left, sr), Signal.FromCopy(right, sr));
         }
 
         /// <summary>
@@ -114,17 +115,67 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects.Stereo
         /// </summary>
         /// <param name="leftSignal">Input signal (left channel)</param>
         /// <param name="rightSignal">Input signal (right channel)</param>
-        public virtual (DiscreteSignal, DiscreteSignal) ApplyTo(DiscreteSignal leftSignal, DiscreteSignal rightSignal)
+        public virtual (Signal, Signal) ApplyTo(Signal leftSignal, Signal rightSignal)
         {
             var srl = leftSignal.SamplingRate;
             var srr = rightSignal.SamplingRate;
 
-            var left = new float[leftSignal.SampleCount];
-            var right = new float[rightSignal.SampleCount];
+            var left = new float[leftSignal.Length];
+            var right = new float[rightSignal.Length];
 
             Process(leftSignal.Samples, rightSignal.Samples, left, right);
 
-            return (new DiscreteSignal(srl, left), new DiscreteSignal(srr, right));
+            return (Signal.FromCopy(left, srl), Signal.FromCopy(right, srr));
+        }
+
+        /// <summary>
+        /// Processes block of samples in mono channel from a span view.
+        /// </summary>
+        public virtual void Process(ReadOnlySpan<float> input,
+                                    float[] outputLeft,
+                                    float[] outputRight,
+                                    int count = 0,
+                                    int inputPos = 0,
+                                    int outputPos = 0)
+        {
+            if (count <= 0)
+            {
+                count = input.Length - inputPos;
+            }
+
+            var endPos = inputPos + count;
+
+            for (int n = inputPos, m = outputPos; n < endPos; n++, m++)
+            {
+                outputLeft[m] = outputRight[m] = input[n];
+                Process(ref outputLeft[m], ref outputRight[m]);
+            }
+        }
+
+        /// <summary>
+        /// Processes blocks of samples in stereo channels from span views.
+        /// </summary>
+        public virtual void Process(ReadOnlySpan<float> inputLeft,
+                                    ReadOnlySpan<float> inputRight,
+                                    float[] outputLeft,
+                                    float[] outputRight,
+                                    int count = 0,
+                                    int inputPos = 0,
+                                    int outputPos = 0)
+        {
+            if (count <= 0)
+            {
+                count = Math.Min(inputLeft.Length - inputPos, inputRight.Length - inputPos);
+            }
+
+            var endPos = inputPos + count;
+
+            for (int n = inputPos, m = outputPos; n < endPos; n++, m++)
+            {
+                outputLeft[m] = inputLeft[n];
+                outputRight[m] = inputRight[n];
+                Process(ref outputLeft[m], ref outputRight[m]);
+            }
         }
 
         /// <summary>

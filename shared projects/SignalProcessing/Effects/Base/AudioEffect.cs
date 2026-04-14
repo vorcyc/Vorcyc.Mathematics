@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 
@@ -10,7 +11,6 @@ public abstract class AudioEffect : WetDryMixer, IFilter, IOnlineFilter
     /// <summary>
     /// Processes one sample.
     /// </summary>
-    /// <param name="sample">Input sample</param>
     public abstract float Process(float sample);
 
     /// <summary>
@@ -21,17 +21,12 @@ public abstract class AudioEffect : WetDryMixer, IFilter, IOnlineFilter
     /// <summary>
     /// Applies effect to entire <paramref name="signal"/> and returns new processed signal.
     /// </summary>
-    /// <param name="signal">Signal</param>
-    /// <param name="method">Filtering method</param>
-    public virtual DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto) 
+    public virtual Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
         => this.FilterOnline(signal);
 
-
     /// <summary>
-    /// Applies effect to entire <paramref name="signal"/> (in-place).
+    /// Applies effect to entire <paramref name="signal"/> in-place.
     /// </summary>
-    /// <param name="signal">Signal</param>
-    /// <param name="method">Filtering method</param>
-    public virtual void Apply(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto) 
+    public virtual void Apply(Signal signal, FilteringMethod method = FilteringMethod.Auto)
         => this.FilterOnline_Inplace(signal);
 }

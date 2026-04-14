@@ -3,207 +3,169 @@ using System.Runtime.CompilerServices;
 
 namespace Vorcyc.Mathematics.MachineLearning;
 
-//double[][] inputs =
-//{
-//                new double[] { 0, 0 },
-//                new double[] { 1, 0 },
-//                new double[] { 0, 1 },
-//                new double[] { 1, 1 }
-//            };
-
-//int[] outputs =
-//{
-//                -1, // Class 1
-//                -1, // Class 1
-//                -1, // Class 1
-//                 1  // Class 2
-//            };
-
-//// 创建并训练支持向量机
-//var svm = new SupportVectorMachine(featureCount: 2);
-//svm.Train(inputs, outputs);
-
-//// 预测
-//double[] newInput = { 0.8, 0.8 };
-//int prediction = svm.Predict(newInput);
-
-//Console.WriteLine($"预测结果: {prediction}");
-
-
 /// <summary>
 /// 表示支持向量机的核函数类型。
 /// </summary>
 public enum SupportVectorMachineKernelType
 {
-    /// <summary>
-    /// 线性核函数。
-    /// </summary>
     Linear,
-    /// <summary>
-    /// 多项式核函数。
-    /// </summary>
     Polynomial,
-    /// <summary>
-    /// 高斯核函数。
-    /// </summary>
     Gaussian,
-    /// <summary>
-    /// 径向基函数（RBF）核函数。等效于 <see cref="SupportVectorMachineKernelType.Gaussian"/>。
-    /// </summary>
     RBF,
-    /// <summary>
-    /// 点乘核函数。等效于 <see cref="SupportVectorMachineKernelType.Linear"/>。
-    /// </summary>
     DotProduct,
-    /// <summary>
-    /// Sigmoid 核函数。
-    /// </summary>
     Sigmoid
 }
 
 /// <summary>
-/// 一个简单的线性支持向量机（SVM）实现，支持选择核函数。
+/// 核感知机式支持向量机：线性模式使用权重向量，非线性模式使用对偶系数与支持向量。
 /// </summary>
 public class SupportVectorMachine<TSelf> : IMachineLearning
     where TSelf : struct, IFloatingPointIeee754<TSelf>
 {
-    private TSelf[] _weights;
+    private readonly TSelf _learningRate;
+    private readonly int _epochs;
+    private readonly SupportVectorMachineKernelType _kernelType;
+    private readonly TSelf _gamma;
+    private readonly int _polynomialDegree;
+    private readonly TSelf _sigmoidAlpha;
+    private readonly TSelf _sigmoidConstant;
+    private readonly bool _isLinearKernel;
+
+    private TSelf[] _weights = [];
     private TSelf _bias;
-    private TSelf _learningRate;
-    private int _epochs;
-    private Func<TSelf[], TSelf[], TSelf> _kernelFunction;
+    private TSelf[][] _trainingInputs = [];
+    private int[] _trainingLabels = [];
+    private TSelf[] _alphas = [];
 
     public MachineLearningTask Task => MachineLearningTask.Classification | MachineLearningTask.Regression;
 
     /// <summary>
-    /// 初始化 <see cref="SupportVectorMachine{TSelf}"/> 类的新实例。
+    /// 初始化支持向量机。
     /// </summary>
-    /// <param name="featureCount">输入数据的特征数量。</param>
-    /// <param name="learningRate">训练算法的学习率。为 null 时默认为 0.01 </param>
-    /// <param name="epochs">训练的轮数。</param>
-    /// <param name="kernelType">核函数类型。默认为线性核函数。</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public SupportVectorMachine(int featureCount, TSelf? learningRate = null, int epochs = 1000, SupportVectorMachineKernelType kernelType = SupportVectorMachineKernelType.Linear)
+    public SupportVectorMachine(
+        int featureCount,
+        TSelf? learningRate = null,
+        int epochs = 1000,
+        SupportVectorMachineKernelType kernelType = SupportVectorMachineKernelType.Linear,
+        TSelf? gamma = null,
+        int polynomialDegree = 3,
+        TSelf? sigmoidAlpha = null,
+        TSelf? sigmoidConstant = null)
     {
+        _learningRate = learningRate ?? TSelf.CreateChecked(0.01);
+        _epochs = epochs;
+        _kernelType = kernelType;
+        _gamma = gamma ?? TSelf.CreateChecked(1.0);
+        _polynomialDegree = polynomialDegree;
+        _sigmoidAlpha = sigmoidAlpha ?? TSelf.CreateChecked(0.01);
+        _sigmoidConstant = sigmoidConstant ?? TSelf.CreateChecked(1.0);
+        _isLinearKernel = kernelType is SupportVectorMachineKernelType.Linear
+            or SupportVectorMachineKernelType.DotProduct;
         _weights = new TSelf[featureCount];
-        _bias = TSelf.Zero;
-        this._learningRate = learningRate is null ? TSelf.CreateChecked(0.01) : learningRate.Value;
-        this._epochs = epochs;
-        this._kernelFunction = GetKernelFunction(kernelType);
     }
 
     /// <summary>
-    /// 使用提供的训练数据训练SVM。
+    /// 训练模型。标签应为 -1 或 1。
     /// </summary>
-    /// <param name="inputs">输入数据，每个元素是一个特征值数组。</param>
-    /// <param name="outputs">与输入数据对应的输出标签。</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Train(TSelf[][] inputs, int[] outputs)
     {
+        if (inputs == null || outputs == null)
+            throw new ArgumentException("训练数据不能为 null。");
+        if (inputs.Length == 0 || inputs.Length != outputs.Length)
+            throw new ArgumentException("样本数与标签数不匹配。");
+        if (inputs[0].Length != _weights.Length)
+            throw new ArgumentException("特征维度与模型不匹配。");
+
+        _trainingInputs = inputs;
+        _trainingLabels = (int[])outputs.Clone();
+        _alphas = new TSelf[inputs.Length];
+        _bias = TSelf.Zero;
+        Array.Clear(_weights, 0, _weights.Length);
+
         for (int epoch = 0; epoch < _epochs; epoch++)
         {
             for (int i = 0; i < inputs.Length; i++)
             {
-                TSelf[] input = inputs[i];
-                TSelf output = TSelf.CreateChecked(outputs[i]);
+                TSelf label = TSelf.CreateChecked(outputs[i]);
+                TSelf prediction = PredictRaw(inputs[i]);
+                if (label * prediction > TSelf.Zero)
+                    continue;
 
-                TSelf prediction = PredictRaw(input);
-                if (output * prediction <= TSelf.Zero)
+                if (_isLinearKernel)
                 {
                     for (int j = 0; j < _weights.Length; j++)
-                    {
-                        _weights[j] += _learningRate * output * input[j];
-                    }
-                    _bias += _learningRate * output;
+                        _weights[j] += _learningRate * label * inputs[i][j];
                 }
+                else
+                {
+                    _alphas[i] += TSelf.One;
+                }
+
+                _bias += _isLinearKernel ? _learningRate * label : label;
             }
         }
     }
 
     /// <summary>
-    /// 预测给定输入数据的类别标签。
+    /// 预测类别标签（1 或 -1）。
     /// </summary>
-    /// <param name="input">输入数据，一个特征值数组。</param>
-    /// <returns>预测的类别标签（1或-1）。</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Predict(Span<TSelf> input)
     {
-        return PredictRaw(input.ToArray()) >= TSelf.Zero ? 1 : -1;
+        var buffer = input.ToArray();
+        return PredictRaw(buffer) >= TSelf.Zero ? 1 : -1;
     }
 
-    /// <summary>
-    /// 计算给定输入数据的原始预测值。
-    /// </summary>
-    /// <param name="input">输入数据，一个特征值数组。</param>
-    /// <returns>原始预测值。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private TSelf PredictRaw(TSelf[] input)
     {
-        TSelf sum = _bias;
-        for (int i = 0; i < input.Length; i++)
+        if (_isLinearKernel)
         {
-            sum += _weights[i] * _kernelFunction(_weights, input);
+            TSelf sum = _bias;
+            for (int i = 0; i < input.Length; i++)
+                sum += _weights[i] * input[i];
+            return sum;
         }
-        return sum;
+
+        TSelf total = _bias;
+        for (int i = 0; i < _trainingInputs.Length; i++)
+        {
+            if (_alphas[i] == TSelf.Zero)
+                continue;
+            TSelf label = TSelf.CreateChecked(_trainingLabels[i]);
+            total += _alphas[i] * label * Kernel(_trainingInputs[i], input);
+        }
+        return total;
     }
 
-    /// <summary>
-    /// 获取指定类型的核函数。
-    /// </summary>
-    /// <param name="kernelType">核函数类型。</param>
-    /// <returns>核函数的委托。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private Func<TSelf[], TSelf[], TSelf> GetKernelFunction(SupportVectorMachineKernelType kernelType) =>
-        kernelType switch
+    private TSelf Kernel(TSelf[] x, TSelf[] y) =>
+        _kernelType switch
         {
-            SupportVectorMachineKernelType.Linear => LinearKernel,
-            SupportVectorMachineKernelType.Polynomial => PolynomialKernel,
-            SupportVectorMachineKernelType.Gaussian => GaussianKernel,
-            SupportVectorMachineKernelType.RBF => GaussianKernel, // RBF 和 Gaussian 核函数相同
-            SupportVectorMachineKernelType.DotProduct => LinearKernel, // 就是线性的
-            SupportVectorMachineKernelType.Sigmoid => SigmoidKernel,
-            _ => throw new ArgumentException("Unsupported kernel type", nameof(kernelType)),
+            SupportVectorMachineKernelType.Linear or SupportVectorMachineKernelType.DotProduct => DotProduct(x, y),
+            SupportVectorMachineKernelType.Polynomial => PolynomialKernel(x, y),
+            SupportVectorMachineKernelType.Gaussian or SupportVectorMachineKernelType.RBF => GaussianKernel(x, y),
+            SupportVectorMachineKernelType.Sigmoid => SigmoidKernel(x, y),
+            _ => throw new ArgumentOutOfRangeException(nameof(_kernelType))
         };
 
-    /// <summary>
-    /// 线性核函数。
-    /// </summary>
-    /// <param name="x">第一个输入向量。</param>
-    /// <param name="y">第二个输入向量。</param>
-    /// <returns>核函数的计算结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static TSelf LinearKernel(TSelf[] x, TSelf[] y)
+    private static TSelf DotProduct(TSelf[] x, TSelf[] y)
     {
         TSelf sum = TSelf.Zero;
         for (int i = 0; i < x.Length; i++)
-        {
             sum += x[i] * y[i];
-        }
         return sum;
     }
 
-    /// <summary>
-    /// 多项式核函数。
-    /// </summary>
-    /// <param name="x">第一个输入向量。</param>
-    /// <param name="y">第二个输入向量。</param>
-    /// <returns>核函数的计算结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static TSelf PolynomialKernel(TSelf[] x, TSelf[] y)
+    private TSelf PolynomialKernel(TSelf[] x, TSelf[] y)
     {
-        TSelf dotProduct = LinearKernel(x, y);
-        TSelf degree = TSelf.CreateChecked(3); // 多项式的度数，可以根据需要调整
-        return TSelf.Pow(dotProduct + TSelf.One, degree);
+        TSelf dot = DotProduct(x, y);
+        return TSelf.Pow(_gamma * dot + TSelf.One, TSelf.CreateChecked(_polynomialDegree));
     }
 
-    /// <summary>
-    /// 高斯核函数（RBF）。
-    /// </summary>
-    /// <param name="x">第一个输入向量。</param>
-    /// <param name="y">第二个输入向量。</param>
-    /// <returns>核函数的计算结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static TSelf GaussianKernel(TSelf[] x, TSelf[] y)
+    private TSelf GaussianKernel(TSelf[] x, TSelf[] y)
     {
         TSelf sum = TSelf.Zero;
         for (int i = 0; i < x.Length; i++)
@@ -211,22 +173,10 @@ public class SupportVectorMachine<TSelf> : IMachineLearning
             TSelf diff = x[i] - y[i];
             sum += diff * diff;
         }
-        TSelf sigma = TSelf.CreateChecked(1.0); // 高斯核的带宽参数，可以根据需要调整
-        return TSelf.Exp(-sum / (TSelf.CreateChecked(2.0) * sigma * sigma));
+        return TSelf.Exp(-_gamma * sum);
     }
 
-    /// <summary>
-    /// Sigmoid 核函数。
-    /// </summary>
-    /// <param name="x">第一个输入向量。</param>
-    /// <param name="y">第二个输入向量。</param>
-    /// <returns>核函数的计算结果。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static TSelf SigmoidKernel(TSelf[] x, TSelf[] y)
-    {
-        TSelf dotProduct = LinearKernel(x, y);
-        TSelf alpha = TSelf.CreateChecked(0.01); // Sigmoid 核的参数，可以根据需要调整
-        TSelf constant = TSelf.CreateChecked(1.0);
-        return TSelf.Tanh(alpha * dotProduct + constant);
-    }
+    private TSelf SigmoidKernel(TSelf[] x, TSelf[] y) =>
+        TSelf.Tanh(_sigmoidAlpha * DotProduct(x, y) + _sigmoidConstant);
 }

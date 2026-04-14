@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Transforms
@@ -62,10 +63,13 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// Returns list of computed spectra (real and imaginary parts) in time.
         /// </summary>
         /// <param name="input">Input data</param>
-        public List<(float[], float[])> Direct(float[] input)
-        {
-            // pre-allocate memory:
+        public List<(float[], float[])> Direct(float[] input) => Direct(input.AsSpan());
 
+        /// <summary>
+        /// Does STFT of sample data.
+        /// </summary>
+        public List<(float[], float[])> Direct(ReadOnlySpan<float> input)
+        {
             var len = input.Length >= _windowSize ? (input.Length - _windowSize) / _hopSize + 1 : 0;
 
             var stft = new List<(float[], float[])>(len + 1);
@@ -83,7 +87,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             for (var i = 0; i < len; pos += _hopSize, i++)
             {
-                input.FastCopyTo(windowedBuffer, _windowSize, pos);
+                CopyFrame(input, pos, _windowSize, windowedBuffer);
 
                 windowedBuffer.ApplyWindow(_windowSamples);
 
@@ -97,7 +101,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             stft.Add((new float[_fftSize], new float[_fftSize]));
 
             Array.Clear(windowedBuffer, 0, _fftSize);
-            input.FastCopyTo(windowedBuffer, input.Length - pos, pos);
+            CopyFrame(input, pos, input.Length - pos, windowedBuffer);
             windowedBuffer.ApplyWindow(_windowSamples);
 
             var (lre, lim) = stft.Last();
@@ -112,10 +116,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// Returns list of computed spectra (real and imaginary parts) in time.
         /// </summary>
         /// <param name="signal">Input signal</param>
-        public List<(float[], float[])> Direct(DiscreteSignal signal)
-        {
-            return Direct(signal.Samples);
-        }
+        public List<(float[], float[])> Direct(Signal signal) => Direct(signal.Samples);
 
         /// <summary>
         /// Does Inverse STFT from list of spectra <paramref name="stft"/>.
@@ -228,9 +229,13 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="input">Input data</param>
         /// <param name="normalize">Normalize each spectrum</param>
         public List<float[]> Spectrogram(float[] input, bool normalize = true)
-        {
-            // pre-allocate memory:
+            => Spectrogram(input.AsSpan(), normalize);
 
+        /// <summary>
+        /// Computes spectrogram from sample data.
+        /// </summary>
+        public List<float[]> Spectrogram(ReadOnlySpan<float> input, bool normalize = true)
+        {
             var len = input.Length >= _windowSize ? (input.Length - _windowSize) / _hopSize + 1 : 0;
 
             var spectrogram = new List<float[]>(len + 1);
@@ -248,7 +253,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             for (int i = 0; i < len; pos += _hopSize, i++)
             {
-                input.FastCopyTo(windowedBuffer, _windowSize, pos);
+                CopyFrame(input, pos, _windowSize, windowedBuffer);
 
                 if (_window != WindowType.Rectangular)
                 {
@@ -261,7 +266,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             // last (incomplete) frame:
 
             Array.Clear(windowedBuffer, 0, _fftSize);
-            input.FastCopyTo(windowedBuffer, input.Length - pos, pos);
+            CopyFrame(input, pos, input.Length - pos, windowedBuffer);
             windowedBuffer.ApplyWindow(_windowSamples);
 
             spectrogram.Add(new float[_fftSize / 2 + 1]);
@@ -272,22 +277,22 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         }
 
         /// <summary>
-        /// Computes spectrogram. 
-        /// The spectrogram is essentially a list of power spectra in time.
+        /// Computes spectrogram from <paramref name="signal"/>.
         /// </summary>
-        /// <param name="signal">Input signal</param>
-        /// <param name="normalize">Normalize each spectrum</param>
-        public List<float[]> Spectrogram(DiscreteSignal signal, bool normalize = true)
-        {
-            return Spectrogram(signal.Samples, normalize);
-        }
+        public List<float[]> Spectrogram(Signal signal, bool normalize = true)
+            => Spectrogram(signal.Samples, normalize);
 
         /// <summary>
         /// Computes averaged periodogram (used, for example, in Welch method). 
         /// This method is memory-efficient since it doesn't store all spectra in memory.
         /// </summary>
         /// <param name="input">Input data</param>
-        public float[] AveragePeriodogram(float[] input)
+        public float[] AveragePeriodogram(float[] input) => AveragePeriodogram(input.AsSpan());
+
+        /// <summary>
+        /// Computes averaged periodogram from sample data.
+        /// </summary>
+        public float[] AveragePeriodogram(ReadOnlySpan<float> input)
         {
             var len = input.Length >= _windowSize ? (input.Length - _windowSize) / _hopSize + 1 : 0;
 
@@ -299,7 +304,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             for (var i = 0; i < len; pos += _hopSize, i++)
             {
-                input.FastCopyTo(windowedBuffer, _windowSize, pos);
+                CopyFrame(input, pos, _windowSize, windowedBuffer);
 
                 if (_window != WindowType.Rectangular)
                 {
@@ -317,28 +322,37 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             // last (incomplete) frame:
 
             Array.Clear(windowedBuffer, 0, _fftSize);
-            input.FastCopyTo(windowedBuffer, input.Length - pos, pos);
+            CopyFrame(input, pos, input.Length - pos, windowedBuffer);
             windowedBuffer.ApplyWindow(_windowSamples);
 
             _fft.PowerSpectrum(windowedBuffer, spectrum, false);
 
             for (var j = 0; j < periodogram.Length; j++)
             {
-                periodogram[j] += spectrum[j];    // add last spectrum
-                periodogram[j] /= len + 1;        // and compute average right away
+                periodogram[j] += spectrum[j];
+                periodogram[j] /= len + 1;
             }
 
             return periodogram;
         }
 
         /// <summary>
+        /// Computes averaged periodogram from <paramref name="signal"/>.
+        /// </summary>
+        public float[] AveragePeriodogram(Signal signal) => AveragePeriodogram(signal.Samples);
+
+        /// <summary>
         /// Computes spectrogram in the form of list of magnitudes and phases from <paramref name="input"/>.
         /// </summary>
         /// <param name="input">Input data</param>
         public MagnitudePhaseList MagnitudePhaseSpectrogram(float[] input)
-        {
-            // pre-allocate memory:
+            => MagnitudePhaseSpectrogram(input.AsSpan());
 
+        /// <summary>
+        /// Computes magnitude-phase spectrogram from sample data.
+        /// </summary>
+        public MagnitudePhaseList MagnitudePhaseSpectrogram(ReadOnlySpan<float> input)
+        {
             var len = input.Length >= _windowSize ? (input.Length - _windowSize) / _hopSize + 1 : 0;
 
             var mag = new List<float[]>(len + 1);
@@ -360,7 +374,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             for (var i = 0; i < len; pos += _hopSize, i++)
             {
-                input.FastCopyTo(windowedBuffer, _windowSize, pos);
+                CopyFrame(input, pos, _windowSize, windowedBuffer);
 
                 windowedBuffer.ApplyWindow(_windowSamples);
 
@@ -376,7 +390,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             // last (incomplete) frame:
 
             Array.Clear(windowedBuffer, 0, _fftSize);
-            input.FastCopyTo(windowedBuffer, input.Length - pos, pos);
+            CopyFrame(input, pos, input.Length - pos, windowedBuffer);
             windowedBuffer.ApplyWindow(_windowSamples);
 
             mag.Add(new float[_fftSize / 2 + 1]);
@@ -400,10 +414,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// Computes spectrogram in the form of list of magnitudes and phases from <paramref name="signal"/>.
         /// </summary>
         /// <param name="signal">Input signal</param>
-        public MagnitudePhaseList MagnitudePhaseSpectrogram(DiscreteSignal signal)
-        {
-            return MagnitudePhaseSpectrogram(signal.Samples);
-        }
+        public MagnitudePhaseList MagnitudePhaseSpectrogram(Signal signal)
+            => MagnitudePhaseSpectrogram(signal.Samples);
 
         /// <summary>
         /// Reconstructs samples from <paramref name="spectrogram"/> in the form of list of magnitudes and phases.
@@ -496,6 +508,11 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             }
 
             return output;
+        }
+
+        private static void CopyFrame(ReadOnlySpan<float> input, int position, int count, Span<float> destination)
+        {
+            input.Slice(position, count).CopyTo(destination.Slice(0, count));
         }
     }
 

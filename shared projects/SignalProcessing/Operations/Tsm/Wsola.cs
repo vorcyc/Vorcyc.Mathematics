@@ -1,6 +1,7 @@
 ﻿using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Operations.Tsm;
@@ -125,7 +126,7 @@ public class Wsola : IFilter
     /// <summary>
     /// Processes entire <paramref name="signal"/> and returns new time-stretched signal.
     /// </summary>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         // adjust default parameters for a new sampling rate
 
@@ -163,13 +164,13 @@ public class Wsola : IFilter
 
             if (posAnalysis > _maxDelta / 2)
             {
-                input.Values.FastCopyTo(current, _windowSize + _maxDelta, posAnalysis - _maxDelta / 2);
+                input.Slice(posAnalysis - _maxDelta / 2, _windowSize + _maxDelta).CopyTo(current);
 
                 delta = WaveformSimilarityPos(current, prev, _maxDelta);
             }
             else
             {
-                input.Values.FastCopyTo(current, _windowSize + _maxDelta, posAnalysis);
+                input.Slice(posAnalysis, _windowSize + _maxDelta).CopyTo(current);
             }
 
             int size = Math.Min(_windowSize, output.Length - posSynthesis);
@@ -184,10 +185,10 @@ public class Wsola : IFilter
                 output[posSynthesis + j] *= gain;
             }
 
-            input.Values.FastCopyTo(prev, _windowSize, posAnalysis + delta - _maxDelta / 2 + _hopSynthesis);
+            input.Slice(posAnalysis + delta - _maxDelta / 2 + _hopSynthesis, _windowSize).CopyTo(prev);
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

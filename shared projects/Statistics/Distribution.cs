@@ -39,7 +39,7 @@ using System.Numerics;
 /// </item>
 /// </list>
 /// </remarks>
-public static class Distribution
+public static partial class Distribution
 {
 
     #region 正态分布

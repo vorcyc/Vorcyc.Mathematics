@@ -46,31 +46,37 @@ public class MedianFilter : IFilter, IOnlineFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
-        var input = signal.Samples;
-        var output = new float[input.Length];
+        var output = new float[signal.Length];
+        Filter(signal.Samples, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
+    }
 
-        int i = 0, j = 0;
+    /// <summary>
+    /// Applies median filter to <paramref name="input"/> and writes result to <paramref name="output"/>.
+    /// </summary>
+    public void Filter(ReadOnlySpan<float> input, Span<float> output)
+    {
+        Reset();
 
-        // to mimic scipy.signal.medfilt() feed Size/2 zeros first
+        var i = 0;
+        var j = 0;
 
-        for (i = 0; i < Size / 2; i++)    // feed first samples
+        for (i = 0; i < Size / 2; i++)
         {
             Process(input[i]);
         }
 
-        for (; j < input.Length - Size / 2; j++, i++)   // and begin populating output signal
+        for (; j < input.Length - Size / 2; j++, i++)
         {
             output[j] = Process(input[i]);
         }
 
-        for (i = 0; i < Size / 2; i++, j++)     // don't forget last samples
+        for (i = 0; i < Size / 2; i++, j++)
         {
             output[j] = Process(0);
         }
-
-        return new DiscreteSignal(signal.SamplingRate, output);
     }
 
     /// <summary>

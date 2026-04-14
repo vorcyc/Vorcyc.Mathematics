@@ -77,7 +77,7 @@ public class CombFeedforwardFilter : FirFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public override Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         if (method != FilteringMethod.Auto)
         {
@@ -96,7 +96,7 @@ public class CombFeedforwardFilter : FirFilter
         {
             output[i] = b0 * input[i];
         }
-        for (; i < signal.SampleCount; i++, j++)
+        for (; i < signal.Length; i++, j++)
         {
             output[i] = b0 * input[i] + bm * input[j];
         }
@@ -105,7 +105,7 @@ public class CombFeedforwardFilter : FirFilter
             output[i] = bm * input[j];
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

@@ -7,6 +7,7 @@ public delegate void TrainingProgressHandler(int epoch, int totalEpochs, double 
 /// <summary>
 /// 表示一个用于曲线拟合的多层感知器神经网络，支持时间序列数据。
 /// </summary>
+[Obsolete("Use Vorcyc.Mathematics.DeepLearning.Training.MlpRegressor and Sequential<T> instead.")]
 internal class NeuralNetwork
 {
     private readonly int inputSize;      // 输入维度（时间步数 * 特征数）
@@ -332,6 +333,7 @@ public delegate void TrainingProgressHandler<T>(int epoch, int totalEpochs, T av
 /// <summary>
 /// 表示一个用于曲线拟合的多层感知器神经网络，支持时间序列数据。
 /// </summary>
+[Obsolete("Use Vorcyc.Mathematics.DeepLearning.Training.MlpRegressor and Sequential<T> instead.")]
 public class NeuralNetwork_Sequential<T>
     where T : unmanaged, IFloatingPointIeee754<T>
 {
@@ -663,6 +665,7 @@ public class NeuralNetwork_Sequential<T>
 /// <summary>
 /// 表示一个用于曲线拟合的多层感知器神经网络，支持时间序列数据。
 /// </summary>
+[Obsolete("Use Vorcyc.Mathematics.DeepLearning.Training.MlpRegressor and Sequential<T> instead.")]
 public class NeuralNetwork_Parallel<T>
     where T : unmanaged, IFloatingPointIeee754<T>
 {

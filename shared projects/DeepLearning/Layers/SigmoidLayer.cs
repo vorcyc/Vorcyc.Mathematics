@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace Vorcyc.Mathematics.DeepLearning.Layers;
@@ -20,7 +20,8 @@ public static partial class Layers
         var width = input.Width;
         var result = new Tensor<T>(input.Width, input.Height, input.Depth);
 
-        Parallel.For(0, input.Depth, (int d) =>
+        long workPer = (long)height * width;
+        ForEachDepth(input.Depth, workPer, d =>
         {
             for (int y = 0; y < height; y++)
             {
@@ -49,7 +50,8 @@ public static partial class Layers
         var width = input.Width;
         var result = new Tensor(input.Width, input.Height, input.Depth);
 
-        Parallel.For(0, input.Depth, (int d) =>
+        long workPer = (long)height * width;
+        ForEachDepth(input.Depth, workPer, d =>
         {
             for (int y = 0; y < height; y++)
             {

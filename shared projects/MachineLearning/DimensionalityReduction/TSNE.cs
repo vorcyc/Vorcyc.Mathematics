@@ -7,12 +7,13 @@ namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 /// t-SNE 算法类，用于降维和数据可视化。
 /// </summary>
 /// <typeparam name="T">数值类型，必须实现 IFloatingPointIeee754 接口。</typeparam>
-public class TSNE<T>
+public class TSNE<T> : IMachineLearning
     where T : struct, IFloatingPointIeee754<T>
 {
-    private int _perplexity;
-    private int _maxIter;
-    private T _learningRate;
+    private readonly int _perplexity;
+    private readonly int _maxIter;
+    private readonly T _learningRate;
+    private readonly Action<int, T>? _progressCallback;
 
     /// <summary>
     /// 构造 t-SNE 算法实例。
@@ -20,12 +21,17 @@ public class TSNE<T>
     /// <param name="perplexity">困惑度参数。</param>
     /// <param name="maxIter">最大迭代次数。</param>
     /// <param name="learningRate">学习率。</param>
-    public TSNE(int perplexity = 30, int maxIter = 1000, T learningRate = default)
+    /// <param name="progressCallback">可选进度回调 (iteration, cost)。</param>
+    public TSNE(int perplexity = 30, int maxIter = 1000, T learningRate = default, Action<int, T>? progressCallback = null)
     {
         _perplexity = perplexity;
         _maxIter = maxIter;
         _learningRate = learningRate.Equals(default) ? T.CreateChecked(200.0) : learningRate;
+        _progressCallback = progressCallback;
     }
+
+    /// <inheritdoc />
+    public MachineLearningTask Task => MachineLearningTask.DimensionalityReduction;
 
     /// <summary>
     /// 执行 t-SNE 算法并返回降维后的矩阵。
@@ -68,9 +74,7 @@ public class TSNE<T>
             }
 
             if (iter % 100 == 0)
-            {
-                Console.WriteLine($"Iteration {iter}: Cost = {ComputeCost(P, Q)}");
-            }
+                _progressCallback?.Invoke(iter, ComputeCost(P, Q));
         }
 
         return Y;

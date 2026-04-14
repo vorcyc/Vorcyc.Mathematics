@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -10,12 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ComputingBackend.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ComputingContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataHelper\CsvManipulater.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataHelper\DataTable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataHelper\DataTableExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DeviceDependencyAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Direction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FilterAttribute2.cs" />

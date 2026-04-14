@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics.Experimental.Signals;
+﻿using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace core_module_test;
 

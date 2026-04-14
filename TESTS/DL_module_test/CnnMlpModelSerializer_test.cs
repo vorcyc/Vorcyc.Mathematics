@@ -1,0 +1,55 @@
+using Vorcyc.Mathematics.DeepLearning;
+using Vorcyc.Mathematics.DeepLearning.Modules;
+using Vorcyc.Mathematics.DeepLearning.Serialization;
+
+namespace DL_module_test;
+
+internal static class CnnMlpModelSerializer_test
+{
+    public static bool Run()
+    {
+        var backbone = new BatchSequential<float>(
+            new BatchConvolution2DLayer<float>(1, 2, kernelSize: 3, name: "conv"),
+            new BatchBatchNormLayer<float>(2, "bn"),
+            new BatchFlattenLayer<float>());
+
+        var head = new Sequential<float>(
+            new FullyConnectedLayer<float>(32, 2, "fc1"),
+            new SigmoidActivation<float>(),
+            new FullyConnectedLayer<float>(2, 1, "fc2"));
+
+        var model = new CnnMlpModel<float>(backbone, head);
+        var before = ModelSerializer.FlattenParameters(model);
+        var path = Path.Combine(Path.GetTempPath(), $"vmath_cnnmlp_{Guid.NewGuid():N}.bin");
+
+        try
+        {
+            ModelSerializer.SaveToFile(model, path);
+            TensorUtilities.FillUniformRandom(model.Parameters[0].Value, 1f);
+            ModelSerializer.LoadFromFile(model, path);
+
+            var after = ModelSerializer.FlattenParameters(model);
+            if (before.Length != after.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < before.Length; i++)
+            {
+                if (before[i] != after[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        finally
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+    }
+}

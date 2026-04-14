@@ -1,79 +1,242 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
+using Vorcyc.Mathematics.MachineLearning.Internal;
+
+
+
 
 namespace Vorcyc.Mathematics.MachineLearning;
 
+
+
 /// <summary>
-/// 表示用于分类和回归的K最近邻算法。
+
+/// K 最近邻回归。
+
 /// </summary>
-/// <typeparam name="T">坐标的数值类型。</typeparam>
-public class KNN<T> :IMachineLearning
+
+/// <typeparam name="T">特征与目标的数值类型。</typeparam>
+
+public class KNN<T> : IMachineLearning
+
     where T : struct, IFloatingPointIeee754<T>
+
 {
-    private readonly List<(Point<T> Point, string Label)> _data;
+
+    private readonly List<T[]> _featureRows = [];
+
+    private readonly List<T> _targets = [];
+
+
+
+    /// <inheritdoc />
+
+    public MachineLearningTask Task => MachineLearningTask.Regression;
+
+
 
     /// <summary>
-    /// 初始化 <see cref="KNN{T}"/> 类的新实例。
+
+    /// 添加二维回归样本。
+
     /// </summary>
-    public KNN()
+
+    public void Add(Point<T> point, T target) =>
+
+        AddRegression([point.X, point.Y], target);
+
+
+
+    /// <summary>
+
+    /// 添加任意维回归样本。
+
+    /// </summary>
+
+    public void Add(ReadOnlySpan<T> features, T target) =>
+
+        AddRegression(features, target);
+
+
+
+    /// <summary>
+
+    /// 对二维点进行回归。
+
+    /// </summary>
+
+    public T Regress(Point<T> point, int k) =>
+
+        Regress([point.X, point.Y], k);
+
+
+
+    /// <summary>
+
+    /// 对特征向量进行回归。
+
+    /// </summary>
+
+    public T Regress(ReadOnlySpan<T> features, int k, bool distanceWeighted = false)
+
     {
-        _data = new List<(Point<T> Point, string Label)>();
+
+        ValidateK(k);
+
+        if (_featureRows.Count == 0)
+
+            throw new InvalidOperationException("训练集为空。");
+
+        if (features.Length != _featureRows[0].Length)
+
+            throw new ArgumentException("特征维度与训练样本不一致。");
+
+        if (_featureRows.Count < k)
+
+            throw new ArgumentException($"可用样本数 ({_featureRows.Count}) 小于 k ({k})。");
+
+
+
+        return KnnNeighborSearch.MeanTargetFromVectors(
+
+            CollectionsMarshal.AsSpan(_featureRows),
+
+            CollectionsMarshal.AsSpan(_targets),
+
+            features,
+
+            k,
+
+            distanceWeighted);
+
     }
 
-    public MachineLearningTask Task => MachineLearningTask.Classification | MachineLearningTask.Regression;
+
 
     /// <summary>
-    /// 添加训练数据点。
+
+    /// 对特征矩阵的每一行进行批量回归预测。
+
     /// </summary>
-    /// <param name="point">数据点。</param>
-    /// <param name="label">数据点的标签。</param>
-    public void Add(Point<T> point, string label)
+
+    public T[] RegressBatch(T[,] x, int k, bool distanceWeighted = false)
+
     {
-        _data.Add((point, label));
+
+        if (x == null)
+
+            throw new ArgumentNullException(nameof(x));
+
+        int rows = x.GetLength(0);
+
+        var predictions = new T[rows];
+
+        RegressBatch(x, k, predictions, distanceWeighted);
+
+        return predictions;
+
     }
 
-    /// <summary>
-    /// 使用K近邻算法对新数据点进行分类。
-    /// </summary>
-    /// <param name="point">要分类的数据点。</param>
-    /// <param name="k">最近邻居的数量。</param>
-    /// <returns>预测的标签。</returns>
-    public string Classify(Point<T> point, int k)
-    {
-        var neighbors = _data
-            .Select(d => (Distance: Point<T>.Distance(point, d.Point), d.Label))
-            .OrderBy(d => d.Distance)
-            .Take(k)
-            .ToList();
 
-        var grouped = neighbors
-            .GroupBy(n => n.Label)
-            .OrderByDescending(g => g.Count())
-            .ThenBy(g => g.Key)
-            .First();
-
-        return grouped.Key;
-    }
 
     /// <summary>
-    /// 使用K近邻算法对新数据点进行回归。
-    /// </summary>
-    /// <param name="point">要回归的数据点。</param>
-    /// <param name="k">最近邻居的数量。</param>
-    /// <returns>预测的值。</returns>
-    public T Regress(Point<T> point, int k)
-    {
-        var neighbors = _data
-            .Select(d => (Distance: Point<T>.Distance(point, d.Point), d.Point))
-            .OrderBy(d => d.Distance)
-            .Take(k)
-            .ToList();
 
-        T sum = T.Zero;
-        foreach (var neighbor in neighbors)
+    /// 将回归预测写入 <paramref name="predictions"/>。
+
+    /// </summary>
+
+    public void RegressBatch(T[,] x, int k, Span<T> predictions, bool distanceWeighted = false)
+
+    {
+
+        ValidateK(k);
+
+        if (x == null)
+
+            throw new ArgumentNullException(nameof(x));
+
+        if (_featureRows.Count == 0)
+
+            throw new InvalidOperationException("训练集为空。");
+
+        if (_featureRows.Count < k)
+
+            throw new ArgumentException($"可用样本数 ({_featureRows.Count}) 小于 k ({k})。");
+
+
+
+        int rows = x.GetLength(0);
+
+        int cols = x.GetLength(1);
+
+        if (cols != _featureRows[0].Length)
+
+            throw new ArgumentException("特征维度与训练样本不一致。");
+
+        if (predictions.Length < rows)
+
+            throw new ArgumentException("predictions 长度不足。", nameof(predictions));
+
+
+
+        var storedFeatures = CollectionsMarshal.AsSpan(_featureRows);
+
+        var storedTargets = CollectionsMarshal.AsSpan(_targets);
+
+        var sample = new T[cols];
+
+        for (int i = 0; i < rows; i++)
+
         {
-            sum += neighbor.Point.X; // 假设回归目标是X坐标
+
+            for (int j = 0; j < cols; j++)
+
+                sample[j] = x[i, j];
+
+            predictions[i] = KnnNeighborSearch.MeanTargetFromVectors(
+
+                storedFeatures,
+
+                storedTargets,
+
+                sample,
+
+                k,
+
+                distanceWeighted);
+
         }
 
-        return sum / T.CreateChecked(k);
     }
+
+
+
+    private void AddRegression(ReadOnlySpan<T> features, T target)
+
+    {
+
+        var row = new T[features.Length];
+
+        features.CopyTo(row);
+
+        _featureRows.Add(row);
+
+        _targets.Add(target);
+
+    }
+
+
+
+    private static void ValidateK(int k)
+
+    {
+
+        if (k <= 0)
+
+            throw new ArgumentOutOfRangeException(nameof(k), "k 必须大于 0。");
+
+    }
+
 }
+
+

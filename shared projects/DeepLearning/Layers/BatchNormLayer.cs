@@ -1,4 +1,4 @@
-﻿//using System.Numerics;
+//using System.Numerics;
 //using System.Runtime.InteropServices;
 //using Vorcyc.Mathematics.LinearAlgebra;
 
@@ -152,7 +152,8 @@ public static partial class Layers
         var v = T.CreateChecked(1e-5);//常数
 
         var normalized = new Tensor<T>(input.Width, input.Height, input.Depth);
-        Parallel.For(0, input.Depth, (int d) =>
+        long workPer = (long)input.Height * input.Width;
+        ForEachDepth(input.Depth, workPer, d =>
         {
             for (int y = 0; y < input.Height; y++)
             {
@@ -179,7 +180,8 @@ public static partial class Layers
         var v = 1e-5f;//常数
 
         var normalized = new Tensor(input.Width, input.Height, input.Depth);
-        Parallel.For(0, input.Depth, (int d) =>
+        long workPer = (long)input.Height * input.Width;
+        ForEachDepth(input.Depth, workPer, d =>
         {
             for (int y = 0; y < input.Height; y++)
             {

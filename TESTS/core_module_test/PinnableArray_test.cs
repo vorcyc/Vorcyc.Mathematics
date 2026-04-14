@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Vorcyc.Mathematics;
+﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Buffers;
 
 namespace core_module_test;
 
@@ -17,7 +13,7 @@ internal class PinnableArray_test
 
 
             PinnableArray<float> a = new(1000);
-            a.FillWithRandomNumber();
+            a.Span.FillWithRandomNumber();
 
             Console.WriteLine(a.ToString());
 

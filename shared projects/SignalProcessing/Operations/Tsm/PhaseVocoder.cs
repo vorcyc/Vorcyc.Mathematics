@@ -1,6 +1,7 @@
 ﻿using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Operations.Tsm;
@@ -103,7 +104,7 @@ public class PhaseVocoder : IFilter
     /// <summary>
     /// Processes entire <paramref name="signal"/> and returns new time-stretched signal.
     /// </summary>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         var input = signal.Samples;
         var output = new float[(int)(input.Length * _stretch) + _fftSize];
@@ -111,7 +112,7 @@ public class PhaseVocoder : IFilter
         var posSynthesis = 0;
         for (var posAnalysis = 0; posAnalysis + _fftSize < input.Length; posAnalysis += _hopAnalysis)
         {
-            input.Values.FastCopyTo(_re, _fftSize, posAnalysis);
+            input.Slice(posAnalysis, _fftSize).CopyTo(_re);
 
             // analysis ==================================================
 
@@ -144,7 +145,7 @@ public class PhaseVocoder : IFilter
             output[posSynthesis] *= _gain;
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

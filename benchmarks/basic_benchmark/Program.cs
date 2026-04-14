@@ -16,5 +16,9 @@ using Vorcyc.Mathematics;
 
 //BenchmarkRunner.Run<SpanMathExtensionBenchmarks>();
 
-BenchmarkRunner.Run<WindowPairBenchmark>();
+//BenchmarkRunner.Run<MachineLearningBatchBenchmark>();
+
+//BenchmarkRunner.Run<WindowPairBenchmark>();
+
+BenchmarkRunner.Run<CalculusBenchmark>();
 

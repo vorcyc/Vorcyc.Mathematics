@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Buffers;
 
 namespace basic_benchmark;
 
@@ -28,7 +29,7 @@ public class ExtremeValueFinder_benchmark
 
     [Benchmark]
     public (float max, float min) Normal() =>
-        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Normal(_array.AsSpan());
+        Vorcyc.Mathematics.Statistics.ExtremeValueFinder.FindExtremeValue_Normal(_array!.Span);
 
 
     [Benchmark]

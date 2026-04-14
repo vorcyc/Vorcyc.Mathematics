@@ -3,6 +3,7 @@
 /// <summary>
 /// Provides extension methods for working with <see cref="DiscreteSignal"/> objects.
 /// </summary>
+[Obsolete("Use Signal and SignalExtensions instead.")]
 public static partial class DiscreteSignalExtensions
 {
     // Note.

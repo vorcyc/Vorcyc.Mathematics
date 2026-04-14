@@ -1,0 +1,1087 @@
+[
+  {
+    "zh": "        // 定义输入信号和卷积核",
+    "en": "        // Define input signal和kernel",
+    "cn": 1
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsMode 枚举定义了动态处理器的类型（模式）。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsMode enum defines 动态Processes器 class型 (模式).",
+    "cn": 6
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsProcessor 是一个用于实现动态处理（如限制器、压缩器、扩展器或噪声门）的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Operations.DynamicsProcessor is a class that implements 动态Processes (如限制器, 压缩器, 扩展器或噪声门).",
+    "cn": 16
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Operations.EnvelopeFollower 是一个用于实现包络跟随（包络检测）的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Operations.EnvelopeFollower is a class that implements envelope跟随 (envelope检测).",
+    "cn": 4
+  },
+  {
+    "zh": "    - `fftSize`: FFT 大小，默认为 2048。",
+    "en": "    - `fftSize`: FFT 大小, default 2048..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `modulationIndex`: 调制指数（深度）。",
+    "en": "    - `modulationIndex`: modulation指数 (深度)..",
+    "cn": 4
+  },
+  {
+    "zh": "    - `fftSize`: FFT 大小，默认为 1024。",
+    "en": "    - `fftSize`: FFT 大小, default 1024..",
+    "cn": 2
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Operations.SpectralSubtractor 是一个用于实现谱减法滤波的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Operations.SpectralSubtractor is a class that implements 谱减法滤波.",
+    "cn": 5
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.Adaptive.NlmfFilter 是一个用于实现归一化最小均方四次（Normalized Least-Mean-Fourth）自适应滤波算法的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.Adaptive.NlmfFilter implements the normalized least mean square四次 (Normalized Least-Mean-Fourth) adaptive filtering algorithm.",
+    "cn": 2
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.Adaptive.SignLmsFilter 是一个用于实现符号最小均方（Sign Least-Mean-Squares）自适应滤波算法的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.Adaptive.SignLmsFilter implements the 符号least mean square (Sign Least-Mean-Squares) adaptive filtering algorithm.",
+    "cn": 2
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.Adaptive.VariableStepLmsFilter 是一个用于实现具有可变步长的最小均方（Least-Mean-Squares）自适应滤波算法的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.Adaptive.VariableStepLmsFilter implements the 具有可变步长的least mean square (Least-Mean-Squares) adaptive filtering algorithm.",
+    "cn": 7
+  },
+  {
+    "zh": "    - `kernel`: FIR 滤波器核。",
+    "en": "    - `kernel`: FIR filter核..",
+    "cn": 1
+  },
+  {
+    "zh": "    - `kernel`: 新的核。",
+    "en": "    - `kernel`: 新的核..",
+    "cn": 3
+  },
+  {
+    "zh": "  - 更改滤波器的分子系数。",
+    "en": "  - 更改filter的分子系数.",
+    "cn": 7
+  },
+  {
+    "zh": "  - 更改滤波器的分母系数。",
+    "en": "  - 更改filter的分母系数.",
+    "cn": 7
+  },
+  {
+    "zh": "  - 更改滤波器的传递函数。",
+    "en": "  - 更改filter的transfer function.",
+    "cn": 3
+  },
+  {
+    "zh": "  - 归一化传递函数（将所有滤波器系数除以传递函数分母的第一个系数）。",
+    "en": "  - 归一化transfer function (将所有filter系数除以transfer function分母的第一个系数).",
+    "cn": 18
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.Base.StereoFilter 是一个用于处理交错立体声缓冲区数据的滤波器类。StereoFilter 包含两个独立的滤波器：一个用于左声道信号，另一个用于右声道信号。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.Base.StereoFilter filters interleaved stereo buffer data.StereoFilter 包含两个独立的filter: 一个用于左声道signal, 另一个用于右声道signal.",
+    "cn": 22
+  },
+  {
+    "zh": "    - `stream`: 输入流。",
+    "en": "    - `stream`: 输入流..",
+    "cn": 3
+  },
+  {
+    "zh": "    - `stream`: 输出流。",
+    "en": "    - `stream`: 输出流..",
+    "cn": 3
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.Base.ZiFilter 是一个基于状态向量实现的 LTI 滤波器的特殊实现。ZiFilter 允许设置初始状态（滤波器延迟的初始条件），并提供零相位滤波的附加方法。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.Base.ZiFilter is a state-vector-based LTI filter implementation.ZiFilter 允许Sets初始状态 (filterdelay的初始条件), 并提供零phase滤波的附加方法.",
+    "cn": 22
+  },
+  {
+    "zh": "  - 从分子和分母构造 ZiFilter 实例。",
+    "en": "  - 从分子和分母Constructs ZiFilter instance.",
+    "cn": 6
+  },
+  {
+    "zh": "  - 从 64 位分子和分母构造 ZiFilter 实例。",
+    "en": "  - From 64 位分子和分母Constructs ZiFilter instance..",
+    "cn": 6
+  },
+  {
+    "zh": "  - 从传递函数构造 ZiFilter 实例。",
+    "en": "  - 从transfer functionConstructs ZiFilter instance.",
+    "cn": 1
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.BiQuad.BiQuadFilter 是一个用于实现双二阶 IIR 滤波器的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.BiQuad.BiQuadFilter is a class that implements 双二阶 IIR filter.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `b0`: B0 系数。",
+    "en": "    - `b0`: B0 系数..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `b1`: B1 系数。",
+    "en": "    - `b1`: B1 系数..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `b2`: B2 系数。",
+    "en": "    - `b2`: B2 系数..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `a0`: A0 系数。",
+    "en": "    - `a0`: A0 系数..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `a1`: A1 系数。",
+    "en": "    - `a1`: A1 系数..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `a2`: A2 系数。",
+    "en": "    - `a2`: A2 系数..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 计算给定阶数的椭圆滤波器的模拟极点。",
+    "en": "  - Computes给定order的椭圆filter的模拟poles.",
+    "cn": 8
+  },
+  {
+    "zh": "  - 返回值: 包含椭圆滤波器极点的 ComplexFp32 数组。",
+    "en": "  - Returns: 包含椭圆filterpoles的 ComplexFp32 数组.",
+    "cn": 7
+  },
+  {
+    "zh": "  - 计算给定阶数的椭圆滤波器的模拟零点。",
+    "en": "  - Computes给定order的椭圆filter的模拟zeros.",
+    "cn": 8
+  },
+  {
+    "zh": "  - 返回值: 包含椭圆滤波器零点的 ComplexFp32 数组。",
+    "en": "  - Returns: 包含椭圆filterzeros的 ComplexFp32 数组.",
+    "cn": 7
+  },
+  {
+    "zh": "  - 计算 Landen 序列。",
+    "en": "  - Computes Landen 序列.",
+    "cn": 2
+  },
+  {
+    "zh": "    - `iterCount`: 迭代次数，默认为 5。",
+    "en": "    - `iterCount`: Iterates次数, default 5..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 返回值: Landen 序列的浮点数组。",
+    "en": "  - Returns: Landen 序列的浮点数组.",
+    "cn": 7
+  },
+  {
+    "zh": "    - `landen`: Landen 序列。",
+    "en": "    - `landen`: Landen 序列..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 返回值: 计算结果的 ComplexFp32 值。",
+    "en": "  - Returns: Computes结果的 ComplexFp32 值.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 计算逆 Sne。",
+    "en": "  - Computes逆 Sne.",
+    "cn": 1
+  },
+  {
+    "zh": "以下是一个使用 PrototypeElliptic 类中 Poles 和 Zeros 方法的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses PrototypeElliptic 类中 Poles 和 Zeros 方法的示例, 并在示例中加入了注释: ",
+    "cn": 23
+  },
+  {
+    "zh": "  - 使用 sinc-window 方法设计理想的低通分数延迟 FIR 滤波器。",
+    "en": "  - Uses sinc-window 方法设计理想的低通分数delay FIR filter.",
+    "cn": 11
+  },
+  {
+    "zh": "    - `delay`: 分数延迟。",
+    "en": "    - `delay`: 分数delay..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 返回值: 滤波器系数数组。",
+    "en": "  - Returns: filter系数数组.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 使用 sinc-window 方法设计理想的高通分数延迟 FIR 滤波器。",
+    "en": "  - Uses sinc-window 方法设计理想的高通分数delay FIR filter.",
+    "cn": 11
+  },
+  {
+    "zh": "  - 使用 sinc-window 方法设计理想的带通分数延迟 FIR 滤波器。",
+    "en": "  - Uses sinc-window 方法设计理想的带通分数delay FIR filter.",
+    "cn": 11
+  },
+  {
+    "zh": "  - 使用 sinc-window 方法设计理想的带阻分数延迟 FIR 滤波器。",
+    "en": "  - Uses sinc-window 方法设计理想的带阻分数delay FIR filter.",
+    "cn": 11
+  },
+  {
+    "zh": "  - 使用 sinc-window 方法设计理想的全通分数延迟 FIR 滤波器。",
+    "en": "  - Uses sinc-window 方法设计理想的全通分数delay FIR filter.",
+    "cn": 11
+  },
+  {
+    "zh": "  - 在给定频率下归一化频率响应（将核系数归一化以将频率响应映射到 [0, 1]）。",
+    "en": "  - At 给定frequency下归一化frequency响应 (将核系数归一化以将frequency响应映射到 [0, 1])..",
+    "cn": 22
+  },
+  {
+    "zh": "    - `kernel`: 核系数数组。",
+    "en": "    - `kernel`: 核系数数组..",
+    "cn": 5
+  },
+  {
+    "zh": "以下是一个使用 DesignFilter 类中 FirWinFdLp 方法的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses DesignFilter 类中 FirWinFdLp 方法的示例, 并在示例中加入了注释: ",
+    "cn": 22
+  },
+  {
+    "zh": "  - 基于给定的频率生成三角形滤波器组权重。",
+    "en": "  - 基于给定的frequencyGenerates三角形filter组权重.",
+    "cn": 11
+  },
+  {
+    "zh": "    - `fftSize`: 假定的 FFT 大小。",
+    "en": "    - `fftSize`: 假定的 FFT 大小..",
+    "cn": 5
+  },
+  {
+    "zh": "    - `samplingRate`: 假定的信号采样率。",
+    "en": "    - `samplingRate`: 假定的signalsample rate..",
+    "cn": 3
+  },
+  {
+    "zh": "    - `frequencies`: 每个滤波器的频率元组数组（左、中、右）。",
+    "en": "    - `frequencies`: 每个filter的frequency元组数组 (左, 中, 右)..",
+    "cn": 10
+  },
+  {
+    "zh": "    - `vtln`: VTLN 频率扭曲器，默认为 null。",
+    "en": "    - `vtln`: VTLN frequency扭曲器, default null..",
+    "cn": 3
+  },
+  {
+    "zh": "    - `mapper`: 频率尺度映射器（例如 herz-to-mel），仅用于适当加权，默认为 null。",
+    "en": "    - `mapper`: frequency尺度映射器 (例如 herz-to-mel), 仅用于适当加权, default null..",
+    "cn": 14
+  },
+  {
+    "zh": "  - 返回值: 滤波器组权重数组。",
+    "en": "  - Returns: filter组权重数组.",
+    "cn": 5
+  },
+  {
+    "zh": "  - 基于给定的频率生成矩形滤波器组权重。",
+    "en": "  - 基于给定的frequencyGenerates矩形filter组权重.",
+    "cn": 10
+  },
+  {
+    "zh": "    - `mapper`: 频率尺度映射器（例如 herz-to-mel），默认为 null。",
+    "en": "    - `mapper`: frequency尺度映射器 (例如 herz-to-mel), default null..",
+    "cn": 7
+  },
+  {
+    "zh": "  - 基于给定的频率生成 FIR 带通（接近梯形）滤波器组。",
+    "en": "  - 基于给定的frequencyGenerates FIR 带通 (接近梯形)filter组.",
+    "cn": 12
+  },
+  {
+    "zh": "  - 基于给定的频率生成 BiQuad 带通重叠滤波器。",
+    "en": "  - 基于给定的frequencyGenerates BiQuad 带通重叠filter.",
+    "cn": 9
+  },
+  {
+    "zh": "  - 返回 Herz 频率尺度上均匀分布的频带的频率元组。",
+    "en": "  - Returns Herz frequency尺度上均匀分布的频带的frequency元组.",
+    "cn": 13
+  },
+  {
+    "zh": "    - `combFilterCount`: 滤波器数量。",
+    "en": "    - `combFilterCount`: filter数量..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `lowFreq`: 频率范围的下限，默认为 0。",
+    "en": "    - `lowFreq`: frequency范围的下限, default 0..",
+    "cn": 5
+  },
+  {
+    "zh": "    - `highFreq`: 频率范围的上限，默认为 0。",
+    "en": "    - `highFreq`: frequency范围的上限, default 0..",
+    "cn": 5
+  },
+  {
+    "zh": "    - `overlap`: 指示频带是否应重叠的标志，默认为 false。",
+    "en": "    - `overlap`: 指示频带是否应重叠的标志, default false..",
+    "cn": 12
+  },
+  {
+    "zh": "  - 返回值: 频率元组数组。",
+    "en": "  - Returns: frequency元组数组.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 返回 Mel 频率尺度上均匀分布的频带的频率元组。",
+    "en": "  - Returns Mel frequency尺度上均匀分布的频带的frequency元组.",
+    "cn": 13
+  },
+  {
+    "zh": "    - `melFilterCount`: Mel 滤波器数量。",
+    "en": "    - `melFilterCount`: Mel filter数量..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `overlap`: 指示频带是否应重叠的标志，默认为 true。",
+    "en": "    - `overlap`: 指示频带是否应重叠的标志, default true..",
+    "cn": 12
+  },
+  {
+    "zh": "  - 返回 Mel 频率尺度上均匀分布的频带的频率元组（根据 M.Slaney 的公式）。",
+    "en": "  - Returns Mel frequency尺度上均匀分布的频带的frequency元组 (根据 M.Slaney 的公式).",
+    "cn": 18
+  },
+  {
+    "zh": "  - 返回 Bark 频率尺度上均匀分布的频带的频率元组（Traunmueller, 1990）。",
+    "en": "  - Returns Bark frequency尺度上均匀分布的频带的frequency元组 (Traunmueller, 1990).",
+    "cn": 13
+  },
+  {
+    "zh": "    - `barkFilterCount`: Bark 滤波器数量。",
+    "en": "    - `barkFilterCount`: Bark filter数量..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 返回 Bark 频率尺度上均匀分布的频带的频率元组（Wang, 1992）。",
+    "en": "  - Returns Bark frequency尺度上均匀分布的频带的frequency元组 (Wang, 1992).",
+    "cn": 13
+  },
+  {
+    "zh": "  - 返回临界频带的频率元组。",
+    "en": "  - Returns临界频带的frequency元组.",
+    "cn": 7
+  },
+  {
+    "zh": "    - `filterCount`: 滤波器数量。",
+    "en": "    - `filterCount`: filter数量..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 返回倍频程频带的频率元组。",
+    "en": "  - Returns倍频程频带的frequency元组.",
+    "cn": 8
+  },
+  {
+    "zh": "    - `octaveCount`: 倍频程滤波器数量。",
+    "en": "    - `octaveCount`: 倍频程filter数量..",
+    "cn": 5
+  },
+  {
+    "zh": "  - 生成色度特征滤波器组。",
+    "en": "  - Generates色度featuresfilter组.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `samplingRate`: 假定的采样率。",
+    "en": "    - `samplingRate`: 假定的sample rate..",
+    "cn": 3
+  },
+  {
+    "zh": "    - `chromaCount`: 色度特征数量，默认为 12。",
+    "en": "    - `chromaCount`: 色度features数量, default 12..",
+    "cn": 4
+  },
+  {
+    "zh": "    - `tuning`: 从 A440 偏离的调音，以色度 bin 的分数表示，默认为 0。",
+    "en": "    - `tuning`: 从 A440 偏离的调音, 以色度 bin 的分数Represents, default 0..",
+    "cn": 12
+  },
+  {
+    "zh": "    - `centerOctave`: 如果 octaveWidth=0，则忽略 centerOctave。否则，它是高斯窗的中心，默认为 5.0f。",
+    "en": "    - `centerOctave`: 如果 octaveWidth=0, 则忽略 centerOctave.否则, 它是高斯窗的中心, default 5.0f..",
+    "cn": 15
+  },
+  {
+    "zh": "    - `octaveWidth`: 如果 octaveWidth=0，则形状为矩形。否则，它是高斯窗的宽度，默认为 2。",
+    "en": "    - `octaveWidth`: 如果 octaveWidth=0, 则形状为矩形.否则, 它是高斯窗的宽度, default 2..",
+    "cn": 18
+  },
+  {
+    "zh": "    - `norm`: 规范化：0 - 无规范化，1 - 应用 L1 规范化，2 - 应用 L2 规范化，默认为 2。",
+    "en": "    - `norm`: 规范化: 0 - 无规范化, 1 - 应用 L1 规范化, 2 - 应用 L2 规范化, default 2..",
+    "cn": 17
+  },
+  {
+    "zh": "    - `baseC`: 如果 baseC=true，则滤波器组将从 'C' 开始。否则，滤波器组将从 'A' 开始，默认为 true。",
+    "en": "    - `baseC`: 如果 baseC=true, 则filter组将从 'C' 开始.否则, filter组将从 'A' 开始, default true..",
+    "cn": 15
+  },
+  {
+    "zh": "  - 创建重叠的三角形 Mel 滤波器（如 Malcolm Slaney 所建议）。",
+    "en": "  - Creates重叠的三角形 Mel filter (如 Malcolm Slaney 所建议).",
+    "cn": 10
+  },
+  {
+    "zh": "    - `filterCount`: Mel 滤波器数量。",
+    "en": "    - `filterCount`: Mel filter数量..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `normalizeGain`: 如果应规范化增益，则为 true；如果所有滤波器应具有相同的高度 1.0，则为 false，默认为 true。",
+    "en": "    - `normalizeGain`: 如果应规范化gain, 则为 true；如果所有filter应具有相同的高度 1.0, 则为 false, default true..",
+    "cn": 22
+  },
+  {
+    "zh": "  - 创建重叠的梯形 Bark 滤波器（如 Malcolm Slaney 所建议）。",
+    "en": "  - Creates重叠的梯形 Bark filter (如 Malcolm Slaney 所建议).",
+    "cn": 9
+  },
+  {
+    "zh": "    - `filterCount`: Bark 滤波器数量。",
+    "en": "    - `filterCount`: Bark filter数量..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `width`: 每个频带的恒定宽度，默认为 1。",
+    "en": "    - `width`: 每个频带的恒定宽度, default 1..",
+    "cn": 9
+  },
+  {
+    "zh": "  - 创建重叠的 ERB 滤波器。",
+    "en": "  - Creates重叠的 ERB filter.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `erbFilterCount`: ERB 滤波器数量。",
+    "en": "    - `erbFilterCount`: ERB filter数量..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 规范化权重（使每个频带中的能量大致相等）。",
+    "en": "  - 规范化权重 (使每个频带中的energy大致相等).",
+    "cn": 16
+  },
+  {
+    "zh": "    - `filterBank`: 滤波器组。",
+    "en": "    - `filterBank`: filter组..",
+    "cn": 1
+  },
+  {
+    "zh": "  - 将滤波器应用于频谱并填充结果滤波后的频谱。",
+    "en": "  - filter应用于频谱并填充结果滤波后的频谱..",
+    "cn": 16
+  },
+  {
+    "zh": "    - `filterbank`: 滤波器组。",
+    "en": "    - `filterbank`: filter组..",
+    "cn": 1
+  },
+  {
+    "zh": "    - `spectrum`: 频谱。",
+    "en": "    - `spectrum`: 频谱..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `filtered`: 滤波后的信号频谱。",
+    "en": "    - `filtered`: 滤波后的signal频谱..",
+    "cn": 6
+  },
+  {
+    "zh": "  - 将滤波器应用于给定序列中的所有频谱。",
+    "en": "  - filter应用于给定序列中的所有频谱..",
+    "cn": 13
+  },
+  {
+    "zh": "    - `spectrogram`: 滤波后信号的输出频谱。",
+    "en": "    - `spectrogram`: 滤波后signal的输出频谱..",
+    "cn": 8
+  },
+  {
+    "zh": "  - 返回值: 滤波后的频谱数组。",
+    "en": "  - Returns: 滤波后的频谱数组.",
+    "cn": 8
+  },
+  {
+    "zh": "  - 将滤波器应用于频谱，然后对结果频谱执行 Ln()。",
+    "en": "  - filter应用于频谱, 然后对结果频谱Performs Ln()..",
+    "cn": 12
+  },
+  {
+    "zh": "    - `floor`: 对数操作的阈值，默认为 float.Epsilon。",
+    "en": "    - `floor`: 对数操作的阈值, default float.Epsilon..",
+    "cn": 7
+  },
+  {
+    "zh": "  - 将滤波器应用于频谱，然后对结果频谱执行 Log10()。",
+    "en": "  - filter应用于频谱, 然后对结果频谱Performs Log10()..",
+    "cn": 12
+  },
+  {
+    "zh": "  - 将滤波器应用于频谱，然后对结果频谱执行 10*Log10()（添加以与 librosa 结果比较 MFCC 系数）。",
+    "en": "  - filter应用于频谱, 然后对结果频谱Performs 10*Log10() (添加以与 librosa 结果比较 MFCC 系数)..",
+    "cn": 22
+  },
+  {
+    "zh": "    - `minLevel`: 对数操作的阈值，默认为 1e-10f。",
+    "en": "    - `minLevel`: 对数操作的阈值, default 1e-10f..",
+    "cn": 7
+  },
+  {
+    "zh": "  - 将滤波器应用于频谱，然后对结果频谱执行 Pow(x, power)。例如，在 PLP 中：power=1/3（立方根）。",
+    "en": "  - filter应用于频谱, 然后对结果频谱Performs Pow(x, power).例如, 在 PLP 中: power=1/3 (立方根)..",
+    "cn": 19
+  },
+  {
+    "zh": "    - `power`: 幂，默认为 1.0f / 3。",
+    "en": "    - `power`: 幂, default 1.0f / 3..",
+    "cn": 1
+  },
+  {
+    "zh": "以下是一个使用 FilterBanks 类中 Triangular 方法的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses FilterBanks 类中 Triangular 方法的示例, 并在示例中加入了注释: ",
+    "cn": 22
+  },
+  {
+    "zh": "  - 获取实际迭代次数。",
+    "en": "  - Gets实际Iterates次数.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 获取极值频率的数量 (K = Order/2 + 2)。",
+    "en": "  - Gets极值frequency的数量 (K = Order/2 + 2).",
+    "cn": 5
+  },
+  {
+    "zh": "  - 获取插值频率响应。",
+    "en": "  - Gets插值frequency响应.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 获取误差数组。",
+    "en": "  - Gets误差数组.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 获取极值频率数组。",
+    "en": "  - Gets极值frequency数组.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 构造 Remez 滤波器设计器。",
+    "en": "  - Constructs Remez filter设计器.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `frequencies`: 归一化频率数组。",
+    "en": "    - `frequencies`: 归一化frequency数组..",
+    "cn": 5
+  },
+  {
+    "zh": "    - `desired`: 给定频率下的期望响应值数组。",
+    "en": "    - `desired`: 给定frequency下的期望响应值数组..",
+    "cn": 11
+  },
+  {
+    "zh": "    - `weights`: 给定频率下的权重数组。",
+    "en": "    - `weights`: 给定frequency下的权重数组..",
+    "cn": 8
+  },
+  {
+    "zh": "    - `gridDensity`: 网格密度，默认为 16。",
+    "en": "    - `gridDensity`: 网格密度, default 16..",
+    "cn": 4
+  },
+  {
+    "zh": "  - 设计最优等波纹滤波器并返回设计的滤波器的核。",
+    "en": "  - Designs 最优等波纹filter并Returns设计的filter的核..",
+    "cn": 11
+  },
+  {
+    "zh": "    - `maxIterations`: 最大迭代次数，默认为 100。",
+    "en": "    - `maxIterations`: 最大Iterates次数, default 100..",
+    "cn": 4
+  },
+  {
+    "zh": "  - 将波纹（以 dB 为单位）转换为通带权重。",
+    "en": "  - 波纹 (以 dB 为单位)转换为passband权重..",
+    "cn": 11
+  },
+  {
+    "zh": "    - `ripple`: 波纹（以 dB 为单位）。",
+    "en": "    - `ripple`: 波纹 (以 dB 为单位)..",
+    "cn": 6
+  },
+  {
+    "zh": "  - 返回值: 通带权重。",
+    "en": "  - Returns: passband权重.",
+    "cn": 2
+  },
+  {
+    "zh": "  - 将波纹（以 dB 为单位）转换为阻带权重。",
+    "en": "  - 波纹 (以 dB 为单位)转换为stopband权重..",
+    "cn": 11
+  },
+  {
+    "zh": "  - 返回值: 阻带权重。",
+    "en": "  - Returns: stopband权重.",
+    "cn": 2
+  },
+  {
+    "zh": "  - 估计低通滤波器的阶数。",
+    "en": "  - Estimates 低通filter的order..",
+    "cn": 3
+  },
+  {
+    "zh": "    - `fp`: 通带边缘频率。",
+    "en": "    - `fp`: passband边缘frequency..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `fa`: 阻带边缘频率。",
+    "en": "    - `fa`: stopband边缘frequency..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `dp`: 通带权重。",
+    "en": "    - `dp`: passband权重..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `da`: 阻带权重。",
+    "en": "    - `da`: stopband权重..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 估计具有自定义频带的滤波器的阶数。",
+    "en": "  - Estimates 具有自定义频带的filter的order..",
+    "cn": 9
+  },
+  {
+    "zh": "    - `frequencies`: 边缘频率数组。",
+    "en": "    - `frequencies`: 边缘frequency数组..",
+    "cn": 4
+  },
+  {
+    "zh": "    - `deltas`: 权重数组。",
+    "en": "    - `deltas`: 权重数组..",
+    "cn": 4
+  },
+  {
+    "zh": "以下是一个使用 Remez 类中 Design 方法的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses Remez 类中 Design 方法的示例, 并在示例中加入了注释: ",
+    "cn": 22
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.Fda.VtlnWarper 是一个用于实现类似于 Kaldi 实现的声道长度归一化 (VTLN) 的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.Fda.VtlnWarper is a class that implements 类似于 Kaldi implements的声道长度归一化 (VTLN).",
+    "cn": 11
+  },
+  {
+    "zh": "  - 低频率。",
+    "en": "  - 低frequency.",
+    "cn": 1
+  },
+  {
+    "zh": "  - 高频率。",
+    "en": "  - 高frequency.",
+    "cn": 1
+  },
+  {
+    "zh": "  - VTLN 的低频率。",
+    "en": "  - VTLN 的低frequency.",
+    "cn": 2
+  },
+  {
+    "zh": "  - VTLN 的高频率。",
+    "en": "  - VTLN 的高frequency.",
+    "cn": 2
+  },
+  {
+    "zh": "  - 计算的中间参数。",
+    "en": "  - Computes的中间parameters.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `alpha`: 扭曲因子。",
+    "en": "    - `alpha`: 扭曲因子..",
+    "cn": 4
+  },
+  {
+    "zh": "    - `lowFrequency`: 低频率。",
+    "en": "    - `lowFrequency`: 低frequency..",
+    "cn": 1
+  },
+  {
+    "zh": "    - `highFrequency`: 高频率。",
+    "en": "    - `highFrequency`: 高frequency..",
+    "cn": 1
+  },
+  {
+    "zh": "    - `lowVtln`: VTLN 的低频率。",
+    "en": "    - `lowVtln`: VTLN 的低frequency..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `highVtln`: VTLN 的高频率。",
+    "en": "    - `highVtln`: VTLN 的高frequency..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 扭曲给定的频率。",
+    "en": "  - 扭曲给定的frequency.",
+    "cn": 5
+  },
+  {
+    "zh": "    - `frequency`: 要扭曲的频率。",
+    "en": "    - `frequency`: 要扭曲的frequency..",
+    "cn": 4
+  },
+  {
+    "zh": "  - 返回值: 扭曲后的频率。",
+    "en": "  - Returns: 扭曲后的frequency.",
+    "cn": 4
+  },
+  {
+    "zh": "以下是一个使用 VtlnWarper 类中 Warp 方法的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses VtlnWarper 类中 Warp 方法的示例, 并在示例中加入了注释: ",
+    "cn": 22
+  },
+  {
+    "zh": "  - 根据给定的截止频率设置滤波器系数。",
+    "en": "  - 根据给定的cutoff frequencysets filter coefficients.",
+    "cn": 5
+  },
+  {
+    "zh": "以下是一个使用 HighPassFilter 类中 Change 方法的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses HighPassFilter 类中 Change 方法的示例, 并在示例中加入了注释: ",
+    "cn": 22
+  },
+  {
+    "zh": "以下是一个使用 LowPassFilter 类中 Change 方法的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses LowPassFilter 类中 Change 方法的示例, 并在示例中加入了注释: ",
+    "cn": 22
+  },
+  {
+    "zh": "`Vorcyc.Mathematics.SignalProcessing.Filters.OnePole.OnePoleFilter` 是一个单极 IIR 滤波器类。",
+    "en": "`Vorcyc.Mathematics.SignalProcessing.Filters.OnePole.OnePoleFilter` is a 单极 IIR filter class.",
+    "cn": 2
+  },
+  {
+    "zh": "  - 构造 `OnePoleFilter` 实例，使用默认的滤波器系数。",
+    "en": "  - Constructs `OnePoleFilter` instance, Uses默认的filter系数.",
+    "cn": 5
+  },
+  {
+    "zh": "  - 构造 `OnePoleFilter` 实例，使用指定的滤波器系数。",
+    "en": "  - Constructs `OnePoleFilter` instance, Uses指定的filter系数.",
+    "cn": 5
+  },
+  {
+    "zh": "    - `b`: 分子系数。",
+    "en": "    - `b`: 分子系数..",
+    "cn": 4
+  },
+  {
+    "zh": "以下是一个使用 OnePoleFilter 类构建和处理样本的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses OnePoleFilter 类构建和Processessample的示例, 并在示例中加入了注释: ",
+    "cn": 22
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase.PolyphaseSystem 是一个多相滤波器系统类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase.PolyphaseSystem is a 多相filter系统 class.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 获取传递函数为 E(z^k) 的多相滤波器。",
+    "en": "  - Getstransfer function为 E(z^k) 的多相filter.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 获取用于多速率处理的传递函数为 E(z) 的多相滤波器。",
+    "en": "  - Gets用于多速率Processes的transfer function为 E(z) 的多相filter.",
+    "cn": 10
+  },
+  {
+    "zh": "  - 构造 PolyphaseSystem 实例，使用指定的滤波器核和滤波器数量。",
+    "en": "  - Constructs PolyphaseSystem instance, Uses指定的filter核和filter数量.",
+    "cn": 7
+  },
+  {
+    "zh": "    - `kernel`: 滤波器核。",
+    "en": "    - `kernel`: filter核..",
+    "cn": 1
+  },
+  {
+    "zh": "    - `n`: 多相滤波器的数量。",
+    "en": "    - `n`: 多相filter的数量..",
+    "cn": 5
+  },
+  {
+    "zh": "    - `type`: 多相系统类型（1 或 2）。",
+    "en": "    - `type`: 多相系统类型 (1 或 2)..",
+    "cn": 7
+  },
+  {
+    "zh": "  - 对输入信号进行多相抽取（适用于类型 I 系统）。",
+    "en": "  - 对input signal进行多相抽取 (适用于类型 I 系统).",
+    "cn": 14
+  },
+  {
+    "zh": "  - 返回值: 抽取后的信号。",
+    "en": "  - Returns: 抽取后的signal.",
+    "cn": 4
+  },
+  {
+    "zh": "  - 对输入信号进行多相插值（适用于类型 II 系统）。",
+    "en": "  - 对input signal进行多相插值 (适用于类型 II 系统).",
+    "cn": 14
+  },
+  {
+    "zh": "  - 返回值: 插值后的信号。",
+    "en": "  - Returns: 插值后的signal.",
+    "cn": 4
+  },
+  {
+    "zh": "以下是一个使用 PolyphaseSystem 类构建处理样本的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses PolyphaseSystem 类构建Processessample的示例, 并在示例中加入了注释: ",
+    "cn": 21
+  },
+  {
+    "zh": "    - `b0`: 系数 b0，默认为 1.0f。",
+    "en": "    - `b0`: 系数 b0, default 1.0f..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `am`: 系数 am，默认为 0.6f。",
+    "en": "    - `am`: 系数 am, default 0.6f..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `b0`: 系数 b0。",
+    "en": "    - `b0`: 系数 b0..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `am`: 系数 am。",
+    "en": "    - `am`: 系数 am..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `b0`: 系数 b0，默认为 1f。",
+    "en": "    - `b0`: 系数 b0, default 1f..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `bm`: 系数 bm，默认为 0.5f。",
+    "en": "    - `bm`: 系数 bm, default 0.5f..",
+    "cn": 2
+  },
+  {
+    "zh": "    - `normalize`: 是否归一化频率响应，默认为 true。",
+    "en": "    - `normalize`: 是否归一化frequency响应, default true..",
+    "cn": 7
+  },
+  {
+    "zh": "    - `bm`: 系数 bm。",
+    "en": "    - `bm`: 系数 bm..",
+    "cn": 2
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.DcRemovalFilter 是一个用于实现直流偏移去除的 IIR 滤波器类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.DcRemovalFilter is a 用于implements直流偏移去除的 IIR filter class.",
+    "cn": 9
+  },
+  {
+    "zh": "    - `r`: R 系数，通常在 [0.9, 1] 范围内，默认为 0.995f。",
+    "en": "    - `r`: R 系数, 通常在 [0.9, 1] 范围内, default 0.995f..",
+    "cn": 8
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.DeEmphasisFilter 是一个用于实现去加重的 IIR 滤波器类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.DeEmphasisFilter is a 用于implements去加重的 IIR filter class.",
+    "cn": 6
+  },
+  {
+    "zh": "    - `a`: 去加重系数，默认为 0.97f。",
+    "en": "    - `a`: 去加重系数, default 0.97f..",
+    "cn": 5
+  },
+  {
+    "zh": "    - `normalize`: 是否归一化频率响应，默认为 false。",
+    "en": "    - `normalize`: 是否归一化frequency响应, default false..",
+    "cn": 7
+  },
+  {
+    "zh": "以下是一个使用 DeEmphasisFilter 类中构造函数的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses DeEmphasisFilter 类中constructor的示例, 并在示例中加入了注释: ",
+    "cn": 20
+  },
+  {
+    "zh": "  - 获取滤波器的大小。",
+    "en": "  - Getsfilter的大小.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `size`: 滤波器的大小，默认为 128。",
+    "en": "    - `size`: filter的大小, default 128..",
+    "cn": 3
+  },
+  {
+    "zh": "  - 生成给定大小的滤波器核。",
+    "en": "  - Generates给定大小的filter核.",
+    "cn": 6
+  },
+  {
+    "zh": "    - `size`: 核的大小。",
+    "en": "    - `size`: 核的大小..",
+    "cn": 4
+  },
+  {
+    "zh": "  - 返回值: 滤波器核的浮点数数组。",
+    "en": "  - Returns: filter核的浮点数数组.",
+    "cn": 7
+  },
+  {
+    "zh": "以下是一个使用 HilbertFilter 类中构造函数的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses HilbertFilter 类中constructor的示例, 并在示例中加入了注释: ",
+    "cn": 20
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter 是一个用于实现中值滤波器的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.MedianFilter is a class that implements 中值filter.",
+    "cn": 2
+  },
+  {
+    "zh": "  - 获取中值滤波器的大小。",
+    "en": "  - Getsmedian filtering器的大小.",
+    "cn": 4
+  },
+  {
+    "zh": "    - `size`: 滤波器的大小，默认为 9。",
+    "en": "    - `size`: filter的大小, default 9..",
+    "cn": 3
+  },
+  {
+    "zh": "以下是一个使用 MovingAverageFilter 类中构造函数的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses MovingAverageFilter 类中constructor的示例, 并在示例中加入了注释: ",
+    "cn": 20
+  },
+  {
+    "zh": "  - 生成给定大小的滤波器分子。",
+    "en": "  - Generates给定大小的filter分子.",
+    "cn": 7
+  },
+  {
+    "zh": "    - `size`: 分子的大小。",
+    "en": "    - `size`: 分子的大小..",
+    "cn": 5
+  },
+  {
+    "zh": "  - 返回值: 滤波器分子的浮点数数组。",
+    "en": "  - Returns: filter分子的浮点数数组.",
+    "cn": 8
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.PreEmphasisFilter 是一个用于实现预加重 FIR 滤波器的类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.PreEmphasisFilter is a class that implements 预加重 FIR filter.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `a`: 预加重系数，默认为 0.97f。",
+    "en": "    - `a`: 预加重系数, default 0.97f..",
+    "cn": 5
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.RastaFilter 是一个用于实现 RASTA 滤波器（用于鲁棒语音处理）的 IIR 滤波器类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.RastaFilter is a 用于implements RASTA filter (用于鲁棒语音Processes)的 IIR filter class.",
+    "cn": 9
+  },
+  {
+    "zh": "以下是一个使用 RastaFilter 类中构造函数的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses RastaFilter 类中constructor的示例, 并在示例中加入了注释: ",
+    "cn": 20
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.SavitzkyGolayFilter 是一个用于实现 Savitzky-Golay 滤波器的 FIR 滤波器类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.SavitzkyGolayFilter is a 用于implements Savitzky-Golay filter的 FIR filter class.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `size`: 滤波器的大小（必须是范围 [5..31] 内的奇数）。",
+    "en": "    - `size`: filter的大小 (必须是范围 [5..31] 内的奇数)..",
+    "cn": 12
+  },
+  {
+    "zh": "    - `deriv`: 导数（必须是 0、1 或 2），默认为 0。",
+    "en": "    - `deriv`: 导数 (必须是 0, 1 或 2), default 0..",
+    "cn": 6
+  },
+  {
+    "zh": "以下是一个使用 SavitzkyGolayFilter 类中构造函数的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses SavitzkyGolayFilter 类中constructor的示例, 并在示例中加入了注释: ",
+    "cn": 20
+  },
+  {
+    "zh": "Vorcyc.Mathematics.SignalProcessing.Filters.ThiranFilter 是一个用于实现 N 阶 Thiran 全通插值滤波器的 IIR 滤波器类。",
+    "en": "Vorcyc.Mathematics.SignalProcessing.Filters.ThiranFilter is a 用于implements N 阶 Thiran 全通插值filter的 IIR filter class.",
+    "cn": 8
+  },
+  {
+    "zh": "    - `delta`: 分数延迟。",
+    "en": "    - `delta`: 分数delay..",
+    "cn": 2
+  },
+  {
+    "zh": "  - 计算传递函数分母的第 k 个系数。",
+    "en": "  - Computestransfer function分母的k-th coefficient.",
+    "cn": 3
+  },
+  {
+    "zh": "    - `k`: 系数索引。",
+    "en": "    - `k`: 系数索引..",
+    "cn": 4
+  },
+  {
+    "zh": "  - 返回值: 计算的系数。",
+    "en": "  - Returns: Computes的系数.",
+    "cn": 3
+  },
+  {
+    "zh": "以下是一个使用 ThiranFilter 类中构造函数的示例，并在示例中加入了注释：",
+    "en": "以下是一个Uses ThiranFilter 类中constructor的示例, 并在示例中加入了注释: ",
+    "cn": 20
+  },
+  {
+    "zh": "    - `size`: 维纳滤波器的大小，默认为 3。",
+    "en": "    - `size`: Wiener filtering器的大小, default 3..",
+    "cn": 4
+  },
+  {
+    "zh": "    - `noise`: 估计的噪声功率，默认为 0.0f。",
+    "en": "    - `noise`: 估计的噪声power, default 0.0f..",
+    "cn": 5
+  }
+]

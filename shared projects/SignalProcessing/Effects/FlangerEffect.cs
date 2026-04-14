@@ -1,6 +1,5 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects;
 
@@ -42,7 +41,7 @@ public class FlangerEffect : AudioEffect
         set
         {
             _lfoFrequency = value;
-            _lfo.SetParameter("freq", value);
+            _lfo.SetLfoFrequency(value);
         }
     }
     private float _lfoFrequency;
@@ -50,16 +49,16 @@ public class FlangerEffect : AudioEffect
     /// <summary>
     /// Gets or sets LFO signal generator.
     /// </summary>
-    public SignalBuilder Lfo
+    public ISampleGenerator Lfo
     {
         get => _lfo;
         set
         {
             _lfo = value;
-            _lfo.SetParameter("min", 0.0f).SetParameter("max", 1.0f);
+            _lfo.SetLfoRange(0f, 1f);
         }
     }
-    private SignalBuilder _lfo;
+    private ISampleGenerator _lfo;
 
     /// <summary>
     /// Gets or sets depth.
@@ -105,7 +104,7 @@ public class FlangerEffect : AudioEffect
                          InterpolationMode interpolationMode = InterpolationMode.Linear,
                          float reserveWidth = 0/*sec*/)
 
-        : this(samplingRate, new SineBuilder().SampledAt(samplingRate), width, depth, feedback, inverted, interpolationMode, reserveWidth)
+        : this(samplingRate, new SineOscillator { SamplingRate = samplingRate, Min = 0, Max = 1 }, width, depth, feedback, inverted, interpolationMode, reserveWidth)
     {
         LfoFrequency = lfoFrequency;
     }
@@ -122,7 +121,7 @@ public class FlangerEffect : AudioEffect
     /// <param name="interpolationMode">Interpolation mode for fractional delay line</param>
     /// <param name="reserveWidth">Max width (in seconds) for reserving the size of delay line</param>
     public FlangerEffect(int samplingRate,
-                         SignalBuilder lfo,
+                         ISampleGenerator lfo,
                          float width = 0.003f/*sec*/,
                          float depth = 0.5f,
                          float feedback = 0,

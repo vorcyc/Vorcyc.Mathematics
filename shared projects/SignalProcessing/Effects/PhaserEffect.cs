@@ -1,7 +1,6 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 using Vorcyc.Mathematics.SignalProcessing.Filters.BiQuad;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects;
 
@@ -24,7 +23,7 @@ public class PhaserEffect : AudioEffect
         set
         {
             _lfoFrequency = value;
-            Lfo.SetParameter("freq", value);
+            Lfo.SetLfoFrequency(value);
         }
     }
     private float _lfoFrequency;
@@ -38,7 +37,7 @@ public class PhaserEffect : AudioEffect
         set
         {
             _minFrequency = value;
-            Lfo.SetParameter("min", value);
+            Lfo.SetLfoRange(value, MaxFrequency);
         }
     }
     private float _minFrequency;
@@ -52,7 +51,7 @@ public class PhaserEffect : AudioEffect
         set
         {
             _maxFrequency = value;
-            Lfo.SetParameter("max", value);
+            Lfo.SetLfoRange(MinFrequency, value);
         }
     }
     private float _maxFrequency;
@@ -60,7 +59,7 @@ public class PhaserEffect : AudioEffect
     /// <summary>
     /// Get or sets LFO signal generator.
     /// </summary>
-    public SignalBuilder Lfo { get; set; }
+    public ISampleGenerator Lfo { get; set; }
 
     /// <summary>
     /// Sampling rate.
@@ -88,7 +87,7 @@ public class PhaserEffect : AudioEffect
     {
         _fs = samplingRate;
         
-        Lfo = new TriangleWaveBuilder().SampledAt(samplingRate);
+        Lfo = new TriangleOscillator { SamplingRate = samplingRate };
         
         LfoFrequency = lfoFrequency;
         MinFrequency = minFrequency;
@@ -104,7 +103,7 @@ public class PhaserEffect : AudioEffect
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="lfo">LFO signal generator</param>
     /// <param name="q">Q factor (a.k.a. Quality Factor, resonance)</param>
-    public PhaserEffect(int samplingRate, SignalBuilder lfo, float q = 0.5f)
+    public PhaserEffect(int samplingRate, ISampleGenerator lfo, float q = 0.5f)
     {
         _fs = samplingRate;
         Q = q;

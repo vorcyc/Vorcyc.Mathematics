@@ -1,6 +1,5 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects
 {
@@ -23,7 +22,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
             set
             {
                 _frequency = value;
-                Lfo.SetParameter("freq", value);
+                Lfo.SetLfoFrequency(value);
             }
         }
         private float _frequency;
@@ -37,7 +36,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
             set
             {
                 _index = value;
-                Lfo.SetParameter("min", 0).SetParameter("max", value * 2);
+                Lfo.SetLfoRange(0, value * 2);
             }
         }
         private float _index;
@@ -45,7 +44,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         /// <summary>
         /// Gets or sets LFO signal generator.
         /// </summary>
-        public SignalBuilder Lfo { get; set; }
+        public ISampleGenerator Lfo { get; set; }
 
         /// <summary>
         /// Constructs <see cref="TremoloEffect"/>.
@@ -56,7 +55,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         /// <param name="tremoloIndex">Tremolo index (modulation index)</param>
         public TremoloEffect(int samplingRate, float depth = 0.5f, float frequency = 10/*Hz*/, float tremoloIndex = 0.5f)
         {
-            Lfo = new CosineBuilder().SampledAt(samplingRate);
+            Lfo = new CosineOscillator { SamplingRate = samplingRate };
 
             Depth = depth;
             Frequency = frequency;
@@ -68,7 +67,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         /// </summary>
         /// <param name="lfo">LFO signal generator</param>
         /// <param name="depth">Depth</param>
-        public TremoloEffect(SignalBuilder lfo, float depth = 0.5f)
+        public TremoloEffect(ISampleGenerator lfo, float depth = 0.5f)
         {
             Lfo = lfo;
             Depth = depth;

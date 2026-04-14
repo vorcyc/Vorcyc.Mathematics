@@ -30,3 +30,18 @@ public delegate T MultiVariableFunction<T>(ReadOnlySpan<T> args) where T : struc
 /// <param name="y">因变量 y</param>
 /// <returns>导数值 dy/dx</returns>
 public delegate T DifferentialFunction<T>(T x, T y) where T : struct, IFloatingPointIeee754<T>;
+
+/// <summary>
+/// 表示常微分方程组 dy/dx = f(x, y)，其中 y 为向量。
+/// </summary>
+/// <param name="x">自变量</param>
+/// <param name="y">状态向量</param>
+/// <param name="dydx">输出导数向量，长度与 <paramref name="y"/> 相同</param>
+public delegate void OdeSystemFunction<T>(T x, ReadOnlySpan<T> y, Span<T> dydx) where T : struct, IFloatingPointIeee754<T>;
+
+/// <summary>
+/// 表示向量值函数 f: R^n → R^m，结果写入 <paramref name="output"/>。
+/// </summary>
+/// <param name="point">输入点</param>
+/// <param name="output">输出向量，长度为 m</param>
+public delegate void VectorFieldFunction<T>(ReadOnlySpan<T> point, Span<T> output) where T : struct, IFloatingPointIeee754<T>;

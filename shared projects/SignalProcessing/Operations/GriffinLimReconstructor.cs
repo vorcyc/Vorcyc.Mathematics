@@ -85,9 +85,13 @@ public class GriffinLimReconstructor
 
             for (var i = 0; i < _magnitudes.Count; i++)
             {
-                randomPhases.Add(Enumerable.Range(0, spectrumSize)
-                                           .Select(s => (float)(2 * Math.PI * r.NextDouble()))
-                                           .ToArray());
+                var phases = new float[spectrumSize];
+                for (var j = 0; j < spectrumSize; j++)
+                {
+                    phases[j] = (float)(2 * Math.PI * r.NextDouble());
+                }
+
+                randomPhases.Add(phases);
             }
 
             magPhase.Phases = randomPhases;

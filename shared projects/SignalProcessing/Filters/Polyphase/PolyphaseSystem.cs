@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase
 {
@@ -87,11 +88,11 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase
         /// Does polyphase decimation (for type-I systems).
         /// </summary>
         /// <param name="signal">Input signal</param>
-        public DiscreteSignal Decimate(DiscreteSignal signal)
+        public Signal Decimate(Signal signal)
         {
             var resampledRate = signal.SamplingRate / MultirateFilters.Length;
-            var resampledLength = signal.SampleCount / MultirateFilters.Length;
-            var resampled = new DiscreteSignal(resampledRate, resampledLength);
+            var resampledLength = signal.Length / MultirateFilters.Length;
+            var resampled = new Signal(resampledLength, resampledRate);
 
             var acc = 0f;
 
@@ -107,7 +108,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase
             // rest of the samples are processed very simply by each filter
 
             var si = 1;
-            for (var i = 1; i < resampled.SampleCount; i++)
+            for (var i = 1; i < resampled.Length; i++)
             {
                 acc = 0f;
 
@@ -126,15 +127,15 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase
         /// Does polyphase interpolation (for type-II systems).
         /// </summary>
         /// <param name="signal">Input signal</param>
-        public DiscreteSignal Interpolate(DiscreteSignal signal)
+        public Signal Interpolate(Signal signal)
         {
             var k = MultirateFilters.Length;
             var resampledRate = signal.SamplingRate * k;
-            var resampledLength = signal.SampleCount * k;
-            var resampled = new DiscreteSignal(resampledRate, resampledLength);
+            var resampledLength = signal.Length * k;
+            var resampled = new Signal(resampledLength, resampledRate);
 
             var ri = 0;
-            for (var i = 0; i < signal.SampleCount; i++)
+            for (var i = 0; i < signal.Length; i++)
             {
                 for (var j = MultirateFilters.Length - 1; j >= 0; j--)
                 {
@@ -187,7 +188,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Polyphase
         /// </summary>
         /// <param name="signal">Input signal</param>
         /// <param name="method">Filtering method</param>
-        public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
+        public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
 
         #endregion
     }

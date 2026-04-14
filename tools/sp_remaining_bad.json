@@ -1,0 +1,202 @@
+[
+  [
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.CosineBuilder 是一个用于生成余弦信号的类，继承了 SignalBuilder 类。",
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.CosineBuilder 是一个用于Generatescosine signals class, inherits了 SignalBuilder 类."
+  ],
+  [
+    "        // 创建一个 SineBuilder 实例",
+    "        // Creates一个 SineBuilder instance"
+  ],
+  [
+    "        // 创建一个 FadeInOutBuilder 实例，装饰 SineBuilder",
+    "        // Creates一个 FadeInOutBuilder instance, 装饰 SineBuilder"
+  ],
+  [
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.PulseWaveBuilder 是一个用于生成周期性脉冲波的类，继承了 SignalBuilder 类。",
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.PulseWaveBuilder 是一个用于Generatesperiodic pulse waves class, inherits了 SignalBuilder 类."
+  ],
+  [
+    "- `\"pulse\", \"width\"`: 脉冲持续时间，默认值为 0.05 秒。",
+    "- `\"pulse\", \"width\"`: pulse duration; default 0.05 秒."
+  ],
+  [
+    "- `\"period\", \"t\"`: 脉冲波周期，默认值为 0.1 秒。",
+    "- `\"period\", \"t\"`: pulse wave period; default 0.1 秒."
+  ],
+  [
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.RampBuilder 是一个用于生成直线信号的类，继承了 SignalBuilder 类。信号的形式为 y[n] = slope * n + intercept。",
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.RampBuilder 是一个用于Generatesramp (linear) signals class, inherits了 SignalBuilder 类.signal的形式为 y[n] = slope * n + intercept."
+  ],
+  [
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.RedNoiseBuilder 是一个用于生成红噪声（布朗噪声）的类，继承了 SignalBuilder 类。",
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.RedNoiseBuilder 是一个用于Generatesred noise (Brownian noise) class, inherits了 SignalBuilder 类."
+  ],
+  [
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.WaveTableBuilder 是一个用于生成基于波表的信号的类，继承了 SignalBuilder 类。",
+    "Vorcyc.Mathematics.SignalProcessing.Signals.Builders.WaveTableBuilder 是一个用于Generateswavetable-based signals class, inherits了 SignalBuilder 类."
+  ],
+  [
+    "        // 定义波表样本数组",
+    "        // 定义wavetable sample array"
+  ],
+  [
+    "  - 使用实部和虚部数组构造 ComplexDiscreteSignal 实例。",
+    "  - Usesreal part和imaginary part数组Constructs ComplexDiscreteSignal instance."
+  ],
+  [
+    "  - 使用实部和虚部集合构造 ComplexDiscreteSignal 实例。",
+    "  - Usesreal part和imaginary part集合Constructs ComplexDiscreteSignal instance."
+  ],
+  [
+    "        // 定义实部和虚部数组",
+    "        // 定义real part和imaginary part数组"
+  ],
+  [
+    "        // 输出信号的实部和虚部",
+    "        // output signal的real part和imaginary part"
+  ],
+  [
+    "        // 获取并输出信号的幅度",
+    "        // Gets并output signal的amplitude"
+  ],
+  [
+    "        // 获取并输出信号的相位",
+    "        // Gets并output signal的phase"
+  ],
+  [
+    "  - 创建 `signal` 的延迟副本，通过将其向右（正 `delay`）或向左（负 `delay`）移动。",
+    "  - Creates `signal` 的delay副本, 通过将其向右 (正 `delay`)或向左 (负 `delay`)移动."
+  ],
+  [
+    "    - `delay`: 延迟（正数或负数的延迟样本数）。",
+    "    - `delay`: delay (正数或负数的delaysample count)."
+  ],
+  [
+    "  - 返回值: 延迟后的 `ComplexDiscreteSignal`。",
+    "  - Returns: delay后的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 延迟后的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: delay后的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 叠加 `signal1` 和 `signal2`。如果大小不同，则较小的信号将广播以适应较大的信号大小。",
+    "  - superimpose `signal1` 和 `signal2`.如果大小不同, 则较小的signal将广播以适应较大的signal大小."
+  ],
+  [
+    "  - 返回值: 叠加后的 `ComplexDiscreteSignal`。",
+    "  - Returns: superimpose后的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 叠加后的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: superimpose后的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 连接 `signal1` 和 `signal2`。",
+    "  - concatenate `signal1` 和 `signal2`."
+  ],
+  [
+    "  - 返回值: 连接后的 `ComplexDiscreteSignal`。",
+    "  - Returns: concatenate后的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 连接后的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: concatenate后的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 创建 `signal` 的副本，并重复 `n` 次。",
+    "  - Creates `signal` 的副本, 并重复 `n` 次."
+  ],
+  [
+    "    - `n`: 重复次数。",
+    "    - `n`: 重复次数."
+  ],
+  [
+    "  - 返回值: 重复后的 `ComplexDiscreteSignal`。",
+    "  - Returns: 重复后的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 重复后的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: 重复后的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 按 `coeff` 放大 `signal`。",
+    "  - 按 `coeff` 放大 `signal`."
+  ],
+  [
+    "    - `coeff`: 放大系数。",
+    "    - `coeff`: 放大系数."
+  ],
+  [
+    "  - 按 `coeff` 衰减 `signal`。",
+    "  - 按 `coeff` attenuation `signal`."
+  ],
+  [
+    "    - `coeff`: 衰减系数。",
+    "    - `coeff`: attenuation系数."
+  ],
+  [
+    "  - 从 `signal` 的前 `n` 个样本创建新信号。",
+    "  - 从 `signal` 的前 `n` 个sampleCreates新signal."
+  ],
+  [
+    "  - 返回值: 新的 `ComplexDiscreteSignal`。",
+    "  - Returns: 新的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 新的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: 新的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 从 `signal` 的后 `n` 个样本创建新信号。",
+    "  - 从 `signal` 的后 `n` 个sampleCreates新signal."
+  ],
+  [
+    "  - 从 `signal` 创建新的零填充复数离散信号。",
+    "  - 从 `signal` Creates新的零填充complexdiscrete signal."
+  ],
+  [
+    "    - `length`: 零填充信号的长度。",
+    "    - `length`: 零填充signal的长度."
+  ],
+  [
+    "  - 返回值: 零填充后的 `ComplexDiscreteSignal`。",
+    "  - Returns: 零填充后的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 零填充后的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: 零填充后的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 执行 `signal1` 和 `signal2` 的复数乘法（按长度归一化）。",
+    "  - Performs `signal1` 和 `signal2` 的complex乘法 (按长度归一化)."
+  ],
+  [
+    "  - 返回值: 乘法后的 `ComplexDiscreteSignal`。",
+    "  - Returns: 乘法后的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 乘法后的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: 乘法后的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 执行 `signal1` 和 `signal2` 的复数除法（按长度归一化）。",
+    "  - Performs `signal1` 和 `signal2` 的complex除法 (按长度归一化)."
+  ],
+  [
+    "  - 返回值: 除法后的 `ComplexDiscreteSignal`。",
+    "  - Returns: 除法后的 `ComplexDiscreteSignal`."
+  ],
+  [
+    "  - 返回值: 除法后的 `ComplexDiscreteSignal<T>`。",
+    "  - Returns: 除法后的 `ComplexDiscreteSignal<T>`."
+  ],
+  [
+    "  - 展开复数值样本的相位。",
+    "  - 展开complex值sample的phase."
+  ],
+  [
+    "  - 返回值: 展开后的相位数组。",
+    "  - Returns: 展开后的phase数组."
+  ]
+]

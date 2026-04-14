@@ -42,9 +42,9 @@ public class WienerFilter : IFilter, IOnlineFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
-        var output = new float[signal.SampleCount];
+        var output = new float[signal.Length];
 
         int i = 0, j = 0;
 
@@ -53,7 +53,7 @@ public class WienerFilter : IFilter, IOnlineFilter
             Process(signal[i]);
         }
 
-        for (; j < signal.SampleCount - _size / 2; j++, i++)   // and begin populating output signal
+        for (; j < signal.Length - _size / 2; j++, i++)   // and begin populating output signal
         {
             output[j] = Process(signal[i]);
         }
@@ -63,7 +63,7 @@ public class WienerFilter : IFilter, IOnlineFilter
             output[j] = Process(0);
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

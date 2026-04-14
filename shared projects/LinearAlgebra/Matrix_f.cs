@@ -1,6 +1,7 @@
 ﻿namespace Vorcyc.Mathematics.LinearAlgebra;
 
 using System.Numerics;
+using Vorcyc.Mathematics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -192,22 +193,18 @@ public class Matrix : ICloneable<Matrix>
     /// <returns>两个矩阵的乘积。</returns>
     /// <exception cref="ArgumentException">当矩阵维度不匹配时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix operator *(Matrix a, Matrix b)
+    public static Matrix operator *(Matrix a, Matrix b) => Multiply(a, b);
+
+    /// <summary>
+    /// Multiplies two matrices with an optional execution policy.
+    /// </summary>
+    public static Matrix Multiply(Matrix a, Matrix b, ComputingContext? context = null)
     {
         if (a.Columns != b.Rows)
             throw new ArgumentException("矩阵维度不匹配，无法相乘。");
 
         var result = new Matrix(a.Rows, b.Columns);
-        for (int i = 0; i < a.Rows; i++)
-        {
-            for (int j = 0; j < b.Columns; j++)
-            {
-                float sum = 0;
-                for (int k = 0; k < a.Columns; k++)
-                    sum += a[i, k] * b[k, j];
-                result[i, j] = sum;
-            }
-        }
+        MatrixMultiply.Multiply(a._values, a.Rows, a.Columns, b._values, b.Rows, b.Columns, result._values, context);
         return result;
     }
 
@@ -273,6 +270,65 @@ public class Matrix : ICloneable<Matrix>
         for (int i = 0; i < _rows; i++)
             column[i] = this[i, columnIndex];
         return column;
+    }
+
+    /// <summary>
+    /// 计算矩阵与列向量的乘积，结果写入 <paramref name="result"/>。
+    /// </summary>
+    /// <param name="vector">列向量，长度必须等于矩阵列数。</param>
+    /// <param name="result">结果向量，长度必须等于矩阵行数。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Multiply(ReadOnlySpan<float> vector, Span<float> result)
+        => Multiply(vector, result, context: null);
+
+    /// <summary>
+    /// 计算矩阵与列向量的乘积，结果写入 <paramref name="result"/>。
+    /// </summary>
+    public void Multiply(ReadOnlySpan<float> vector, Span<float> result, ComputingContext? context)
+    {
+        if (vector.Length != _columns)
+            throw new ArgumentException("向量长度必须与矩阵列数匹配。", nameof(vector));
+        if (result.Length != _rows)
+            throw new ArgumentException("结果向量长度必须与矩阵行数匹配。", nameof(result));
+
+        int problemSize = _rows * _columns;
+        if (ComputingContextExecution.UseParallel(context, problemSize, ComputingContextExecution.ParallelMatrixMultiplyThreshold))
+        {
+            var matrix = _values;
+            var vectorData = vector.ToArray();
+            var buffer = GC.AllocateUninitializedArray<float>(_rows);
+            ComputingContextExecution.ForEach(context, 0, _rows, i =>
+            {
+                int row = i * _columns;
+                float sum = 0f;
+                for (int j = 0; j < _columns; j++)
+                {
+                    sum += matrix[row + j] * vectorData[j];
+                }
+
+                buffer[i] = sum;
+            }, _columns);
+            buffer.AsSpan().CopyTo(result);
+            return;
+        }
+
+        for (int i = 0; i < _rows; i++)
+        {
+            result[i] = VectorSpan.Dot(_values.AsSpan(i * _columns, _columns), vector, context);
+        }
+    }
+
+    /// <summary>
+    /// 计算矩阵与列向量的乘积。
+    /// </summary>
+    /// <param name="vector">列向量，长度必须等于矩阵列数。</param>
+    /// <returns>长度为矩阵行数的结果向量。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float[] Multiply(ReadOnlySpan<float> vector)
+    {
+        var result = new float[_rows];
+        Multiply(vector, result);
+        return result;
     }
 
     #endregion
@@ -415,6 +471,8 @@ public class Matrix : ICloneable<Matrix>
             if (pivot != k)
             {
                 SwapRows(A, k, pivot);
+                for (int j = 0; j < k; j++)
+                    (L[k, j], L[pivot, j]) = (L[pivot, j], L[k, j]);
                 (P[k], P[pivot]) = (P[pivot], P[k]);
             }
 
@@ -508,6 +566,112 @@ public class Matrix : ICloneable<Matrix>
         }
         return L;
     }
+
+    #endregion
+
+    #region Linear Solving
+
+    /// <summary>
+    /// 转换为泛型矩阵 <see cref="Matrix{Float32}"/>。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public Matrix<float> ToGeneric()
+    {
+        var generic = new Matrix<float>(Rows, Columns);
+        for (int i = 0; i < Rows; i++)
+        {
+            for (int j = 0; j < Columns; j++)
+                generic[i, j] = this[i, j];
+        }
+
+        return generic;
+    }
+
+    /// <summary>
+    /// 从泛型矩阵 <see cref="Matrix{Float32}"/> 构造单精度矩阵。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Matrix FromGeneric(Matrix<float> matrix)
+    {
+        var legacy = new Matrix(matrix.Rows, matrix.Columns);
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+            for (int j = 0; j < matrix.Columns; j++)
+                legacy[i, j] = float.CreateTruncating(matrix[i, j]);
+        }
+
+        return legacy;
+    }
+
+    /// <summary>
+    /// 隐式转换为 <see cref="Matrix{Float32}"/>。
+    /// </summary>
+    public static implicit operator Matrix<float>(Matrix matrix) => matrix.ToGeneric();
+
+    /// <summary>
+    /// 求解方阵线性方程组 Ax = b（LU 分解）。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float[] Solve(float[] b) => ToGeneric().Solve(b);
+
+    /// <summary>
+    /// 求解方阵线性方程组 Ax = b，结果写入 <paramref name="x"/>。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Solve(ReadOnlySpan<float> b, Span<float> x)
+        => ToGeneric().Solve(b, x);
+
+    /// <summary>
+    /// 求解对称正定方程组 Ax = b（Cholesky 分解）。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float[] SolveSymmetricPositiveDefinite(float[] b)
+        => ToGeneric().SolveSymmetricPositiveDefinite(b);
+
+    /// <summary>
+    /// 作为设计矩阵求解最小二乘 min ‖Ax - y‖²。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float[] SolveLeastSquares(ReadOnlySpan<float> observations)
+        => ToGeneric().SolveLeastSquares(observations);
+
+    /// <summary>
+    /// 使用薄 SVD 伪逆求解最小二乘。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float[] SolveLeastSquaresSvd(ReadOnlySpan<float> observations, float? tolerance = null)
+        => ToGeneric().SolveLeastSquaresSvd(observations, tolerance);
+
+    /// <summary>
+    /// 求解岭回归 min ‖Ax - y‖² + λ‖β‖²。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float[] SolveRidgeLeastSquares(
+        ReadOnlySpan<float> observations,
+        float lambda,
+        bool regularizeIntercept = true)
+        => ToGeneric().SolveRidgeLeastSquares(observations, lambda, regularizeIntercept);
+
+    /// <summary>
+    /// Estimates κ₂(A) ≈ σ_max / σ_min from a thin SVD.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float ConditionNumber(float? tolerance = null)
+        => ToGeneric().ConditionNumber(tolerance);
+
+    /// <summary>
+    /// Returns true when the estimated condition number exceeds <paramref name="threshold"/>.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsIllConditioned(float threshold, float? tolerance = null)
+        => ToGeneric().IsIllConditioned(threshold, tolerance);
+
+    /// <summary>
+    /// Checks whether this square matrix is symmetric within <paramref name="tolerance"/>.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsSymmetric(float? tolerance = null)
+        => ToGeneric().IsSymmetric(tolerance);
 
     #endregion
 

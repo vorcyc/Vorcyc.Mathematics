@@ -50,7 +50,7 @@ using System.Linq;
 /// </item>
 /// </list>
 /// </remarks>
-public static class Advanced
+public static partial class Advanced
 {
     /// <summary>
     /// 计算数据集的指定百分位数。
@@ -155,8 +155,9 @@ public static class Advanced
     {
         T mean = sequence.Average();
         T stdDev = T.Sqrt(sequence.Sum(x => T.Pow(x - mean, T.CreateChecked(2))) / (T.CreateChecked(sequence.Length) - T.One));
-        T z = T.CreateChecked(1.96); // For 95% confidence
-        T marginOfError = z * (stdDev / T.Sqrt(T.CreateChecked(sequence.Length)));
+        double df = sequence.Length - 1;
+        double critical = StatisticalMath.StudentTCriticalValue(confidenceLevel, df);
+        T marginOfError = T.CreateChecked(critical) * (stdDev / T.Sqrt(T.CreateChecked(sequence.Length)));
         return (mean - marginOfError, mean + marginOfError);
     }
 
@@ -403,8 +404,8 @@ internal static class Advanced2
     {
         double mean = sequence.Average();
         double stdDev = Math.Sqrt(sequence.Sum(x => Math.Pow(x - mean, 2)) / (sequence.Length - 1));
-        double z = 1.96; // For 95% confidence
-        double marginOfError = z * (stdDev / Math.Sqrt(sequence.Length));
+        double critical = StatisticalMath.StudentTCriticalValue(confidenceLevel, sequence.Length - 1);
+        double marginOfError = critical * (stdDev / Math.Sqrt(sequence.Length));
         return (mean - marginOfError, mean + marginOfError);
     }
 

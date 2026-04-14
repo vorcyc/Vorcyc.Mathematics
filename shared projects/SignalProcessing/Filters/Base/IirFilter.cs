@@ -132,7 +132,7 @@ public class IirFilter : LtiFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public override Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         switch (method)
         {
@@ -141,7 +141,7 @@ public class IirFilter : LtiFilter
             {
                 var length = Math.Max(DefaultImpulseResponseLength, _denominatorSize + _numeratorSize);
                     var fftSize = (4 * length).NextPowerOf2();// MathUtils.NextPowerOfTwo(4 * length);
-                var ir = new DiscreteSignal(signal.SamplingRate, Tf.ImpulseResponse(length));
+                var ir = Signal.FromCopy(Tf.ImpulseResponse(length), signal.SamplingRate);
                 return Operation.BlockConvolve(signal, ir, fftSize, method);
             }
             case FilteringMethod.DifferenceEquation:
@@ -200,7 +200,7 @@ public class IirFilter : LtiFilter
     /// code the difference equation as it is.
     /// </summary>
     /// <param name="signal">Input signal</param>
-    protected DiscreteSignal ApplyFilterDirectly(DiscreteSignal signal)
+    protected Signal ApplyFilterDirectly(Signal signal)
     {
         var input = signal.Samples;
 
@@ -218,7 +218,7 @@ public class IirFilter : LtiFilter
             }
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 {
@@ -54,7 +55,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// </summary>
         /// <param name="input">Input array of samples</param>
         /// <param name="n">Number of the frequency component</param>
-        public ComplexFp32 Direct(float[] input, int n)
+        public ComplexFp32 Direct(float[] input, int n) => Direct(input.AsSpan(), n);
+
+        /// <summary>
+        /// Computes <paramref name="n"/>-th component of a spectrum using Goertzel algorithm.
+        /// </summary>
+        public ComplexFp32 Direct(ReadOnlySpan<float> input, int n)
         {
             var f = (2 * MathF.Cos(2 * ConstantsFp32.PI * n / _fftSize));
 
@@ -62,7 +68,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             for (var i = 0; i < _fftSize; i++)
             {
-                s = input[i] + s1 * f - s2;
+                var sample = i < input.Length ? input[i] : 0f;
+                s = sample + s1 * f - s2;
 
                 s2 = s1;
                 s1 = s;
@@ -81,12 +88,6 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// </summary>
         /// <param name="input">Input signal</param>
         /// <param name="n">Number of the frequency component</param>
-        public ComplexFp32 Direct(DiscreteSignal input, int n)
-        {
-            return Direct(input.Samples, n);
-        }   
-        
-        
-   
+        public ComplexFp32 Direct(Signal input, int n) => Direct(input.Samples, n);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Vorcyc.Mathematics.Experimental.Signals;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace DSP_module_test;
 

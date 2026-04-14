@@ -117,7 +117,7 @@ public class FirFilter : LtiFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public override Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         if (_kernelSize >= KernelSizeForBlockConvolution && method == FilteringMethod.Auto)
         {
@@ -144,7 +144,7 @@ public class FirFilter : LtiFilter
                 }
             default:
                 {
-                    return new DiscreteSignal(signal.SamplingRate, ProcessAllSamples(signal.Samples));
+                    return Signal.FromCopy(ProcessAllSamples(signal.Samples), signal.SamplingRate);
                 }
         }
     }
@@ -257,7 +257,7 @@ public class FirFilter : LtiFilter
     /// code the difference equation as it is (it's slower than ProcessAllSamples).
     /// </summary>
     /// <param name="signal">Input signal</param>
-    protected DiscreteSignal ApplyFilterDirectly(DiscreteSignal signal)
+    protected Signal ApplyFilterDirectly(Signal signal)
     {
         var input = signal.Samples;
 
@@ -274,7 +274,7 @@ public class FirFilter : LtiFilter
             }
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

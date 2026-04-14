@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Framework.Utilities;
 
 namespace core_module_test;
@@ -17,12 +18,12 @@ internal class SimpleLinearRegression_test
             count.PrintLine(ConsoleColor.Green);
             var x = new PinnableArray<float>(count, false);
             var y = new PinnableArray<float>(count, false);
-            x.FillWithRandomNumber();
-            y.FillWithRandomNumber();
+            x.Span.FillWithRandomNumber();
+            y.Span.FillWithRandomNumber();
 
 
-            var r = new Vorcyc.Mathematics.MachineLearning.SimpleLinearRegression<float>();
-            var c= r.Learn(x, y);
+            var r = new Vorcyc.Mathematics.MachineLearning.Regression.SimpleLinearRegression<float>();
+            var c = r.Fit(x, y);
 
             c.PrintLine(ConsoleColor.Red);
 

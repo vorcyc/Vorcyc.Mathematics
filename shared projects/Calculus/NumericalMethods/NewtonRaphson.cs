@@ -6,12 +6,11 @@ namespace Vorcyc.Mathematics.Calculus.NumericalMethods;
 /// 使用牛顿-拉夫逊法求解非线性方程 f(x) = 0 的实例类，支持泛型浮点类型。
 /// </summary>
 /// <typeparam name="T">浮点类型，必须实现 <see cref="IFloatingPointIeee754{T}"/></typeparam>
-public class NewtonRaphson<T> where T : struct, IFloatingPointIeee754<T>
+public sealed class NewtonRaphson<T> where T : struct, IFloatingPointIeee754<T>
 {
-
-    private readonly SingleVariableFunction<T> _func; // 目标函数 f(x)
-    private readonly Derivative<T> _derivative;    // 用于计算导数 f'(x)
-    private readonly T _defaultH;                  // 导数默认步长
+    private readonly SingleVariableFunction<T> _func;
+    private readonly Derivative<T> _derivative;
+    private readonly T _minDerivative;
 
     /// <summary>
     /// 初始化 <see cref="NewtonRaphson{T}"/> 实例。
@@ -22,8 +21,8 @@ public class NewtonRaphson<T> where T : struct, IFloatingPointIeee754<T>
     public NewtonRaphson(SingleVariableFunction<T> func, T defaultH)
     {
         _func = func ?? throw new ArgumentNullException(nameof(func));
-        _defaultH = defaultH;
         _derivative = new Derivative<T>(func, defaultH);
+        _minDerivative = T.CreateChecked(1e-15);
     }
 
     /// <summary>
@@ -38,26 +37,22 @@ public class NewtonRaphson<T> where T : struct, IFloatingPointIeee754<T>
     public T Solve(T initialGuess, int maxIterations = 100, T? tolerance = null)
     {
         if (maxIterations < 1) throw new ArgumentException("迭代次数必须大于等于 1", nameof(maxIterations));
-        T tol = tolerance ?? T.CreateChecked(1e-10); // 默认收敛容差
+        T tol = tolerance ?? T.CreateChecked(1e-10);
 
         T x = initialGuess;
         for (int i = 0; i < maxIterations; i++)
         {
-            T fx = _func(x);               // f(x)
-            T dfx = _derivative.Calculate(x); // f'(x)
+            T fx = _func(x);
+            T dfx = _derivative.Calculate(x);
 
-            // 检查导数是否为 0
-            if (T.Abs(dfx) < T.CreateChecked(1e-15))
+            if (T.Abs(dfx) < _minDerivative)
                 throw new InvalidOperationException("导数接近 0，牛顿法无法继续");
 
-            T dx = fx / dfx; // 牛顿迭代步长
-            T xNext = x - dx;
-
-            // 检查收敛
+            T dx = fx / dfx;
             if (T.Abs(dx) < tol)
-                return xNext;
+                return x - dx;
 
-            x = xNext;
+            x -= dx;
         }
 
         throw new InvalidOperationException("牛顿法未在指定迭代次数内收敛");

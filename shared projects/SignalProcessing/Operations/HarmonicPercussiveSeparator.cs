@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Filters;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Operations;
@@ -68,7 +69,7 @@ public class HarmonicPercussiveSeparator
     /// Evaluates harmonic and percussive mag-phase spectrograms from given <paramref name="signal"/>. 
     /// Both spectrogram objects share the same phase array.
     /// </summary>
-    public (MagnitudePhaseList, MagnitudePhaseList) EvaluateSpectrograms(DiscreteSignal signal)
+    public (MagnitudePhaseList, MagnitudePhaseList) EvaluateSpectrograms(Signal signal)
     {
         // spectrogram memory will be reused for harmonic magnitudes
 
@@ -81,9 +82,9 @@ public class HarmonicPercussiveSeparator
 
         for (var i = 0; i < harmonicMagnitudes.Count; i++)
         {
-            var mag = new DiscreteSignal(1, harmonicMagnitudes[i]);
-            percussiveMagnitudes.Add(_medianPercussive.ApplyTo(mag).Samples);
-            _medianPercussive.Reset();
+            var row = new float[harmonicMagnitudes[i].Length];
+            _medianPercussive.Filter(harmonicMagnitudes[i], row);
+            percussiveMagnitudes.Add(row);
         }
 
         // median filtering along time axis:
@@ -128,17 +129,12 @@ public class HarmonicPercussiveSeparator
     /// <summary>
     /// Extracts harmonic and percussive signals from given <paramref name="signal"/>.
     /// </summary>
-    public (DiscreteSignal, DiscreteSignal) EvaluateSignals(DiscreteSignal signal)
+    public (Signal, Signal) EvaluateSignals(Signal signal)
     {
         var (harmonicSpectrogram, percussiveSpectrogram) = EvaluateSpectrograms(signal);
 
-        // reconstruct harmonic part:
-
-        var harmonic = new DiscreteSignal(signal.SamplingRate, _stft.ReconstructMagnitudePhase(harmonicSpectrogram));
-
-        // reconstruct percussive part:
-
-        var percussive = new DiscreteSignal(signal.SamplingRate, _stft.ReconstructMagnitudePhase(percussiveSpectrogram));
+        var harmonic = Signal.FromCopy(_stft.ReconstructMagnitudePhase(harmonicSpectrogram), signal.SamplingRate);
+        var percussive = Signal.FromCopy(_stft.ReconstructMagnitudePhase(percussiveSpectrogram), signal.SamplingRate);
 
         return (harmonic, percussive);
     }

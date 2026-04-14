@@ -198,5 +198,5 @@ public class DynamicsProcessor : IFilter, IOnlineFilter
     /// </summary>
     /// <param name="signal">Input signal</param>
     /// <param name="method">Filtering method</param>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
 }

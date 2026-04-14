@@ -16,7 +16,7 @@ namespace Vorcyc.Mathematics.Buffers;
 public static class PinnableArrayExtension
 {
     extension<T>(PinnableArray<T> array)
-        where T : unmanaged, INumber<T>
+        where T : unmanaged, INumber<T>, IFloatingPointIeee754<T>
     {
         #region Max
 
@@ -113,6 +113,39 @@ public static class PinnableArrayExtension
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<T> MinAsync(int start, int length, int? numberOfWorkers = null, bool useTPL = false)
             => await IComparableExtension.CompareMinAsync((T[])array, start, length, numberOfWorkers, useTPL);
+
+        #endregion
+
+        #region Descriptive statistics
+
+        /// <summary>
+        /// Computes mean over the array span.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Average() => Basic.Average(array.Span);
+
+        /// <summary>
+        /// Computes sample standard deviation.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T StandardDeviation()
+            => Basic.StandardDeviation(array.Span);
+
+        /// <summary>
+        /// Computes full descriptive statistics.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public (T Mean, T Median, T Mode, T Variance, T StandardDeviation, T CoefficientOfVariation)
+            DescriptiveStatistics()
+            => Basic.CalculateAllStatistics(array.Span);
+
+        /// <summary>
+        /// Computes descriptive statistics with options.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public (T Mean, T Median, T Mode, T Variance, T StandardDeviation, T CoefficientOfVariation)
+            DescriptiveStatistics(DescriptiveStatisticsOptions options)
+            => Basic.CalculateAllStatistics(array.Span, options);
 
         #endregion
     }

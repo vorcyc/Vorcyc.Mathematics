@@ -2,6 +2,7 @@
 namespace Vorcyc.Mathematics.LinearAlgebra;
 
 using System.Numerics;
+using Vorcyc.Mathematics;
 using System.Text;
 
 
@@ -218,22 +219,18 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <returns>两个矩阵的乘积。</returns>
     /// <exception cref="ArgumentException">当矩阵维度不匹配时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Matrix<T> operator *(Matrix<T> a, Matrix<T> b)
+    public static Matrix<T> operator *(Matrix<T> a, Matrix<T> b) => Multiply(a, b);
+
+    /// <summary>
+    /// Multiplies two matrices with an optional execution policy.
+    /// </summary>
+    public static Matrix<T> Multiply(Matrix<T> a, Matrix<T> b, ComputingContext? context = null)
     {
         if (a.Columns != b.Rows)
             throw new ArgumentException("矩阵维度不匹配，无法相乘。");
 
         var result = new Matrix<T>(a.Rows, b.Columns);
-        for (int i = 0; i < a.Rows; i++)
-        {
-            for (int j = 0; j < b.Columns; j++)
-            {
-                T sum = T.Zero;
-                for (int k = 0; k < a.Columns; k++)
-                    sum += a[i, k] * b[k, j];
-                result[i, j] = sum;
-            }
-        }
+        MatrixMultiply.Multiply(a._values, a.Rows, a.Columns, b._values, b.Rows, b.Columns, result._values, context);
         return result;
     }
 
@@ -299,6 +296,65 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         for (int i = 0; i < _rows; i++)
             column[i] = this[i, columnIndex];
         return column;
+    }
+
+    /// <summary>
+    /// 计算矩阵与列向量的乘积，结果写入 <paramref name="result"/>。
+    /// </summary>
+    /// <param name="vector">列向量，长度必须等于矩阵列数。</param>
+    /// <param name="result">结果向量，长度必须等于矩阵行数。</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Multiply(ReadOnlySpan<T> vector, Span<T> result)
+        => Multiply(vector, result, context: null);
+
+    /// <summary>
+    /// 计算矩阵与列向量的乘积，结果写入 <paramref name="result"/>。
+    /// </summary>
+    public void Multiply(ReadOnlySpan<T> vector, Span<T> result, ComputingContext? context)
+    {
+        if (vector.Length != _columns)
+            throw new ArgumentException("向量长度必须与矩阵列数匹配。", nameof(vector));
+        if (result.Length != _rows)
+            throw new ArgumentException("结果向量长度必须与矩阵行数匹配。", nameof(result));
+
+        int problemSize = _rows * _columns;
+        if (ComputingContextExecution.UseParallel(context, problemSize, ComputingContextExecution.ParallelMatrixMultiplyThreshold))
+        {
+            var matrix = _values;
+            var vectorData = vector.ToArray();
+            var buffer = GC.AllocateUninitializedArray<T>(_rows);
+            ComputingContextExecution.ForEach(context, 0, _rows, i =>
+            {
+                int row = i * _columns;
+                T sum = T.Zero;
+                for (int j = 0; j < _columns; j++)
+                {
+                    sum += matrix[row + j] * vectorData[j];
+                }
+
+                buffer[i] = sum;
+            }, _columns);
+            buffer.AsSpan().CopyTo(result);
+            return;
+        }
+
+        for (int i = 0; i < _rows; i++)
+        {
+            result[i] = VectorSpan.Dot(_values.AsSpan(i * _columns, _columns), vector, context);
+        }
+    }
+
+    /// <summary>
+    /// 计算矩阵与列向量的乘积。
+    /// </summary>
+    /// <param name="vector">列向量，长度必须等于矩阵列数。</param>
+    /// <returns>长度为矩阵行数的结果向量。</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T[] Multiply(ReadOnlySpan<T> vector)
+    {
+        var result = new T[_rows];
+        Multiply(vector, result);
+        return result;
     }
 
     #endregion
@@ -447,13 +503,14 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                     pivot = i;
                 }
 
-            Console.WriteLine($"k={k}, max={max}, pivot={pivot}"); // 调试信息
             if (max < T.CreateChecked(1e-6))
                 throw new InvalidOperationException("矩阵不可逆。");
 
             if (pivot != k)
             {
                 SwapRows(A, k, pivot);
+                for (int j = 0; j < k; j++)
+                    (L[k, j], L[pivot, j]) = (L[pivot, j], L[k, j]);
                 (P[k], P[pivot]) = (P[pivot], P[k]);
             }
 
@@ -550,7 +607,76 @@ public class Matrix<T> : ICloneable<Matrix<T>>
 
     #endregion
 
+    #region Linear Solving
+
+    /// <summary>
+    /// 求解方阵线性方程组 Ax = b（LU 分解）。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T[] Solve(T[] b) => LinearEquationSolver.LUSolve(this, b);
+
+    /// <summary>
+    /// 求解方阵线性方程组 Ax = b，结果写入 <paramref name="x"/>。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Solve(ReadOnlySpan<T> b, Span<T> x)
+        => LinearEquationSolver.GaussianEliminationSolve(this, b, x);
+
+    /// <summary>
+    /// 求解对称正定方程组 Ax = b（Cholesky 分解）。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T[] SolveSymmetricPositiveDefinite(T[] b)
+        => LinearEquationSolver.CholeskySolve(this, b);
+
+    /// <summary>
+    /// 作为设计矩阵求解最小二乘 min ‖Ax - y‖²。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T[] SolveLeastSquares(ReadOnlySpan<T> observations)
+        => LinearEquationSolver.SolveLeastSquares(this, observations);
+
+    /// <summary>
+    /// 使用薄 SVD 伪逆求解最小二乘，适用于秩亏或病态设计矩阵。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T[] SolveLeastSquaresSvd(ReadOnlySpan<T> observations, T? tolerance = null)
+        => LinearEquationSolver.SolveLeastSquaresSvd(this, observations, tolerance);
+
+    /// <summary>
+    /// 求解岭回归 min ‖Ax - y‖² + λ‖β‖²。
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T[] SolveRidgeLeastSquares(
+        ReadOnlySpan<T> observations,
+        T lambda,
+        bool regularizeIntercept = true)
+        => LinearEquationSolver.SolveRidgeLeastSquares(this, observations, lambda, regularizeIntercept);
+
+    #endregion
+
     #region Utility Methods
+
+    /// <summary>
+    /// Estimates κ₂(A) ≈ σ_max / σ_min from a thin SVD.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T ConditionNumber(T? tolerance = null)
+        => MatrixDiagnostics.ConditionNumber(this, tolerance);
+
+    /// <summary>
+    /// Returns true when the estimated condition number exceeds <paramref name="threshold"/>.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsIllConditioned(T threshold, T? tolerance = null)
+        => MatrixDiagnostics.IsIllConditioned(this, threshold, tolerance);
+
+    /// <summary>
+    /// Checks whether this square matrix is symmetric within <paramref name="tolerance"/>.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsSymmetric(T? tolerance = null)
+        => MatrixDiagnostics.IsSymmetric(this, tolerance);
 
     /// <summary>
     /// 创建一个单位矩阵。

@@ -62,10 +62,15 @@ public class ComplexConvolver
     /// </summary>
     public ComplexDiscreteSignal CrossCorrelate(ComplexDiscreteSignal signal, ComplexDiscreteSignal kernel, int fftSize = 0)
     {
-        var reversedKernel =
-            new ComplexDiscreteSignal(kernel.SamplingRate, kernel.Real.Reverse(), kernel.Imag.Reverse());
+        var reversedReal = new float[kernel.Length];
+        var reversedImag = new float[kernel.Length];
+        for (var i = 0; i < kernel.Length; i++)
+        {
+            reversedReal[i] = kernel.Real[kernel.Length - 1 - i];
+            reversedImag[i] = kernel.Imag[kernel.Length - 1 - i];
+        }
 
-        return Convolve(signal, reversedKernel, fftSize);
+        return Convolve(signal, new ComplexDiscreteSignal(kernel.SamplingRate, reversedReal, reversedImag), fftSize);
     }
 
     /// <summary>
@@ -75,8 +80,8 @@ public class ComplexConvolver
     {
         // first, try to divide polynomials
 
-        var div = VMath.DividePolynomial(signal.Real.Zip(signal.Imag, (r, i) => new ComplexFp32(r, i)).ToArray(),
-                                               kernel.Real.Zip(kernel.Imag, (r, i) => new ComplexFp32(r, i)).ToArray());
+        var div = VMath.DividePolynomial(ToComplexFp32Array(signal.Real, signal.Imag),
+                                         ToComplexFp32Array(kernel.Real, kernel.Imag));
 
         var quotient = div[0];
         var remainder = div[1];
@@ -128,5 +133,16 @@ public class ComplexConvolver
         return new ComplexDiscreteSignal(signal.SamplingRate,
                                          spectrum.Real.FastCopyFragment(length),
                                          spectrum.Imag.FastCopyFragment(length));
+    }
+
+    private static ComplexFp32[] ToComplexFp32Array(float[] real, float[] imag)
+    {
+        var result = new ComplexFp32[real.Length];
+        for (var i = 0; i < real.Length; i++)
+        {
+            result[i] = new ComplexFp32(real[i], imag[i]);
+        }
+
+        return result;
     }
 }

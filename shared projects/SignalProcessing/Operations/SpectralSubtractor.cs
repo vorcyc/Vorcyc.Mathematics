@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Operations;
 
@@ -71,9 +72,23 @@ public class SpectralSubtractor : OverlapAddFilter
     /// <param name="noise">Noise signal</param>
     /// <param name="fftSize">FFT size</param>
     /// <param name="hopSize">Hop length (number of samples)</param>
+    [Obsolete("Use Signal instead.")]
     public SpectralSubtractor(DiscreteSignal noise, int fftSize = 1024, int hopSize = 128)
-        : this(noise.Samples, fftSize, hopSize)
+        : this(noise.ToSignal(), fftSize, hopSize)
     {
+    }
+
+    /// <summary>
+    /// Constructs <see cref="SpectralSubtractor"/> from noise <see cref="Signal"/>.
+    /// </summary>
+    public SpectralSubtractor(Signal noise, int fftSize = 1024, int hopSize = 128) : base(hopSize, fftSize)
+    {
+        _noiseEstimate = new float[_fftSize / 2 + 1];
+        _noiseBuf = new float[_fftSize];
+        _noiseSpectrum = new float[_fftSize / 2 + 1];
+        _noiseAcc = new float[_fftSize / 2 + 2];
+
+        EstimateNoise(noise.Samples);
     }
 
     /// <summary>
@@ -117,6 +132,12 @@ public class SpectralSubtractor : OverlapAddFilter
     /// <param name="startPos">Index of the first sample in array for processing</param>
     /// <param name="endPos">Index of the last sample in array for processing</param>
     public void EstimateNoise(float[] noise, int startPos = 0, int endPos = -1)
+        => EstimateNoise(noise.AsSpan(), startPos, endPos);
+
+    /// <summary>
+    /// Estimates power spectrum of <paramref name="noise"/> samples.
+    /// </summary>
+    public void EstimateNoise(ReadOnlySpan<float> noise, int startPos = 0, int endPos = -1)
     {
         if (endPos < 0)
         {
@@ -127,7 +148,7 @@ public class SpectralSubtractor : OverlapAddFilter
 
         for (var pos = startPos; pos + _fftSize < endPos; pos += _hopSize, numFrames++)
         {
-            noise.FastCopyTo(_noiseBuf, _fftSize, pos);
+            noise.Slice(pos, _fftSize).CopyTo(_noiseBuf);
 
             _fft.PowerSpectrum(_noiseBuf, _noiseSpectrum, false);
 
@@ -151,7 +172,16 @@ public class SpectralSubtractor : OverlapAddFilter
     /// <param name="noise">Noise signal</param>
     /// <param name="startPos">Index of the first sample in signal</param>
     /// <param name="endPos">Index of the last sample in signal</param>
+    [Obsolete("Use Signal instead.")]
     public void EstimateNoise(DiscreteSignal noise, int startPos = 0, int endPos = -1)
+    {
+        EstimateNoise(noise.Samples.Values, startPos, endPos);
+    }
+
+    /// <summary>
+    /// Estimates power spectrum of <paramref name="noise"/> signal.
+    /// </summary>
+    public void EstimateNoise(Signal noise, int startPos = 0, int endPos = -1)
     {
         EstimateNoise(noise.Samples, startPos, endPos);
     }

@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Transforms;
@@ -416,8 +417,14 @@ public class RealFft : IComplexTransform
     /// <param name="spectrum">Magnitude spectrum</param>
     /// <param name="normalize">Normalize by FFT size or not</param>
     public void MagnitudeSpectrum(float[] samples, float[] spectrum, bool normalize = false)
+        => MagnitudeSpectrum(samples.AsSpan(), spectrum, normalize);
+
+    /// <summary>
+    /// Computes magnitude spectrum from a sample span.
+    /// </summary>
+    public void MagnitudeSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = false)
     {
-        Direct(samples, _realSpectrum, _imagSpectrum);
+        DirectFromSpan(samples);
 
         // Since for realFFT: im[0] = im[fftSize/2] = 0
         // we don't process separately these elements (like in case of FFT)
@@ -449,8 +456,14 @@ public class RealFft : IComplexTransform
     /// <param name="spectrum">Magnitude spectrum</param>
     /// <param name="normalize">Normalize by FFT size or not</param>
     public void PowerSpectrum(float[] samples, float[] spectrum, bool normalize = true)
+        => PowerSpectrum(samples.AsSpan(), spectrum, normalize);
+
+    /// <summary>
+    /// Computes power spectrum from a sample span.
+    /// </summary>
+    public void PowerSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = true)
     {
-        Direct(samples, _realSpectrum, _imagSpectrum);
+        DirectFromSpan(samples);
 
         // Since for realFFT: im[0] = im[fftSize/2] = 0
         // we don't process separately these elements (like in case of FFT)
@@ -479,11 +492,11 @@ public class RealFft : IComplexTransform
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="normalize">Normalize by FFT size or not</param>
-    public DiscreteSignal MagnitudeSpectrum(DiscreteSignal signal, bool normalize = false)
+    public Signal MagnitudeSpectrum(Signal signal, bool normalize = false)
     {
         var spectrum = new float[_fftSize + 1];
         MagnitudeSpectrum(signal.Samples, spectrum, normalize);
-        return new DiscreteSignal(signal.SamplingRate, spectrum);
+        return Signal.FromCopy(spectrum, signal.SamplingRate);
     }
 
     /// <summary>
@@ -494,11 +507,28 @@ public class RealFft : IComplexTransform
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="normalize">Normalize by FFT size or not</param>
-    public DiscreteSignal PowerSpectrum(DiscreteSignal signal, bool normalize = true)
+    public Signal PowerSpectrum(Signal signal, bool normalize = true)
     {
         var spectrum = new float[_fftSize + 1];
         PowerSpectrum(signal.Samples, spectrum, normalize);
-        return new DiscreteSignal(signal.SamplingRate, spectrum);
+        return Signal.FromCopy(spectrum, signal.SamplingRate);
+    }
+
+    /// <summary>
+    /// Computes and returns power spectrum array from <paramref name="signal"/>.
+    /// </summary>
+    public float[] PowerSpectrumArray(Signal signal, bool normalize = true)
+    {
+        var spectrum = new float[_fftSize + 1];
+        PowerSpectrum(signal.Samples, spectrum, normalize);
+        return spectrum;
+    }
+
+    private void DirectFromSpan(ReadOnlySpan<float> samples)
+    {
+        var buffer = new float[Size];
+        samples.Slice(0, Math.Min(samples.Length, Size)).CopyTo(buffer);
+        Direct(buffer, _realSpectrum, _imagSpectrum);
     }
 
     /// <summary>

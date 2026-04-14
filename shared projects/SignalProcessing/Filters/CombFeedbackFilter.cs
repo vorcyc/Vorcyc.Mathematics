@@ -57,7 +57,7 @@ public class CombFeedbackFilter : IirFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public override Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         if (method != FilteringMethod.Auto)
         {
@@ -74,12 +74,12 @@ public class CombFeedbackFilter : IirFilter
         {
             output[i] = b0 * input[i];
         }
-        for (int i = _delay, j = 0; i < signal.SampleCount; i++, j++)
+        for (int i = _delay, j = 0; i < signal.Length; i++, j++)
         {
             output[i] = b0 * input[i] - am * output[j];
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

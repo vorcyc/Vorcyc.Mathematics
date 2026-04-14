@@ -1,6 +1,6 @@
 ﻿using Vorcyc.Mathematics.Framework;
 using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
-using Vorcyc.Mathematics.SignalProcessing.Signals.Builders.Base;
+using Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects;
 
@@ -76,7 +76,7 @@ public class ChorusEffect : AudioEffect
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="lfos">LFOs (in the form of signal builders)</param>
     /// <param name="widths">Widths (max delays, in seconds) for each voice</param>
-    public ChorusEffect(int samplingRate, SignalBuilder[] lfos, float[] widths)
+    public ChorusEffect(int samplingRate, ISampleGenerator[] lfos, float[] widths)
     {
         Guard.AgainstInequality(lfos.Length, widths.Length, "Size of frequency array", "number of LFOs");
 

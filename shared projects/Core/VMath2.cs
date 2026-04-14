@@ -54,10 +54,19 @@ public static partial class VMath
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Diff(float[] samples, float[] diff)
+        => Diff(samples.AsSpan(), diff);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Diff(ReadOnlySpan<float> samples, Span<float> diff)
     {
+        if (diff.Length == 0)
+        {
+            return;
+        }
+
         diff[0] = samples[0];
 
-        for (var i = 1; i < samples.Length; i++)
+        for (var i = 1; i < samples.Length && i < diff.Length; i++)
         {
             diff[i] = samples[i] - samples[i - 1];
         }
@@ -68,6 +77,10 @@ public static partial class VMath
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InterpolateLinear(float[] x, float[] y, float[] arg, float[] interp)
+        => InterpolateLinear(x, y.AsSpan(), arg, interp);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void InterpolateLinear(float[] x, ReadOnlySpan<float> y, float[] arg, float[] interp)
     {
         var left = 0;
         var right = 1;

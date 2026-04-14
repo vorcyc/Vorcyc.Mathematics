@@ -192,5 +192,5 @@ public abstract class OverlapAddFilter : WetDryMixer, IFilter, IOnlineFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
+    public Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto) => this.FilterOnline(signal);
 }

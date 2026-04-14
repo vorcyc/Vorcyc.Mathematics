@@ -1,4 +1,6 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
+using Vorcyc.Mathematics;
+
+namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 /*25.5.10 与 SIMD 和 Parallel版本一起实现。
  * 按理说应该有 SIMDParallel 同时的版本，并且达到最优，但是暂时有问题，所以暂时不放上来。
@@ -10,6 +12,10 @@
 /// <summary>
 /// FFT code version.
 /// </summary>
+/// <remarks>
+/// Prefer <see cref="ComputingContext"/> and <see cref="ComputingScope"/> for execution policy.
+/// </remarks>
+[Obsolete("Use ComputingContext and ComputingScope instead. This enum will be removed in a future release.", false)]
 public enum FftVersion
 {
     /// <summary>
@@ -73,11 +79,70 @@ public unsafe static class FastFourierTransform
     private static InverseInplaceArrayDelegate _inverseInplaceArray = FastFourierTransformNormal.Inverse;
     private static InverseInplaceSpanDelegate _inverseInplaceSpan = FastFourierTransformNormal.Inverse;
 
+#pragma warning disable CS0618 // FftVersion is obsolete; retained for legacy pointer overloads and internal dispatch.
     private static FftVersion _version = FftVersion.Normal;
+
+    private static FftVersion ResolveContext(ComputingContext? context, int? transformLength)
+    {
+        var resolved = ComputingContext.Resolve(context);
+        return resolved.ResolveCpuMode(transformLength) switch
+        {
+            CpuExecutionMode.Normal => FftVersion.Normal,
+            CpuExecutionMode.Simd => FftVersion.SIMD,
+            CpuExecutionMode.Parallel => FftVersion.Parallel,
+            _ => FftVersion.Normal
+        };
+    }
+
+    private static ForwardSpanFloatDelegate ForwardSpanFloatFor(FftVersion version)
+        => version switch
+        {
+            FftVersion.SIMD => FastFourierTransformSIMD.Forward,
+            FftVersion.Parallel => FastFourierTransformParallel.Forward,
+            _ => FastFourierTransformNormal.Forward
+        };
+
+    private static ForwardArrayOutFloatDelegate ForwardArrayOutFloatFor(FftVersion version)
+        => version switch
+        {
+            FftVersion.SIMD => FastFourierTransformSIMD.Forward,
+            FftVersion.Parallel => FastFourierTransformParallel.Forward,
+            _ => FastFourierTransformNormal.Forward
+        };
+
+    private static ForwardSpanComplexDelegate ForwardSpanComplexFor(FftVersion version)
+        => version switch
+        {
+            FftVersion.SIMD => FastFourierTransformSIMD.Forward,
+            FftVersion.Parallel => FastFourierTransformParallel.Forward,
+            _ => FastFourierTransformNormal.Forward
+        };
+
+    private static InverseSpanDelegate InverseSpanFor(FftVersion version)
+        => version switch
+        {
+            FftVersion.SIMD => FastFourierTransformSIMD.Inverse,
+            FftVersion.Parallel => FastFourierTransformParallel.Inverse,
+            _ => FastFourierTransformNormal.Inverse
+        };
+
+    private static InverseArrayDelegate InverseArrayFor(FftVersion version)
+        => version switch
+        {
+            FftVersion.SIMD => FastFourierTransformSIMD.Inverse,
+            FftVersion.Parallel => FastFourierTransformParallel.Inverse,
+            _ => FastFourierTransformNormal.Inverse
+        };
+#pragma warning restore CS0618
 
     /// <summary>
     /// Sets the FFT version to perform related methods.
     /// </summary>
+    /// <remarks>
+    /// Prefer per-call <c>Forward(..., ComputingContext?)</c> or <see cref="ComputingScope.Enter"/>.
+    /// Only pointer-based overloads without a context parameter still use this global setting.
+    /// </remarks>
+    [Obsolete("Use ComputingContext on Forward/Inverse overloads or ComputingScope instead of mutating global FFT delegates.", false)]
     public static FftVersion Version
     {
         get => _version;
@@ -170,8 +235,16 @@ public unsafe static class FastFourierTransform
     /// <param name="N">FFT length, must be a power of 2.</param>
     /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(float[] input, int offset, out ComplexFp32[] output, int N)
+        => Forward(input, offset, out output, N, context: null);
+
+    /// <summary>
+    /// Performs a forward Fast Fourier Transform, converting a real-number array to complex-number array.
+    /// </summary>
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public static bool Forward(float[] input, int offset, out ComplexFp32[] output, int N, ComputingContext? context)
     {
-        return _forwardArrayOutFloat(input, offset, out output, N);
+        var version = ResolveContext(context, N);
+        return ForwardArrayOutFloatFor(version)(input, offset, out output, N);
     }
 
     /// <summary>
@@ -181,8 +254,16 @@ public unsafe static class FastFourierTransform
     /// <param name="output">Transform result: complex-number span (frequency-domain).</param>
     /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(ReadOnlySpan<float> input, Span<ComplexFp32> output)
+        => Forward(input, output, context: null);
+
+    /// <summary>
+    /// Performs a forward Fast Fourier Transform, converting a real-number span to complex-number span.
+    /// </summary>
+    /// <param name="context">Optional execution policy. When null, uses <see cref="ComputingContext.Resolve"/>.</param>
+    public static bool Forward(ReadOnlySpan<float> input, Span<ComplexFp32> output, ComputingContext? context)
     {
-        return _forwardSpanFloat(input, output);
+        var version = ResolveContext(context, input.Length);
+        return ForwardSpanFloatFor(version)(input, output);
     }
 
     /// <summary>
@@ -204,8 +285,15 @@ public unsafe static class FastFourierTransform
     /// <param name="output">Transform result: complex-number span (frequency-domain).</param>
     /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Forward(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output)
+        => Forward(input, output, context: null);
+
+    /// <summary>
+    /// Performs a forward FFT on complex spans with an optional execution policy.
+    /// </summary>
+    public static bool Forward(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, ComputingContext? context)
     {
-        return _forwardSpanComplex(input, output);
+        var version = ResolveContext(context, input.Length);
+        return ForwardSpanComplexFor(version)(input, output);
     }
 
     /// <summary>
@@ -282,8 +370,22 @@ public unsafe static class FastFourierTransform
     /// <param name="scale">If true, scales the result by 1/N.</param>
     /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Inverse(ComplexFp32[] input, int inOffset, out ComplexFp32[] output, int outOffset, int N, bool scale = true)
+        => Inverse(input, inOffset, out output, outOffset, N, scale, context: null);
+
+    /// <summary>
+    /// Performs an inverse FFT on complex arrays with an optional execution policy.
+    /// </summary>
+    public static bool Inverse(
+        ComplexFp32[] input,
+        int inOffset,
+        out ComplexFp32[] output,
+        int outOffset,
+        int N,
+        bool scale,
+        ComputingContext? context)
     {
-        return _inverseArray(input, inOffset, out output, outOffset, N, scale);
+        var version = ResolveContext(context, N);
+        return InverseArrayFor(version)(input, inOffset, out output, outOffset, N, scale);
     }
 
     /// <summary>
@@ -294,8 +396,15 @@ public unsafe static class FastFourierTransform
     /// <param name="scale">If true, scales the result by 1/N.</param>
     /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Inverse(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, bool scale = true)
+        => Inverse(input, output, scale, context: null);
+
+    /// <summary>
+    /// Performs an inverse FFT on complex spans with an optional execution policy.
+    /// </summary>
+    public static bool Inverse(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, bool scale, ComputingContext? context)
     {
-        return _inverseSpan(input, output, scale);
+        var version = ResolveContext(context, input.Length);
+        return InverseSpanFor(version)(input, output, scale);
     }
 
     /// <summary>
@@ -330,8 +439,15 @@ public unsafe static class FastFourierTransform
     /// <param name="scale">If true, scales the result by 1/N.</param>
     /// <returns>True if the transform succeeds, false if input parameters are invalid.</returns>
     public static bool Inverse(Span<ComplexFp32> data, bool scale = true)
+        => Inverse(data, scale, context: null);
+
+    /// <summary>
+    /// Performs an inplace inverse FFT with an optional execution policy.
+    /// </summary>
+    public static bool Inverse(Span<ComplexFp32> data, bool scale, ComputingContext? context)
     {
-        return _inverseInplaceSpan(data, scale);
+        var version = ResolveContext(context, data.Length);
+        return InverseSpanFor(version)(data, data, scale);
     }
 
     #endregion

@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics.Experimental.Signals;
+﻿using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.Extensions.FFTW;

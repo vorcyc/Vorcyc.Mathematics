@@ -11,12 +11,6 @@ public static class IFilterExtensions
     /// <summary>
     /// Filters data frame-wise.
     /// </summary>
-    /// <param name="filter">Online filter</param>
-    /// <param name="input">Input block of samples</param>
-    /// <param name="output">Block of filtered samples</param>
-    /// <param name="count">Number of samples to filter</param>
-    /// <param name="inputPos">Input starting index</param>
-    /// <param name="outputPos">Output starting index</param>
     public static void Process(this IOnlineFilter filter,
                                float[] input,
                                float[] output,
@@ -40,11 +34,9 @@ public static class IFilterExtensions
     /// <summary>
     /// Filters entire <paramref name="signal"/> by processing each signal sample in a loop.
     /// </summary>
-    /// <param name="filter">Online filter</param>
-    /// <param name="signal">Input signal</param>
-    public static DiscreteSignal FilterOnline(this IOnlineFilter filter, DiscreteSignal signal)
+    public static Signal FilterOnline(this IOnlineFilter filter, Signal signal)
     {
-        var output = new float[signal.SampleCount];
+        var output = new float[signal.Length];
         var samples = signal.Samples;
 
         for (var i = 0; i < samples.Length; i++)
@@ -52,42 +44,36 @@ public static class IFilterExtensions
             output[i] = filter.Process(samples[i]);
         }
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
-
     /// <summary>
-    /// 我加的 in-place 版本
+    /// In-place online filtering.
     /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="signal"></param>
-    public static void FilterOnline_Inplace(this IOnlineFilter filter, DiscreteSignal signal)
+    public static void FilterOnline_Inplace(this IOnlineFilter filter, Signal signal)
     {
-        for (var i = 0; i < signal.SampleCount; i++)
+        var samples = signal.Samples;
+        for (var i = 0; i < signal.Length; i++)
         {
-            signal[i] = filter.Process(signal[i]);
+            samples[i] = filter.Process(samples[i]);
         }
+
+        signal.NotifySamplesModified();
     }
 
-
-
-
-
     /// <summary>
-    /// Calculates extra gain for filtering so that frequency response is normalized onto [0..1] range. 
-    /// Call this function if the filter could not be designed with proper frequency response gain due to numerical problems.
+    /// Calculates extra gain for filtering so that frequency response is normalized onto [0..1] range.
     /// </summary>
-    /// <param name="filter">Online filter</param>
-    /// <param name="fftSize">FFT size (for evaluating frequency response)</param>
     public static float EstimateGain(this IOnlineFilter filter, int fftSize = 512)
     {
-        var unit = DiscreteSignal.Unit(fftSize);
+        var unit = Signal.Unit(fftSize);
 
-        // get impulse response
-
-        var response = unit.Samples.Select(s => filter.Process(s)).ToArray();
-
-        // get frequency response
+        var unitSamples = unit.Samples;
+        var response = new float[fftSize];
+        for (var i = 0; i < fftSize; i++)
+        {
+            response[i] = filter.Process(unitSamples[i]);
+        }
 
         var spectrum = new float[fftSize / 2 + 1];
         var fft = new RealFft(fftSize);
@@ -97,56 +83,45 @@ public static class IFilterExtensions
     }
 
     /// <summary>
-    /// Filters entire <paramref name="signal"/> with extra <paramref name="gain"/>. 
-    /// Call this function if the filter could not be designed with proper frequency response gain due to numerical problems.
+    /// Filters entire <paramref name="signal"/> with extra <paramref name="gain"/>.
     /// </summary>
-    /// <param name="filter">Online filter</param>
-    /// <param name="signal">Input signal</param>
-    /// <param name="gain">Gain</param>
-    public static DiscreteSignal ApplyTo(this IOnlineFilter filter,
-                                         DiscreteSignal signal,
-                                         float gain)
+    public static Signal ApplyTo(this IOnlineFilter filter, Signal signal, float gain)
     {
-        var output = signal.Samples.Select(s => gain * filter.Process(s));
-        return new DiscreteSignal(signal.SamplingRate, output);
+        var samples = signal.Samples;
+        var output = new float[signal.Length];
+        for (var i = 0; i < output.Length; i++)
+        {
+            output[i] = gain * filter.Process(samples[i]);
+        }
+
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>
-    /// Processes one <paramref name="sample"/> of a signal with extra <paramref name="gain"/>. 
-    /// Call this function if the filter could not be designed with proper frequency response gain due to numerical problems.
+    /// Processes one sample with extra <paramref name="gain"/>.
     /// </summary>
-    /// <param name="filter">Online filter</param>
-    /// <param name="sample">Input sample</param>
-    /// <param name="gain">Gain</param>
     public static float Process(this IOnlineFilter filter, float sample, float gain)
-    {
-        return gain * filter.Process(sample);
-    }
+        => gain * filter.Process(sample);
 
 #if DEBUG
     /// <summary>
-    /// NOTE. For educational purposes and for testing online filtering.
-    /// 
-    /// Implementation of offline filtering in time domain frame-by-frame.
-    /// 
+    /// Offline filtering in time domain frame-by-frame (for tests).
     /// </summary>
-    public static DiscreteSignal ProcessChunks(this IOnlineFilter filter,
-                                                    DiscreteSignal signal,
-                                                    int frameSize = 4096)
+    public static Signal ProcessChunks(this IOnlineFilter filter, Signal signal, int frameSize = 4096)
     {
-        var input = signal.Samples;
-        var output = new float[input.Length];
+        var input = new float[signal.Length];
+        signal.Samples.CopyTo(input);
+        var output = new float[signal.Length];
 
         var i = 0;
-        for (; i + frameSize < input.Length; i += frameSize)
+        for (; i + frameSize < signal.Length; i += frameSize)
         {
             filter.Process(input, output, frameSize, i, i);
         }
 
-        // process last chunk
-        filter.Process(input, output, input.Length - i, i, i);
+        filter.Process(input, output, signal.Length - i, i, i);
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 #endif
 }

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 
 namespace Vorcyc.Mathematics.Experimental.CurveFitting;
 
@@ -91,6 +92,22 @@ public class FitResult<T>(Func<T, T> predict, T[] parameters, T mse) where T : s
 /// <summary>
 /// 表示曲线拟合的结果，支持多列输入。
 /// </summary>
+/// <summary>
+/// Regression result where inputs are DSP <see cref="Signal"/> instances.
+/// </summary>
+public class SignalFitResult<T>(Func<Signal, T> predict, T[] parameters, T mse)
+    where T : struct, IFloatingPointIeee754<T>
+{
+    /// <summary>Predicts a scalar target from a signal.</summary>
+    public Func<Signal, T> Predict { get; } = predict ?? throw new ArgumentNullException(nameof(predict));
+
+    /// <summary>Flattened MLP parameters.</summary>
+    public T[] Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
+
+    /// <summary>Training mean squared error.</summary>
+    public T MeanSquaredError { get; } = mse;
+}
+
 public class MultiColumnFitResult<T>(Func<DataRow<T>, T>? predict, T[] parameters, T mse)
     where T : struct, IFloatingPointIeee754<T>
 {

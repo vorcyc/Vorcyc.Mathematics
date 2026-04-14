@@ -44,7 +44,7 @@ public class PreEmphasisFilter : FirFilter
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="method">Filtering method</param>
-    public override DiscreteSignal ApplyTo(DiscreteSignal signal, FilteringMethod method = FilteringMethod.Auto)
+    public override Signal ApplyTo(Signal signal, FilteringMethod method = FilteringMethod.Auto)
     {
         if (method != FilteringMethod.Auto)
         {
@@ -68,7 +68,7 @@ public class PreEmphasisFilter : FirFilter
         }
         output[i] = b1 * _prevSample;
 
-        return new DiscreteSignal(signal.SamplingRate, output);
+        return Signal.FromCopy(output, signal.SamplingRate);
     }
 
     /// <summary>

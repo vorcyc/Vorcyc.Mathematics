@@ -9,14 +9,36 @@
     <Import_RootNamespace>Vorcyc.Mathematics.Calculus</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CalculusVectorOps.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Derivative.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DualNumber.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HyperDualNumber.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hessian.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Optimization\BfgsOptimizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Optimization\LBfgsOptimizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Optimization\LevenbergMarquardt.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Optimization\LineSearch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Jacobian.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Series\FourierSeries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Series\FourierSeriesFromSamples.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Functions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Integration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Limits.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalStep.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\AdaptiveRungeKutta.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\AdaptiveRungeKuttaSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\ImplicitEuler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\OdeTrajectory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\ShootingBvpSolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\Bisection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\Brent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\OdeStepControl.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\NewtonRaphson.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\NewtonRaphsonSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\RungeKutta.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericalMethods\RungeKuttaSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Series\ChebyshevSeries.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Series\PadeApproximant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Series\TaylorSeries.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)NumericalMethods\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Optimization\" />
     <Folder Include="$(MSBuildThisFileDirectory)Series\" />
   </ItemGroup>
 </Project>
