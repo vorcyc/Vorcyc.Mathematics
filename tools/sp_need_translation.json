@@ -1,6 +1,0 @@
-[
-  "当前位置 : [首页](HOME.md)/[信号处理模块](Module_SignalProcessing.md)/[信号定义和相关操作](Module_SignalProcessing_Signals.md)",
-  "- `TransformToFrequencyDomain(WindowType?, FftVersion)` → `FrequencyDomain`（**已过时**，见 [ComputingContext](Module_ComputingContext.md)）",
-  "当前位置 : [首页](HOME.md)/[信号处理模块](Module_SignalProcessing.md)/[常用操作](Module_SignalProcessing_Operations.md)",
-  "当前位置 : [首页](HOME.md)/[信号处理模块](Module_SignalProcessing.md)/[一维滤波器](Module_SignalProcessing_Filters.md)"
-]

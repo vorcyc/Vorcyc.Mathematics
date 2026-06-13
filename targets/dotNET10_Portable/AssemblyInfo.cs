@@ -11,4 +11,3 @@
 [assembly: InternalsVisibleTo("Signal")]
 
 [assembly: InternalsVisibleTo("DSP_module_test")]
-[assembly:InternalsVisibleTo("")]
