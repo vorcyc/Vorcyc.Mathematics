@@ -1,70 +1,70 @@
 0.7.5.0 - 2025.7.9
 
-1. ĞŞ¸Ä ComplexFp32 ºÍ Complex<T> ÀàĞÍ£º
-	 * 1 ¸Ä»ØÖ»¶Á½á¹¹Ìå
-	 * 2 Ôö¼ÓÓëÖµÔª×æ»¥×ª
-	 * 3 Ôö¼Ó´Ó³¤¶ÈÎª2µÄ Span<T> ¸ßĞÔÄÜ×ª»»Îª ComplexF
-2. Ìí¼Ó ComplexÀàĞÍ£¬±£³ÖÓëComplexFp32 ºÍ Complex<T> µÄÊµÏÖÒ»ÖÂ
-3. ĞŞ¸Ä PinableArray µÄÀàĞÍÔ¼ÊøÎª INumberBase<T>£¬ÒÔÖ§³Ö°üº¬ComplexÔÚÄÚµÄ¸ü¶àÊıÖµÀàĞÍ
+1. ï¿½Ş¸ï¿½ ComplexFp32 ï¿½ï¿½ Complex<T> ï¿½ï¿½ï¿½Í£ï¿½
+	 * 1 ï¿½Ä»ï¿½Ö»ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½
+	 * 2 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÔªï¿½æ»¥×ª
+	 * 3 ï¿½ï¿½ï¿½Ó´Ó³ï¿½ï¿½ï¿½Îª2ï¿½ï¿½ Span<T> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Îª ComplexF
+2. ï¿½ï¿½ï¿½ï¿½ Complexï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ComplexFp32 ï¿½ï¿½ Complex<T> ï¿½ï¿½Êµï¿½ï¿½Ò»ï¿½ï¿½
+3. ï¿½Ş¸ï¿½ PinableArray ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Îª INumberBase<T>ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Ö°ï¿½ï¿½ï¿½Complexï¿½ï¿½ï¿½ÚµÄ¸ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
 
 
 
 25.11.18
-Ìí¼Ó Vorcyc.Mathematics.Helpers.StringExtensions Àà£¬°üº¬×Ö·û´®À©Õ¹·½·¨
+ï¿½ï¿½ï¿½ï¿½ Vorcyc.Mathematics.Helpers.StringExtensions ï¿½à£¬ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½
 
 25.11.20
-Ô¤±àÒë¹¤³ÌÓÉ net9.0 ĞŞ¸ÄÎª net10.0
+Ô¤ï¿½ï¿½ï¿½ë¹¤ï¿½ï¿½ï¿½ï¿½ net9.0 ï¿½Ş¸ï¿½Îª net10.0
 
 25.11.25
-PinnableArray<T>ÀàµÄÀàĞÍÔ¼ÊøÓÉ unmanaged, INumber<T> ĞŞ¸ÄÎª unmanaged, INumberBase<T>£¬ÒÔÖ§³Ö¸ü¶àÊıÖµÀàĞÍ
-PinnableArray<T>ÀàÀàÖĞµÄ Max() ¡¢Min() ·½·¨×ªÒÆµ½ PinnableArrayExtension ÀàÖĞ×÷ÎªÀ©Õ¹·½·¨ÊµÏÖ£¬²¢ÇÒÀàĞÍÔ¼ÊøÎª unmanaged, INumber<T>
-ÎªPinnableArray<T>ÀàÌí¼Ó°´ÒıÓÃ´«µİÔªËØµÄ Each() ·½·¨
+PinnableArray<T>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ unmanaged, INumber<T> ï¿½Ş¸ï¿½Îª unmanaged, INumberBase<T>ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
+PinnableArray<T>ï¿½ï¿½ï¿½ï¿½ï¿½Ğµï¿½ Max() ï¿½ï¿½Min() ï¿½ï¿½ï¿½ï¿½×ªï¿½Æµï¿½ PinnableArrayExtension ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½Êµï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Îª unmanaged, INumber<T>
+ÎªPinnableArray<T>ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½Ôªï¿½Øµï¿½ Each() ï¿½ï¿½ï¿½ï¿½
 
 
 0.8.1.0
 - 2025.11.28
-Ìí¼Ó dotNET10_Portable_Extensions_FFTW ¿â£¬ÆäÎª FFTW¿âµÄ.NET·â×°£¬²¢ÇÒÓÃÁËĞÂ´úÂëÓÅ»¯ĞÔÄÜ¡£
+ï¿½ï¿½ï¿½ï¿½ dotNET10_Portable_Extensions_FFTW ï¿½â£¬ï¿½ï¿½Îª FFTWï¿½ï¿½ï¿½.NETï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½Ü¡ï¿½
 
 0.8.3.0
 - 2025.12.05
-¶Ô FFTW ¿âÖĞµÄ·½·¨½øĞĞÖØÃüÃû£¬Ê¹Æä¸üÓÑºÃ¡£
+ï¿½ï¿½ FFTW ï¿½ï¿½ï¿½ĞµÄ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ÑºÃ¡ï¿½
 
 26.1.11
-ĞŞÕı´°º¯ÊıÖĞ Èı½Ç´°Triangular µÄ¹«Ê½´íÎó¡¢ĞŞÕı´úÂëÂ©¶´¡¢Ôö¼ÓÕë¶ÔÊµÊıµÄSIMD°æ±¾£º
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ç´ï¿½Triangular ï¿½Ä¹ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½SIMDï¿½æ±¾ï¿½ï¿½
 
 26.1.22
-ĞŞ¸´ FFTWÖĞµÄÒ»Ğ©Â©¶´£¬µ÷ÕûÁËÑéÖ¤ÖĞµÄ²»ºÏÀí´¦£¬¸ÄÓÃ¡°¿íÏŞÖÆ¡±¡£
+ï¿½Ş¸ï¿½ FFTWï¿½Ğµï¿½Ò»Ğ©Â©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ĞµÄ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¡ï¿½ï¿½ï¿½
 
 
 26.3.23
-É¾³ı Vorcyc.Mathematics.PinnableArray.
-ĞÂµÄ¼Óµ½ Vorcyc.Mathematics.Buffers ÃüÃû¿Õ¼äÏÂ£¬¸ÄÃûÎª Vorcyc.Mathematics.Buffers.PinnableArray<T>£¬²¢ÇÒÔö¼ÓÁËÒ»¸öĞÂµÄ PinnableArrayExtension ÀàÀ´ÊµÏÖÒ»Ğ©À©Õ¹·½·¨¡£
+É¾ï¿½ï¿½ Vorcyc.Mathematics.PinnableArray.
+ï¿½ÂµÄ¼Óµï¿½ Vorcyc.Mathematics.Buffers ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½Îª Vorcyc.Mathematics.Buffers.PinnableArray<T>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Âµï¿½ PinnableArrayExtension ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Ò»Ğ©ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Vorcyc.Mathematics.Buffers ÃüÃû¿Õ¼äĞÂ¼Ó :
-IPinnedBuffer½Ó¿Ú
-IPinnedBufferExtensionsÀ©Õ¹Àà
-NativeBufferÀà
+Vorcyc.Mathematics.Buffers ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½Â¼ï¿½ :
+IPinnedBufferï¿½Ó¿ï¿½
+IPinnedBufferExtensionsï¿½ï¿½Õ¹ï¿½ï¿½
+NativeBufferï¿½ï¿½
 PinnedArrayPool
 POHBuffer
 PooledPinnedBuffer
 
 
-ĞÂµÄ PinnableArray<T> ÀàÈ¥µôÁË ÔËËã·ûÖØÔØ¡£
+ï¿½Âµï¿½ PinnableArray<T> ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¡ï¿½
 
-Vorcyc.Mathematics.Experimental.Signals.FrequencyDomain Àà¸Ä³É Ö»¶Á½á¹¹Ìå£¬´Ó¶ø¼õÉÙĞü´¸ÎÊÌâ¡£
-Vorcyc.Mathematics.Experimental.Signals.SignalSegment Àà¸Ä³É Ö»¶Á½á¹¹Ìå£¬´Ó¶ø¼õÉÙĞü´¸ÎÊÌâ¡£
+Vorcyc.Mathematics.Experimental.Signals.FrequencyDomain ï¿½ï¿½Ä³ï¿½ Ö»ï¿½ï¿½ï¿½á¹¹ï¿½å£¬ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â¡£
+Vorcyc.Mathematics.Experimental.Signals.SignalSegment ï¿½ï¿½Ä³ï¿½ Ö»ï¿½ï¿½ï¿½á¹¹ï¿½å£¬ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â¡£
 
-Vorcyc.Mathematics.Experimental.Signals.ITimeDomainCharacteristics ½Ó¿Ú
-ÓÉ
-Period¡¢Amplitude ¡¢Power¡¢Energy
-¸Ä³É£º
-Period¡¢Amplitude¡¢TotalPower¡¢AveragePower¡¢TotalEnergy¡¢AverageEnergy¡¢RMS¡¢ZeroCrossingRate¡¢Entropy
+Vorcyc.Mathematics.Experimental.Signals.ITimeDomainCharacteristics ï¿½Ó¿ï¿½
+ï¿½ï¿½
+Periodï¿½ï¿½Amplitude ï¿½ï¿½Powerï¿½ï¿½Energy
+ï¿½Ä³É£ï¿½
+Periodï¿½ï¿½Amplitudeï¿½ï¿½TotalPowerï¿½ï¿½AveragePowerï¿½ï¿½TotalEnergyï¿½ï¿½AverageEnergyï¿½ï¿½RMSï¿½ï¿½ZeroCrossingRateï¿½ï¿½Entropy
 
-ĞÂÔö£º
-IModifiableTimeDomainSignal ½Ó¿Ú
-ISingleThreadTimeDomainSignal ½Ó¿Ú
-ModifiableTimeDomainSignal Àà
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+IModifiableTimeDomainSignal ï¿½Ó¿ï¿½
+ISingleThreadTimeDomainSignal ï¿½Ó¿ï¿½
+ModifiableTimeDomainSignal ï¿½ï¿½
 
-	FFTW À©Õ¹:
+	FFTW ï¿½ï¿½Õ¹:
 	HilbertTransform
 	EnvelopeComputer

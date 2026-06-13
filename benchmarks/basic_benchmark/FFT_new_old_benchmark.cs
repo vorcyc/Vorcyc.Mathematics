@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Numerics;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;

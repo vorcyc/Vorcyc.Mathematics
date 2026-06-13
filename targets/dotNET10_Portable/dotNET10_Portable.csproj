@@ -13,9 +13,9 @@
 		<Company>Vorcyc</Company>
 		<Description>A pure dotNET and high performance math library.</Description>
 		<Copyright>Vorcyc® Mathematics</Copyright>
-		<Version>0.8.7.3</Version>
-		<AssemblyVersion>0.8.7.3</AssemblyVersion>
-		<Title>Vorcy.Mathematics</Title>
+		<Version>0.8.7.4</Version>
+		<AssemblyVersion>0.8.7.4</AssemblyVersion>
+		<Title>Vorcyc.Mathematics</Title>
 		<PackageIcon>logo1.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>.NET Math Statistics DSP LinearAlgebra Numerics ArrayEx Generic-Math misc</PackageTags>

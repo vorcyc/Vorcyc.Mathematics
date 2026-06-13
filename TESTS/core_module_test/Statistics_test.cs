@@ -1,4 +1,5 @@
 ﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.Framework.Utilities;
 using Vorcyc.Mathematics.Statistics;
 
@@ -15,16 +16,16 @@ internal class Statistics_test
         {
             //var values = new float[Random.Shared.Next(50,5000000)];
             var size = Random.Shared.Next(50, 5000000);
-            var values = new PinnableArray<double>(size, false);
-            values.FillWithRandomNumber();
+            var values = new PinnableArray<float>(size, false);
+            values.Span.FillWithRandomNumber();
 
 
             $"length : {values.Values.Length}".PrintLine(ConsoleColor.Green);
-            var average = values.AsSpan().Variance<double>();
+            var average = values.Span.Variance<float>();
             average.PrintLine();
 
-            $"length : {values.AsSpan().Length}".PrintLine(ConsoleColor.Green);
-            average = values.AsSpan().Variance();
+            $"length : {values.Span.Length}".PrintLine(ConsoleColor.Green);
+            average = values.Span.Variance();
             average.PrintLine();
 
             "----------".PrintLine(ConsoleColor.Red);
