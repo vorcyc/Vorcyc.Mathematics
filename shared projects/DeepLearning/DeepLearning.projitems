@@ -27,6 +27,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\BatchTensor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\BatchTensorUtilities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\IBatchLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\IBatchCompositeLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\ILayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\LayerBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Parameter.cs" />

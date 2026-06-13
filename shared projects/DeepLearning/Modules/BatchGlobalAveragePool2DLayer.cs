@@ -25,17 +25,18 @@ public sealed class BatchGlobalAveragePool2DLayer<T> : BatchLayerBase<T>
     {
         _inputShape = input.Shape;
         var output = new BatchTensor<T>(input.Batch, 1, 1, input.Channels);
-        int spatial = input.Height * input.Width;
+        int height = input.Height, width = input.Width, channels = input.Channels;
+        int spatial = height * width;
         var scale = T.One / T.CreateTruncating(spatial);
 
-        for (int n = 0; n < input.Batch; n++)
+        ComputingContextExecution.ForEach(null, 0, input.Batch, n =>
         {
-            for (int c = 0; c < input.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
                 T sum = T.Zero;
-                for (int h = 0; h < input.Height; h++)
+                for (int h = 0; h < height; h++)
                 {
-                    for (int w = 0; w < input.Width; w++)
+                    for (int w = 0; w < width; w++)
                     {
                         sum += input[n, h, w, c];
                     }
@@ -43,7 +44,7 @@ public sealed class BatchGlobalAveragePool2DLayer<T> : BatchLayerBase<T>
 
                 output[n, 0, 0, c] = sum * scale;
             }
-        }
+        }, spatial * channels);
 
         CacheForward(input, output);
         return output;
@@ -53,24 +54,25 @@ public sealed class BatchGlobalAveragePool2DLayer<T> : BatchLayerBase<T>
     public override BatchTensor<T> Backward(BatchTensor<T> gradOutput)
     {
         EnsureCached();
-        int spatial = _inputShape.Height * _inputShape.Width;
+        int height = _inputShape.Height, width = _inputShape.Width, channels = _inputShape.Channels;
+        int spatial = height * width;
         var scale = T.One / T.CreateTruncating(spatial);
-        var gradInput = new BatchTensor<T>(_inputShape.Batch, _inputShape.Height, _inputShape.Width, _inputShape.Channels);
+        var gradInput = new BatchTensor<T>(_inputShape.Batch, height, width, channels);
 
-        for (int n = 0; n < _inputShape.Batch; n++)
+        ComputingContextExecution.ForEach(null, 0, _inputShape.Batch, n =>
         {
-            for (int c = 0; c < _inputShape.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
                 var grad = gradOutput[n, 0, 0, c] * scale;
-                for (int h = 0; h < _inputShape.Height; h++)
+                for (int h = 0; h < height; h++)
                 {
-                    for (int w = 0; w < _inputShape.Width; w++)
+                    for (int w = 0; w < width; w++)
                     {
                         gradInput[n, h, w, c] = grad;
                     }
                 }
             }
-        }
+        }, spatial * channels);
 
         return gradInput;
     }

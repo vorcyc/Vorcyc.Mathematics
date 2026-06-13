@@ -133,38 +133,48 @@ public sealed class BatchDepthwiseConvolution2DLayer<T> : BatchLayerBase<T>
         gradInput.Values.Clear();
         var pad = (KernelSize * Dilation + Dilation - 1) / 2;
 
-        for (int n = 0; n < input.Batch; n++)
-        {
-            for (int c = 0; c < Channels; c++)
-            {
-                var filter = _filters[c].Value.Values;
-                var filterGrad = _filters[c].Gradient.Values;
-                for (int ay = 0; ay < outShape.Height; ay++)
-                {
-                    var y = ay * Stride - pad;
-                    for (int ax = 0; ax < outShape.Width; ax++)
-                    {
-                        var x = ax * Stride - pad;
-                        var gradOut = gradOutput[n, ay, ax, c];
-                        _bias.Gradient[0, 0, c] += gradOut;
+        int batch = input.Batch, inHeight = input.Height, inWidth = input.Width;
+        int kernelSize = KernelSize, stride = Stride, dilation = Dilation;
+        int outHeight = outShape.Height, outWidth = outShape.Width;
 
-                        for (int fy = 0; fy < KernelSize; fy++)
+        // Parallel over channels: channel c reads/writes only its own filter, bias slot,
+        // and the c-th channel plane of gradInput across all n — fully disjoint per c, so
+        // both gradInput and weight/bias gradients are race-free in a single kernel.
+        long workPerChannel = (long)batch * outHeight * outWidth * kernelSize * kernelSize;
+        ComputingContextExecution.ForEach(null, 0, Channels, c =>
+        {
+            var filter = _filters[c].Value.Values;
+            var filterGrad = _filters[c].Gradient.Values;
+            T biasAcc = T.Zero;
+
+            for (int n = 0; n < batch; n++)
+            {
+                for (int ay = 0; ay < outHeight; ay++)
+                {
+                    var y = ay * stride - pad;
+                    for (int ax = 0; ax < outWidth; ax++)
+                    {
+                        var x = ax * stride - pad;
+                        var gradOut = gradOutput[n, ay, ax, c];
+                        biasAcc += gradOut;
+
+                        for (int fy = 0; fy < kernelSize; fy++)
                         {
-                            var oy = y + fy * Dilation + Dilation - 1;
-                            if (oy < 0 || oy >= input.Height)
+                            var oy = y + fy * dilation + dilation - 1;
+                            if (oy < 0 || oy >= inHeight)
                             {
                                 continue;
                             }
 
-                            for (int fx = 0; fx < KernelSize; fx++)
+                            for (int fx = 0; fx < kernelSize; fx++)
                             {
-                                var ox = x + fx * Dilation + Dilation - 1;
-                                if (ox < 0 || ox >= input.Width)
+                                var ox = x + fx * dilation + dilation - 1;
+                                if (ox < 0 || ox >= inWidth)
                                 {
                                     continue;
                                 }
 
-                                var fi = (fy * KernelSize) + fx;
+                                var fi = (fy * kernelSize) + fx;
                                 var inVal = input[n, oy, ox, c];
                                 filterGrad[fi] += gradOut * inVal;
                                 gradInput[n, oy, ox, c] += gradOut * filter[fi];
@@ -173,7 +183,9 @@ public sealed class BatchDepthwiseConvolution2DLayer<T> : BatchLayerBase<T>
                     }
                 }
             }
-        }
+
+            _bias.Gradient[0, 0, c] += biasAcc;
+        }, workPerChannel);
 
         return gradInput;
     }

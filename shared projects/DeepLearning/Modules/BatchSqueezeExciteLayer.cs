@@ -6,7 +6,7 @@ using Vorcyc.Mathematics.DeepLearning;
 /// <summary>
 /// Squeeze-and-Excitation channel attention (GAP → FC → ReLU → FC → Sigmoid → scale).
 /// </summary>
-public sealed class BatchSqueezeExciteLayer<T> : BatchLayerBase<T>
+public sealed class BatchSqueezeExciteLayer<T> : BatchLayerBase<T>, IBatchCompositeLayer<T>
     where T : unmanaged, IBinaryFloatingPointIeee754<T>
 {
     private readonly BatchGlobalAveragePool2DLayer<T> _squeeze;
@@ -37,6 +37,9 @@ public sealed class BatchSqueezeExciteLayer<T> : BatchLayerBase<T>
 
     public int Channels { get; }
     public int Reduction { get; }
+
+    /// <summary>Child layers in execution order (none carry batch-norm state, but exposed for consistency and future use).</summary>
+    public IReadOnlyList<IBatchLayer<T>> Children => [_squeeze, _reduce, _relu, _expand, _gate];
 
     /// <inheritdoc/>
     public override IReadOnlyList<Parameter<T>> Parameters
@@ -69,20 +72,23 @@ public sealed class BatchSqueezeExciteLayer<T> : BatchLayerBase<T>
         _cachedGates = _gate.Forward(_expand.Forward(reduced, training), training);
 
         var output = new BatchTensor<T>(input.Batch, input.Height, input.Width, input.Channels);
-        for (int n = 0; n < input.Batch; n++)
+        int height = input.Height, width = input.Width, channels = input.Channels;
+        var gates = _cachedGates;
+        long workPerSample = (long)height * width * channels;
+        ComputingContextExecution.ForEach(null, 0, input.Batch, n =>
         {
-            for (int c = 0; c < input.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
-                var scale = _cachedGates[n, 0, 0, c];
-                for (int h = 0; h < input.Height; h++)
+                var scale = gates[n, 0, 0, c];
+                for (int h = 0; h < height; h++)
                 {
-                    for (int w = 0; w < input.Width; w++)
+                    for (int w = 0; w < width; w++)
                     {
                         output[n, h, w, c] = input[n, h, w, c] * scale;
                     }
                 }
             }
-        }
+        }, workPerSample);
 
         CacheForward(input, output);
         return output;
@@ -102,15 +108,17 @@ public sealed class BatchSqueezeExciteLayer<T> : BatchLayerBase<T>
         var gradInput = new BatchTensor<T>(input.Batch, input.Height, input.Width, input.Channels);
         var gradGate = new BatchTensor<T>(input.Batch, 1, 1, input.Channels);
 
-        for (int n = 0; n < input.Batch; n++)
+        int height = input.Height, width = input.Width, channels = input.Channels;
+        long workPerSample = (long)height * width * channels;
+        ComputingContextExecution.ForEach(null, 0, input.Batch, n =>
         {
-            for (int c = 0; c < input.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
                 var gate = gates[n, 0, 0, c];
                 T gateGrad = T.Zero;
-                for (int h = 0; h < input.Height; h++)
+                for (int h = 0; h < height; h++)
                 {
-                    for (int w = 0; w < input.Width; w++)
+                    for (int w = 0; w < width; w++)
                     {
                         gradInput[n, h, w, c] = gradOutput[n, h, w, c] * gate;
                         gateGrad += gradOutput[n, h, w, c] * input[n, h, w, c];
@@ -119,7 +127,7 @@ public sealed class BatchSqueezeExciteLayer<T> : BatchLayerBase<T>
 
                 gradGate[n, 0, 0, c] = gateGrad;
             }
-        }
+        }, workPerSample);
 
         var gradExpand = _gate.Backward(gradGate);
         var gradReduced = _expand.Backward(gradExpand);

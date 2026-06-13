@@ -26,14 +26,16 @@ public sealed class BatchUpsample2DLayer<T> : BatchLayerBase<T>
         _inputShape = input.Shape;
         var output = new BatchTensor<T>(input.Batch, input.Height * 2, input.Width * 2, input.Channels);
 
-        for (int n = 0; n < input.Batch; n++)
+        int height = input.Height, width = input.Width, channels = input.Channels;
+        long workPerSample = (long)height * width * channels * 4;
+        ComputingContextExecution.ForEach(null, 0, input.Batch, n =>
         {
-            for (int c = 0; c < input.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
-                for (int ay = 0; ay < input.Height; ay++)
+                for (int ay = 0; ay < height; ay++)
                 {
                     var y = 2 * ay;
-                    for (int ax = 0; ax < input.Width; ax++)
+                    for (int ax = 0; ax < width; ax++)
                     {
                         var x = 2 * ax;
                         var value = input[n, ay, ax, c];
@@ -47,7 +49,7 @@ public sealed class BatchUpsample2DLayer<T> : BatchLayerBase<T>
                     }
                 }
             }
-        }
+        }, workPerSample);
 
         CacheForward(input, output);
         return output;
@@ -59,14 +61,16 @@ public sealed class BatchUpsample2DLayer<T> : BatchLayerBase<T>
         EnsureCached();
         var gradInput = new BatchTensor<T>(_inputShape.Batch, _inputShape.Height, _inputShape.Width, _inputShape.Channels);
 
-        for (int n = 0; n < _inputShape.Batch; n++)
+        int height = _inputShape.Height, width = _inputShape.Width, channels = _inputShape.Channels;
+        long workPerSample = (long)height * width * channels * 4;
+        ComputingContextExecution.ForEach(null, 0, _inputShape.Batch, n =>
         {
-            for (int c = 0; c < _inputShape.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
-                for (int ay = 0; ay < _inputShape.Height; ay++)
+                for (int ay = 0; ay < height; ay++)
                 {
                     var y = 2 * ay;
-                    for (int ax = 0; ax < _inputShape.Width; ax++)
+                    for (int ax = 0; ax < width; ax++)
                     {
                         var x = 2 * ax;
                         T sum = T.Zero;
@@ -82,7 +86,7 @@ public sealed class BatchUpsample2DLayer<T> : BatchLayerBase<T>
                     }
                 }
             }
-        }
+        }, workPerSample);
 
         return gradInput;
     }

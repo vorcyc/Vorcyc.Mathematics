@@ -84,38 +84,46 @@ public sealed class BatchTransposedConvolution2DLayer<T> : BatchLayerBase<T>
         output.Values.Clear();
         var pad = (KernelSize * Dilation + Dilation - 1) / 2;
 
-        for (int n = 0; n < input.Batch; n++)
+        int inChannels = InputChannels, outChannels = OutputChannels;
+        int kernelSize = KernelSize, stride = Stride, dilation = Dilation;
+        int inHeight = input.Height, inWidth = input.Width;
+        int outHeight = outShape.Height, outWidth = outShape.Width;
+
+        // Parallel over samples: each sample writes only its own output region, so the
+        // scatter-add is race-free across n (accumulation within one n stays serial).
+        long workPerSample = (long)inChannels * inHeight * inWidth * outChannels * kernelSize * kernelSize;
+        ComputingContextExecution.ForEach(null, 0, input.Batch, n =>
         {
-            for (int ic = 0; ic < InputChannels; ic++)
+            for (int ic = 0; ic < inChannels; ic++)
             {
-                for (int ay = 0; ay < input.Height; ay++)
+                for (int ay = 0; ay < inHeight; ay++)
                 {
-                    for (int ax = 0; ax < input.Width; ax++)
+                    for (int ax = 0; ax < inWidth; ax++)
                     {
                         var inVal = input[n, ay, ax, ic];
-                        var y = ay * Stride - pad;
-                        var x = ax * Stride - pad;
+                        var y = ay * stride - pad;
+                        var x = ax * stride - pad;
 
-                        for (int d = 0; d < OutputChannels; d++)
+                        for (int d = 0; d < outChannels; d++)
                         {
                             var filter = _filters[d].Value.Values;
-                            for (int fy = 0; fy < KernelSize; fy++)
+                            for (int fy = 0; fy < kernelSize; fy++)
                             {
-                                var oy = y + fy * Dilation + Dilation - 1;
-                                if (oy < 0 || oy >= outShape.Height)
+                                var oy = y + fy * dilation + dilation - 1;
+                                if (oy < 0 || oy >= outHeight)
                                 {
                                     continue;
                                 }
 
-                                for (int fx = 0; fx < KernelSize; fx++)
+                                for (int fx = 0; fx < kernelSize; fx++)
                                 {
-                                    var ox = x + fx * Dilation + Dilation - 1;
-                                    if (ox < 0 || ox >= outShape.Width)
+                                    var ox = x + fx * dilation + dilation - 1;
+                                    if (ox < 0 || ox >= outWidth)
                                     {
                                         continue;
                                     }
 
-                                    var fi = ((KernelSize * fy) + fx) * InputChannels + ic;
+                                    var fi = ((kernelSize * fy) + fx) * inChannels + ic;
                                     output[n, oy, ox, d] += inVal * filter[fi];
                                 }
                             }
@@ -124,18 +132,18 @@ public sealed class BatchTransposedConvolution2DLayer<T> : BatchLayerBase<T>
                 }
             }
 
-            for (int d = 0; d < OutputChannels; d++)
+            for (int d = 0; d < outChannels; d++)
             {
                 var bias = _bias.Value[0, 0, d];
-                for (int oy = 0; oy < outShape.Height; oy++)
+                for (int oy = 0; oy < outHeight; oy++)
                 {
-                    for (int ox = 0; ox < outShape.Width; ox++)
+                    for (int ox = 0; ox < outWidth; ox++)
                     {
                         output[n, oy, ox, d] += bias;
                     }
                 }
             }
-        }
+        }, workPerSample);
 
         CacheForward(input, output);
         return output;
@@ -151,43 +159,49 @@ public sealed class BatchTransposedConvolution2DLayer<T> : BatchLayerBase<T>
         gradInput.Values.Clear();
         var pad = (KernelSize * Dilation + Dilation - 1) / 2;
 
-        for (int n = 0; n < input.Batch; n++)
+        int inChannels = InputChannels, outChannels = OutputChannels;
+        int kernelSize = KernelSize, stride = Stride, dilation = Dilation;
+        int inHeight = input.Height, inWidth = input.Width;
+        int outHeight = outShape.Height, outWidth = outShape.Width;
+        int batch = input.Batch;
+
+        // Two race-free parallel kernels (same approach as BatchConv2DMath.Backward):
+        //   (1) gradInput — parallel over samples n (disjoint input regions).
+        //   (2) weight/bias grads — parallel over output channels d (disjoint filter/bias rows).
+        long gradInputWork = (long)inChannels * inHeight * inWidth * outChannels * kernelSize * kernelSize;
+        ComputingContextExecution.ForEach(null, 0, batch, n =>
         {
-            for (int d = 0; d < OutputChannels; d++)
+            for (int d = 0; d < outChannels; d++)
             {
                 var filter = _filters[d].Value.Values;
-                var filterGrad = _filters[d].Gradient.Values;
-                for (int ic = 0; ic < InputChannels; ic++)
+                for (int ic = 0; ic < inChannels; ic++)
                 {
-                    for (int ay = 0; ay < input.Height; ay++)
+                    for (int ay = 0; ay < inHeight; ay++)
                     {
-                        for (int ax = 0; ax < input.Width; ax++)
+                        for (int ax = 0; ax < inWidth; ax++)
                         {
-                            var inVal = input[n, ay, ax, ic];
-                            var y = ay * Stride - pad;
-                            var x = ax * Stride - pad;
+                            var y = ay * stride - pad;
+                            var x = ax * stride - pad;
                             T gradInAcc = T.Zero;
 
-                            for (int fy = 0; fy < KernelSize; fy++)
+                            for (int fy = 0; fy < kernelSize; fy++)
                             {
-                                var oy = y + fy * Dilation + Dilation - 1;
-                                if (oy < 0 || oy >= outShape.Height)
+                                var oy = y + fy * dilation + dilation - 1;
+                                if (oy < 0 || oy >= outHeight)
                                 {
                                     continue;
                                 }
 
-                                for (int fx = 0; fx < KernelSize; fx++)
+                                for (int fx = 0; fx < kernelSize; fx++)
                                 {
-                                    var ox = x + fx * Dilation + Dilation - 1;
-                                    if (ox < 0 || ox >= outShape.Width)
+                                    var ox = x + fx * dilation + dilation - 1;
+                                    if (ox < 0 || ox >= outWidth)
                                     {
                                         continue;
                                     }
 
-                                    var fi = ((KernelSize * fy) + fx) * InputChannels + ic;
-                                    var gradOut = gradOutput[n, oy, ox, d];
-                                    filterGrad[fi] += gradOut * inVal;
-                                    gradInAcc += gradOut * filter[fi];
+                                    var fi = ((kernelSize * fy) + fx) * inChannels + ic;
+                                    gradInAcc += gradOutput[n, oy, ox, d] * filter[fi];
                                 }
                             }
 
@@ -195,16 +209,63 @@ public sealed class BatchTransposedConvolution2DLayer<T> : BatchLayerBase<T>
                         }
                     }
                 }
+            }
+        }, gradInputWork);
 
-                for (int oy = 0; oy < outShape.Height; oy++)
+        long weightWork = (long)batch * inChannels * inHeight * inWidth * kernelSize * kernelSize;
+        ComputingContextExecution.ForEach(null, 0, outChannels, d =>
+        {
+            var filter = _filters[d].Value.Values;
+            var filterGrad = _filters[d].Gradient.Values;
+            T biasAcc = T.Zero;
+
+            for (int n = 0; n < batch; n++)
+            {
+                for (int ic = 0; ic < inChannels; ic++)
                 {
-                    for (int ox = 0; ox < outShape.Width; ox++)
+                    for (int ay = 0; ay < inHeight; ay++)
                     {
-                        _bias.Gradient[0, 0, d] += gradOutput[n, oy, ox, d];
+                        for (int ax = 0; ax < inWidth; ax++)
+                        {
+                            var inVal = input[n, ay, ax, ic];
+                            var y = ay * stride - pad;
+                            var x = ax * stride - pad;
+
+                            for (int fy = 0; fy < kernelSize; fy++)
+                            {
+                                var oy = y + fy * dilation + dilation - 1;
+                                if (oy < 0 || oy >= outHeight)
+                                {
+                                    continue;
+                                }
+
+                                for (int fx = 0; fx < kernelSize; fx++)
+                                {
+                                    var ox = x + fx * dilation + dilation - 1;
+                                    if (ox < 0 || ox >= outWidth)
+                                    {
+                                        continue;
+                                    }
+
+                                    var fi = ((kernelSize * fy) + fx) * inChannels + ic;
+                                    filterGrad[fi] += gradOutput[n, oy, ox, d] * inVal;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (int oy = 0; oy < outHeight; oy++)
+                {
+                    for (int ox = 0; ox < outWidth; ox++)
+                    {
+                        biasAcc += gradOutput[n, oy, ox, d];
                     }
                 }
             }
-        }
+
+            _bias.Gradient[0, 0, d] += biasAcc;
+        }, weightWork);
 
         return gradInput;
     }

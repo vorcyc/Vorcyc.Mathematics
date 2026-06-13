@@ -6,7 +6,7 @@ using Vorcyc.Mathematics.DeepLearning;
 /// <summary>
 /// Residual block: Conv→BN→ReLU→Conv→BN + skip connection → ReLU.
 /// </summary>
-public sealed class BatchResidualBlockLayer<T> : BatchLayerBase<T>
+public sealed class BatchResidualBlockLayer<T> : BatchLayerBase<T>, IBatchCompositeLayer<T>
     where T : unmanaged, IBinaryFloatingPointIeee754<T>
 {
     private readonly BatchConvolution2DLayer<T> _conv1;
@@ -43,6 +43,27 @@ public sealed class BatchResidualBlockLayer<T> : BatchLayerBase<T>
     public int OutputChannels { get; }
     public int Stride { get; }
     public int KernelSize { get; }
+
+    /// <summary>
+    /// Child layers in execution order. Exposes the internal BatchNorm layers so the
+    /// serializer can persist their running statistics (Conv/ReLU carry no extra state).
+    /// </summary>
+    public IReadOnlyList<IBatchLayer<T>> Children
+    {
+        get
+        {
+            var list = new List<IBatchLayer<T>>
+            {
+                _conv1, _bn1, _relu1, _conv2, _bn2, _reluOut,
+            };
+            if (_projection is not null)
+            {
+                list.Add(_projection);
+            }
+
+            return list;
+        }
+    }
 
     /// <inheritdoc/>
     public override IReadOnlyList<Parameter<T>> Parameters

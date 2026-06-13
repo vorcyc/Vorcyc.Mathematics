@@ -32,7 +32,15 @@ internal static class ComputingContext_equivalence_test
         ok &= Check("BatchConv2D im2col forward", BatchConvIm2ColForwardMatches);
         ok &= Check("BatchConv2D im2col backward", BatchConvIm2ColBackwardMatches);
         ok &= Check("BatchMaxPool2D forward", BatchMaxPoolForwardMatches);
+        ok &= Check("BatchMaxPool2D backward", BatchMaxPoolBackwardMatches);
         ok &= Check("BatchDepthwiseConv forward", BatchDepthwiseForwardMatches);
+        ok &= Check("BatchDepthwiseConv backward", BatchDepthwiseBackwardMatches);
+        ok &= Check("BatchTransposedConv forward", BatchTransposedConvForwardMatches);
+        ok &= Check("BatchTransposedConv backward", BatchTransposedConvBackwardMatches);
+        ok &= Check("BatchAvgPool2D backward", BatchAvgPoolBackwardMatches);
+        ok &= Check("BatchGlobalAvgPool2D backward", BatchGlobalAvgPoolBackwardMatches);
+        ok &= Check("BatchLayerNorm backward", BatchLayerNormBackwardMatches);
+        ok &= Check("BatchSoftmax backward", BatchSoftmaxBackwardMatches);
         ok &= Check("BatchFullyConnected forward", BatchFullyConnectedForwardMatches);
         ok &= Check("BatchFullyConnected backward", BatchFullyConnectedBackwardMatches);
         ok &= Check("Legacy Conv2D", LegacyConv2DForwardMatches);
@@ -210,6 +218,93 @@ internal static class ComputingContext_equivalence_test
             new BatchDepthwiseConvolution2DLayer<float>(4, kernelSize: 3));
         InitBatchParametersSame(a, b);
         return CompareForwardBatch(a, b, input, Tol);
+    }
+
+    private static bool BatchMaxPoolBackwardMatches()
+    {
+        var input = MakeBatchTensor(4, 8, 8, 3);
+        var (a, b) = (new BatchMaxPool2DLayer<float>(), new BatchMaxPool2DLayer<float>());
+        var output = a.Forward(input, training: true);
+        var gradOut = MakeBatchTensor(output.Batch, output.Height, output.Width, output.Channels);
+        FillPattern(gradOut.Values, 0.13f);
+        return CompareBackwardBatch(a, b, input, gradOut, Tol);
+    }
+
+    private static bool BatchDepthwiseBackwardMatches()
+    {
+        var input = MakeBatchTensor(3, 10, 10, 4);
+        var (a, b) = (
+            new BatchDepthwiseConvolution2DLayer<float>(4, kernelSize: 3),
+            new BatchDepthwiseConvolution2DLayer<float>(4, kernelSize: 3));
+        InitBatchParametersSame(a, b);
+        var output = a.Forward(input, training: true);
+        var gradOut = MakeBatchTensor(output.Batch, output.Height, output.Width, output.Channels);
+        FillPattern(gradOut.Values, 0.08f);
+        return CompareBackwardBatch(a, b, input, gradOut, Tol);
+    }
+
+    private static bool BatchTransposedConvForwardMatches()
+    {
+        var input = MakeBatchTensor(2, 6, 6, 2);
+        var (a, b) = (
+            new BatchTransposedConvolution2DLayer<float>(2, 3, kernelSize: 3, stride: 2),
+            new BatchTransposedConvolution2DLayer<float>(2, 3, kernelSize: 3, stride: 2));
+        InitBatchParametersSame(a, b);
+        return CompareForwardBatch(a, b, input, Tol);
+    }
+
+    private static bool BatchTransposedConvBackwardMatches()
+    {
+        var input = MakeBatchTensor(2, 5, 5, 2);
+        var (a, b) = (
+            new BatchTransposedConvolution2DLayer<float>(2, 3, kernelSize: 3, stride: 2),
+            new BatchTransposedConvolution2DLayer<float>(2, 3, kernelSize: 3, stride: 2));
+        InitBatchParametersSame(a, b);
+        var output = a.Forward(input, training: true);
+        var gradOut = MakeBatchTensor(output.Batch, output.Height, output.Width, output.Channels);
+        FillPattern(gradOut.Values, 0.06f);
+        return CompareBackwardBatch(a, b, input, gradOut, Tol);
+    }
+
+    private static bool BatchAvgPoolBackwardMatches()
+    {
+        var input = MakeBatchTensor(4, 8, 8, 3);
+        var (a, b) = (new BatchAvgPool2DLayer<float>(), new BatchAvgPool2DLayer<float>());
+        var output = a.Forward(input, training: true);
+        var gradOut = MakeBatchTensor(output.Batch, output.Height, output.Width, output.Channels);
+        FillPattern(gradOut.Values, 0.12f);
+        return CompareBackwardBatch(a, b, input, gradOut, Tol);
+    }
+
+    private static bool BatchGlobalAvgPoolBackwardMatches()
+    {
+        var input = MakeBatchTensor(4, 7, 7, 5);
+        var (a, b) = (new BatchGlobalAveragePool2DLayer<float>(), new BatchGlobalAveragePool2DLayer<float>());
+        var output = a.Forward(input, training: true);
+        var gradOut = MakeBatchTensor(output.Batch, output.Height, output.Width, output.Channels);
+        FillPattern(gradOut.Values, 0.21f);
+        return CompareBackwardBatch(a, b, input, gradOut, Tol);
+    }
+
+    private static bool BatchLayerNormBackwardMatches()
+    {
+        var input = MakeBatchTensor(4, 6, 6, 8);
+        var (a, b) = (new BatchLayerNormLayer<float>(8), new BatchLayerNormLayer<float>(8));
+        InitBatchParametersSame(a, b);
+        var output = a.Forward(input, training: true);
+        var gradOut = MakeBatchTensor(output.Batch, output.Height, output.Width, output.Channels);
+        FillPattern(gradOut.Values, 0.05f);
+        return CompareBackwardBatch(a, b, input, gradOut, Tol);
+    }
+
+    private static bool BatchSoftmaxBackwardMatches()
+    {
+        var input = MakeBatchTensor(4, 6, 6, 5);
+        var (a, b) = (new BatchSoftmaxLayer<float>(), new BatchSoftmaxLayer<float>());
+        var output = a.Forward(input, training: true);
+        var gradOut = MakeBatchTensor(output.Batch, output.Height, output.Width, output.Channels);
+        FillPattern(gradOut.Values, 0.17f);
+        return CompareBackwardBatch(a, b, input, gradOut, Tol);
     }
 
     private static bool BatchFullyConnectedForwardMatches()

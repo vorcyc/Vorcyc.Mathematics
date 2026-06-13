@@ -72,24 +72,47 @@ public static partial class ModelSerializer
         int layerIndex = 0;
         foreach (var layer in layers)
         {
-            int paramIndex = 0;
-            foreach (var parameter in layer.Parameters)
-            {
-                var name = parameter.Name ?? $"{prefix}.{layer.Name}.{paramIndex}";
-                entries.Add(new NamedTensor<T>(name, parameter.Value));
-                paramIndex++;
-            }
-
-            if (layer is BatchBatchNormLayer<T> batchNorm)
-            {
-                entries.Add(new NamedTensor<T>($"{prefix}.{layer.Name}.running_mean.{layerIndex}", batchNorm.RunningMean));
-                entries.Add(new NamedTensor<T>($"{prefix}.{layer.Name}.running_var.{layerIndex}", batchNorm.RunningVariance));
-            }
-
+            CollectBatchLayer(entries, layer, $"{prefix}.{layerIndex}");
             layerIndex++;
         }
 
         return entries;
+    }
+
+    /// <summary>
+    /// Collects parameters and batch-norm running statistics for a single batch layer,
+    /// recursing into composite layers so nested state (e.g. BN inside a residual block)
+    /// is persisted. The path prefix guarantees stable, unique entry names across nesting.
+    /// </summary>
+    private static void CollectBatchLayer<T>(
+        List<NamedTensor<T>> entries,
+        IBatchLayer<T> layer,
+        string path)
+        where T : unmanaged, IBinaryFloatingPointIeee754<T>
+    {
+        int paramIndex = 0;
+        foreach (var parameter in layer.Parameters)
+        {
+            var name = parameter.Name ?? $"{path}.{layer.Name}.{paramIndex}";
+            entries.Add(new NamedTensor<T>(name, parameter.Value));
+            paramIndex++;
+        }
+
+        if (layer is BatchBatchNormLayer<T> batchNorm)
+        {
+            entries.Add(new NamedTensor<T>($"{path}.{layer.Name}.running_mean", batchNorm.RunningMean));
+            entries.Add(new NamedTensor<T>($"{path}.{layer.Name}.running_var", batchNorm.RunningVariance));
+        }
+
+        if (layer is IBatchCompositeLayer<T> composite)
+        {
+            int childIndex = 0;
+            foreach (var child in composite.Children)
+            {
+                CollectBatchLayer(entries, child, $"{path}.{childIndex}");
+                childIndex++;
+            }
+        }
     }
 
     private static T[] FlattenEntries<T>(List<NamedTensor<T>> entries)

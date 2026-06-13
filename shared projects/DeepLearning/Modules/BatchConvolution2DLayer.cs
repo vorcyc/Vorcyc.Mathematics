@@ -118,7 +118,7 @@ public sealed class BatchConvolution2DLayer<T> : BatchLayerBase<T>
                 input.Height,
                 input.Width,
                 input.Channels,
-                _inner.FilterParameters,
+                _inner.FilterParameterArray,
                 _inner.BiasParameter,
                 _inner.KernelSize,
                 _inner.Stride,

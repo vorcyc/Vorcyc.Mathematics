@@ -25,16 +25,17 @@ public sealed class BatchAvgPool2DLayer<T> : BatchLayerBase<T>
     {
         _inputShape = input.Shape;
         var output = new BatchTensor<T>(input.Batch, input.Height / 2, input.Width / 2, input.Channels);
-        var quarter = T.CreateTruncating(0.25);
+        int inHeight = input.Height, inWidth = input.Width, channels = input.Channels;
+        int outHeight = output.Height, outWidth = output.Width;
 
-        for (int n = 0; n < input.Batch; n++)
+        ComputingContextExecution.ForEach(null, 0, input.Batch, n =>
         {
-            for (int c = 0; c < input.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
-                for (int ay = 0; ay < output.Height; ay++)
+                for (int ay = 0; ay < outHeight; ay++)
                 {
                     var y = 2 * ay;
-                    for (int ax = 0; ax < output.Width; ax++)
+                    for (int ax = 0; ax < outWidth; ax++)
                     {
                         var x = 2 * ax;
                         T sum = T.Zero;
@@ -45,7 +46,7 @@ public sealed class BatchAvgPool2DLayer<T> : BatchLayerBase<T>
                             {
                                 var oy = y + fy;
                                 var ox = x + fx;
-                                if (oy < input.Height && ox < input.Width)
+                                if (oy < inHeight && ox < inWidth)
                                 {
                                     sum += input[n, oy, ox, c];
                                     count++;
@@ -57,7 +58,7 @@ public sealed class BatchAvgPool2DLayer<T> : BatchLayerBase<T>
                     }
                 }
             }
-        }
+        }, (long)outHeight * outWidth * channels * 4);
 
         CacheForward(input, output);
         return output;
@@ -68,15 +69,17 @@ public sealed class BatchAvgPool2DLayer<T> : BatchLayerBase<T>
     {
         EnsureCached();
         var gradInput = new BatchTensor<T>(_inputShape.Batch, _inputShape.Height, _inputShape.Width, _inputShape.Channels);
+        int inHeight = _inputShape.Height, inWidth = _inputShape.Width, channels = _inputShape.Channels;
+        int outHeight = gradOutput.Height, outWidth = gradOutput.Width;
 
-        for (int n = 0; n < _inputShape.Batch; n++)
+        ComputingContextExecution.ForEach(null, 0, _inputShape.Batch, n =>
         {
-            for (int c = 0; c < _inputShape.Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
-                for (int ay = 0; ay < gradOutput.Height; ay++)
+                for (int ay = 0; ay < outHeight; ay++)
                 {
                     var y = 2 * ay;
-                    for (int ax = 0; ax < gradOutput.Width; ax++)
+                    for (int ax = 0; ax < outWidth; ax++)
                     {
                         var x = 2 * ax;
                         int count = 0;
@@ -86,7 +89,7 @@ public sealed class BatchAvgPool2DLayer<T> : BatchLayerBase<T>
                             {
                                 var oy = y + fy;
                                 var ox = x + fx;
-                                if (oy < _inputShape.Height && ox < _inputShape.Width)
+                                if (oy < inHeight && ox < inWidth)
                                 {
                                     count++;
                                 }
@@ -100,7 +103,7 @@ public sealed class BatchAvgPool2DLayer<T> : BatchLayerBase<T>
                             {
                                 var oy = y + fy;
                                 var ox = x + fx;
-                                if (oy < _inputShape.Height && ox < _inputShape.Width)
+                                if (oy < inHeight && ox < inWidth)
                                 {
                                     gradInput[n, oy, ox, c] += grad;
                                 }
@@ -109,7 +112,7 @@ public sealed class BatchAvgPool2DLayer<T> : BatchLayerBase<T>
                     }
                 }
             }
-        }
+        }, (long)outHeight * outWidth * channels * 4);
 
         return gradInput;
     }

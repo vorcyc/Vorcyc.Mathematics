@@ -159,5 +159,8 @@ public sealed class Convolution2DLayer<T> : LayerBase<T>
 
     internal ReadOnlySpan<Parameter<T>> FilterParameters => _filters;
 
+    /// <summary>Filter parameters as the backing array, to avoid per-call copies in hot paths (e.g. parallel backward closures).</summary>
+    internal Parameter<T>[] FilterParameterArray => _filters;
+
     internal Parameter<T> BiasParameter => _bias;
 }

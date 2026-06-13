@@ -51,33 +51,28 @@ public sealed class BatchLayerNormLayer<T> : BatchLayerBase<T>
         _normalizedInput = new BatchTensor<T>(input.Batch, input.Height, input.Width, input.Channels);
         _mean = new T[spatial];
         _variance = new T[spatial];
-        var workspace = new T[Channels];
+        int channels = Channels;
+        var epsilon = Epsilon;
 
-        for (int s = 0; s < spatial; s++)
+        // Each spatial position s owns a contiguous channel slice [s*C, s*C+C) in the
+        // NHWC buffer and its own _mean[s]/_variance[s] — fully independent across s.
+        ComputingContextExecution.ForEach(null, 0, spatial, s =>
         {
-            int n = s / (input.Height * input.Width);
-            int rem = s % (input.Height * input.Width);
-            int h = rem / input.Width;
-            int w = rem % input.Width;
-            int outBase = s * Channels;
+            int outBase = s * channels;
+            var slice = input.Values.Slice(outBase, channels);
 
-            for (int c = 0; c < Channels; c++)
-            {
-                workspace[c] = input[n, h, w, c];
-            }
-
-            BatchNormMath.ComputeMeanAndVariance(workspace, out var mean, out var variance);
+            BatchNormMath.ComputeMeanAndVariance(slice, out var mean, out var variance);
             _mean[s] = mean;
             _variance[s] = variance;
-            var invStd = T.One / T.Sqrt(variance + Epsilon);
+            var invStd = T.One / T.Sqrt(variance + epsilon);
 
-            for (int c = 0; c < Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
-                var norm = (workspace[c] - mean) * invStd;
+                var norm = (slice[c] - mean) * invStd;
                 _normalizedInput.Values[outBase + c] = norm;
                 output.Values[outBase + c] = norm * _scale.Value[0, 0, c] + _shift.Value[0, 0, c];
             }
-        }
+        }, channels);
 
         CacheForward(input, output);
         return output;
@@ -94,25 +89,21 @@ public sealed class BatchLayerNormLayer<T> : BatchLayerBase<T>
 
         int spatial = gradOutput.Batch * gradOutput.Height * gradOutput.Width;
         var gradInput = new BatchTensor<T>(gradOutput.Batch, gradOutput.Height, gradOutput.Width, gradOutput.Channels);
+        int channels = Channels;
         var countT = T.CreateTruncating(Channels);
+        var epsilon = Epsilon;
 
-        for (int s = 0; s < spatial; s++)
+        // Kernel 1: gradInput — each spatial position s reads/writes only its own channel
+        // slice and its own _variance[s]/_normalizedInput slice, so it is race-free over s.
+        ComputingContextExecution.ForEach(null, 0, spatial, s =>
         {
-            int baseIndex = s * Channels;
+            int baseIndex = s * channels;
             var variance = _variance[s];
-            var invStd = T.One / T.Sqrt(variance + Epsilon);
+            var invStd = T.One / T.Sqrt(variance + epsilon);
 
             T gradNormSum = T.Zero;
             T gradNormDot = T.Zero;
-
-            for (int c = 0; c < Channels; c++)
-            {
-                var gradOut = gradOutput.Values[baseIndex + c];
-                _shift.Gradient[0, 0, c] += gradOut;
-                _scale.Gradient[0, 0, c] += gradOut * _normalizedInput.Values[baseIndex + c];
-            }
-
-            for (int c = 0; c < Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
                 var scale = _scale.Value[0, 0, c];
                 var gradNorm = gradOutput.Values[baseIndex + c] * scale;
@@ -121,15 +112,32 @@ public sealed class BatchLayerNormLayer<T> : BatchLayerBase<T>
                 gradNormDot += gradNorm * norm;
             }
 
-            for (int c = 0; c < Channels; c++)
+            for (int c = 0; c < channels; c++)
             {
                 var scale = _scale.Value[0, 0, c];
                 var gradNorm = gradOutput.Values[baseIndex + c] * scale;
                 var norm = _normalizedInput.Values[baseIndex + c];
                 gradInput.Values[baseIndex + c] = invStd / countT * (countT * gradNorm - gradNormSum - norm * gradNormDot);
             }
+        }, channels * 3);
 
-        }
+        // Kernel 2: scale/shift grads — channel c accumulates across all spatial positions
+        // into its own _scale.Gradient[c]/_shift.Gradient[c], disjoint per c.
+        ComputingContextExecution.ForEach(null, 0, channels, c =>
+        {
+            T shiftAcc = T.Zero;
+            T scaleAcc = T.Zero;
+            for (int s = 0; s < spatial; s++)
+            {
+                int idx = s * channels + c;
+                var gradOut = gradOutput.Values[idx];
+                shiftAcc += gradOut;
+                scaleAcc += gradOut * _normalizedInput.Values[idx];
+            }
+
+            _shift.Gradient[0, 0, c] += shiftAcc;
+            _scale.Gradient[0, 0, c] += scaleAcc;
+        }, spatial);
 
         return gradInput;
     }

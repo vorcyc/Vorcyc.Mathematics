@@ -71,14 +71,15 @@ public sealed class BatchConcatenateLayer<T> : BatchLayerBase<T>
         var gradPrimary = new BatchTensor<T>(input.Batch, input.Height, input.Width, leftChannels);
         var gradSecondary = new BatchTensor<T>(_secondary.Batch, _secondary.Height, _secondary.Width, rightChannels);
 
-        for (int n = 0; n < input.Batch; n++)
+        // Each sample n copies into disjoint slices of gradPrimary/gradSecondary — race-free over n.
+        ComputingContextExecution.ForEach(null, 0, input.Batch, n =>
         {
             int outOffset = n * plane * (leftChannels + rightChannels);
             gradOutput.Values.Slice(outOffset, plane * leftChannels)
                 .CopyTo(gradPrimary.Values.Slice(n * plane * leftChannels, plane * leftChannels));
             gradOutput.Values.Slice(outOffset + plane * leftChannels, plane * rightChannels)
                 .CopyTo(gradSecondary.Values.Slice(n * plane * rightChannels, plane * rightChannels));
-        }
+        }, (long)plane * (leftChannels + rightChannels));
 
         _secondaryGrad = gradSecondary;
         return gradPrimary;

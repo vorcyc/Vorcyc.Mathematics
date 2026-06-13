@@ -76,7 +76,7 @@ internal static class BatchConv2DMath
         int inHeight,
         int inWidth,
         int inChannels,
-        ReadOnlySpan<Parameter<T>> filters,
+        Parameter<T>[] filters,
         Parameter<T> bias,
         int kernelSize,
         int stride,
@@ -84,7 +84,8 @@ internal static class BatchConv2DMath
         Memory<T> gradInputMemory,
         int outHeight,
         int outWidth,
-        int outChannels)
+        int outChannels,
+        ComputingContext? context = null)
         where T : unmanaged, IBinaryFloatingPointIeee754<T>
     {
         if (!MemoryMarshal.TryGetArray(inputMemory, out ArraySegment<T> inputSegment)
@@ -107,30 +108,63 @@ internal static class BatchConv2DMath
 
         gradInput.AsSpan(gradInOffset, gradInSegment.Count).Clear();
 
-        for (int n = 0; n < batch; n++)
+        // Backward is split into two race-free parallel kernels so it honors the
+        // ComputingContext just like Forward:
+        //   (1) gradInput — parallel over samples n; sample n writes only its own
+        //       gradInput region, so no two threads touch the same element.
+        //   (2) weight/bias grads — parallel over output channels d; channel d writes
+        //       only filters[d].Gradient and biasGrad[d], which are disjoint per d.
+        // input/gradOutput are read-only in both kernels. filters is passed as an array
+        // (not a span) so it can be captured by the parallel closures without copying.
+        var filtersArray = filters;
+
+        long gradInputWork = (long)outHeight * outWidth * outChannels * kernelSize * kernelSize * inChannels;
+        ComputingContextExecution.ForEach(context, 0, batch, n =>
         {
-            BackwardSample(
-                input,
-                inputOffset,
+            BackwardGradInputSample(
                 gradOutput,
                 gradOutOffset,
                 n,
                 inHeight,
                 inWidth,
                 inChannels,
-                filters,
-                bias,
+                filtersArray,
                 kernelSize,
                 stride,
                 dilation,
                 pad,
                 gradInput,
                 gradInOffset,
+                inputOffset,
                 batch,
                 outHeight,
                 outWidth,
                 outChannels);
-        }
+        }, gradInputWork);
+
+        long weightWork = (long)batch * outHeight * outWidth * kernelSize * kernelSize * inChannels;
+        ComputingContextExecution.ForEach(context, 0, outChannels, d =>
+        {
+            BackwardWeightChannel(
+                input,
+                inputOffset,
+                gradOutput,
+                gradOutOffset,
+                d,
+                inHeight,
+                inWidth,
+                inChannels,
+                filtersArray,
+                bias,
+                kernelSize,
+                stride,
+                dilation,
+                pad,
+                batch,
+                outHeight,
+                outWidth,
+                outChannels);
+        }, weightWork);
     }
 
     private static void ForwardSample<T>(
@@ -220,35 +254,34 @@ internal static class BatchConv2DMath
         }
     }
 
-    private static void BackwardSample<T>(
-        T[] input,
-        int inputOffset,
+    /// <summary>
+    /// Computes gradInput for a single sample n. Writes only into sample n's gradInput
+    /// region, so this is safe to run in parallel across samples.
+    /// </summary>
+    private static void BackwardGradInputSample<T>(
         T[] gradOutput,
         int gradOutOffset,
         int n,
         int inHeight,
         int inWidth,
         int inChannels,
-        ReadOnlySpan<Parameter<T>> filters,
-        Parameter<T> bias,
+        Parameter<T>[] filters,
         int kernelSize,
         int stride,
         int dilation,
         int pad,
         T[] gradInput,
         int gradInOffset,
+        int inputOffset,
         int batch,
         int outHeight,
         int outWidth,
         int outChannels)
         where T : unmanaged, IBinaryFloatingPointIeee754<T>
     {
-        var biasGrad = bias.Gradient.Values;
-
         for (int d = 0; d < outChannels; d++)
         {
             var filter = filters[d].Value;
-            var filterGrad = filters[d].Gradient.Values;
             var filterSpan = filter.Values;
 
             for (int ay = 0; ay < outHeight; ay++)
@@ -258,7 +291,6 @@ internal static class BatchConv2DMath
                 {
                     var x = ax * stride - pad;
                     var gradOut = gradOutput[gradOutOffset + GetOutputIndex(n, ay, ax, d, batch, outHeight, outWidth, outChannels)];
-                    biasGrad[d] += gradOut;
 
                     for (int fy = 0; fy < kernelSize; fy++)
                     {
@@ -281,16 +313,87 @@ internal static class BatchConv2DMath
 
                             for (int fd = 0; fd < inChannels; fd++)
                             {
-                                var w = filterSpan[fi + fd];
-                                var inVal = input[ti + fd];
-                                filterGrad[fi + fd] += gradOut * inVal;
-                                gradInput[gradInOffset + ti + fd - inputOffset] += gradOut * w;
+                                gradInput[gradInOffset + ti + fd - inputOffset] += gradOut * filterSpan[fi + fd];
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Computes filter and bias gradients for a single output channel d, accumulated
+    /// over the whole batch. Writes only into filters[d].Gradient and biasGrad[d],
+    /// so this is safe to run in parallel across output channels.
+    /// </summary>
+    private static void BackwardWeightChannel<T>(
+        T[] input,
+        int inputOffset,
+        T[] gradOutput,
+        int gradOutOffset,
+        int d,
+        int inHeight,
+        int inWidth,
+        int inChannels,
+        Parameter<T>[] filters,
+        Parameter<T> bias,
+        int kernelSize,
+        int stride,
+        int dilation,
+        int pad,
+        int batch,
+        int outHeight,
+        int outWidth,
+        int outChannels)
+        where T : unmanaged, IBinaryFloatingPointIeee754<T>
+    {
+        var filter = filters[d].Value;
+        var filterGrad = filters[d].Gradient.Values;
+        var biasGrad = bias.Gradient.Values;
+        T biasAcc = T.Zero;
+
+        for (int n = 0; n < batch; n++)
+        {
+            for (int ay = 0; ay < outHeight; ay++)
+            {
+                var y = ay * stride - pad;
+                for (int ax = 0; ax < outWidth; ax++)
+                {
+                    var x = ax * stride - pad;
+                    var gradOut = gradOutput[gradOutOffset + GetOutputIndex(n, ay, ax, d, batch, outHeight, outWidth, outChannels)];
+                    biasAcc += gradOut;
+
+                    for (int fy = 0; fy < kernelSize; fy++)
+                    {
+                        var oy = y + fy * dilation + dilation - 1;
+                        if (oy < 0 || oy >= inHeight)
+                        {
+                            continue;
+                        }
+
+                        for (int fx = 0; fx < kernelSize; fx++)
+                        {
+                            var ox = x + fx * dilation + dilation - 1;
+                            if (ox < 0 || ox >= inWidth)
+                            {
+                                continue;
+                            }
+
+                            var fi = ((filter.Width * fy) + fx) * filter.Depth;
+                            var ti = inputOffset + GetInputIndex(n, oy, ox, 0, batch, inHeight, inWidth, inChannels);
+
+                            for (int fd = 0; fd < inChannels; fd++)
+                            {
+                                filterGrad[fi + fd] += gradOut * input[ti + fd];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        biasGrad[d] += biasAcc;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

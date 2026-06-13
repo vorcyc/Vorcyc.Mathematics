@@ -91,8 +91,9 @@ internal static class BatchMaxPool2DMath
         int outHeight,
         int outWidth,
         int channels,
-        ReadOnlySpan<int> argmaxIndices,
-        Memory<T> gradInputMemory)
+        int[] argmaxIndices,
+        Memory<T> gradInputMemory,
+        ComputingContext? context = null)
         where T : unmanaged, IBinaryFloatingPointIeee754<T>
     {
         if (!MemoryMarshal.TryGetArray(gradOutputMemory, out ArraySegment<T> gradOutSegment)
@@ -109,11 +110,21 @@ internal static class BatchMaxPool2DMath
         var gradInOffset = gradInSegment.Offset;
 
         gradInput.AsSpan(gradInOffset, gradInSegment.Count).Clear();
-        int length = batch * outHeight * outWidth * channels;
-        for (int i = 0; i < length; i++)
+
+        // Parallel over samples: each sample's argmax indices point only into its own
+        // gradInput region (2×2/stride-2 pooling windows are disjoint), so no two
+        // threads write the same element. argmaxIndices is the layer's backing array,
+        // captured directly by the closure (no per-call copy).
+        int perSample = outHeight * outWidth * channels;
+        long workPerSample = perSample;
+        ComputingContextExecution.ForEach(context, 0, batch, n =>
         {
-            gradInput[argmaxIndices[i]] += gradOutput[gradOutOffset + i];
-        }
+            int start = n * perSample;
+            for (int i = start; i < start + perSample; i++)
+            {
+                gradInput[argmaxIndices[i]] += gradOutput[gradOutOffset + i];
+            }
+        }, workPerSample);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

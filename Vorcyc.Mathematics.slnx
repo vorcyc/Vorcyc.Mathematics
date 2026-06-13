@@ -6,6 +6,7 @@
   </Folder>
   <Folder Name="/docs/">
     <File Path="docs/License.txt" />
+    <File Path="docs/tech.md" />
   </Folder>
   <Folder Name="/wiki_en/">
     <File Path="wiki_en/changelog.txt" />

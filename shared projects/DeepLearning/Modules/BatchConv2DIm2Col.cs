@@ -179,7 +179,9 @@ internal static class BatchConv2DIm2Col
 
         int outWidth,
 
-        int outChannels)
+        int outChannels,
+
+        ComputingContext? context = null)
 
         where T : unmanaged, IBinaryFloatingPointIeee754<T>
 
@@ -253,37 +255,48 @@ internal static class BatchConv2DIm2Col
 
 
 
-        for (int p = 0; p < numPatches; p++)
+        // Two race-free parallel kernels (mirrors BatchConv2DMath.Backward):
+        //   (1) gradCol — parallel over patches p; patch p writes only gradCol[p*patchSize ..],
+        //       a disjoint block per p.
+        //   (2) weight/bias grads — parallel over output channels d; channel d writes only
+        //       filters[d].Gradient and bias.Gradient[d], disjoint per d.
+        // col/filterFlat/gradOut are read-only in both kernels.
+        var filterParams = filters.ToArray();
+        var biasParam = bias;
 
+        ComputingContextExecution.ForEach(context, 0, numPatches, p =>
         {
-
+            int colBase = p * patchSize;
+            int gradOutBase = gradOutOffset + p * outChannels;
             for (int d = 0; d < outChannels; d++)
-
             {
-
-                var grad = gradOut[gradOutOffset + p * outChannels + d];
-
-                bias.Gradient.Values[d] += grad;
-
-
-
-                int colBase = p * patchSize;
-
+                var grad = gradOut[gradOutBase + d];
                 int filterBase = d * patchSize;
-
                 for (int k = 0; k < patchSize; k++)
-
                 {
-
-                    filters[d].Gradient.Values[k] += grad * col[colBase + k];
-
                     gradCol[colBase + k] += grad * filterFlat[filterBase + k];
-
                 }
+            }
+        }, (long)outChannels * patchSize);
 
+        ComputingContextExecution.ForEach(context, 0, outChannels, d =>
+        {
+            var filterGrad = filterParams[d].Gradient.Values;
+            int filterBase = d * patchSize;
+            T biasAcc = T.Zero;
+            for (int p = 0; p < numPatches; p++)
+            {
+                var grad = gradOut[gradOutOffset + p * outChannels + d];
+                biasAcc += grad;
+                int colBase = p * patchSize;
+                for (int k = 0; k < patchSize; k++)
+                {
+                    filterGrad[k] += grad * col[colBase + k];
+                }
             }
 
-        }
+            biasParam.Gradient.Values[d] += biasAcc;
+        }, (long)numPatches * patchSize);
 
 
 

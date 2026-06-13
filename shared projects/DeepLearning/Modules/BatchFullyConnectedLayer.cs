@@ -93,30 +93,57 @@ public sealed class BatchFullyConnectedLayer<T> : BatchLayerBase<T>
         gradInput.Values.Clear();
         var weight = _weight.Value;
         int spatial = input.Height * input.Width;
+        int batch = input.Batch, inWidth = input.Width, inHeight = input.Height, channels = input.Channels;
+        int goWidth = gradOutput.Width, goHeight = gradOutput.Height;
 
-        for (int n = 0; n < input.Batch; n++)
+        // Two race-free parallel kernels, mirroring the convolution backward:
+        //   (1) gradInput — parallel over samples n (disjoint input regions).
+        //   (2) weight/bias grads — parallel over output units o (disjoint gradient rows).
+        long gradInputWork = (long)spatial * OutputSize * InputSize;
+        ComputingContextExecution.ForEach(null, 0, batch, n =>
         {
             for (int s = 0; s < spatial; s++)
             {
-                int h = s / input.Width;
-                int w = s % input.Width;
-                int inBase = ((n * input.Height + h) * input.Width + w) * input.Channels;
-                int outBase = ((n * gradOutput.Height + h) * gradOutput.Width + w) * OutputSize;
+                int h = s / inWidth;
+                int w = s % inWidth;
+                int inBase = ((n * inHeight + h) * inWidth + w) * channels;
+                int outBase = ((n * goHeight + h) * goWidth + w) * OutputSize;
 
                 for (int o = 0; o < OutputSize; o++)
                 {
                     var gradO = gradOutput.Values[outBase + o];
-                    _bias.Gradient[0, 0, o] += gradO;
-
                     for (int i = 0; i < InputSize; i++)
                     {
-                        var inVal = input.Values[inBase + i];
-                        _weight.Gradient[0, o, i] += gradO * inVal;
                         gradInput.Values[inBase + i] += gradO * weight[0, o, i];
                     }
                 }
             }
-        }
+        }, gradInputWork);
+
+        long weightWork = (long)batch * spatial * InputSize;
+        ComputingContextExecution.ForEach(null, 0, OutputSize, o =>
+        {
+            T biasAcc = T.Zero;
+            for (int n = 0; n < batch; n++)
+            {
+                for (int s = 0; s < spatial; s++)
+                {
+                    int h = s / inWidth;
+                    int w = s % inWidth;
+                    int inBase = ((n * inHeight + h) * inWidth + w) * channels;
+                    int outBase = ((n * goHeight + h) * goWidth + w) * OutputSize;
+                    var gradO = gradOutput.Values[outBase + o];
+                    biasAcc += gradO;
+
+                    for (int i = 0; i < InputSize; i++)
+                    {
+                        _weight.Gradient[0, o, i] += gradO * input.Values[inBase + i];
+                    }
+                }
+            }
+
+            _bias.Gradient[0, 0, o] += biasAcc;
+        }, weightWork);
 
         return gradInput;
     }
