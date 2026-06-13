@@ -25,10 +25,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="runtimes\win-x64\native\*.dll"
-			  Pack="true"
-			  PackagePath="runtimes/win-x64/native"
-			  CopyToOutputDirectory="PreserveNewest" />
+		<None Include="runtimes\win-x64\native\*.dll" Pack="true" PackagePath="runtimes/win-x64/native" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -39,6 +36,10 @@
 	  <None Include="..\..\docs\logos\logo1.png" Link="logo1.png">
 	    <PackagePath>\</PackagePath>
 	    <Pack>True</Pack>
+	  </None>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
 	  </None>
 	  <None Include="..\..\wiki_en\HOME.md" Link="README.md">
 	    <PackagePath>\</PackagePath>
