@@ -4,7 +4,7 @@
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**版本：** 0.9.0 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
+**版本：** 0.9.2 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
 
 [English readme](readme.md)
 
