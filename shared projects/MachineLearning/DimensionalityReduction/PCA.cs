@@ -1,29 +1,13 @@
-﻿
-
-using System.Numerics;
-
-using System.Runtime.CompilerServices;
-
+﻿using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
-
-
 
 namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 
-
-
-
-
 /// <summary>
-
-/// 主成分分析 (PCA) 类，用于降维和特征提取。
-
+/// Principal Component Analysis (PCA) class for dimensionality reduction and feature extraction.
 /// </summary>
-
 public class PCA<TSelf> : IMachineLearning
-
     where TSelf : struct, IFloatingPointIeee754<TSelf>
-
 {
 
     private readonly Matrix<TSelf> _data;
@@ -36,216 +20,129 @@ public class PCA<TSelf> : IMachineLearning
 
     private TSelf[][] _eigenVectors;
 
-
-
     public MachineLearningTask Task => MachineLearningTask.DimensionalityReduction;
 
-
+    /// <summary>
+    /// Execution policy honored by this estimator. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
+    /// </summary>
+    public ComputingContext? Context { get; set; }
 
     /// <summary>
-
-    /// 初始化 PCA 类的新实例。
-
+    /// Initializes a new instance of the PCA class.
     /// </summary>
-
-    /// <param name="data">输入数据集，每行是一个样本，每列是一个特征。</param>
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
-    public PCA(TSelf[,] data)
-
+    /// <param name="data">The input data set; each row is a sample and each column is a feature.</param>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    public PCA(TSelf[,] data, ComputingContext? context = null)
     {
-
+        Context = context;
         _data = new Matrix<TSelf>(data);
-
         ComputeMeans();
-
         CenterData();
-
         ComputeCovarianceMatrix();
-
         ComputeEigenDecomposition();
-
     }
 
-
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
     private void ComputeMeans()
-
     {
 
         int numFeatures = _data.Columns;
-
         int numSamples = _data.Rows;
-
         _means = new TSelf[numFeatures];
 
         for (int j = 0; j < numFeatures; j++)
-
         {
 
             TSelf sum = TSelf.Zero;
-
             for (int i = 0; i < numSamples; i++)
-
                 sum += _data[i, j];
-
             _means[j] = sum / TSelf.CreateChecked(numSamples);
-
         }
-
     }
 
-
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
     private void CenterData()
-
     {
-
         for (int i = 0; i < _data.Rows; i++)
-
         {
-
             for (int j = 0; j < _data.Columns; j++)
-
                 _data[i, j] -= _means[j];
-
         }
-
     }
 
-
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
     private void ComputeCovarianceMatrix()
-
     {
-
         int numFeatures = _data.Columns;
-
         int numSamples = _data.Rows;
-
         TSelf scale = TSelf.One / TSelf.CreateChecked(numSamples - 1);
-
         _covarianceMatrix = new Matrix<TSelf>(numFeatures, numFeatures);
 
-
-
-        for (int i = 0; i < numFeatures; i++)
-
-        {
-
-            for (int j = 0; j < numFeatures; j++)
-
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            numFeatures,
+            i =>
             {
-
-                TSelf sum = TSelf.Zero;
-
-                for (int k = 0; k < numSamples; k++)
-
-                    sum += _data[k, i] * _data[k, j];
-
-                _covarianceMatrix[i, j] = sum * scale;
-
-            }
-
-        }
-
+                for (int j = 0; j < numFeatures; j++)
+                {
+                    TSelf sum = TSelf.Zero;
+                    for (int k = 0; k < numSamples; k++)
+                        sum += _data[k, i] * _data[k, j];
+                    _covarianceMatrix[i, j] = sum * scale;
+                }
+            },
+            workPerItem: (long)numFeatures * numSamples);
     }
-
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
     private void ComputeEigenDecomposition()
-
     {
-
         var result = MatrixDecomposition.SymmetricEigendecomposition(_covarianceMatrix);
-
         _eigenValues = result.Eigenvalues;
-
         int n = _eigenValues.Length;
-
         _eigenVectors = new TSelf[n][];
-
         for (int j = 0; j < n; j++)
-
             _eigenVectors[j] = result.Eigenvectors.GetColumn(j);
-
     }
-
-
 
     /// <summary>
-
-    /// 将原始数据转换为主成分。
-
+    /// Transforms the original data into principal components.
     /// </summary>
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
     public TSelf[,] Transform()
-
     {
-
         int numSamples = _data.Rows;
-
         int numFeatures = _data.Columns;
-
         TSelf[,] components = new TSelf[numSamples, numFeatures];
 
-        var row = new TSelf[numFeatures];
-
-
-
-        for (int i = 0; i < numSamples; i++)
-
-        {
-
-            _data.GetRow(i).CopyTo(row);
-
-            for (int j = 0; j < numFeatures; j++)
-
-                components[i, j] = VectorSpan.Dot(_eigenVectors[j], row);
-
-        }
-
-
-
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            numSamples,
+            i =>
+            {
+                var row = new TSelf[numFeatures];
+                _data.GetRow(i).CopyTo(row);
+                for (int j = 0; j < numFeatures; j++)
+                    components[i, j] = VectorSpan.Dot(_eigenVectors[j], row);
+            },
+            workPerItem: (long)numFeatures * numFeatures);
         return components;
-
     }
-
-
 
     /// <summary>
-
-    /// 获取解释的方差比例。
-
+    /// Gets the explained variance ratios.
     /// </summary>
-
     public TSelf[] GetExplainedVarianceRatio()
-
     {
-
         TSelf totalVariance = VectorSpan.Sum(_eigenValues);
-
         var ratios = new TSelf[_eigenValues.Length];
-
         for (int i = 0; i < ratios.Length; i++)
-
             ratios[i] = _eigenValues[i] / totalVariance;
-
         return ratios;
-
     }
-
 }
 
 

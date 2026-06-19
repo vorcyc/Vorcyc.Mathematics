@@ -1,19 +1,11 @@
-﻿//namespace Vorcyc.Mathematics.SignalProcessing.Windowing;
-
+//namespace Vorcyc.Mathematics.SignalProcessing.Windowing;
 //using static System.MathF;
 //using static Vorcyc.Mathematics.VMath;
-
 //public static partial class Windowing
 //{
-
-
 //    //! 8.0f * Atan(1.0f)  = 2* Constants.M_PI
 
-
-
-
 //    #region Rectangular
-
 //    public static void Rectangular(ComplexFp32[] data, int offset, int length)
 //    {
 //        //for (int index = offset, increment = 0; index < length + offset; index++, increment++)
@@ -22,8 +14,6 @@
 //        //}
 //        //! 实际上就是啥都不做
 //    }
-
-
 //    public static unsafe void Rectangular(ComplexFp32* pData, int length)
 //    {
 //        //for (int i = 0; i < length; i++)
@@ -32,14 +22,9 @@
 //        //}
 //        //! 实际上就是啥都不做
 //    }
-
 //    #endregion
-
-
 //    #region Triangular
-
 //    //tex: $$ w[n]=1 -  |\frac{n - \frac{N}{2}} {\frac{L}{2}}| ,  0 \le n \le N $$
-
 //    /// <summary>
 //    /// Performs triangle window on complex sequence.
 //    /// </summary>
@@ -61,7 +46,6 @@
 //            pData[i].Imaginary *= tri;
 //        }
 //    }
-
 //    public static void Triangular(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = 2.0f / (length - 1);
@@ -76,12 +60,8 @@
 //            data[i] *= tri;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Hamming
-
 //    /// <summary>
 //    /// Performs Hamming window on complex sequence.
 //    /// </summary>
@@ -98,7 +78,6 @@
 //            pData[i].Imaginary *= ham;
 //        }
 //    }
-
 //    public static void Hamming(ComplexFp32[] data, int offset, int length)
 //    {
 //        //float factor = 2 * ConstantsFP32.M_PI / (length - 1);
@@ -110,12 +89,8 @@
 //            data[i].Imaginary *= ham;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Blackman
-
 //    public static void Blackman(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = ConstantsFp32.TWO_PI / (length - 1);
@@ -125,12 +100,10 @@
 //                 0.42f -
 //                 (0.5f * Cos(factor * increment)) +
 //                 (0.08f * Cos(2 * factor * increment));
-
 //            data[i].Real *= black;
 //            data[i].Imaginary *= black;
 //        }
 //    }
-
 //    /// <summary>
 //    /// Performs Blackman window on complex sequence.
 //    /// </summary>
@@ -146,21 +119,14 @@
 //                 0.42f -
 //                 (0.5f * Cos(factor * i)) +
 //                 (0.08f * Cos(2 * factor * i));
-
 //            pData[i].Real *= black;
 //            pData[i].Imaginary *= black;
 //        }
 //    }
-
-
 //    #endregion
-
-
 //    #region Hann
-
 //    //百度百科的 https://baike.baidu.com/item/%E6%B1%89%E5%AE%81%E7%AA%97/10378703?fr=ge_ala
 //    // 是错的！！！那么重要的公式竟然是错的！！！！
-
 //    public static void Hann(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = ConstantsFp32.TWO_PI / (length - 1);
@@ -171,8 +137,6 @@
 //            data[index].Imaginary *= han;
 //        }
 //    }
-
-
 //    public static unsafe void Hann(ComplexFp32* pData, int length)
 //    {
 //        float factor = ConstantsFp32.TWO_PI / (length - 1);
@@ -183,12 +147,8 @@
 //            pData[i].Real *= han;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Gaussian
-
 //    public static void Gaussian(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = (length - 1) * .5f;
@@ -199,7 +159,6 @@
 //            data[index].Imaginary *= gaussian;
 //        }
 //    }
-
 //    public static unsafe void Gaussian(ComplexFp32* pData, int length)
 //    {
 //        float factor = (length - 1) * .5f;
@@ -210,12 +169,8 @@
 //            pData[i].Imaginary *= gaussian;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Kaiser
-
 //    public static void Kaiser(ComplexFp32[] data, int offset, int length, float alpha = 12f)
 //    {
 //        float factor = 2.0f / (length - 1);
@@ -223,13 +178,10 @@
 //        {
 //            float kaiser = I0(alpha * Sqrt(1 - (increment * factor - 1) * (increment * factor - 1)))
 //                / I0(alpha);
-
 //            data[index].Real *= kaiser;
 //            data[index].Imaginary *= kaiser;
 //        }
 //    }
-
-
 //    public static unsafe void Kaiser(ComplexFp32* pData, int length, float alpha = 12f)
 //    {
 //        float factor = 2.0f / (length - 1);
@@ -240,12 +192,8 @@
 //            pData[i].Imaginary *= kaiser;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Kaiser-Bessel Derived
-
 //    /// <summary>
 //    ///  Generates Kaiser-Bessel Derived window .
 //    /// </summary>
@@ -258,89 +206,68 @@
 //        //x var window = new float[length ];
 //        // 优化数据量 :
 //        var window = new float[length / 2 + 1];
-
 //        float factor = 4.0f / length;
 //        float sum = 0f;
-
 //        for (int index = offset, increment = 0; index <= (length + offset) / 2; index++, increment++)
 //        {
 //            sum += I0(ConstantsFp32.PI * alpha * Sqrt(1 - (increment * factor - 1) * (increment * factor - 1)));
 //            window[increment] = sum;
 //        }
-
 //        for (int index = offset, increment = 0; index < (length + offset) / 2; index++, increment++)
 //        {
 //            var v = Sqrt(window[increment] / sum);
 //            data[index].Real *= v;
 //            data[index].Imaginary *= v;
-
 //            var backwardIndex = length - 1 - increment + offset;
 //            data[backwardIndex].Real *= v;
 //            data[backwardIndex].Imaginary *= v;
 //        }
 //    }
-
 //    public static unsafe void Kbd(ComplexFp32* pData, int length, float alpha = 4f)
 //    {
 //        //x var window = new float[length ];
 //        // 优化数据量 :
 //        var window = new float[length / 2 + 1];
-
 //        float factor = 4.0f / length;
 //        float sum = 0f;
-
 //        for (int i = 0; i <= length / 2; i++)
 //        {
 //            sum += I0(ConstantsFp32.PI * alpha * Sqrt(1 - (i * factor - 1) * (i * factor - 1)));
 //            window[i] = sum;
 //        }
-
 //        for (int i = 0; i < length / 2; i++)
 //        {
 //            var v = Sqrt(window[i] / sum);
 //            pData[i].Real *= v;
 //            pData[i].Imaginary *= v;
-
 //            var backwardIndex = length - 1 - i;
 //            pData[backwardIndex].Real *= v;
 //            pData[backwardIndex].Imaginary *= v;
 //        }
 //    }
-
-
 //    //public static void Kbd2(float[] data, int offset, int length, float alpha = 4f)
 //    //{
 //    //    //var window = new float[length ];
 //    //    // 优化数据量 :
 //    //    var window = new float[length / 2 + 1];
-
 //    //    float factor = 4.0f / length;
 //    //    float sum = 0f;
-
 //    //    for (int index = offset, increment = 0; index <= (length + offset) / 2; index++, increment++)
 //    //    {
 //    //        sum += MathUtils.I0(ConstantsFP32.M_PI * alpha * Sqrt(1 - (increment * factor - 1) * (increment * factor - 1)));
 //    //        window[increment] = sum;
 //    //    }
-
 //    //    for (int index = offset, increment = 0; index < (length + offset) / 2; index++, increment++)
 //    //    {
 //    //        var v = Sqrt(window[increment] / sum);
 //    //        data[index] *= v;
-
 //    //        var backwardIndex = length - 1 - increment + offset;
 //    //        data[backwardIndex] *= v;
-
 //    //    }
 //    //}
 
-
-
 //    #endregion
-
-
 //    #region Bartlett-Hann
-
 //    public static void Bartlett_Hann(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = 1.0f / (length - 1);
@@ -351,7 +278,6 @@
 //            data[index].Imaginary *= bh;
 //        }
 //    }
-
 //    public static unsafe void Bartlett_Hann(ComplexFp32* pData, int length)
 //    {
 //        float factor = 1.0f / (length - 1);
@@ -362,12 +288,8 @@
 //            pData[i].Imaginary *= bh;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Lanczos
-
 //    public static void Lanczos(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = 2.0f / (length - 1);
@@ -378,8 +300,6 @@
 //            data[index].Imaginary *= lanczos;
 //        }
 //    }
-
-
 //    public static unsafe void Lanczos(ComplexFp32* pData, int length)
 //    {
 //        float factor = 2.0f / (length - 1);
@@ -390,12 +310,8 @@
 //            pData[i].Imaginary *= lanczos;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region PowerOfSine
-
 //    public static void PowerOfSine(ComplexFp32[] data, int offset, int length, float alpha = 1.5f)
 //    {
 //        float factor = ConstantsFp32.PI / length;
@@ -406,8 +322,6 @@
 //            data[index].Imaginary *= v;
 //        }
 //    }
-
-
 //    public static unsafe void PowerOfSine(ComplexFp32* pData, int length, float alpha = 1.5f)
 //    {
 //        float factor = ConstantsFp32.PI / length;
@@ -418,16 +332,11 @@
 //            pData[i].Imaginary *= v;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Flattop
-
 //    public static void Flattop(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = 2 * ConstantsFp32.PI / (length - 1);
-
 //        for (int index = offset, increment = 0; index < length + offset; index++, increment++)
 //        {
 //            var v = 0.216f - 0.417f * Cos(increment * factor) + 0.278f * Cos(2 * increment * factor) - 0.084f * Cos(3 * increment * factor) + 0.007f * Cos(4 * increment * factor);
@@ -435,12 +344,9 @@
 //            data[index].Imaginary *= v;
 //        }
 //    }
-
-
 //    public static unsafe void Flattop(ComplexFp32* pData, int length)
 //    {
 //        float factor = 2 * ConstantsFp32.PI / (length - 1);
-
 //        for (int i = 0; i < length; i++)
 //        {
 //            var v = 0.216f - 0.417f * Cos(i * factor) + 0.278f * Cos(2 * i * factor) - 0.084f * Cos(3 * i * factor) + 0.007f * Cos(4 * i * factor);
@@ -448,12 +354,8 @@
 //            pData[i] *= v;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Liftering
-
 //    public static void Liftering(ComplexFp32[] data, int offset, int length, int l = 22)
 //    {
 //        if (l <= 0)
@@ -461,7 +363,6 @@
 //            //Rectangular(data,offset, length);
 //            return;
 //        }
-
 //        for (int index = offset, increment = 0; index < length + offset; index++, increment++)
 //        {
 //            var v = 1 + l * Sin(ConstantsFp32.PI * increment / l) / 2;
@@ -469,8 +370,6 @@
 //            data[index].Imaginary *= v;
 //        }
 //    }
-
-
 //    public static unsafe void Liftering(ComplexFp32* pData, int length, int l = 22)
 //    {
 //        if (l <= 0)
@@ -478,7 +377,6 @@
 //            //Rectangular(data,offset, length);
 //            return;
 //        }
-
 //        for (int i = 0; i < length; i++)
 //        {
 //            var v = 1 + l * Sin(ConstantsFp32.PI * i / l) / 2;
@@ -486,13 +384,8 @@
 //            pData[i].Imaginary *= v;
 //        }
 //    }
-
 //    #endregion
-
-
 //    #region Blackman Harris
-
-
 //    public static void Blackman_Harris(ComplexFp32[] data, int offset, int length)
 //    {
 //        float factor = ConstantsFp32.TWO_PI / length;
@@ -504,13 +397,10 @@
 //                0.48829f * Cos(arg) +
 //                0.14128f * Cos(2 * arg) -
 //                0.01168f * Cos(3 * arg);
-
 //            data[i].Real *= harris;
 //            data[i].Imaginary *= harris;
 //        }
 //    }
-
-
 //    /// <summary>
 //    /// Performs 4 term Blackman-Harris window on complex sequence.
 //    /// </summary>
@@ -527,15 +417,11 @@
 //                0.48829f * Cos(arg) +
 //                0.14128f * Cos(2 * arg) -
 //                0.01168f * Cos(3 * arg);
-
 //            pData[i].Real *= harris;
 //            pData[i].Imaginary *= harris;
 //        }
 //    }
-
 //    #endregion
-
-
 
 //    public static void Apply(ComplexFp32[] data, int offset, int length, WindowType windowType)
 //    {
@@ -587,7 +473,5 @@
 //                break;
 //        }
 //    }
-
-
 
 //}

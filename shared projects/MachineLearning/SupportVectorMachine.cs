@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace Vorcyc.Mathematics.MachineLearning;
 
 /// <summary>
-/// 表示支持向量机的核函数类型。
+/// Kernel function type for a support vector machine.
 /// </summary>
 public enum SupportVectorMachineKernelType
 {
@@ -17,7 +17,7 @@ public enum SupportVectorMachineKernelType
 }
 
 /// <summary>
-/// 核感知机式支持向量机：线性模式使用权重向量，非线性模式使用对偶系数与支持向量。
+/// Kernel-perceptron-style support vector machine: the linear mode uses a weight vector, while non-linear modes use dual coefficients and support vectors.
 /// </summary>
 public class SupportVectorMachine<TSelf> : IMachineLearning
     where TSelf : struct, IFloatingPointIeee754<TSelf>
@@ -40,7 +40,7 @@ public class SupportVectorMachine<TSelf> : IMachineLearning
     public MachineLearningTask Task => MachineLearningTask.Classification | MachineLearningTask.Regression;
 
     /// <summary>
-    /// 初始化支持向量机。
+    /// Initializes a support vector machine.
     /// </summary>
     public SupportVectorMachine(
         int featureCount,
@@ -50,7 +50,8 @@ public class SupportVectorMachine<TSelf> : IMachineLearning
         TSelf? gamma = null,
         int polynomialDegree = 3,
         TSelf? sigmoidAlpha = null,
-        TSelf? sigmoidConstant = null)
+        TSelf? sigmoidConstant = null,
+        ComputingContext? context = null)
     {
         _learningRate = learningRate ?? TSelf.CreateChecked(0.01);
         _epochs = epochs;
@@ -62,19 +63,26 @@ public class SupportVectorMachine<TSelf> : IMachineLearning
         _isLinearKernel = kernelType is SupportVectorMachineKernelType.Linear
             or SupportVectorMachineKernelType.DotProduct;
         _weights = new TSelf[featureCount];
+        Context = context;
     }
 
     /// <summary>
-    /// 训练模型。标签应为 -1 或 1。
+    /// Execution policy context. When null, the ambient <see cref="ComputingScope"/>
+    /// and then <see cref="ComputingContext.Default"/> are used.
+    /// </summary>
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>
+    /// Trains the model. Labels must be -1 or 1.
     /// </summary>
     public void Train(TSelf[][] inputs, int[] outputs)
     {
         if (inputs == null || outputs == null)
-            throw new ArgumentException("训练数据不能为 null。");
+            throw new ArgumentException("Training data cannot be null.");
         if (inputs.Length == 0 || inputs.Length != outputs.Length)
-            throw new ArgumentException("样本数与标签数不匹配。");
+            throw new ArgumentException("The number of samples does not match the number of labels.");
         if (inputs[0].Length != _weights.Length)
-            throw new ArgumentException("特征维度与模型不匹配。");
+            throw new ArgumentException("Feature dimension does not match the model.");
 
         _trainingInputs = inputs;
         _trainingLabels = (int[])outputs.Clone();
@@ -107,7 +115,7 @@ public class SupportVectorMachine<TSelf> : IMachineLearning
     }
 
     /// <summary>
-    /// 预测类别标签（1 或 -1）。
+    /// Predicts the class label (1 or -1).
     /// </summary>
     public int Predict(Span<TSelf> input)
     {

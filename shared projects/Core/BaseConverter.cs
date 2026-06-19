@@ -1,7 +1,5 @@
-﻿using System.Numerics;
-
+using System.Numerics;
 namespace Vorcyc.Mathematics;
-
 /// <summary>
 /// 提供将任意实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型转换为指定进制的字符串表示和从指定进制的字符串表示转换为整数的方法。
 /// </summary>
@@ -33,16 +31,12 @@ public static class BaseConverter
     //{
     //    int digitValue;
     //    System.Text.StringBuilder res = new System.Text.StringBuilder();
-
     //    const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
     //    //检查进制数和源数
     //    if (number < 0)
     //        throw new ArgumentOutOfRangeException("值必须为正");
     //    else if (baseNum < 2 || baseNum > 36)
     //        throw new ArgumentOutOfRangeException("基数必须在2到36间");
-
-
     //    while (number > 0L)
     //    {
     //        digitValue = (int)(number % ((long)baseNum));
@@ -50,10 +44,7 @@ public static class BaseConverter
     //        res.Insert(0, digits[digitValue]);
     //    }
     //    return res.ToString();
-
     //}
-
-
 
     /// <summary>
     /// 将任意实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型转换为指定进制的字符串表示。
@@ -69,31 +60,24 @@ public static class BaseConverter
         where TSelf : IBinaryInteger<TSelf>
     {
         const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
         // 检查进制数和源数
         if (integer < TSelf.Zero)
             throw new ArgumentOutOfRangeException(nameof(integer), "值必须为正");
         if (baseNumber < TSelf.CreateChecked(2) || baseNumber > TSelf.CreateChecked(digits.Length))
             throw new ArgumentOutOfRangeException(nameof(baseNumber), $"基数必须在2到{digits.Length}间");
-
         // 特殊处理零
         if (integer == TSelf.Zero)
             return "0";
-
         Span<char> buffer = stackalloc char[128]; // 足够大以容纳所有可能的结果
         int index = buffer.Length;
-
         while (integer > TSelf.Zero)
         {
             var (quotient, remainder) = TSelf.DivRem(integer, baseNumber);
             buffer[--index] = digits[int.CreateChecked(remainder)];
             integer = quotient;
         }
-
         return new string(buffer.Slice(index));
     }
-
-
 
     /// <summary>
     /// 将指定进制的字符串表示转换为任意实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型。
@@ -109,24 +93,19 @@ public static class BaseConverter
         where TSelf : IBinaryInteger<TSelf>
     {
         const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
         // 检查进制数和源数
         if (baseNumber < TSelf.CreateChecked(2) || baseNumber > TSelf.CreateChecked(digits.Length))
             throw new ArgumentOutOfRangeException(nameof(baseNumber), $"基数必须在2到{digits.Length}间");
-
         TSelf result = TSelf.Zero;
         TSelf baseValue = TSelf.One;
-
         for (int i = value.Length - 1; i >= 0; i--)
         {
             int digitValue = digits.IndexOf(value[i]);
             if (digitValue == -1)
                 throw new ArgumentOutOfRangeException(nameof(value), $"字符串包含无效字符 '{value[i]}'");
-
             result += TSelf.CreateChecked(digitValue) * baseValue;
             baseValue *= baseNumber;
         }
-        
         return result;
     }
 }

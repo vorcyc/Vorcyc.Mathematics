@@ -1,13 +1,9 @@
-﻿namespace Vorcyc.Mathematics;
-
+namespace Vorcyc.Mathematics;
 using System.Numerics;
 using System.Runtime.InteropServices;
-
 public static partial class ArrayExtension
 {
-
     #region Generic
-
     /// <summary>
     /// 复制数组。
     /// </summary>
@@ -21,7 +17,6 @@ public static partial class ArrayExtension
         Array.Copy(source, result, source.Length);
         return result;
     }
-
     /// <summary>
     /// 复制数组的指定长度。
     /// </summary>
@@ -36,7 +31,6 @@ public static partial class ArrayExtension
         Array.Copy(source, result, length);
         return result;
     }
-
     /// <summary>
     /// 初始化一个指定长度的数组，并用初始值填充。
     /// </summary>
@@ -51,7 +45,6 @@ public static partial class ArrayExtension
         {
             return null;
         }
-
         var array = new T[length];
         for (var i = 0; i < length; i++)
         {
@@ -59,7 +52,6 @@ public static partial class ArrayExtension
         }
         return array;
     }
-
     /// <summary>
     /// 用指定值填充整个数组。
     /// </summary>
@@ -74,7 +66,6 @@ public static partial class ArrayExtension
             array[i] = value;
         }
     }
-
     /// <summary>
     /// 用指定值填充数组的指定范围。
     /// </summary>
@@ -90,19 +81,15 @@ public static partial class ArrayExtension
     {
         if (array == null)
             throw new ArgumentNullException(nameof(array));
-
         if (start < 0 || start > end)
             throw new ArgumentOutOfRangeException(nameof(start));
-
         if (end >= array.Length)
             throw new ArgumentOutOfRangeException(nameof(end));
-
         for (int i = start; i < end; i++)
         {
             array[i] = value;
         }
     }
-
     /// <summary>
     /// 用指定值填充数组的指定范围。
     /// </summary>
@@ -116,15 +103,12 @@ public static partial class ArrayExtension
     public static void Fill<T>(this T[] array, Range range, T value)
     {
         if (array is null) throw new ArgumentNullException(nameof(array));
-
         var (offset, length) = range.GetOffsetAndLength(array.Length);
         for (int i = offset; i < offset + length; i++)
         {
             array[i] = value;
         }
     }
-
-
     /// <summary>
     /// 用指定值填充数组的指定范围。
     /// </summary>
@@ -139,7 +123,6 @@ public static partial class ArrayExtension
             values[i] = value;
         }
     }
-
     /// <summary>
     /// 用随机浮点数填充数组。
     /// </summary>
@@ -150,13 +133,11 @@ public static partial class ArrayExtension
     {
         if (span.Length < 1)
             throw new ArgumentOutOfRangeException(nameof(span));
-
         for (int i = 0; i < span.Length; i++)
         {
             span[i] = Random.Shared.NextSingle();
         }
     }
-
     /// <summary>
     /// 用随机数填充数组。
     /// </summary>
@@ -168,11 +149,9 @@ public static partial class ArrayExtension
         where T : IFloatingPointIeee754<T>
     {
         ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
-
         for (int i = 0; i < array.Length; i++)
             array[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
-
     /// <summary>
     /// 用随机数填充数组的指定范围。
     /// </summary>
@@ -186,12 +165,10 @@ public static partial class ArrayExtension
         where T : IFloatingPointIeee754<T>
     {
         ArgumentNullException.ThrowIfNullOrEmpty(nameof(array));
-
         var (offset, length) = range.GetOffsetAndLength(array.Length);
         for (int i = offset; i < offset + length; i++)
             array[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
-
     /// <summary>
     /// 用随机数填充数组。
     /// </summary>
@@ -209,7 +186,6 @@ public static partial class ArrayExtension
             for (int i = 0; i < array.Length; i++)
                 array[i] = Random.Shared.Next(limit.Value.min, limit.Value.max);
     }
-
     /// <summary>
     /// 用随机数填充数组的指定范围。
     /// </summary>
@@ -224,7 +200,6 @@ public static partial class ArrayExtension
         for (int i = offset; i < offset + length; i++)
             array[i] = Random.Shared.Next();
     }
-
     /// <summary>
     /// 用随机数填充数组。
     /// </summary>
@@ -237,7 +212,6 @@ public static partial class ArrayExtension
         for (int i = 0; i < array.Length; i++)
             array[i] = Random.Shared.NextInt64();
     }
-
     /// <summary>
     /// 用随机数填充数组的指定范围。
     /// </summary>
@@ -252,7 +226,6 @@ public static partial class ArrayExtension
         for (int i = offset; i < offset + length; i++)
             array[i] = Random.Shared.NextInt64();
     }
-
     /// <summary>
     /// 用指定的起始值和步长填充数组。
     /// </summary>
@@ -271,7 +244,6 @@ public static partial class ArrayExtension
             startValue += step;
         }
     }
-
     /// <summary>
     /// 用指定的起始值和步长填充数组。
     /// </summary>
@@ -290,7 +262,6 @@ public static partial class ArrayExtension
             startValue += step;
         }
     }
-
     /// <summary>
     /// 取内部一段，并返回迭代集。
     /// </summary>
@@ -310,20 +281,16 @@ public static partial class ArrayExtension
     {
         if (array is null)
             throw new ArgumentNullException();
-
         if (start < 0 || start > array.Length)
             throw new ArgumentOutOfRangeException(nameof(start));
-
         if (length <= 0)
             throw new ArgumentOutOfRangeException(nameof(length));
-
         int len = System.Math.Min(array.Length, length) + start;
         for (int i = start; i < len; i++)
         {
             yield return array[i];
         }
     }
-
     /// <summary>
     /// 取一个数组的内部片段，并返回片段。
     /// </summary>
@@ -341,16 +308,13 @@ public static partial class ArrayExtension
             throw new ArgumentNullException();
         if (start < 0 || start > array.Length)
             throw new ArgumentOutOfRangeException(nameof(start));
-
         if (length <= 0)
             throw new ArgumentOutOfRangeException(nameof(length));
-
         int arrayBound = System.Math.Min(array.Length - start, length);
         T[] result = new T[arrayBound];
         Array.Copy(array, start, result, 0, arrayBound);
         return result;
     }
-
     /// <summary>
     /// 移出数组中的一部分，并返回移出后的新数组。
     /// </summary>
@@ -367,7 +331,6 @@ public static partial class ArrayExtension
         Array.Copy(array, start + length, result, start, array.Length - start - length);
         return result;
     }
-
     ///// <summary>
     ///// 联接两个数组。
     ///// </summary>
@@ -383,7 +346,6 @@ public static partial class ArrayExtension
     //    Array.Copy(following, 0, result, leading.Length, following.Length);
     //    return result;
     //}
-
     /// <summary>
     /// 联接两个数组。
     /// </summary>
@@ -398,17 +360,14 @@ public static partial class ArrayExtension
         // 显式检查 null，更友好（尤其在调试时）
         ArgumentNullException.ThrowIfNull(leading);
         ArgumentNullException.ThrowIfNull(following);
-
         // 如果任一数组为空，直接返回另一个的副本（避免分配 0 长数组）
         if (leading.Length == 0) return following.ToArray();  // ToArray() 会返回克隆
         if (following.Length == 0) return leading.ToArray();
-
         var result = new T[leading.Length + following.Length];
         Array.Copy(leading, result, leading.Length);
         Array.Copy(following, 0, result, leading.Length, following.Length);
         return result;
     }
-
     /// <summary>
     /// 将集合转换为字符串。
     /// </summary>
@@ -420,7 +379,6 @@ public static partial class ArrayExtension
     {
         return "[" + string.Join(",", collection) + "]";
     }
-
     /// <summary>
     /// 快速复制数组的片段。
     /// </summary>
@@ -439,7 +397,6 @@ public static partial class ArrayExtension
         Array.Copy(source, sourceOffset, destination, destinationOffset, size);
         return destination;
     }
-
     /// <summary>
     /// 快速复制数组到目标数组。
     /// </summary>
@@ -454,7 +411,6 @@ public static partial class ArrayExtension
     {
         Array.Copy(source, sourceOffset, destination, destinationOffset, size);
     }
-
     /// <summary>
     /// 创建一个包含给定数组重复 <paramref name="n"/> 次的新数组。
     /// </summary>
@@ -467,20 +423,15 @@ public static partial class ArrayExtension
     {
         var repeated = new T[source.Length * n];
         var elementSize = Marshal.SizeOf<T>();
-
         var offset = 0;
         for (var i = 0; i < n; i++)
         {
             Buffer.BlockCopy(source, 0, repeated, offset * elementSize, source.Length * elementSize);
             offset += source.Length;
         }
-
         return repeated;
     }
-
     #endregion
-
-
     /// <summary>
     /// Creates array of single-precision values from enumerable of double-precision values.
     /// </summary>
@@ -489,7 +440,6 @@ public static partial class ArrayExtension
     {
         return values.Select(v => (float)v).ToArray();
     }
-
     /// <summary>
     /// Creates array of double-precision values from enumerable of single-precision values.
     /// </summary>
@@ -499,13 +449,8 @@ public static partial class ArrayExtension
         return values.Select(v => (double)v).ToArray();
     }
 
-
-
     #region single precision
-
-
     private const byte _32Bits = sizeof(float);
-
     /// <summary>
     /// Creates fast copy of array.
     /// </summary>
@@ -516,7 +461,6 @@ public static partial class ArrayExtension
         Buffer.BlockCopy(source, 0, destination, 0, source.Length * _32Bits);
         return destination;
     }
-
     /// <summary>
     /// Makes fast copy of array (or its part) to existing <paramref name="destination"/> array (or its part).
     /// </summary>
@@ -530,7 +474,6 @@ public static partial class ArrayExtension
     {
         Buffer.BlockCopy(source, sourceOffset * _32Bits, destination, destinationOffset * _32Bits, size * _32Bits);
     }
-
     /// <summary>
     /// Makes fast copy of array fragment starting at specified offset.
     /// </summary>
@@ -546,7 +489,6 @@ public static partial class ArrayExtension
         Buffer.BlockCopy(source, sourceOffset * _32Bits, destination, destinationOffset * _32Bits, size * _32Bits);
         return destination;
     }
-
     /// <summary>
     /// Performs fast merging of array with <paramref name="another"/> array.
     /// </summary>
@@ -558,7 +500,6 @@ public static partial class ArrayExtension
         Buffer.BlockCopy(another, 0, merged, source.Length * _32Bits, another.Length * _32Bits);
         return merged;
     }
-
     /// <summary>
     /// Creates new array containing given array repeated <paramref name="n"/> times.
     /// </summary>
@@ -566,18 +507,14 @@ public static partial class ArrayExtension
     public static float[] Repeat(this float[] source, int n)
     {
         var repeated = new float[source.Length * n];
-
         var offset = 0;
         for (var i = 0; i < n; i++)
         {
             Buffer.BlockCopy(source, 0, repeated, offset * _32Bits, source.Length * _32Bits);
             offset += source.Length;
         }
-
         return repeated;
     }
-
-
 
     /// <summary>
     /// Creates new zero-padded array of given <paramref name="size"/> from given array.
@@ -589,8 +526,6 @@ public static partial class ArrayExtension
         Buffer.BlockCopy(source, 0, zeroPadded, 0, source.Length * _32Bits);
         return zeroPadded;
     }
-
-
     /// <summary>
     /// Creates new zero-padded array of given <paramref name="size"/> from given array.
     /// </summary>
@@ -601,15 +536,10 @@ public static partial class ArrayExtension
         Array.Copy(source, zeroPadded, size);
         return zeroPadded;
     }
-
     #endregion
 
-
-
     #region double precision
-
     private const byte _64Bits = sizeof(double);
-
     /// <summary>
     /// Creates fast copy of array.
     /// </summary>
@@ -620,7 +550,6 @@ public static partial class ArrayExtension
         Buffer.BlockCopy(source, 0, destination, 0, source.Length * _64Bits);
         return destination;
     }
-
     /// <summary>
     /// Makes fast copy of array (or its part) to existing <paramref name="destination"/> array (or its part).
     /// </summary>
@@ -634,7 +563,6 @@ public static partial class ArrayExtension
     {
         Buffer.BlockCopy(source, sourceOffset * _64Bits, destination, destinationOffset * _64Bits, size * _64Bits);
     }
-
     /// <summary>
     /// Makes fast copy of array fragment starting at specified offset.
     /// </summary>
@@ -650,7 +578,6 @@ public static partial class ArrayExtension
         Buffer.BlockCopy(source, sourceOffset * _64Bits, destination, destinationOffset * _64Bits, size * _64Bits);
         return destination;
     }
-
     /// <summary>
     /// Performs fast merging of array with <paramref name="another"/> array.
     /// </summary>
@@ -662,7 +589,6 @@ public static partial class ArrayExtension
         Buffer.BlockCopy(another, 0, merged, source.Length * _64Bits, another.Length * _64Bits);
         return merged;
     }
-
     /// <summary>
     /// Creates new array containing given array repeated <paramref name="n"/> times.
     /// </summary>
@@ -670,17 +596,14 @@ public static partial class ArrayExtension
     public static double[] Repeat(this double[] source, int n)
     {
         var repeated = new double[source.Length * n];
-
         var offset = 0;
         for (var i = 0; i < n; i++)
         {
             Buffer.BlockCopy(source, 0, repeated, offset * _64Bits, source.Length * _64Bits);
             offset += source.Length;
         }
-
         return repeated;
     }
-
     /// <summary>
     /// Creates new zero-padded array of given <paramref name="size"/> from given array.
     /// </summary>
@@ -692,11 +615,7 @@ public static partial class ArrayExtension
         return zeroPadded;
     }
 
-
-
     #endregion
-
-
     /// <summary>
     /// Gets the last element of the array.
     /// </summary>
@@ -705,7 +624,6 @@ public static partial class ArrayExtension
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Last<T>(this T[] array) => array[array.Length - 1];// array[^1];
-
     /// <summary>
     /// Gets the first element of the array.
     /// </summary>
@@ -714,23 +632,5 @@ public static partial class ArrayExtension
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T First<T>(this T[] array) => array[0];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

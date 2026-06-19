@@ -1,12 +1,12 @@
 namespace Vorcyc.Mathematics.MachineLearning.Internal;
 
 /// <summary>
-/// 集成学习共用的采样工具。
+/// Shared sampling utilities for ensemble learning.
 /// </summary>
 internal static class EnsembleHelpers
 {
     /// <summary>
-    /// 有放回自助法索引，长度等于 <paramref name="count"/>。
+    /// Bootstrap (sampling with replacement) indices, with length equal to <paramref name="count"/>.
     /// </summary>
     public static int[] CreateBootstrapIndices(int count, Random random)
     {

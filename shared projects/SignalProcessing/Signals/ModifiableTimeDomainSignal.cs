@@ -1,5 +1,4 @@
 using System.Threading.Channels;
-using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.Buffers;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
@@ -16,10 +15,8 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
 {
     private readonly Channel<float[]> _channel;
     private POHBuffer<float>? _buffer;
-
     private volatile int _length;
     private readonly float _samplingRate;
-
     private readonly object _viewLock = new();
 
     #region Constructors
@@ -36,18 +33,15 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(sampleCount, 0, nameof(sampleCount));
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(samplingRate, 0, nameof(samplingRate));
-
         _length = sampleCount;
         _samplingRate = samplingRate;
         _buffer = new(sampleCount);
-
         var options = new UnboundedChannelOptions()
         {
             SingleReader = true,
             SingleWriter = true,
             AllowSynchronousContinuations = false,
         };
-
         _channel = Channel.CreateUnbounded<float[]>(options);
     }
 
@@ -60,7 +54,6 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         : this(ITimeDomainSignal.TimeToArrayIndexOrLength(duration, samplingRate), samplingRate)
     {
     }
-
     #endregion
 
     #region Signal Properties
@@ -76,8 +69,8 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return _buffer!;
         }
     }
-
-    /// <summary>
+    /// <summa
+    /// ry>
     /// Gets a lock-holding view for safe, direct access to the sample <see cref="Span{T}"/>.
     /// Must be used with a <c>using</c> statement to ensure the lock is properly released.
     /// <example><code>
@@ -110,7 +103,6 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         ClearAllCaches();
     }
-
     /// <summary>
     /// Called when the sample collection has been modified.
     /// Derived classes can override this to perform additional logic or refresh dependent data.
@@ -119,11 +111,9 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         ClearAllCaches();
     }
-
     #endregion
 
     #region LockedSamplesView
-
     /// <summary>
     /// Represents a lock-protected writable view of the samples, ensuring safe modification
     /// in concurrent scenarios. Call <see cref="Dispose"/> to release the lock.
@@ -132,18 +122,15 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         private readonly ModifiableTimeDomainSignal _signal;
         private readonly bool _lockTaken;
-
         /// <summary>
         /// Gets the writable sample span.
         /// </summary>
         public readonly Span<float> Span;
-
         internal LockedSamplesView(ModifiableTimeDomainSignal signal)
         {
             _signal = signal;
             _lockTaken = false;
             Monitor.Enter(signal._viewLock, ref _lockTaken);
-
             if (signal._buffer is null || signal._buffer.IsDisposed)
             {
                 if (_lockTaken) Monitor.Exit(signal._viewLock);
@@ -151,10 +138,8 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
                 Span = default;
                 throw new ObjectDisposedException(nameof(ModifiableTimeDomainSignal));
             }
-
             Span = signal._buffer.Span;
         }
-
         /// <summary>
         /// Releases the lock, ending safe access to the samples.
         /// </summary>
@@ -166,13 +151,10 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             }
         }
     }
-
     #endregion
 
     #region Time-Domain Characteristics
-
     private float? _amplitude = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.Amplitude"/>
     public float Amplitude
     {
@@ -189,12 +171,9 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.Period"/>
     public float Period => 1f / _samplingRate;
-
     private float? _totalPower = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.TotalPower"/>
     public float TotalPower
     {
@@ -211,9 +190,7 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     private float? _averagePower = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.AveragePower"/>
     public float AveragePower
     {
@@ -230,9 +207,7 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     private float? _totalEnergy = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.TotalEnergy"/>
     public float TotalEnergy
     {
@@ -249,9 +224,7 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     private float? _averageEnergy = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.AverageEnergy"/>
     public float AverageEnergy
     {
@@ -268,9 +241,7 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     private float? _rms = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.Rms"/>
     public float Rms
     {
@@ -287,9 +258,7 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     private float? _zeroCrossingRate = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.ZeroCrossingRate"/>
     public float ZeroCrossingRate
     {
@@ -306,9 +275,7 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     private float? _entropy = null;
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.Entropy"/>
     public float Entropy
     {
@@ -325,7 +292,6 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             return cached.Value;
         }
     }
-
     /// <inheritdoc cref="ITimeDomainCharacteristics.GetEntropy(int)"/>
     public float GetEntropy(int binCount = 32)
     {
@@ -333,7 +299,6 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         using var view = Samples;
         return ITimeDomainCharacteristics.GetEntropy_SIMD(view.Span, binCount);
     }
-
     /// <summary>
     /// Clears all lazily computed cached characteristic values.
     /// </summary>
@@ -348,11 +313,9 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         _zeroCrossingRate = null;
         _entropy = null;
     }
-
     #endregion
 
     #region Clone
-
     /// <summary>
     /// Creates a deep copy of the current signal, including the sample buffer and metadata.
     /// </summary>
@@ -364,11 +327,9 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         view.Span.CopyTo(result._buffer!.Span);
         return result;
     }
-
     #endregion
 
     #region Frequency-Domain Transformation
-
     /// <inheritdoc cref="ITimeDomainSignal.TransformToFrequencyDomain(WindowType?, FftVersion)"/>
     [Obsolete("Use TransformToFrequencyDomain(ComputingContext?, WindowType?) instead.", false)]
     public FrequencyDomain TransformToFrequencyDomain(WindowType? window, FftVersion fftVersion)
@@ -379,39 +340,31 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
             FftVersion.Parallel => ComputingContext.Parallel,
             _ => ComputingContext.Normal
         };
-
         return TransformToFrequencyDomain(context, window);
     }
-
     /// <inheritdoc/>
     public FrequencyDomain TransformToFrequencyDomain(ComputingContext? context = null, WindowType? window = null)
     {
         using var samples = Samples;
-
         if (window is null && _length.IsPowerOf2())
         {
             var result = new Vorcyc.Mathematics.Numerics.ComplexFp32[_length];
             FastFourierTransform.Forward(samples.Span, result, context);
             return new FrequencyDomain(0, _length, _length, result, this, window);
         }
-
         var windowedSamples = ITimeDomainSignal.PadZerosAndWindowing(samples.Span, _length.NextPowerOf2(), window);
         FastFourierTransform.Forward(windowedSamples, 0, out var resultPadded, windowedSamples.Length, context);
         return new FrequencyDomain(0, windowedSamples.Length, _length, resultPadded, this, window);
     }
 
-
-
     #endregion
 
     #region Resampling
-
     /// <inheritdoc cref="IModifiableTimeDomainSignal.Resample(float, FirFilter?, int)"/>
     public ModifiableTimeDomainSignal Resample(float destinationSamplingRate, FirFilter? filter = null, int order = 15)
     {
         return SignalResamplingExtension.Resample(this, destinationSamplingRate, filter, order);
     }
-
     #endregion
 
     #region Modify (Append / Insert / Remove)
@@ -431,12 +384,10 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         {
             return;
         }
-
         if (_channel.Writer.TryWrite(samples))
         {
             return;
         }
-
         await _channel.Writer.WriteAsync(samples, cancellationToken).ConfigureAwait(false);
     }
 
@@ -449,7 +400,6 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         var blocks = new List<float[]>();
         int totalAdded = 0;
-
         while (_channel.Reader.TryRead(out var block))
         {
             if (block is { Length: > 0 })
@@ -458,35 +408,27 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
                 totalAdded += block.Length;
             }
         }
-
         if (totalAdded == 0) return 0;
-
         lock (_viewLock)
         {
             ThrowIfDisposed();
-
             var oldLen = _length;
             var newLen = checked(oldLen + totalAdded);
-
             var merged = new POHBuffer<float>(newLen);
-
             if (oldLen > 0)
             {
                 _buffer[0, oldLen].CopyTo(merged[0, oldLen]);
             }
-
             int offset = oldLen;
             foreach (var b in blocks)
             {
                 b.AsSpan().CopyTo(merged[offset, b.Length]);
                 offset += b.Length;
             }
-
             _buffer.Dispose();
             _buffer = merged;
             _length = newLen;
         }
-
         OnSamplesModified();
         return totalAdded;
     }
@@ -506,37 +448,29 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         if (samples is null)
             throw new ArgumentNullException(nameof(samples));
         if (samples.Length == 0)
-            throw new ArgumentException("插入数组长度必须大于 0。", nameof(samples));
-
+            throw new ArgumentException("samples must not be empty.", nameof(samples));
         if ((uint)index > (uint)_length)
-            throw new ArgumentOutOfRangeException(nameof(index), "索引超出当前信号长度范围。");
-
+            throw new ArgumentOutOfRangeException(nameof(index), "index is out of range.");
         lock (_viewLock)
         {
             if (_buffer is null || _buffer.IsDisposed)
-                throw new ObjectDisposedException(nameof(_buffer), "缓冲区不可用。");
-
+                throw new ObjectDisposedException(nameof(_buffer), "The internal buffer has been disposed.");
             var newLen = checked(_length + samples.Length);
             var result = new POHBuffer<float>(newLen);
-
             if (index > 0)
             {
                 _buffer[0, index].CopyTo(result[0, index]);
             }
-
             samples.AsSpan().CopyTo(result[index, samples.Length]);
-
             var rightCount = _length - index;
             if (rightCount > 0)
             {
                 _buffer[index, rightCount].CopyTo(result[index + samples.Length, rightCount]);
             }
-
             _buffer.Dispose();
             _buffer = result;
             _length = newLen;
         }
-
         OnSamplesModified();
     }
 
@@ -562,43 +496,34 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     public void RemoveRange(int index, int count)
     {
         if (count < 0)
-            throw new ArgumentOutOfRangeException(nameof(count), "删除数量必须为非负数。");
+            throw new ArgumentOutOfRangeException(nameof(count), "count must be non-negative.");
         if ((uint)index > (uint)_length)
-            throw new ArgumentOutOfRangeException(nameof(index), "索引超出当前信号长度范围。");
+            throw new ArgumentOutOfRangeException(nameof(index), "index is out of range.");
         if (count == 0 || index == _length)
             return;
-
         if (index + count > _length)
-            throw new ArgumentOutOfRangeException(nameof(count), "删除范围超出当前信号长度。");
-
+            throw new ArgumentOutOfRangeException(nameof(count), "The specified range exceeds the signal length.");
         lock (_viewLock)
         {
             if (_buffer is null || _buffer.IsDisposed)
-                throw new ObjectDisposedException(nameof(_buffer), "缓冲区不可用。");
-
+                throw new ObjectDisposedException(nameof(_buffer), "The internal buffer has been disposed.");
             var newLen = _length - count;
-
-            if (newLen <= 0) throw new InvalidOperationException("不允许删除至空序列");
-
+            if (newLen <= 0) throw new InvalidOperationException("Removal would result in an empty signal.");
             var result = new POHBuffer<float>(newLen);
-
             if (index > 0)
             {
                 _buffer[0, index].CopyTo(result[0, index]);
             }
-
             var rightStart = index + count;
             var rightCount = _length - rightStart;
             if (rightCount > 0)
             {
                 _buffer[rightStart, rightCount].CopyTo(result[index, rightCount]);
             }
-
             _buffer.Dispose();
             _buffer = result;
             _length = newLen;
         }
-
         OnSamplesModified();
     }
 
@@ -613,7 +538,6 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         var count = ITimeDomainSignal.TimeToArrayIndexOrLength(duration, _samplingRate);
         RemoveRange(index, count);
     }
-
     #endregion
 
     #region Dispose
@@ -626,9 +550,7 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         ObjectDisposedException.ThrowIf(_buffer is null || _buffer.IsDisposed || _isDisposed, nameof(ModifiableTimeDomainSignal));
     }
-
     private volatile bool _isDisposed = false;
-
     /// <summary>
     /// Releases managed and unmanaged resources and suppresses finalization.
     /// </summary>
@@ -637,7 +559,6 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-
     /// <summary>
     /// Releases resources. When <paramref name="disposing"/> is <see langword="true"/>,
     /// managed resources (buffer and channel) are released.
@@ -650,13 +571,10 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         if (_isDisposed)
             return;
-
         if (disposing)
         {
             _channel.Writer.Complete();
-
             while (_channel.Reader.TryRead(out _)) { }
-
             lock (_viewLock)
             {
                 if (_buffer is not null)
@@ -667,10 +585,8 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
                 _length = 0;
             }
         }
-
         _isDisposed = true;
     }
-
     /// <summary>
     /// Destructor. Ensures resources are released if the consumer forgets to call <see cref="Dispose()"/>.
     /// </summary>
@@ -678,8 +594,5 @@ public class ModifiableTimeDomainSignal : IModifiableTimeDomainSignal, IDisposab
     {
         Dispose(false);
     }
-
     #endregion
 }
-
-

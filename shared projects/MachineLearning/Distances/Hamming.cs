@@ -1,8 +1,6 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-
 namespace Vorcyc.Mathematics.MachineLearning.Distances;
-
 /// <summary>
 ///   Hamming distance.
 /// </summary>
@@ -14,9 +12,7 @@ where TSelf : INumber<TSelf>
 #endif
 {
     public static bool ToBool(int x) => x != 0;
-
 #if NET7_0_OR_GREATER
-
     /// <summary>
     ///   Computes the distance <c>d(x,y)</c> between points
     ///   <paramref name="x"/> and <paramref name="y"/>.
@@ -39,11 +35,7 @@ where TSelf : INumber<TSelf>
                 sum++;
         return sum;
     }
-
-
 #endif
-
-
     /// <summary>
     /// Computes the hamming distance of two signed 32-bit intergers.
     /// </summary>
@@ -54,7 +46,6 @@ where TSelf : INumber<TSelf>
     {
         int dist = 0;
         var val = x ^ y;
-
         // Count the number of bits set
         while (val != 0)
         {
@@ -62,11 +53,9 @@ where TSelf : INumber<TSelf>
             dist++;
             val &= val - 1;
         }
-
         // Return the number of differing bits
         return dist;
     }
-
     /// <summary>
     /// Computes the hamming distance of two unsigned 32-bit intergers.
     /// </summary>
@@ -77,7 +66,6 @@ where TSelf : INumber<TSelf>
     {
         int dist = 0;
         uint val = x ^ y;
-
         // Count the number of bits set
         while (val != 0)
         {
@@ -85,11 +73,9 @@ where TSelf : INumber<TSelf>
             dist++;
             val &= val - 1;
         }
-
         // Return the number of differing bits
         return dist;
     }
-
     /// <summary>
     /// Computes the hamming distance of two signed 64-bit intergers.
     /// </summary>
@@ -100,7 +86,6 @@ where TSelf : INumber<TSelf>
     {
         int dist = 0;
         var val = x ^ y;
-
         // Count the number of bits set
         while (val != 0)
         {
@@ -108,11 +93,9 @@ where TSelf : INumber<TSelf>
             dist++;
             val &= val - 1;
         }
-
         // Return the number of differing bits
         return dist;
     }
-
     /// <summary>
     /// Computes the hamming distance of two unsigned 64-bit intergers.
     /// </summary>
@@ -123,7 +106,6 @@ where TSelf : INumber<TSelf>
     {
         int dist = 0;
         var val = x ^ y;
-
         // Count the number of bits set
         while (val != 0)
         {
@@ -131,12 +113,9 @@ where TSelf : INumber<TSelf>
             dist++;
             val &= val - 1;
         }
-
         // Return the number of differing bits
         return dist;
     }
-
-
 
     /// <summary>
     /// Computes the hamming distance of two strings.
@@ -151,7 +130,6 @@ where TSelf : INumber<TSelf>
     {
         if (x.Length != y.Length)
             throw new ArgumentException("Undefined for sequences of unequal length");
-
         int dist = 0;
         var i = x.Length;
         //while (i-- > 0)
@@ -162,13 +140,8 @@ where TSelf : INumber<TSelf>
                 dist++;
             }
         }
-
         return dist;
     }
-
-
-
-
 
     public static int Distance(byte[] a, byte[] b)
     {
@@ -180,43 +153,32 @@ where TSelf : INumber<TSelf>
                 distance++;
             }
         }
-
         return distance;
     }
-
-
 
     public static int Similarity(byte[] a, byte[] b)
     {
         return a.Length - Distance(a, b);
     }
 
-
-
     public static int Similarity(int[] expected, int[] actual, int setBytesPerLong)
     {
         int mask = 0xFF;
         int sameBytes = 0;
-
         for (int i = 0; i < expected.Length; ++i)
         {
             long a = expected[i];
             long b = actual[i];
-
             for (int j = 0; j < setBytesPerLong; ++j)
             {
                 if ((a & mask) == (b & mask))
                 {
                     sameBytes++;
                 }
-
                 a >>= 8;
                 b >>= 8;
             }
         }
-
         return sameBytes;
     }
-
-
 }

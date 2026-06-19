@@ -1,20 +1,20 @@
 ﻿
 /* usage : */
-//todo 用随机特征 :
+//todo Using random features:
 //Random random = new Random();
-//int numData = 10000; // 数据的数量
-//int numFeatures = 512; // 数据的特征维度
-//var data = new float[numData][]; // 数据矩阵
+//int numData = 10000; // Number of data points
+//int numFeatures = 512; // Feature dimension of the data
+//var data = new float[numData][]; // Data matrix
 //for (int i = 0; i < numData; i++)
 //{
 //    data[i] = new float[numFeatures];
 //    for (int j = 0; j < numFeatures; j++)
 //    {
-//        data[i][j] = random.NextSingle() * 10; // 生成0到10之间的随机数
+//        data[i][j] = random.NextSingle() * 10; // Generate a random number between 0 and 10
 //    }
 //}
 
-//todo 用特征 :
+//todo Using features:
 //static float[][] LoadData()
 //{
 //    var file = @"C:\Users\cyclo\Desktop\all.txt";
@@ -53,22 +53,22 @@
 
 
 //! CODE :
-//// 设置聚类的参数
+//// Set the clustering parameters
 //using static System.Runtime.InteropServices.JavaScript.JSType;
 //using Vorcyc.Offlet.MachineLearning.Clustering;
 
-//int numClusters = 2; // 聚类的数量
-//int maxIterations = 100; // 最大迭代次数
-//float tolerance = 0.01f; // 收敛的容差
+//int numClusters = 2; // Number of clusters
+//int maxIterations = 100; // Maximum number of iterations
+//float tolerance = 0.01f; // Convergence tolerance
 
-//// 调用K均值聚类算法
+//// Invoke the K-means clustering algorithm
 //int[] clustering = KMeansClusterer.KMeans(data, numClusters, maxIterations, tolerance);
 
-//// 显示聚类的结果
-//Console.WriteLine("数据的聚类结果如下：");
+//// Display the clustering result
+//Console.WriteLine("The clustering result of the data is as follows:");
 //for (int i = 0; i < 5; i++)
 //{
-//    Console.WriteLine($"数据 {i}: ({data[i][0]:F2}, {data[i][1]:F2}) 属于聚类 {clustering[i]}");
+//    Console.WriteLine($"Data {i}: ({data[i][0]:F2}, {data[i][1]:F2}) belongs to cluster {clustering[i]}");
 //}
 
 
@@ -77,9 +77,9 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning.Clustering;
 
 /// <summary>
-/// 提供 K 均值聚类算法的类。
+/// Provides the K-means clustering algorithm.
 /// </summary>
-/// <typeparam name="T">坐标的数值类型。</typeparam>
+/// <typeparam name="T">The numeric type of the coordinates.</typeparam>
 public class KMeansClusterer<T> : IMachineLearning 
     where T : struct, IFloatingPointIeee754<T>
 {
@@ -93,13 +93,20 @@ public class KMeansClusterer<T> : IMachineLearning
     public MachineLearningTask Task => MachineLearningTask.Clustering;
 
     /// <summary>
-    /// 使用指定的数据、聚类数量、最大迭代次数和收敛容忍度初始化 <see cref="KMeansClusterer{T}"/> 类的新实例。
+    /// Execution policy honored by the clustering loops. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
     /// </summary>
-    /// <param name="data">要聚类的数据。</param>
-    /// <param name="numClusters">要创建的聚类数量。</param>
-    /// <param name="maxIterations">最大迭代次数。</param>
-    /// <param name="tolerance">收敛容忍度。</param>
-    public KMeansClusterer(T[][] data, int numClusters, int maxIterations, T tolerance)
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KMeansClusterer{T}"/> class using the specified data, number of clusters, maximum iterations, and convergence tolerance.
+    /// </summary>
+    /// <param name="data">The data to cluster.</param>
+    /// <param name="numClusters">The number of clusters to create.</param>
+    /// <param name="maxIterations">The maximum number of iterations.</param>
+    /// <param name="tolerance">The convergence tolerance.</param>
+    /// <param name="context">Execution policy context; when null the ambient scope or default context is used.</param>
+    public KMeansClusterer(T[][] data, int numClusters, int maxIterations, T tolerance, ComputingContext? context = null)
     {
         _data = data;
         _numClusters = numClusters;
@@ -107,12 +114,13 @@ public class KMeansClusterer<T> : IMachineLearning
         _tolerance = tolerance;
         _clustering = InitClustering(data.Length, numClusters);
         _centroids = Allocate(numClusters, data[0].Length);
+        Context = context;
     }
 
     /// <summary>
-    /// 执行 K 均值聚类算法。
+    /// Runs the K-means clustering algorithm.
     /// </summary>
-    /// <returns>每个数据点的聚类分配。</returns>
+    /// <returns>The cluster assignment of each data point.</returns>
     public int[] Cluster()
     {
         int iteration = 0;
@@ -130,10 +138,10 @@ public class KMeansClusterer<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 初始化聚类。
+    /// Initializes the clustering.
     /// </summary>
-    /// <param name="numData">数据的数量。</param>
-    /// <param name="numClusters">聚类的数量。</param>
+    /// <param name="numData">The number of data points.</param>
+    /// <param name="numClusters">The number of clusters.</param>
     private int[] InitClustering(int numData, int numClusters)
     {
         int[] clustering = new int[numData];
@@ -145,10 +153,10 @@ public class KMeansClusterer<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 分配二维数组的空间。
+    /// Allocates the space for a jagged two-dimensional array.
     /// </summary>
-    /// <param name="numRows">行数。</param>
-    /// <param name="numCols">列数。</param>
+    /// <param name="numRows">The number of rows.</param>
+    /// <param name="numCols">The number of columns.</param>
     private T[][] Allocate(int numRows, int numCols)
     {
         T[][] result = new T[numRows][];
@@ -158,7 +166,7 @@ public class KMeansClusterer<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 更新质心（聚类中心）。
+    /// Updates the centroids (cluster centers).
     /// </summary>
     private bool UpdateCentroids()
     {
@@ -193,28 +201,36 @@ public class KMeansClusterer<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 更新聚类分配。
+    /// Updates the cluster assignment.
     /// </summary>
     private bool UpdateClustering()
     {
         int numClusters = _centroids.Length;
-        bool isChanged = false;
 
         int[] newClustering = new int[_clustering.Length];
         Array.Copy(_clustering, newClustering, _clustering.Length);
 
-        T[] distances = new T[numClusters];
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            _data.Length,
+            i =>
+            {
+                T[] distances = new T[numClusters];
+                for (int k = 0; k < numClusters; ++k)
+                    distances[k] = Distance(_data[i], _centroids[k]);
 
-        for (int i = 0; i < _data.Length; ++i)
+                newClustering[i] = MinIndex(distances);
+            },
+            workPerItem: numClusters);
+
+        bool isChanged = false;
+        for (int i = 0; i < newClustering.Length; ++i)
         {
-            for (int k = 0; k < numClusters; ++k)
-                distances[k] = Distance(_data[i], _centroids[k]);
-
-            int newCluster = MinIndex(distances);
-            if (newCluster != newClustering[i])
+            if (newClustering[i] != _clustering[i])
             {
                 isChanged = true;
-                newClustering[i] = newCluster;
+                break;
             }
         }
 
@@ -237,11 +253,11 @@ public class KMeansClusterer<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算两个向量之间的欧几里得距离。
+    /// Computes the Euclidean distance between two vectors.
     /// </summary>
-    /// <param name="vector1">第一个向量。</param>
-    /// <param name="vector2">第二个向量。</param>
-    /// <returns>两个向量之间的欧几里得距离。</returns>
+    /// <param name="vector1">The first vector.</param>
+    /// <param name="vector2">The second vector.</param>
+    /// <returns>The Euclidean distance between the two vectors.</returns>
     private T Distance(T[] vector1, T[] vector2)
     {
         T sum = T.Zero;
@@ -251,9 +267,9 @@ public class KMeansClusterer<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 找到数组中最小值的索引。
+    /// Finds the index of the minimum value in the array.
     /// </summary>
-    /// <param name="distances">表示距离的数组。</param>
+    /// <param name="distances">The array representing distances.</param>
     private int MinIndex(T[] distances)
     {
         int index = 0;

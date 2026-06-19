@@ -1,9 +1,6 @@
-﻿using System.Numerics;
-
+using System.Numerics;
 namespace Vorcyc.Mathematics.Experimental.CurveFitting;
-
 public delegate void TrainingProgressHandler(int epoch, int totalEpochs, double averageError);
-
 /// <summary>
 /// 表示一个用于曲线拟合的多层感知器神经网络，支持时间序列数据。
 /// </summary>
@@ -18,7 +15,6 @@ internal class NeuralNetwork
     private readonly double[] bias1;     // 隐藏层偏置
     private readonly double[] bias2;     // 输出层偏置
     private readonly Random random;      // 随机数生成器
-
     /// <summary>
     /// 初始化神经网络。
     /// </summary>
@@ -32,13 +28,11 @@ internal class NeuralNetwork
         hiddenSize = hidden;
         outputSize = output;
         random = new Random();
-
         weights1 = InitializeWeights(inputSize, hiddenSize);
         weights2 = InitializeWeights(hiddenSize, outputSize);
         bias1 = InitializeBias(hiddenSize);
         bias2 = InitializeBias(outputSize);
     }
-
     /// <summary>
     /// 初始化权重矩阵，使用随机值。
     /// </summary>
@@ -55,7 +49,6 @@ internal class NeuralNetwork
         }
         return matrix;
     }
-
     /// <summary>
     /// 初始化偏置向量，使用随机值。
     /// </summary>
@@ -68,17 +61,14 @@ internal class NeuralNetwork
         }
         return bias;
     }
-
     /// <summary>
     /// Sigmoid激活函数。
     /// </summary>
     private double Sigmoid(double x) => 1.0 / (1.0 + Math.Exp(-x));
-
     /// <summary>
     /// Sigmoid函数的导数。
     /// </summary>
     private double SigmoidDerivative(double x) => x * (1 - x);
-
     /// <summary>
     /// 将二维输入展平为一维数组。
     /// </summary>
@@ -96,7 +86,6 @@ internal class NeuralNetwork
         }
         return flattened;
     }
-
     /// <summary>
     /// 执行前向传播，预测输出。
     /// </summary>
@@ -108,11 +97,9 @@ internal class NeuralNetwork
         double[] flattenedInputs = FlattenInput(inputs);
         if (flattenedInputs.Length != inputSize)
             throw new ArgumentException($"Input size ({flattenedInputs.Length}) does not match network input size ({inputSize})");
-
         double[] hidden = ComputeHidden(flattenedInputs);
         return ComputeOutput(hidden);
     }
-
     /// <summary>
     /// 训练神经网络。
     /// </summary>
@@ -127,32 +114,25 @@ internal class NeuralNetwork
     {
         if (inputs.GetLength(0) != targets.Length)
             throw new ArgumentException("Inputs and targets must have same length");
-
         for (int epoch = 0; epoch < epochs; epoch++)
         {
             ShuffleData(inputs, targets);
             double totalError = 0;
-
             for (int i = 0; i < inputs.GetLength(0); i++)
             {
                 double[,] sample = GetSample(inputs, i);
                 double[] flattenedInputs = FlattenInput(sample);
-
                 // 前向传播
                 double[] hidden = ComputeHidden(flattenedInputs);
                 double[] outputs = ComputeOutput(hidden);
-
                 // 计算误差
                 totalError += ComputeError(outputs, targets[i]);
-
                 // 反向传播
                 double[] outputDeltas = ComputeOutputDeltas(outputs, targets[i]);
                 double[] hiddenDeltas = ComputeHiddenDeltas(hidden, outputDeltas);
-
                 // 更新权重和偏置
                 UpdateWeightsAndBiases(flattenedInputs, hidden, outputDeltas, hiddenDeltas, learningRate);
             }
-
             if (progressCallback != null)
             {
                 double avgError = totalError / inputs.GetLength(0);
@@ -160,7 +140,6 @@ internal class NeuralNetwork
             }
         }
     }
-
     /// <summary>
     /// 计算隐藏层输出。
     /// </summary>
@@ -178,7 +157,6 @@ internal class NeuralNetwork
         }
         return hidden;
     }
-
     /// <summary>
     /// 计算输出层输出。
     /// </summary>
@@ -196,7 +174,6 @@ internal class NeuralNetwork
         }
         return outputs;
     }
-
     /// <summary>
     /// 计算样本误差。
     /// </summary>
@@ -209,7 +186,6 @@ internal class NeuralNetwork
         }
         return sampleError;
     }
-
     /// <summary>
     /// 计算输出层误差项。
     /// </summary>
@@ -223,7 +199,6 @@ internal class NeuralNetwork
         }
         return outputDeltas;
     }
-
     /// <summary>
     /// 计算隐藏层误差项。
     /// </summary>
@@ -241,7 +216,6 @@ internal class NeuralNetwork
         }
         return hiddenDeltas;
     }
-
     /// <summary>
     /// 更新权重和偏置。
     /// </summary>
@@ -260,7 +234,6 @@ internal class NeuralNetwork
         {
             bias2[o] += learningRate * outputDeltas[o];
         }
-
         // 更新输入到隐藏层的权重和偏置
         for (int j = 0; j < inputSize; j++)
         {
@@ -274,7 +247,6 @@ internal class NeuralNetwork
             bias1[h] += learningRate * hiddenDeltas[h];
         }
     }
-
     /// <summary>
     /// 打乱输入和目标数据。
     /// </summary>
@@ -298,7 +270,6 @@ internal class NeuralNetwork
             targets[j] = tempTarget;
         }
     }
-
     /// <summary>
     /// 从输入数据中提取单个样本。
     /// </summary>
@@ -321,14 +292,8 @@ internal class NeuralNetwork
     }
 }
 
-
-
-
-
 public delegate void TrainingProgressHandler<T>(int epoch, int totalEpochs, T averageError)
     where T : unmanaged, IFloatingPointIeee754<T>;
-
-
 
 /// <summary>
 /// 表示一个用于曲线拟合的多层感知器神经网络，支持时间序列数据。
@@ -345,7 +310,6 @@ public class NeuralNetwork_Sequential<T>
     private readonly T[] bias1;     // 隐藏层偏置
     private readonly T[] bias2;     // 输出层偏置
     private readonly Random random;      // 随机数生成器
-
     /// <summary>
     /// 初始化神经网络。
     /// </summary>
@@ -359,13 +323,11 @@ public class NeuralNetwork_Sequential<T>
         hiddenSize = hidden;
         outputSize = output;
         random = new Random();
-
         weights1 = InitializeWeights(inputSize, hiddenSize);
         weights2 = InitializeWeights(hiddenSize, outputSize);
         bias1 = InitializeBias(hiddenSize);
         bias2 = InitializeBias(outputSize);
     }
-
     /// <summary>
     /// 初始化权重矩阵，使用随机值。
     /// </summary>
@@ -382,7 +344,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return matrix;
     }
-
     /// <summary>
     /// 初始化偏置向量，使用随机值。
     /// </summary>
@@ -395,17 +356,14 @@ public class NeuralNetwork_Sequential<T>
         }
         return bias;
     }
-
     /// <summary>
     /// Sigmoid激活函数。
     /// </summary>
     private T Sigmoid(T x) => T.One / (T.One + T.Exp(-x));
-
     /// <summary>
     /// Sigmoid函数的导数。
     /// </summary>
     private T SigmoidDerivative(T x) => x * (T.One - x);
-
     /// <summary>
     /// 将二维输入展平为一维数组。
     /// </summary>
@@ -423,7 +381,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return flattened;
     }
-
     /// <summary>
     /// 执行前向传播，预测输出。
     /// </summary>
@@ -435,11 +392,9 @@ public class NeuralNetwork_Sequential<T>
         T[] flattenedInputs = FlattenInput(inputs);
         if (flattenedInputs.Length != inputSize)
             throw new ArgumentException($"Input size ({flattenedInputs.Length}) does not match network input size ({inputSize})");
-
         T[] hidden = ComputeHidden(flattenedInputs);
         return ComputeOutput(hidden);
     }
-
     /// <summary>
     /// 训练神经网络。
     /// </summary>
@@ -454,32 +409,25 @@ public class NeuralNetwork_Sequential<T>
     {
         if (inputs.GetLength(0) != targets.Length)
             throw new ArgumentException("Inputs and targets must have same length");
-
         for (int epoch = 0; epoch < epochs; epoch++)
         {
             ShuffleData(inputs, targets);
             T totalError = T.Zero;
-
             for (int i = 0; i < inputs.GetLength(0); i++)
             {
                 T[,] sample = GetSample(inputs, i);
                 T[] flattenedInputs = FlattenInput(sample);
-
                 // 前向传播
                 T[] hidden = ComputeHidden(flattenedInputs);
                 T[] outputs = ComputeOutput(hidden);
-
                 // 计算误差
                 totalError += ComputeError(outputs, targets[i]);
-
                 // 反向传播
                 T[] outputDeltas = ComputeOutputDeltas(outputs, targets[i]);
                 T[] hiddenDeltas = ComputeHiddenDeltas(hidden, outputDeltas);
-
                 // 更新权重和偏置
                 UpdateWeightsAndBiases(flattenedInputs, hidden, outputDeltas, hiddenDeltas, learningRate);
             }
-
             if (progressCallback is not null)
             {
                 T avgError = totalError / T.CreateChecked(inputs.GetLength(0));
@@ -487,7 +435,6 @@ public class NeuralNetwork_Sequential<T>
             }
         }
     }
-
     /// <summary>
     /// 计算隐藏层输出。
     /// </summary>
@@ -505,7 +452,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return hidden;
     }
-
     /// <summary>
     /// 计算输出层输出。
     /// </summary>
@@ -523,7 +469,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return outputs;
     }
-
     /// <summary>
     /// 计算样本误差。
     /// </summary>
@@ -536,7 +481,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return sampleError;
     }
-
     /// <summary>
     /// 计算输出层误差项。
     /// </summary>
@@ -550,7 +494,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return outputDeltas;
     }
-
     /// <summary>
     /// 计算隐藏层误差项。
     /// </summary>
@@ -568,7 +511,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return hiddenDeltas;
     }
-
     /// <summary>
     /// 更新权重和偏置。
     /// </summary>
@@ -587,7 +529,6 @@ public class NeuralNetwork_Sequential<T>
         {
             bias2[o] += learningRate * outputDeltas[o];
         }
-
         // 更新输入到隐藏层的权重和偏置
         for (int j = 0; j < inputSize; j++)
         {
@@ -601,7 +542,6 @@ public class NeuralNetwork_Sequential<T>
             bias1[h] += learningRate * hiddenDeltas[h];
         }
     }
-
     /// <summary>
     /// 打乱输入和目标数据。
     /// </summary>
@@ -625,7 +565,6 @@ public class NeuralNetwork_Sequential<T>
             targets[j] = tempTarget;
         }
     }
-
     /// <summary>
     /// 从输入数据中提取单个样本。
     /// </summary>
@@ -646,7 +585,6 @@ public class NeuralNetwork_Sequential<T>
         }
         return sample;
     }
-
     // 获取所有参数
     internal T[] GetParameters()
     {
@@ -657,10 +595,7 @@ public class NeuralNetwork_Sequential<T>
         parameters.AddRange(bias2);
         return parameters.ToArray();
     }
-
 }
-
-
 
 /// <summary>
 /// 表示一个用于曲线拟合的多层感知器神经网络，支持时间序列数据。
@@ -677,7 +612,6 @@ public class NeuralNetwork_Parallel<T>
     private readonly T[] bias1;     // 隐藏层偏置
     private readonly T[] bias2;     // 输出层偏置
     private readonly Random random;      // 随机数生成器
-
     /// <summary>
     /// 初始化神经网络。
     /// </summary>
@@ -691,13 +625,11 @@ public class NeuralNetwork_Parallel<T>
         hiddenSize = hidden;
         outputSize = output;
         random = new Random();
-
         weights1 = InitializeWeights(inputSize, hiddenSize);
         weights2 = InitializeWeights(hiddenSize, outputSize);
         bias1 = InitializeBias(hiddenSize);
         bias2 = InitializeBias(outputSize);
     }
-
     /// <summary>
     /// 初始化权重矩阵，使用随机值。
     /// </summary>
@@ -714,7 +646,6 @@ public class NeuralNetwork_Parallel<T>
         }
         return matrix;
     }
-
     /// <summary>
     /// 初始化偏置向量，使用随机值。
     /// </summary>
@@ -727,17 +658,14 @@ public class NeuralNetwork_Parallel<T>
         }
         return bias;
     }
-
     /// <summary>
     /// Sigmoid激活函数。
     /// </summary>
     private T Sigmoid(T x) => T.One / (T.One + T.Exp(-x));
-
     /// <summary>
     /// Sigmoid函数的导数。
     /// </summary>
     private T SigmoidDerivative(T x) => x * (T.One - x);
-
     /// <summary>
     /// 将二维输入展平为一维数组。
     /// </summary>
@@ -755,7 +683,6 @@ public class NeuralNetwork_Parallel<T>
         }
         return flattened;
     }
-
     /// <summary>
     /// 执行前向传播，预测输出。
     /// </summary>
@@ -767,11 +694,9 @@ public class NeuralNetwork_Parallel<T>
         T[] flattenedInputs = FlattenInput(inputs);
         if (flattenedInputs.Length != inputSize)
             throw new ArgumentException($"Input size ({flattenedInputs.Length}) does not match network input size ({inputSize})");
-
         T[] hidden = ComputeHidden(flattenedInputs);
         return ComputeOutput(hidden);
     }
-
     /// <summary>
     /// 训练神经网络。
     /// </summary>
@@ -786,36 +711,29 @@ public class NeuralNetwork_Parallel<T>
     {
         if (inputs.GetLength(0) != targets.Length)
             throw new ArgumentException("Inputs and targets must have same length");
-
         for (int epoch = 0; epoch < epochs; epoch++)
         {
             ShuffleData(inputs, targets);
             T totalError = T.Zero;
-
             Parallel.For(0, inputs.GetLength(0), i =>
             {
                 T[,] sample = GetSample(inputs, i);
                 T[] flattenedInputs = FlattenInput(sample);
-
                 // 前向传播
                 T[] hidden = ComputeHidden(flattenedInputs);
                 T[] outputs = ComputeOutput(hidden);
-
                 // 计算误差
                 T sampleError = ComputeError(outputs, targets[i]);
                 lock (this)
                 {
                     totalError += sampleError;
                 }
-
                 // 反向传播
                 T[] outputDeltas = ComputeOutputDeltas(outputs, targets[i]);
                 T[] hiddenDeltas = ComputeHiddenDeltas(hidden, outputDeltas);
-
                 // 更新权重和偏置
                 UpdateWeightsAndBiases(flattenedInputs, hidden, outputDeltas, hiddenDeltas, learningRate);
             });
-
             if (progressCallback is not null)
             {
                 T avgError = totalError / T.CreateChecked(inputs.GetLength(0));
@@ -823,7 +741,6 @@ public class NeuralNetwork_Parallel<T>
             }
         }
     }
-
     /// <summary>
     /// 计算隐藏层输出。
     /// </summary>
@@ -841,7 +758,6 @@ public class NeuralNetwork_Parallel<T>
         });
         return hidden;
     }
-
     /// <summary>
     /// 计算输出层输出。
     /// </summary>
@@ -859,7 +775,6 @@ public class NeuralNetwork_Parallel<T>
         });
         return outputs;
     }
-
     /// <summary>
     /// 计算样本误差。
     /// </summary>
@@ -872,7 +787,6 @@ public class NeuralNetwork_Parallel<T>
         }
         return sampleError;
     }
-
     /// <summary>
     /// 计算输出层误差项。
     /// </summary>
@@ -886,7 +800,6 @@ public class NeuralNetwork_Parallel<T>
         }
         return outputDeltas;
     }
-
     /// <summary>
     /// 计算隐藏层误差项。
     /// </summary>
@@ -904,7 +817,6 @@ public class NeuralNetwork_Parallel<T>
         }
         return hiddenDeltas;
     }
-
     /// <summary>
     /// 更新权重和偏置。
     /// </summary>
@@ -923,7 +835,6 @@ public class NeuralNetwork_Parallel<T>
         {
             bias2[o] += learningRate * outputDeltas[o];
         });
-
         // 更新输入到隐藏层的权重和偏置
         Parallel.For(0, inputSize, j =>
         {
@@ -937,7 +848,6 @@ public class NeuralNetwork_Parallel<T>
             bias1[h] += learningRate * hiddenDeltas[h];
         });
     }
-
     /// <summary>
     /// 打乱输入和目标数据。
     /// </summary>
@@ -961,7 +871,6 @@ public class NeuralNetwork_Parallel<T>
             targets[j] = tempTarget;
         }
     }
-
     /// <summary>
     /// 从输入数据中提取单个样本。
     /// </summary>
@@ -982,7 +891,6 @@ public class NeuralNetwork_Parallel<T>
         }
         return sample;
     }
-
     // 获取所有参数
     internal T[] GetParameters()
     {

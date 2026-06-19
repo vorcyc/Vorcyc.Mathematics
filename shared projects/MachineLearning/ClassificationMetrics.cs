@@ -1,51 +1,64 @@
 namespace Vorcyc.Mathematics.MachineLearning;
 
 /// <summary>
-/// 混淆矩阵。
+/// Confusion matrix.
 /// </summary>
 public sealed class ConfusionMatrix
 {
     /// <summary>
-    /// 初始化混淆矩阵。
+    /// Initializes the confusion matrix.
     /// </summary>
-    /// <param name="matrix">行=真实类别，列=预测类别。</param>
-    /// <param name="classLabels">类别标签。</param>
+    /// <param name="matrix">Rows = actual classes, columns = predicted classes.</param>
+    /// <param name="classLabels">The class labels.</param>
     public ConfusionMatrix(int[,] matrix, IReadOnlyList<int> classLabels)
     {
         Matrix = matrix;
         ClassLabels = classLabels;
     }
 
-    /// <summary>矩阵元素 [actual, predicted]。</summary>
+    /// <summary>Matrix element [actual, predicted].</summary>
     public int[,] Matrix { get; }
 
-    /// <summary>类别标签顺序。</summary>
+    /// <summary>The order of the class labels.</summary>
     public IReadOnlyList<int> ClassLabels { get; }
 
-    /// <summary>类别数。</summary>
+    /// <summary>The number of classes.</summary>
     public int NumClasses => ClassLabels.Count;
 }
 
 /// <summary>
-/// 分类评估指标。
+/// Classification evaluation metrics.
 /// </summary>
 public static class ClassificationMetrics
 {
     /// <summary>
-    /// 构建混淆矩阵。
+    /// Builds the confusion matrix, optionally honoring a <see cref="ComputingContext"/> for the histogram pass.
     /// </summary>
-    public static ConfusionMatrix ConfusionMatrix(ReadOnlySpan<int> actual, ReadOnlySpan<int> predicted)
+    public static ConfusionMatrix ConfusionMatrix(ReadOnlySpan<int> actual, ReadOnlySpan<int> predicted, ComputingContext? context = null)
     {
         if (actual.Length != predicted.Length)
-            throw new ArgumentException("标签长度必须相同。");
+            throw new ArgumentException("The label lengths must be the same.");
         if (actual.Length == 0)
-            throw new ArgumentException("输入不能为空。");
+            throw new ArgumentException("The input cannot be empty.");
 
-        var labels = actual.ToArray().Concat(predicted.ToArray()).Distinct().Order().ToArray();
+        var actualArray = actual.ToArray();
+        var predictedArray = predicted.ToArray();
+        var labels = actualArray.Concat(predictedArray).Distinct().Order().ToArray();
         int k = labels.Length;
-        var matrix = new int[k, k];
         var labelToIndex = labels.Select((label, index) => (label, index)).ToDictionary(t => t.label, t => t.index);
 
+        int n = actualArray.Length;
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(n);
+        var matrix = mode == CpuExecutionMode.Parallel && ComputingContextExecution.UseParallel(context, n)
+            ? BuildMatrixParallel(actualArray, predictedArray, labelToIndex, k, context)
+            : BuildMatrixScalar(actualArray, predictedArray, labelToIndex, k);
+
+        return new ConfusionMatrix(matrix, labels);
+    }
+
+    private static int[,] BuildMatrixScalar(int[] actual, int[] predicted, Dictionary<int, int> labelToIndex, int k)
+    {
+        var matrix = new int[k, k];
         for (int i = 0; i < actual.Length; i++)
         {
             int a = labelToIndex[actual[i]];
@@ -53,17 +66,64 @@ public static class ClassificationMetrics
             matrix[a, p]++;
         }
 
-        return new ConfusionMatrix(matrix, labels);
+        return matrix;
+    }
+
+    private static int[,] BuildMatrixParallel(int[] actual, int[] predicted, Dictionary<int, int> labelToIndex, int k, ComputingContext? context)
+    {
+        int workers = ComputingContextExecution.ParallelWorkerCount(context);
+        var partials = new int[workers][,];
+        int length = actual.Length;
+        int chunk = (length + workers - 1) / workers;
+
+        Parallel.For(0, workers, worker =>
+        {
+            int start = worker * chunk;
+            if (start >= length)
+            {
+                return;
+            }
+
+            int end = Math.Min(start + chunk, length);
+            var local = new int[k, k];
+            for (int i = start; i < end; i++)
+            {
+                int a = labelToIndex[actual[i]];
+                int p = labelToIndex[predicted[i]];
+                local[a, p]++;
+            }
+
+            partials[worker] = local;
+        });
+
+        var matrix = new int[k, k];
+        foreach (var local in partials)
+        {
+            if (local is null)
+            {
+                continue;
+            }
+
+            for (int r = 0; r < k; r++)
+            {
+                for (int c = 0; c < k; c++)
+                {
+                    matrix[r, c] += local[r, c];
+                }
+            }
+        }
+
+        return matrix;
     }
 
     /// <summary>
-    /// 计算单类精确率。
+    /// Computes the per-class precision.
     /// </summary>
     public static double Precision(ConfusionMatrix cm, int classLabel)
     {
         int index = cm.ClassLabels.ToList().IndexOf(classLabel);
         if (index < 0)
-            throw new ArgumentException("类别不存在。", nameof(classLabel));
+            throw new ArgumentException("The class does not exist.", nameof(classLabel));
 
         int tp = cm.Matrix[index, index];
         int predictedPositive = 0;
@@ -73,13 +133,13 @@ public static class ClassificationMetrics
     }
 
     /// <summary>
-    /// 计算单类召回率。
+    /// Computes the per-class recall.
     /// </summary>
     public static double Recall(ConfusionMatrix cm, int classLabel)
     {
         int index = cm.ClassLabels.ToList().IndexOf(classLabel);
         if (index < 0)
-            throw new ArgumentException("类别不存在。", nameof(classLabel));
+            throw new ArgumentException("The class does not exist.", nameof(classLabel));
 
         int tp = cm.Matrix[index, index];
         int actualPositive = 0;
@@ -89,7 +149,7 @@ public static class ClassificationMetrics
     }
 
     /// <summary>
-    /// 计算单类 F1。
+    /// Computes the per-class F1 score.
     /// </summary>
     public static double F1Score(ConfusionMatrix cm, int classLabel)
     {
@@ -99,7 +159,7 @@ public static class ClassificationMetrics
     }
 
     /// <summary>
-    /// 宏平均 F1。
+    /// Macro-averaged F1.
     /// </summary>
     public static double MacroF1(ConfusionMatrix cm)
     {
@@ -112,7 +172,7 @@ public static class ClassificationMetrics
     }
 
     /// <summary>
-    /// 微平均 F1（多分类单标签下等价于准确率）。
+    /// Micro-averaged F1 (equivalent to accuracy in the single-label multiclass case).
     /// </summary>
     public static double MicroF1(ConfusionMatrix cm)
     {
@@ -128,14 +188,14 @@ public static class ClassificationMetrics
     }
 
     /// <summary>
-    /// 从标签直接计算宏平均 F1。
+    /// Computes macro-averaged F1 directly from labels.
     /// </summary>
-    public static double MacroF1(ReadOnlySpan<int> actual, ReadOnlySpan<int> predicted) =>
-        MacroF1(ConfusionMatrix(actual, predicted));
+    public static double MacroF1(ReadOnlySpan<int> actual, ReadOnlySpan<int> predicted, ComputingContext? context = null) =>
+        MacroF1(ConfusionMatrix(actual, predicted, context));
 
     /// <summary>
-    /// 从标签直接计算微平均 F1。
+    /// Computes micro-averaged F1 directly from labels.
     /// </summary>
-    public static double MicroF1(ReadOnlySpan<int> actual, ReadOnlySpan<int> predicted) =>
-        MicroF1(ConfusionMatrix(actual, predicted));
+    public static double MicroF1(ReadOnlySpan<int> actual, ReadOnlySpan<int> predicted, ComputingContext? context = null) =>
+        MicroF1(ConfusionMatrix(actual, predicted, context));
 }

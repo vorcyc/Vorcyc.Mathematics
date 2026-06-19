@@ -1,9 +1,6 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-
 namespace Vorcyc.Mathematics.MachineLearning.Distances;
-
-
 /// <summary>
 ///   Sokal-Michener dissimilarity.
 /// </summary>
@@ -11,9 +8,6 @@ public class SokalMichener<TSelf>
     : IDistance<TSelf>
     where TSelf : INumber<TSelf>
 {
-
-
-
 
     /// <summary>
     ///   Computes the distance <c>d(x,y)</c> between points
@@ -36,7 +30,6 @@ public class SokalMichener<TSelf>
         TSelf ft = TSelf.Zero;
         TSelf tt = TSelf.Zero;
         TSelf ff = TSelf.Zero;
-
         for (int i = 0; i < x.Length; i++)
         {
             if (x[i] == TSelf.One && y[i] == TSelf.Zero) tf++;
@@ -44,11 +37,8 @@ public class SokalMichener<TSelf>
             if (x[i] == TSelf.Zero && y[i] == TSelf.Zero) tt++;
             if (x[i] == TSelf.Zero && y[i] == TSelf.Zero) ff++;
         }
-
         TSelf r = TSelf.CreateTruncating(2) * (tf + ft);
         return r / (ff + tt + r);
     }
-
-
 
 }

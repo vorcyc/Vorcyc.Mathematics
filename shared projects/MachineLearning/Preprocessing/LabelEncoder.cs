@@ -1,7 +1,7 @@
 namespace Vorcyc.Mathematics.MachineLearning.Preprocessing;
 
 /// <summary>
-/// 将字符串标签编码为 0..K-1 整数。
+/// Encodes string labels as integers in the range 0..K-1.
 /// </summary>
 public sealed class LabelEncoder : IMachineLearning
 {
@@ -11,11 +11,11 @@ public sealed class LabelEncoder : IMachineLearning
     /// <inheritdoc />
     public MachineLearningTask Task => MachineLearningTask.Classification;
 
-    /// <summary>已知类别标签。</summary>
+    /// <summary>The known class labels.</summary>
     public IReadOnlyList<string> Classes => _labels;
 
     /// <summary>
-    /// 拟合标签映射。
+    /// Fits the label mapping.
     /// </summary>
     public void Fit(IEnumerable<string> labels)
     {
@@ -26,21 +26,21 @@ public sealed class LabelEncoder : IMachineLearning
     }
 
     /// <summary>
-    /// 编码单个标签。
+    /// Encodes a single label.
     /// </summary>
     public int Transform(string label) =>
         _mapping.TryGetValue(label, out int value)
             ? value
-            : throw new ArgumentException($"未知标签: {label}", nameof(label));
+            : throw new ArgumentException($"Unknown label: {label}", nameof(label));
 
     /// <summary>
-    /// 批量编码。
+    /// Batch encoding.
     /// </summary>
     public int[] Transform(IReadOnlyList<string> labels) =>
         labels.Select(Transform).ToArray();
 
     /// <summary>
-    /// 解码整数标签。
+    /// Decodes an integer label.
     /// </summary>
     public string InverseTransform(int label)
     {

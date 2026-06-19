@@ -1,7 +1,5 @@
-﻿using System.Numerics;
-
+using System.Numerics;
 namespace Vorcyc.Mathematics.Experimental.CurveFitting;
-
 internal static class NonlinearRegression
 {
     /// <summary>
@@ -39,17 +37,13 @@ internal static class NonlinearRegression
             throw new ArgumentNullException(nameof(initialParams), "初始参数不能为空");
         if (maxIterations <= 0)
             throw new ArgumentException("最大迭代次数必须大于0");
-
         // 转换为数组以避免 Span 在 lambda 中的问题
         T[] xDataArray = xData.ToArray();
         T[] yDataArray = yData.ToArray();
-
         int n = xDataArray.Length;
         int m = initialParams.Length;
-
         // 参数优化
         T[] parameters = (T[])initialParams.Clone();
-
         // 配置参数
         T defaultTolerance = T.CreateChecked(1e-6);
         T effectiveTolerance = tolerance ?? defaultTolerance;
@@ -61,14 +55,12 @@ internal static class NonlinearRegression
         T decreaseFactor = lambdaDecreaseFactor ?? defaultDecrease;
         T defaultStepSize = T.CreateChecked(1e-6);
         T h = stepSize ?? defaultStepSize;
-
         for (int iter = 0; iter < maxIterations; iter++)
         {
             // 计算残差
             T[] residuals = new T[n];
             for (int i = 0; i < n; i++)
                 residuals[i] = model(xDataArray[i], parameters) - yDataArray[i];
-
             // 计算雅可比矩阵（数值近似）
             T[][] jacobian = new T[n][];
             for (int i = 0; i < n; i++)
@@ -84,7 +76,6 @@ internal static class NonlinearRegression
                     jacobian[i][j] = (f1 - f2) / (h + h);
                 }
             }
-
             // 计算 J^T * J 和 J^T * r
             T[][] jtJ = new T[m][];
             for (int i = 0; i < m; i++)
@@ -98,7 +89,6 @@ internal static class NonlinearRegression
                     jtJ[i][j] = sum + (i == j ? currentLambda * sum : T.Zero); // 添加阻尼
                 }
             }
-
             T[] jtr = new T[m];
             for (int i = 0; i < m; i++)
             {
@@ -107,10 +97,8 @@ internal static class NonlinearRegression
                     sum += jacobian[k][i] * residuals[k];
                 jtr[i] = -sum;
             }
-
             // 求解更新步长
             T[] delta = SolveLinearSystem(jtJ, jtr);
-
             // 更新参数并检查收敛
             T[] newParams = new T[m];
             T change = T.Zero;
@@ -119,7 +107,6 @@ internal static class NonlinearRegression
                 newParams[i] = parameters[i] + delta[i];
                 change += delta[i] * delta[i];
             }
-
             // 计算新残差平方和
             T newSsr = T.Zero;
             for (int i = 0; i < n; i++)
@@ -127,11 +114,9 @@ internal static class NonlinearRegression
                 T r = model(xDataArray[i], newParams) - yDataArray[i];
                 newSsr += r * r;
             }
-
             T oldSsr = T.Zero;
             for (int i = 0; i < n; i++)
                 oldSsr += residuals[i] * residuals[i];
-
             // 根据残差调整 lambda 并检查终止条件
             if (newSsr < oldSsr)
             {
@@ -146,10 +131,8 @@ internal static class NonlinearRegression
                 currentLambda *= increaseFactor;
             }
         }
-
         // 预测函数
         Func<T, T> predict = x => model(x, parameters);
-
         // 计算 MSE
         T mse = T.Zero;
         for (int i = 0; i < n; i++)
@@ -159,10 +142,8 @@ internal static class NonlinearRegression
             mse += diff * diff;
         }
         mse /= T.CreateChecked(n);
-
         return new FitResult<T>(predict, parameters, mse);
     }
-
     // 高斯消元法求解线性方程组
     private static T[] SolveLinearSystem<T>(T[][] A, T[] b)
         where T : unmanaged, IFloatingPointIeee754<T>
@@ -170,20 +151,17 @@ internal static class NonlinearRegression
         int n = b.Length;
         T[] x = new T[n];
         T[][] augmented = new T[n][];
-
         for (int i = 0; i < n; i++)
         {
             augmented[i] = new T[n + 1];
             Array.Copy(A[i], 0, augmented[i], 0, n);
             augmented[i][n] = b[i];
         }
-
         for (int i = 0; i < n; i++)
         {
             T pivot = augmented[i][i];
             if (pivot == T.Zero)
                 throw new InvalidOperationException("矩阵奇异，无法求解");
-
             for (int j = i + 1; j < n; j++)
             {
                 T factor = augmented[j][i] / pivot;
@@ -191,7 +169,6 @@ internal static class NonlinearRegression
                     augmented[j][k] -= factor * augmented[i][k];
             }
         }
-
         for (int i = n - 1; i >= 0; i--)
         {
             T sum = augmented[i][n];
@@ -199,11 +176,8 @@ internal static class NonlinearRegression
                 sum -= augmented[i][j] * x[j];
             x[i] = sum / augmented[i][i];
         }
-
         return x;
     }
-
-
     /// <summary>
     /// 非线性回归：拟合复杂非线性模型，支持多变量输入。
     /// </summary>
@@ -241,19 +215,15 @@ internal static class NonlinearRegression
             throw new ArgumentException("最大迭代次数必须大于0");
         if (xData.Any(row => row.ColumnCount == 0))
             throw new ArgumentException("X 数据中不能包含空行");
-
         int n = xData.Length; // 数据点数
         int m = initialParams.Length; // 参数数
         int inputDim = xData[0].ColumnCount; // 输入变量维度
         if (xData.Any(row => row.ColumnCount != inputDim))
             throw new ArgumentException("所有数据点的输入维度必须一致");
-
         // 转换为数组以避免 Span 在 lambda 中的问题
         T[] yDataArray = yData.ToArray();
-
         // 参数优化
         T[] parameters = (T[])initialParams.Clone();
-
         // 配置参数
         T defaultTolerance = T.CreateChecked(1e-6);
         T effectiveTolerance = tolerance ?? defaultTolerance;
@@ -265,14 +235,12 @@ internal static class NonlinearRegression
         T decreaseFactor = lambdaDecreaseFactor ?? defaultDecrease;
         T defaultStepSize = T.CreateChecked(1e-6);
         T h = stepSize ?? defaultStepSize;
-
         for (int iter = 0; iter < maxIterations; iter++)
         {
             // 计算残差
             T[] residuals = new T[n];
             for (int i = 0; i < n; i++)
                 residuals[i] = model(xData[i], parameters) - yDataArray[i];
-
             // 计算雅可比矩阵（数值近似）
             T[][] jacobian = new T[n][];
             for (int i = 0; i < n; i++)
@@ -288,7 +256,6 @@ internal static class NonlinearRegression
                     jacobian[i][j] = (f1 - f2) / (h + h);
                 }
             }
-
             // 计算 J^T * J 和 J^T * r
             T[][] jtJ = new T[m][];
             for (int i = 0; i < m; i++)
@@ -302,7 +269,6 @@ internal static class NonlinearRegression
                     jtJ[i][j] = sum + (i == j ? currentLambda * sum : T.Zero);
                 }
             }
-
             T[] jtr = new T[m];
             for (int i = 0; i < m; i++)
             {
@@ -311,10 +277,8 @@ internal static class NonlinearRegression
                     sum += jacobian[k][i] * residuals[k];
                 jtr[i] = -sum;
             }
-
             // 求解更新步长
             T[] delta = SolveLinearSystem(jtJ, jtr);
-
             // 更新参数并检查收敛
             T[] newParams = new T[m];
             T change = T.Zero;
@@ -323,7 +287,6 @@ internal static class NonlinearRegression
                 newParams[i] = parameters[i] + delta[i];
                 change += delta[i] * delta[i];
             }
-
             // 计算新残差平方和
             T newSsr = T.Zero;
             for (int i = 0; i < n; i++)
@@ -331,11 +294,9 @@ internal static class NonlinearRegression
                 T r = model(xData[i], newParams) - yDataArray[i];
                 newSsr += r * r;
             }
-
             T oldSsr = T.Zero;
             for (int i = 0; i < n; i++)
                 oldSsr += residuals[i] * residuals[i];
-
             // 根据残差调整 lambda 并检查终止条件
             if (newSsr < oldSsr)
             {
@@ -350,10 +311,8 @@ internal static class NonlinearRegression
                 currentLambda *= increaseFactor;
             }
         }
-
         // 预测函数
         Func<DataRow<T>, T> predict = x => model(x, parameters);
-
         // 计算 MSE
         T mse = T.Zero;
         for (int i = 0; i < n; i++)
@@ -363,27 +322,20 @@ internal static class NonlinearRegression
             mse += diff * diff;
         }
         mse /= T.CreateChecked(n);
-
         return new MultiColumnFitResult<T>(predict, parameters, mse);
     }
-
-
 
     // 测试方法
     public static void RunTests()
     {
         Console.WriteLine("Running Nonlinear Fit Tests...");
-
         TestMultiVariableModel();
         TestInvalidInput();
-
         Console.WriteLine("All tests completed!");
     }
-
     private static void TestMultiVariableModel()
     {
         Console.WriteLine("\nTest 1: Multi-Variable Model (y = a * x1 + b * x2^2)");
-
         DataRow<double>[] xData = new DataRow<double>[]
         {
             new DataRow<double>(1, 1),
@@ -394,16 +346,13 @@ internal static class NonlinearRegression
         double[] yData = { 2, 10, 24, 44 }; // y ≈ 2*x1 + 3*x2^2
         Func<DataRow<double>, double[], double> model = (x, p) => p[0] * x[0] + p[1] * x[1] * x[1];
         double[] initialParams = { 1.0, 1.0 };
-
         var result = NonlinearRegression.Fit_MultiColumn_Normal(xData, yData, model, initialParams);
-
         double tolerance = 0.1;
         bool aOk = Math.Abs(result.Parameters[0] - 2.0) < tolerance;
         bool bOk = Math.Abs(result.Parameters[1] - 3.0) < tolerance;
         Console.WriteLine($"a = {result.Parameters[0]:F3} (Expected ~2): {(aOk ? "PASS" : "FAIL")}");
         Console.WriteLine($"b = {result.Parameters[1]:F3} (Expected ~3): {(bOk ? "PASS" : "FAIL")}");
         Console.WriteLine($"MSE = {result.MeanSquaredError:F6} (Expected small): {(result.MeanSquaredError < 0.1 ? "PASS" : "FAIL")}");
-
         // 测试多列预测
         DataRow<double> testInput = new DataRow<double>(2.5, 2.5);
         double expected = 2.0 * 2.5 + 3.0 * 2.5 * 2.5; // 5 + 18.75 = 23.75
@@ -411,11 +360,9 @@ internal static class NonlinearRegression
         bool predictOk = Math.Abs(predicted - expected) < tolerance;
         Console.WriteLine($"Prediction at [2.5, 2.5] = {predicted:F3} (Expected ~23.75): {(predictOk ? "PASS" : "FAIL")}");
     }
-
     private static void TestInvalidInput()
     {
         Console.WriteLine("\nTest 2: Invalid Input");
-
         DataRow<double>[] emptyX = Array.Empty<DataRow<double>>();
         double[] emptyY = Array.Empty<double>();
         bool threwEmpty = false;
@@ -427,7 +374,6 @@ internal static class NonlinearRegression
         {
             threwEmpty = true;
         }
-
         DataRow<double>[] mismatchX = new DataRow<double>[] { new DataRow<double>(1), new DataRow<double>(2) };
         double[] mismatchY = { 1 };
         bool threwMismatch = false;
@@ -439,7 +385,6 @@ internal static class NonlinearRegression
         {
             threwMismatch = true;
         }
-
         DataRow<double>[] validX = new DataRow<double>[] { new DataRow<double>(1), new DataRow<double>(2) };
         double[] validY = { 1, 2 };
         bool threwNullModel = false;
@@ -451,7 +396,6 @@ internal static class NonlinearRegression
         {
             threwNullModel = true;
         }
-
         bool threwNullParams = false;
         try
         {
@@ -461,7 +405,6 @@ internal static class NonlinearRegression
         {
             threwNullParams = true;
         }
-
         bool threwInvalidMaxIter = false;
         try
         {
@@ -471,7 +414,6 @@ internal static class NonlinearRegression
         {
             threwInvalidMaxIter = true;
         }
-
         DataRow<double>[] inconsistentX = new DataRow<double>[] { new DataRow<double>(1), new DataRow<double>(1, 2) };
         bool threwInconsistentDim = false;
         try
@@ -482,7 +424,6 @@ internal static class NonlinearRegression
         {
             threwInconsistentDim = true;
         }
-
         Console.WriteLine($"Empty data test: {(threwEmpty ? "PASS" : "FAIL")}");
         Console.WriteLine($"Mismatched lengths test: {(threwMismatch ? "PASS" : "FAIL")}");
         Console.WriteLine($"Null model test: {(threwNullModel ? "PASS" : "FAIL")}");
@@ -491,4 +432,3 @@ internal static class NonlinearRegression
         Console.WriteLine($"Inconsistent input dimension test: {(threwInconsistentDim ? "PASS" : "FAIL")}");
     }
 }
-

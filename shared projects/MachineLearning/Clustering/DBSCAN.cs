@@ -3,9 +3,9 @@
 namespace Vorcyc.Mathematics.MachineLearning.Clustering;
 
 /// <summary>
-/// 表示用于二维平面点的DBSCAN聚类算法。
+/// Represents the DBSCAN clustering algorithm for points on a 2D plane.
 /// </summary>
-/// <typeparam name="T">坐标的数值类型。</typeparam>
+/// <typeparam name="T">The numeric type of the coordinates.</typeparam>
 public class DBSCAN<T> :IMachineLearning
     where T : struct, IFloatingPointIeee754<T>
 {
@@ -17,12 +17,19 @@ public class DBSCAN<T> :IMachineLearning
     private readonly List<List<Point<T>>> _clusters;
 
     /// <summary>
-    /// 使用指定的点、邻域半径和最小点数初始化 <see cref="DBSCAN{T}"/> 类的新实例。
+    /// Execution policy honored by the neighbor search. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
     /// </summary>
-    /// <param name="points">要聚类的点。</param>
-    /// <param name="eps">邻域半径。</param>
-    /// <param name="minPts">形成一个聚类的最小点数。</param>
-    public DBSCAN(Point<T>[] points, T eps, int minPts)
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DBSCAN{T}"/> class using the specified points, neighborhood radius, and minimum number of points.
+    /// </summary>
+    /// <param name="points">The points to cluster.</param>
+    /// <param name="eps">The neighborhood radius.</param>
+    /// <param name="minPts">The minimum number of points required to form a cluster.</param>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    public DBSCAN(Point<T>[] points, T eps, int minPts, ComputingContext? context = null)
     {
         _points = points;
         _eps = eps;
@@ -30,14 +37,15 @@ public class DBSCAN<T> :IMachineLearning
         _visited = new HashSet<Point<T>>();
         _noise = new HashSet<Point<T>>();
         _clusters = new List<List<Point<T>>>();
+        Context = context;
     }
 
     public MachineLearningTask Task => MachineLearningTask.Clustering;
 
     /// <summary>
-    /// 执行DBSCAN聚类。
+    /// Runs the DBSCAN clustering.
     /// </summary>
-    /// <returns>聚类的列表，每个聚类是一个点的列表。</returns>
+    /// <returns>The list of clusters; each cluster is a list of points.</returns>
     public List<List<Point<T>>> Cluster()
     {
         foreach (var point in _points)
@@ -64,11 +72,11 @@ public class DBSCAN<T> :IMachineLearning
     }
 
     /// <summary>
-    /// 扩展聚类。
+    /// Expands the cluster.
     /// </summary>
-    /// <param name="point">当前点。</param>
-    /// <param name="neighbors">当前点的邻居。</param>
-    /// <param name="cluster">当前聚类。</param>
+    /// <param name="point">The current point.</param>
+    /// <param name="neighbors">The neighbors of the current point.</param>
+    /// <param name="cluster">The current cluster.</param>
     private void ExpandCluster(Point<T> point, List<Point<T>> neighbors, List<Point<T>> cluster)
     {
         cluster.Add(point);
@@ -96,19 +104,29 @@ public class DBSCAN<T> :IMachineLearning
     }
 
     /// <summary>
-    /// 获取点的邻居。
+    /// Gets the neighbors of a point.
     /// </summary>
-    /// <param name="point">当前点。</param>
-    /// <returns>邻居的列表。</returns>
+    /// <param name="point">The current point.</param>
+    /// <returns>The list of neighbors.</returns>
     private List<Point<T>> GetNeighbors(Point<T> point)
     {
         var neighbors = new List<Point<T>>();
+        bool[] isNeighbor = new bool[_points.Length];
 
-        foreach (var p in _points)
-        {
-            if (Point<T>.Distance(point, p) <= _eps)
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            _points.Length,
+            i =>
             {
-                neighbors.Add(p);
+                isNeighbor[i] = Point<T>.Distance(point, _points[i]) <= _eps;
+            });
+
+        for (int i = 0; i < _points.Length; i++)
+        {
+            if (isNeighbor[i])
+            {
+                neighbors.Add(_points[i]);
             }
         }
 

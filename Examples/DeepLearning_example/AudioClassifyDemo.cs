@@ -29,7 +29,7 @@ internal static class AudioClassifyDemo
             numClasses: 2,
             extractor: mfcc);
 
-        Console.WriteLine($"批输入形状: N={sample.Input.BatchSize}, F={sample.Input.Width}");
+        Console.WriteLine($"批输入形状: N={sample.Input.Batch}, F={sample.Input.Width}");
         Console.WriteLine($"特征: 低频正弦 → 类 0, 高频正弦 → 类 1");
 
         var model = new BatchSequential<float>(
@@ -60,7 +60,7 @@ internal static class AudioClassifyDemo
         return 0;
     }
 
-        Console.WriteLine($"批输入形状: N={sample.Input.Batch}, F={sample.Input.Width}");
+    private static Signal MakeSine(int length, float rate, float frequency)
     {
         var signal = new Signal(length, rate);
         signal.GenerateWave(WaveShape.Sine, frequency, Behaviour.Replace);

@@ -1,7 +1,7 @@
 namespace Vorcyc.Mathematics.MachineLearning.Internal;
 
 /// <summary>
-/// <see cref="T:T[,]"/> 特征矩阵的共享切片工具。
+/// Shared slicing utilities for <see cref="T:T[,]"/> feature matrices.
 /// </summary>
 internal static class Array2DHelpers
 {

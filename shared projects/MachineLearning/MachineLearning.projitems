@@ -9,6 +9,7 @@
     <Import_RootNamespace>Vorcyc.Mathematics.MachineLearning</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Decomposition\ICA.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\Array2DHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\CartThresholdSearch.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\KnnNeighborSearch.cs" />

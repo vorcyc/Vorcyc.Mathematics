@@ -1,7 +1,5 @@
-﻿using System.Numerics;
-
+using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning.Distances;
-
 /// <summary>
 ///   The Minkowski distance is a metric in a normed vector space which can be 
 ///   considered as a generalization of both the <see cref="Euclidean">Euclidean 
@@ -24,9 +22,7 @@ namespace Vorcyc.Mathematics.MachineLearning.Distances;
 public class Minkowski<TNumber> : IDistance<TNumber>
     where TNumber : INumber<TNumber>, IPowerFunctions<TNumber>
 {
-
     private static TNumber _p;
-
     /// <summary>
     ///   Gets the order <c>p</c> of this Minkowski distance.
     /// </summary>
@@ -40,8 +36,6 @@ public class Minkowski<TNumber> : IDistance<TNumber>
             _p = value;
         }
     }
-
-
     /// <summary>
     ///   Computes the distance <c>d(x,y)</c> between points
     ///   <paramref name="x"/> and <paramref name="y"/>.
@@ -62,7 +56,5 @@ public class Minkowski<TNumber> : IDistance<TNumber>
             sum += TNumber.Pow(TNumber.Abs(x[i] - y[i]), _p);
         return TNumber.Pow(sum, TNumber.One / _p);
     }
-
-
 
 }

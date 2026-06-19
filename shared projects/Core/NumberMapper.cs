@@ -1,14 +1,10 @@
-﻿namespace Vorcyc.Mathematics;
-
+namespace Vorcyc.Mathematics;
 using System.Numerics;
-
 /// <summary>
 /// Map a value from one range to another range.
 /// </summary>
 public static class NumberMapper
 {
-
-
     /// <summary>
     /// Defines the behavior when the input value is out of the specified range.
     /// </summary>
@@ -18,13 +14,11 @@ public static class NumberMapper
         /// Clamps the input value to the nearest boundary value.
         /// </summary>
         Saturating,
-
         /// <summary>
         /// Throws an exception when the input value is out of range.
         /// </summary>
         ThrowException,
     }
-
     /// <summary>
     /// Maps an input value from one range to another.
     /// </summary>
@@ -46,13 +40,10 @@ public static class NumberMapper
         InputValueOutOfRangeHandleBehavior handleBehavior = InputValueOutOfRangeHandleBehavior.Saturating)
         where TNumber : unmanaged, INumber<TNumber>
     {
-
         if (inMin >= inMax)
             throw new ArgumentOutOfRangeException(nameof(inMin), "inMin must be less than inMax.");
-
         if (outMin >= outMax)
             throw new ArgumentOutOfRangeException(nameof(outMin), "outMin must be less than outMax.");
-
         if (handleBehavior == InputValueOutOfRangeHandleBehavior.ThrowException)
         {
             if (number < inMin || number > inMax)
@@ -65,14 +56,11 @@ public static class NumberMapper
             else if (number > inMax)
                 number = inMax;
         }
-
         var inputRange = inMax - inMin;
         var outputRange = outMax - outMin;
         var ratio = outputRange / inputRange;
         return outMin + ratio * (number - inMin);
     }
-
-
     /// <summary>
     /// Maps a floating-point number from one range to another and returns a boolean indicating success.
     /// </summary>
@@ -97,30 +85,23 @@ public static class NumberMapper
             result = TFloatingNumber.NaN;
             return false;
         }
-
         if (inputMin >= inputMax)
         {
             result = TFloatingNumber.NaN;
             return false;
         }
-
         if (outputMin >= outputMax)
         {
             result = TFloatingNumber.NaN;
             return false;
         }
-
         var inputRange = inputMax - inputMin;
         var outputRange = outputMax - outputMin;
         var ratio = outputRange / inputRange;
         result = outputMin + ratio * (input - inputMin);
         return true;
     }
-
-
     //#region normal form
-
-
     ///// <summary>
     ///// Maps a double-precision floating-point number from one range to another.
     ///// </summary>
@@ -143,23 +124,15 @@ public static class NumberMapper
     //{
     //    if (number < inMin || number > inMax) return 0.0f;
     //    //throw new ArgumentException(nameof(number));
-
     //    if (inMin >= inMax)
     //        return 0.0f;//float.NaN;// ; throw new ArgumentException("rangeMin must less than rangeMax.");
-
     //    if (outMin >= outMax)
     //        return 0.0f;// float.NaN;// throw new ArgumentException("mappingMin must less than mappingMax.");
-
-
     //    var inputRange = inMax - inMin;
     //    var outputRange = outMax - outMin;
     //    var ratio = outputRange / inputRange;
     //    return outMin + ratio * (number - inMin);
-
     //}
-
-
-
 
     ///// <summary>
     ///// Maps a double-precision floating-point number from one range to another.
@@ -183,20 +156,15 @@ public static class NumberMapper
     //{
     //    if (number < inMin || number > inMax)
     //        throw new ArgumentException(nameof(number));
-
     //    if (inMin >= inMax)
     //        throw new ArgumentException("rangeMin must less than rangeMax.");
-
     //    if (outMin >= outMax)
     //        throw new ArgumentException("mappingMin must less than mappingMax.");
-
     //    var inputRange = inMax - inMin;
     //    var outputRange = outMax - outMin;
     //    var r = outputRange / inputRange;
     //    return outMin + r * (number - inMin);
     //}
-
-
     ///// <summary>
     ///// Maps a floating-point number from one range to another.
     ///// </summary>
@@ -216,28 +184,17 @@ public static class NumberMapper
     //{
     //    if (number < inMin || number > inMax) return TFloatingNumber.Zero;
     //    //throw new ArgumentException(nameof(number));
-
     //    if (inMin >= inMax)
     //        return TFloatingNumber.Zero;//float.NaN;// ; throw new ArgumentException("rangeMin must less than rangeMax.");
-
     //    if (outMin >= outMax)
     //        return TFloatingNumber.Zero;// float.NaN;// throw new ArgumentException("mappingMin must less than mappingMax.");
-
-
     //    var inputRange = inMax - inMin;
     //    var outputRange = outMax - outMin;
     //    var ratio = outputRange / inputRange;
     //    return outMin + ratio * (number - inMin);
-
     //}
-
-
     //#endregion
-
-
     //#region with check
-
-
     ///// <summary>
     ///// Maps a single-precision floating-point number from one range to another and returns a boolean indicating success.
     ///// </summary>
@@ -260,26 +217,22 @@ public static class NumberMapper
     //        result = float.NaN;
     //        return false;
     //    }
-
     //    if (inputMin >= inputMax)
     //    {
     //        result = float.NaN;
     //        return false;
     //    }
-
     //    if (outputMin >= outputMax)
     //    {
     //        result = float.NaN;
     //        return false;
     //    }
-
     //    var inputRange = inputMax - inputMin;
     //    var outputRange = outputMax - outputMin;
     //    var ratio = outputRange / inputRange;
     //    result = outputMin + ratio * (input - inputMin);
     //    return true;
     //}
-
     ///// <summary>
     ///// Maps a floating-point number from one range to another and returns a boolean indicating success.
     ///// </summary>
@@ -304,31 +257,24 @@ public static class NumberMapper
     //        result = TFloatingNumber.NaN;
     //        return false;
     //    }
-
     //    if (inputMin >= inputMax)
     //    {
     //        result = TFloatingNumber.NaN;
     //        return false;
     //    }
-
     //    if (outputMin >= outputMax)
     //    {
     //        result = TFloatingNumber.NaN;
     //        return false;
     //    }
-
     //    var inputRange = inputMax - inputMin;
     //    var outputRange = outputMax - outputMin;
     //    var ratio = outputRange / inputRange;
     //    result = outputMin + ratio * (input - inputMin);
     //    return true;
     //}
-
     //#endregion
-
-
     //#region with my Range<T>
-
     ///// <summary>
     ///// Maps a double-precision floating-point number from one range to another.
     ///// </summary>
@@ -345,13 +291,11 @@ public static class NumberMapper
     //{
     //    if (number < from.Minimum || number > from.Maximum)
     //        throw new ArgumentOutOfRangeException("Argument 'number' must in range 'from'");
-
     //    var fromSize = from.Maximum - from.Minimum;
     //    var toSize = to.Maximum - to.Minimum;
     //    var r = toSize / fromSize;
     //    return to.Minimum + r * (number - from.Minimum);
     //}
-
     ///// <summary>
     ///// Maps a single-precision floating-point number from one range to another.
     ///// </summary>
@@ -368,25 +312,15 @@ public static class NumberMapper
     //{
     //    if (number < from.Minimum || number > from.Maximum)
     //        throw new ArgumentOutOfRangeException("Argument 'number' must in range 'from'");
-
     //    var fromSize = from.Maximum - from.Minimum;
     //    var toSize = to.Maximum - to.Minimum;
     //    var r = toSize / fromSize;
     //    return to.Minimum + r * (number - from.Minimum);
     //}
 
-
-
-
-
-
     //#endregion
 
-
-
-
     //#region with ValueTuple<T1,T2>
-
     ///// <summary>
     ///// Maps a single-precision floating-point number from one range to another.
     ///// </summary>
@@ -403,14 +337,11 @@ public static class NumberMapper
     //{
     //    if (number < from.minimum || number > from.maximum)
     //        throw new ArgumentOutOfRangeException("Argument 'number' must in range 'from'");
-
     //    var fromSize = from.maximum - from.minimum;
     //    var toSize = to.maximum - to.minimum;
     //    var r = toSize / fromSize;
     //    return to.minimum + r * (number - from.minimum);
     //}
-
-
     ///// <summary>
     ///// Maps a double-precision floating-point number from one range to another.
     ///// </summary>
@@ -427,14 +358,11 @@ public static class NumberMapper
     //{
     //    if (number < from.minimum || number > from.maximum)
     //        throw new ArgumentOutOfRangeException("Argument 'number' must in range 'from'");
-
     //    var fromSize = from.maximum - from.minimum;
     //    var toSize = to.maximum - to.minimum;
     //    var r = toSize / fromSize;
     //    return to.minimum + r * (number - from.minimum);
     //}
-
-
     ///// <summary>
     ///// Maps a floating-point number from one range to another.
     ///// </summary>
@@ -454,21 +382,14 @@ public static class NumberMapper
     //    // 确保数字在 'from' 范围内
     //    if (number < from.minimum || number > from.maximum)
     //        throw new ArgumentOutOfRangeException(nameof(number), "参数 'number' 必须在 'from' 范围内");
-
     //    // 计算 'from' 和 'to' 范围的大小
     //    var fromSize = from.maximum - from.minimum;
     //    var toSize = to.maximum - to.minimum;
-
     //    // 计算比例并将数字映射到 'to' 范围
     //    var r = toSize / fromSize;
     //    return to.minimum + r * (number - from.minimum);
     //}
 
-
-
     //#endregion
-
-
-
 
 }

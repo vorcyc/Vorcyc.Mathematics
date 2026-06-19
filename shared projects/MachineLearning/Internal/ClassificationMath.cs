@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning.Internal;
 
 /// <summary>
-/// 分类器共用的投票与 argmax 工具。
+/// Shared voting and argmax utilities for classifiers.
 /// </summary>
 internal static class ClassificationMath
 {
@@ -45,7 +45,7 @@ internal static class ClassificationMath
         where T : struct, IFloatingPointIeee754<T>
     {
         if (classLabels.Length == 0 || scores.Length != classLabels.Length)
-            throw new ArgumentException("类别与分数长度必须一致且非空。");
+            throw new ArgumentException("The classes and scores must have the same length and be non-empty.");
 
         int bestLabel = classLabels[0];
         T bestScore = scores[0];
@@ -63,7 +63,7 @@ internal static class ClassificationMath
     public static int MajorityVote(ReadOnlySpan<int> predictions)
     {
         if (predictions.Length == 0)
-            throw new ArgumentException("至少需要一个预测标签。");
+            throw new ArgumentException("At least one predicted label is required.");
 
         var counts = new Dictionary<int, int>(predictions.Length);
         foreach (int prediction in predictions)

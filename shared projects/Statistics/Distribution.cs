@@ -1,93 +1,87 @@
-﻿//7.正态分布(Normal Distribution): 计算正态分布的概率密度函数和累积分布函数。
+//7.正态分布(Normal Distribution): 计算正态分布的概率密度函数和累积分布函数。
 //8.	泊松分布 (Poisson Distribution): 计算泊松分布的概率质量函数和累积分布函数。
 //9.	指数分布 (Exponential Distribution): 计算指数分布的概率密度函数和累积分布函数。
 //10.	二项分布 (Binomial Distribution): 计算二项分布的概率质量函数和累积分布函数。
 //11.	多项分布 (Multinomial Distribution): 计算多项分布的概率质量函数。
 //12.	Gamma分布 (Gamma Distribution): 计算Gamma分布的概率密度函数和累积分布函数。
 //13.	Beta分布 (Beta Distribution): 计算Beta分布的概率密度函数和累积分布函数。  
-
 namespace Vorcyc.Mathematics.Statistics;
 
 using System.Numerics;
 
 /// <summary>
-/// 提供各种概率分布的计算方法，包括正态分布、泊松分布、指数分布、二项分布、多项分布、Gamma分布和Beta分布。
+/// Provides computation methods for various probability distributions, including the normal, Poisson, exponential, binomial, multinomial, Gamma, and Beta distributions.
 /// </summary>
 /// <remarks>
-/// 该类包含以下概率分布的计算方法：
+/// This class contains computation methods for the following probability distributions:
 /// <list type="bullet">
 /// <item>
-/// <description>正态分布 (Normal Distribution): 计算正态分布的概率密度函数和累积分布函数。</description>
+/// <description>Normal Distribution: Computes the probability density function and cumulative distribution function of the normal distribution.</description>
 /// </item>
 /// <item>
-/// <description>泊松分布 (Poisson Distribution): 计算泊松分布的概率质量函数和累积分布函数。</description>
+/// <description>Poisson Distribution: Computes the probability mass function and cumulative distribution function of the Poisson distribution.</description>
 /// </item>
 /// <item>
-/// <description>指数分布 (Exponential Distribution): 计算指数分布的概率密度函数和累积分布函数。</description>
+/// <description>Exponential Distribution: Computes the probability density function and cumulative distribution function of the exponential distribution.</description>
 /// </item>
 /// <item>
-/// <description>二项分布 (Binomial Distribution): 计算二项分布的概率质量函数和累积分布函数。</description>
+/// <description>Binomial Distribution: Computes the probability mass function and cumulative distribution function of the binomial distribution.</description>
 /// </item>
 /// <item>
-/// <description>多项分布 (Multinomial Distribution): 计算多项分布的概率质量函数。</description>
+/// <description>Multinomial Distribution: Computes the probability mass function of the multinomial distribution.</description>
 /// </item>
 /// <item>
-/// <description>Gamma分布 (Gamma Distribution): 计算Gamma分布的概率密度函数和累积分布函数。</description>
+/// <description>Gamma Distribution: Computes the probability density function and cumulative distribution function of the Gamma distribution.</description>
 /// </item>
 /// <item>
-/// <description>Beta分布 (Beta Distribution): 计算Beta分布的概率密度函数和累积分布函数。</description>
+/// <description>Beta Distribution: Computes the probability density function and cumulative distribution function of the Beta distribution.</description>
 /// </item>
 /// </list>
 /// </remarks>
 public static partial class Distribution
 {
 
-    #region 正态分布
-
+    #region Normal Distribution
 
     /// <summary>
-    /// 计算正态分布的概率密度函数。
+    /// Computes the probability density function of the normal distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="mean">均值。</param>
-    /// <param name="stdDev">标准差。</param>
-    /// <returns>正态分布的概率密度值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="mean">The mean.</param>
+    /// <param name="stdDev">The standard deviation.</param>
+    /// <returns>The probability density value of the normal distribution.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T NormalPDF<T>(T x, T mean, T stdDev) where T : IFloatingPointIeee754<T>
     {
         T exponent = T.Exp(-T.CreateChecked(0.5) * T.Pow((x - mean) / stdDev, T.CreateChecked(2)));
         return (T.One / (stdDev * T.Sqrt(T.CreateChecked(2) * T.Pi))) * exponent;
     }
-
     /// <summary>
-    /// 计算正态分布的累积分布函数。
+    /// Computes the cumulative distribution function of the normal distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="mean">均值。</param>
-    /// <param name="stdDev">标准差。</param>
-    /// <returns>正态分布的累积分布值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="mean">The mean.</param>
+    /// <param name="stdDev">The standard deviation.</param>
+    /// <returns>The cumulative distribution value of the normal distribution.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T NormalCDF<T>(T x, T mean, T stdDev) where T : IFloatingPointIeee754<T>
     {
         return T.CreateChecked(0.5) * (T.One + VMath.Erf((x - mean) / (stdDev * T.Sqrt(T.CreateChecked(2)))));
     }
 
-
-
     #endregion
 
-
-    #region 泊松分布
+    #region Poisson Distribution
 
     /// <summary>
-    /// 计算泊松分布的概率质量函数。
+    /// Computes the probability mass function of the Poisson distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="k">事件发生的次数。</param>
-    /// <param name="lambda">单位时间内事件的平均发生率。</param>
-    /// <returns>泊松分布的概率质量值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="k">The number of times the event occurs.</param>
+    /// <param name="lambda">The average rate of event occurrence per unit time.</param>
+    /// <returns>The probability mass value of the Poisson distribution.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T PoissonPMF<T>(int k, T lambda) where T : IFloatingPointIeee754<T>
     {
@@ -95,12 +89,12 @@ public static partial class Distribution
     }
 
     /// <summary>
-    /// 计算泊松分布的累积分布函数。
+    /// Computes the cumulative distribution function of the Poisson distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="k">事件发生的次数。</param>
-    /// <param name="lambda">单位时间内事件的平均发生率。</param>
-    /// <returns>泊松分布的累积分布值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="k">The number of times the event occurs.</param>
+    /// <param name="lambda">The average rate of event occurrence per unit time.</param>
+    /// <returns>The cumulative distribution value of the Poisson distribution.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T PoissonCDF<T>(int k, T lambda) where T : IFloatingPointIeee754<T>
     {
@@ -114,23 +108,21 @@ public static partial class Distribution
 
     #endregion
 
-
-    #region 指数分布
-
+    #region Exponential Distribution
     /// <summary>
-    /// 计算指数分布的概率密度函数。
+    /// Computes the probability density function of the exponential distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="lambda">分布的参数。</param>
-    /// <returns>指数分布的概率密度值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="lambda">The parameter of the distribution.</param>
+    /// <returns>The probability density value of the exponential distribution.</returns>
     /// <remarks>
-    /// 指数分布（Exponential Distribution）是一种连续概率分布，常用于描述独立事件发生的时间间隔。
-    /// 概率密度函数（PDF）的公式为：
+    /// The exponential distribution is a continuous probability distribution commonly used to describe the time interval between independent events.
+    /// The formula for the probability density function (PDF) is:
     /// <code>
     /// f(x; λ) = λ * e^(-λx)  for x >= 0, λ > 0
     /// </code>
-    /// 其中，λ 是分布的参数，表示事件发生的平均速率。
+    /// where λ is the parameter of the distribution, representing the average rate of event occurrence.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ExponentialPDF<T>(T x, T lambda) where T : IFloatingPointIeee754<T>
@@ -138,21 +130,20 @@ public static partial class Distribution
         if (x < T.Zero) return T.Zero;
         return lambda * T.Exp(-lambda * x);
     }
-
     /// <summary>
-    /// 计算指数分布的累积分布函数。
+    /// Computes the cumulative distribution function of the exponential distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="lambda">分布的参数。</param>
-    /// <returns>指数分布的累积分布值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="lambda">The parameter of the distribution.</param>
+    /// <returns>The cumulative distribution value of the exponential distribution.</returns>
     /// <remarks>
-    /// 指数分布（Exponential Distribution）是一种连续概率分布，常用于描述独立事件发生的时间间隔。
-    /// 累积分布函数（CDF）的公式为：
+    /// The exponential distribution is a continuous probability distribution commonly used to describe the time interval between independent events.
+    /// The formula for the cumulative distribution function (CDF) is:
     /// <code>
     /// F(x; λ) = 1 - e^(-λx)  for x >= 0, λ > 0
     /// </code>
-    /// 其中，λ 是分布的参数，表示事件发生的平均速率。
+    /// where λ is the parameter of the distribution, representing the average rate of event occurrence.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ExponentialCDF<T>(T x, T lambda) where T : IFloatingPointIeee754<T>
@@ -160,49 +151,45 @@ public static partial class Distribution
         if (x < T.Zero) return T.Zero;
         return T.One - T.Exp(-lambda * x);
     }
-
     #endregion
 
-
-    #region 二项分布
-
+    #region Binomial Distribution
     /// <summary>
-    /// 计算二项分布的概率质量函数。
+    /// Computes the probability mass function of the binomial distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="k">成功的次数。</param>
-    /// <param name="n">试验的总次数。</param>
-    /// <param name="p">每次试验成功的概率。</param>
-    /// <returns>二项分布的概率质量值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="k">The number of successes.</param>
+    /// <param name="n">The total number of trials.</param>
+    /// <param name="p">The probability of success in each trial.</param>
+    /// <returns>The probability mass value of the binomial distribution.</returns>
     /// <remarks>
-    /// 二项分布（Binomial Distribution）是一种离散概率分布，描述在 n 次独立试验中成功 k 次的概率，每次试验成功的概率为 p。
-    /// 概率质量函数（PMF）的公式为：
+    /// The binomial distribution is a discrete probability distribution that describes the probability of achieving k successes in n independent trials, where the probability of success in each trial is p.
+    /// The formula for the probability mass function (PMF) is:
     /// <code>
     /// P(X = k) = C(n, k) * p^k * (1 - p)^(n - k)
     /// </code>
-    /// 其中，C(n, k) 是组合数，表示从 n 个元素中选取 k 个元素的方式数。
+    /// where C(n, k) is the binomial coefficient, representing the number of ways to choose k elements from n elements.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T BinomialPMF<T>(int k, int n, T p) where T : IFloatingPointIeee754<T>
     {
         return Combinatorics.Combinations<T>(n, k) * T.Pow(p, T.CreateChecked(k)) * T.Pow(T.One - p, T.CreateChecked(n - k));
     }
-
     /// <summary>
-    /// 计算二项分布的累积分布函数。
+    /// Computes the cumulative distribution function of the binomial distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="k">成功的次数。</param>
-    /// <param name="n">试验的总次数。</param>
-    /// <param name="p">每次试验成功的概率。</param>
-    /// <returns>二项分布的累积分布值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="k">The number of successes.</param>
+    /// <param name="n">The total number of trials.</param>
+    /// <param name="p">The probability of success in each trial.</param>
+    /// <returns>The cumulative distribution value of the binomial distribution.</returns>
     /// <remarks>
-    /// 二项分布（Binomial Distribution）是一种离散概率分布，描述在 n 次独立试验中成功 k 次的概率，每次试验成功的概率为 p。
-    /// 累积分布函数（CDF）的公式为：
+    /// The binomial distribution is a discrete probability distribution that describes the probability of achieving k successes in n independent trials, where the probability of success in each trial is p.
+    /// The formula for the cumulative distribution function (CDF) is:
     /// <code>
     /// F(X &lt;= k) = Σ P(X = i)  for i = 0 to k
     /// </code>
-    /// 其中，P(X = i) 是概率质量函数（PMF）。
+    /// where P(X = i) is the probability mass function (PMF).
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T BinomialCDF<T>(int k, int n, T p) where T : IFloatingPointIeee754<T>
@@ -215,27 +202,23 @@ public static partial class Distribution
         return sum;
     }
 
-
-
     #endregion
 
-
-    #region 多项分布
-
+    #region Multinomial Distribution
     /// <summary>
-    /// 计算多项分布的概率质量函数。
+    /// Computes the probability mass function of the multinomial distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="counts">每个类别的计数。</param>
-    /// <param name="probabilities">每个类别的概率。</param>
-    /// <returns>多项分布的概率质量值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="counts">The count of each category.</param>
+    /// <param name="probabilities">The probability of each category.</param>
+    /// <returns>The probability mass value of the multinomial distribution.</returns>
     /// <remarks>
-    /// 多项分布（Multinomial Distribution）是一种离散概率分布，描述在 n 次独立试验中，每个类别出现的次数。
-    /// 概率质量函数（PMF）的公式为：
+    /// The multinomial distribution is a discrete probability distribution that describes the number of occurrences of each category in n independent trials.
+    /// The formula for the probability mass function (PMF) is:
     /// <code>
     /// P(X1 = x1, X2 = x2, ..., Xk = xk) = n! / (x1! * x2! * ... * xk!) * p1^x1 * p2^x2 * ... * pk^xk
     /// </code>
-    /// 其中，n 是总试验次数，xi 是第 i 类别出现的次数，pi 是第 i 类别的概率。
+    /// where n is the total number of trials, xi is the number of occurrences of the i-th category, and pi is the probability of the i-th category.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T MultinomialPMF<T>(int[] counts, T[] probabilities) where T : IFloatingPointIeee754<T>
@@ -249,28 +232,24 @@ public static partial class Distribution
         return result;
     }
 
-
-
     #endregion
 
-
-    #region Gamma分布
-
+    #region Gamma Distribution
     /// <summary>
-    /// 计算Gamma分布的概率密度函数。
+    /// Computes the probability density function of the Gamma distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="shape">形状参数。</param>
-    /// <param name="scale">尺度参数。</param>
-    /// <returns>Gamma分布的概率密度值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>The probability density value of the Gamma distribution.</returns>
     /// <remarks>
-    /// Gamma分布（Gamma Distribution）是一种连续概率分布，常用于描述等待时间。
-    /// 概率密度函数（PDF）的公式为：
+    /// The Gamma distribution is a continuous probability distribution commonly used to describe waiting times.
+    /// The formula for the probability density function (PDF) is:
     /// <code>
     /// f(x; α, β) = (β^α * x^(α - 1) * e^(-βx)) / Γ(α)  for x > 0, α > 0, β > 0
     /// </code>
-    /// 其中，α 是形状参数，β 是尺度参数，Γ(α) 是Gamma函数。
+    /// where α is the shape parameter, β is the scale parameter, and Γ(α) is the Gamma function.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T GammaPDF<T>(T x, T shape, T scale) where T : IFloatingPointIeee754<T>
@@ -278,22 +257,21 @@ public static partial class Distribution
         if (x < T.Zero) return T.Zero;
         return (T.Pow(x, shape - T.One) * T.Exp(-x / scale)) / (T.Pow(scale, shape) * VMath.Gamma(shape));
     }
-
     /// <summary>
-    /// 计算Gamma分布的累积分布函数。
+    /// Computes the cumulative distribution function of the Gamma distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="shape">形状参数。</param>
-    /// <param name="scale">尺度参数。</param>
-    /// <returns>Gamma分布的累积分布值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="shape">The shape parameter.</param>
+    /// <param name="scale">The scale parameter.</param>
+    /// <returns>The cumulative distribution value of the Gamma distribution.</returns>
     /// <remarks>
-    /// Gamma分布（Gamma Distribution）是一种连续概率分布，常用于描述等待时间。
-    /// 累积分布函数（CDF）的公式为：
+    /// The Gamma distribution is a continuous probability distribution commonly used to describe waiting times.
+    /// The formula for the cumulative distribution function (CDF) is:
     /// <code>
     /// F(x; α, β) = γ(α, βx) / Γ(α)  for x > 0, α > 0, β > 0
     /// </code>
-    /// 其中，α 是形状参数，β 是尺度参数，Γ(α) 是Gamma函数，γ(α, βx) 是下不完全Gamma函数。
+    /// where α is the shape parameter, β is the scale parameter, Γ(α) is the Gamma function, and γ(α, βx) is the lower incomplete Gamma function.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T GammaCDF<T>(T x, T shape, T scale) where T : IFloatingPointIeee754<T>
@@ -302,28 +280,24 @@ public static partial class Distribution
         return VMath.LowerIncompleteGamma(shape, x / scale) / VMath.Gamma(shape);
     }
 
-
-
     #endregion
 
-
-    #region Beta分布
-
+    #region Beta Distribution
     /// <summary>
-    /// 计算Beta分布的概率密度函数。
+    /// Computes the probability density function of the Beta distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="alpha">形状参数α。</param>
-    /// <param name="beta">形状参数β。</param>
-    /// <returns>Beta分布的概率密度值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="alpha">The shape parameter α.</param>
+    /// <param name="beta">The shape parameter β.</param>
+    /// <returns>The probability density value of the Beta distribution.</returns>
     /// <remarks>
-    /// Beta分布（Beta Distribution）是一种连续概率分布，常用于描述概率或比例。
-    /// 概率密度函数（PDF）的公式为：
+    /// The Beta distribution is a continuous probability distribution commonly used to describe probabilities or proportions.
+    /// The formula for the probability density function (PDF) is:
     /// <code>
     /// f(x; α, β) = (x^(α - 1) * (1 - x)^(β - 1)) / B(α, β)  for 0 &lt;= x &lt;= 1, α > 0, β > 0
     /// </code>
-    /// 其中，α 和 β 是形状参数，B(α, β) 是Beta函数。
+    /// where α and β are shape parameters, and B(α, β) is the Beta function.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T BetaPDF<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>
@@ -331,22 +305,21 @@ public static partial class Distribution
         if (x < T.Zero || x > T.One) return T.Zero;
         return (T.Pow(x, alpha - T.One) * T.Pow(T.One - x, beta - T.One)) / VMath.Beta(alpha, beta);
     }
-
     /// <summary>
-    /// 计算Beta分布的累积分布函数。
+    /// Computes the cumulative distribution function of the Beta distribution.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="alpha">形状参数α。</param>
-    /// <param name="beta">形状参数β。</param>
-    /// <returns>Beta分布的累积分布值。</returns>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="alpha">The shape parameter α.</param>
+    /// <param name="beta">The shape parameter β.</param>
+    /// <returns>The cumulative distribution value of the Beta distribution.</returns>
     /// <remarks>
-    /// Beta分布（Beta Distribution）是一种连续概率分布，常用于描述概率或比例。
-    /// 累积分布函数（CDF）的公式为：
+    /// The Beta distribution is a continuous probability distribution commonly used to describe probabilities or proportions.
+    /// The formula for the cumulative distribution function (CDF) is:
     /// <code>
     /// F(x; α, β) = I_x(α, β)  for 0 &lt;= x &lt;= 1, α > 0, β > 0
     /// </code>
-    /// 其中，α 和 β 是形状参数，I_x(α, β) 是正则化不完全Beta函数。
+    /// where α and β are shape parameters, and I_x(α, β) is the regularized incomplete Beta function.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T BetaCDF<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>
@@ -355,11 +328,143 @@ public static partial class Distribution
         return VMath.RegularizedIncompleteBeta(x, alpha, beta);
     }
 
-    
+    #endregion
 
+    #region Uniform Distribution
 
+    /// <summary>
+    /// Computes the probability density function of the continuous uniform distribution.
+    /// </summary>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="min">The lower bound of the distribution.</param>
+    /// <param name="max">The upper bound of the distribution.</param>
+    /// <returns>The probability density value of the uniform distribution.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="max"/> is less than or equal to <paramref name="min"/>.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T UniformPDF<T>(T x, T min, T max) where T : IFloatingPointIeee754<T>
+    {
+        if (max <= min)
+            throw new ArgumentException("The upper bound must be greater than the lower bound.", nameof(max));
+        if (x < min || x > max) return T.Zero;
+        return T.One / (max - min);
+    }
 
+    /// <summary>
+    /// Computes the cumulative distribution function of the continuous uniform distribution.
+    /// </summary>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="min">The lower bound of the distribution.</param>
+    /// <param name="max">The upper bound of the distribution.</param>
+    /// <returns>The cumulative probability value of the uniform distribution.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="max"/> is less than or equal to <paramref name="min"/>.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T UniformCDF<T>(T x, T min, T max) where T : IFloatingPointIeee754<T>
+    {
+        if (max <= min)
+            throw new ArgumentException("The upper bound must be greater than the lower bound.", nameof(max));
+        if (x < min) return T.Zero;
+        if (x > max) return T.One;
+        return (x - min) / (max - min);
+    }
 
     #endregion
 
+    #region Log-Normal Distribution
+
+    /// <summary>
+    /// Computes the probability density function of the log-normal distribution.
+    /// </summary>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value. Must be positive; non-positive values return zero density.</param>
+    /// <param name="mu">The mean of the variable's natural logarithm.</param>
+    /// <param name="sigma">The standard deviation of the variable's natural logarithm. Must be positive.</param>
+    /// <returns>The probability density value of the log-normal distribution.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="sigma"/> is not positive.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T LogNormalPDF<T>(T x, T mu, T sigma) where T : IFloatingPointIeee754<T>
+    {
+        if (sigma <= T.Zero)
+            throw new ArgumentException("The standard deviation must be positive.", nameof(sigma));
+        if (x <= T.Zero) return T.Zero;
+
+        T two = T.CreateChecked(2);
+        T logX = T.Log(x);
+        T z = (logX - mu) / sigma;
+        T coefficient = T.One / (x * sigma * T.Sqrt(two * T.Pi));
+        return coefficient * T.Exp(-(z * z) / two);
+    }
+
+    /// <summary>
+    /// Computes the cumulative distribution function of the log-normal distribution.
+    /// </summary>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value. Must be positive; non-positive values return zero.</param>
+    /// <param name="mu">The mean of the variable's natural logarithm.</param>
+    /// <param name="sigma">The standard deviation of the variable's natural logarithm. Must be positive.</param>
+    /// <returns>The cumulative probability value of the log-normal distribution.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="sigma"/> is not positive.</exception>
+    /// <remarks>
+    /// The log-normal cumulative distribution function equals the normal cumulative distribution
+    /// function evaluated at the natural logarithm of <paramref name="x"/>.
+    /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T LogNormalCDF<T>(T x, T mu, T sigma) where T : IFloatingPointIeee754<T>
+    {
+        if (sigma <= T.Zero)
+            throw new ArgumentException("The standard deviation must be positive.", nameof(sigma));
+        if (x <= T.Zero) return T.Zero;
+        return NormalCDF(T.Log(x), mu, sigma);
+    }
+
+    #endregion
+
+    #region Weibull Distribution
+
+    /// <summary>
+    /// Computes the probability density function of the Weibull distribution.
+    /// </summary>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value. Must be non-negative; negative values return zero density.</param>
+    /// <param name="shape">The shape parameter (k). Must be positive.</param>
+    /// <param name="scale">The scale parameter (lambda). Must be positive.</param>
+    /// <returns>The probability density value of the Weibull distribution.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="shape"/> or <paramref name="scale"/> is not positive.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T WeibullPDF<T>(T x, T shape, T scale) where T : IFloatingPointIeee754<T>
+    {
+        if (shape <= T.Zero)
+            throw new ArgumentException("The shape parameter must be positive.", nameof(shape));
+        if (scale <= T.Zero)
+            throw new ArgumentException("The scale parameter must be positive.", nameof(scale));
+        if (x < T.Zero) return T.Zero;
+
+        T ratio = x / scale;
+        T powTerm = T.Pow(ratio, shape - T.One);
+        return (shape / scale) * powTerm * T.Exp(-T.Pow(ratio, shape));
+    }
+
+    /// <summary>
+    /// Computes the cumulative distribution function of the Weibull distribution.
+    /// </summary>
+    /// <typeparam name="T">The generic type that must implement the <see cref="IFloatingPointIeee754{T}"/> interface.</typeparam>
+    /// <param name="x">The variable value. Must be non-negative; negative values return zero.</param>
+    /// <param name="shape">The shape parameter (k). Must be positive.</param>
+    /// <param name="scale">The scale parameter (lambda). Must be positive.</param>
+    /// <returns>The cumulative probability value of the Weibull distribution.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="shape"/> or <paramref name="scale"/> is not positive.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T WeibullCDF<T>(T x, T shape, T scale) where T : IFloatingPointIeee754<T>
+    {
+        if (shape <= T.Zero)
+            throw new ArgumentException("The shape parameter must be positive.", nameof(shape));
+        if (scale <= T.Zero)
+            throw new ArgumentException("The scale parameter must be positive.", nameof(scale));
+        if (x < T.Zero) return T.Zero;
+
+        return T.One - T.Exp(-T.Pow(x / scale, shape));
+    }
+
+    #endregion
 }

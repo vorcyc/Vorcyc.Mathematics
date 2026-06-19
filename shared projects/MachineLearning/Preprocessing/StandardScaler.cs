@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning.Preprocessing;
 
 /// <summary>
-/// 标准化缩放：x' = (x - mean) / std。
+/// Standardization scaling: x' = (x - mean) / std.
 /// </summary>
 public class StandardScaler<T> : IMatrixTransformInto<T>
     where T : struct, IFloatingPointIeee754<T>
@@ -15,16 +15,16 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
     /// <inheritdoc />
     public MachineLearningTask Task => MachineLearningTask.None;
 
-    /// <summary>各特征均值。</summary>
+    /// <summary>The per-feature means.</summary>
     public IReadOnlyList<T> Mean =>
-        _isFitted ? _mean : throw new InvalidOperationException("缩放器尚未拟合。");
+        _isFitted ? _mean : throw new InvalidOperationException("The scaler has not been fitted yet.");
 
-    /// <summary>各特征标准差。</summary>
+    /// <summary>The per-feature standard deviations.</summary>
     public IReadOnlyList<T> Std =>
-        _isFitted ? _std : throw new InvalidOperationException("缩放器尚未拟合。");
+        _isFitted ? _std : throw new InvalidOperationException("The scaler has not been fitted yet.");
 
     /// <summary>
-    /// 根据数据估计均值与标准差。
+    /// Estimates the mean and standard deviation from the data.
     /// </summary>
     public void Fit(T[,] x)
     {
@@ -33,7 +33,7 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
         int rows = x.GetLength(0);
         int cols = x.GetLength(1);
         if (rows == 0 || cols == 0)
-            throw new ArgumentException("输入矩阵不能为空。");
+            throw new ArgumentException("The input matrix cannot be empty.");
 
         _mean = new T[cols];
         _std = new T[cols];
@@ -61,7 +61,7 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
     }
 
     /// <summary>
-    /// 拟合并变换。
+    /// Fits and transforms.
     /// </summary>
     public T[,] FitTransform(T[,] x)
     {
@@ -70,7 +70,7 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
     }
 
     /// <summary>
-    /// 变换矩阵。
+    /// Transforms a matrix.
     /// </summary>
     public T[,] Transform(T[,] x)
     {
@@ -89,7 +89,7 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
         int rows = source.GetLength(0);
         int cols = source.GetLength(1);
         if (destination.GetLength(0) != rows || destination.GetLength(1) != cols)
-            throw new ArgumentException("destination 形状须与 source 一致。", nameof(destination));
+            throw new ArgumentException("The destination shape must match the source.", nameof(destination));
 
         for (int i = 0; i < rows; i++)
         {
@@ -99,14 +99,14 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
     }
 
     /// <summary>
-    /// 变换单向量。
+    /// Transforms a single vector.
     /// </summary>
     public T[] Transform(T[] x)
     {
         if (!_isFitted)
-            throw new InvalidOperationException("缩放器尚未拟合。");
+            throw new InvalidOperationException("The scaler has not been fitted yet.");
         if (x == null || x.Length != _mean.Length)
-            throw new ArgumentException("特征维度不匹配。", nameof(x));
+            throw new ArgumentException("The feature dimensionality does not match.", nameof(x));
 
         var result = new T[x.Length];
         for (int j = 0; j < x.Length; j++)
@@ -117,20 +117,20 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
     private void EnsureFitted(T[,] x)
     {
         if (!_isFitted)
-            throw new InvalidOperationException("缩放器尚未拟合。");
+            throw new InvalidOperationException("The scaler has not been fitted yet.");
         if (x.GetLength(1) != _mean.Length)
-            throw new ArgumentException("特征维度不匹配。");
+            throw new ArgumentException("The feature dimensionality does not match.");
     }
 
     /// <summary>
-    /// 从已保存的均值与标准差恢复缩放器。
+    /// Restores the scaler from saved means and standard deviations.
     /// </summary>
     public void LoadState(T[] mean, T[] std)
     {
         if (mean == null || std == null)
-            throw new ArgumentException("均值与标准差不能为 null。");
+            throw new ArgumentException("The mean and standard deviation cannot be null.");
         if (mean.Length == 0 || mean.Length != std.Length)
-            throw new ArgumentException("均值与标准差长度必须相同且非空。");
+            throw new ArgumentException("The mean and standard deviation must have the same length and be non-empty.");
 
         _mean = (T[])mean.Clone();
         _std = (T[])std.Clone();

@@ -11,13 +11,19 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Advanced.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Correlation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distribution.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Basic_FloatingPointNumberExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Divergence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Histogram.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InformationTheory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Standardization.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StatisticsComputingContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension_Max_Parallel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IComparableExtension_Min_Parallel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Others.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StatisticsParallel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)s_ExtremeValueFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)s_INumberExtension_Max_Min.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TimeSeriesAnalysis.cs" />

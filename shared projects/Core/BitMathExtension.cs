@@ -1,15 +1,10 @@
-﻿namespace Vorcyc.Mathematics;
-
-
+namespace Vorcyc.Mathematics;
 /// <summary>
 /// Provides extension methods for various bitwise operations.
 /// </summary>
 public static class BitMathExtension
 {
-
-
     #region is power of 2
-
     /// <summary>
     /// Verifies a number is a power of two
     /// </summary>
@@ -20,7 +15,6 @@ public static class BitMathExtension
     {
         return ((x != 0) && (x & (x - 1)) == 0);
     }
-
     /// <summary>
     /// Verifies a number is a power of two
     /// </summary>
@@ -31,7 +25,6 @@ public static class BitMathExtension
     {
         return ((x != 0) && (x & (x - 1)) == 0);
     }
-
     /// <summary>
     /// Verifies a number is a power of two
     /// </summary>
@@ -45,7 +38,6 @@ public static class BitMathExtension
             throw new ArgumentOutOfRangeException(nameof(x), "Must be greater than or equal to zero");
         return IsPowerOf2((uint)x);
     }
-
     /// <summary>
     /// Verifies a number is a power of two
     /// </summary>
@@ -59,11 +51,8 @@ public static class BitMathExtension
             throw new ArgumentOutOfRangeException(nameof(x), "Must be greater than or equal to zero");
         return IsPowerOf2((ulong)x);
     }
-
     #endregion
-
     #region Next Power Of 2
-
     /// <summary>
     /// Get Next power of number.
     /// </summary>
@@ -75,10 +64,8 @@ public static class BitMathExtension
     {
         if (x < 0)
             throw new ArgumentOutOfRangeException(nameof(x), "Must be greater than or equal to zero");
-
         if (x == 0)
             return 1;
-
         x -= 1;
         x |= (x >> 1);
         x |= (x >> 2);
@@ -87,7 +74,6 @@ public static class BitMathExtension
         x |= (x >> 16);
         return x + 1;
     }
-
     /// <summary>
     /// Rounds a number up to the nearest power of 2.
     /// If the value is a power of two, the same value is returned.
@@ -116,7 +102,6 @@ public static class BitMathExtension
         value++;
         return value;
     }
-
     /// <summary>
     /// Rounds a number up to the nearest power of 2.
     /// If the value is a power of two, the same value is returned.
@@ -144,11 +129,8 @@ public static class BitMathExtension
         value++;
         return value;
     }
-
     #endregion
-
     #region previous power of 2 
-
     /// <summary>
     /// Returns the previous power of 2 after the input value x.
     /// </summary>
@@ -162,7 +144,6 @@ public static class BitMathExtension
     {
         return NextPowerOf2(x + 1) / 2;
     }
-
     /// <summary>
     /// Rounds a number down to the nearest power of 2.
     /// If the value is a power of two, the same value is returned.
@@ -177,7 +158,6 @@ public static class BitMathExtension
             return 1;
         return (1ul << 63) >> CountLeadingZeros(value);
     }
-
     /// <summary>
     /// Rounds a number down to the nearest power of 2.
     /// If the value is a power of two, the same value is returned.
@@ -192,11 +172,8 @@ public static class BitMathExtension
             return 1;
         return (1u << 31) >> CountLeadingZeros(value);
     }
-
     #endregion
-
     #region [ Count Bits ]
-
     /// <summary>
     /// Counts the number of bits that are set
     /// </summary>
@@ -212,7 +189,6 @@ public static class BitMathExtension
         }
         return (int)count;
     }
-
     /// <summary>
     /// Counts the number of bits that are set
     /// </summary>
@@ -228,7 +204,6 @@ public static class BitMathExtension
         }
         return (int)count;
     }
-
     /// <summary>
     /// Counts the number of bits that are not set
     /// </summary>
@@ -239,7 +214,6 @@ public static class BitMathExtension
     {
         return CountBitsSet(~value);
     }
-
     /// <summary>
     /// Counts the number of bits that are not set
     /// </summary>
@@ -250,9 +224,7 @@ public static class BitMathExtension
     {
         return CountBitsSet(~value);
     }
-
     #endregion
-
     /// <summary>
     /// Creates a bit mask for a number with the given number of bits.
     /// </summary>
@@ -265,9 +237,7 @@ public static class BitMathExtension
             return 0;
         return ulong.MaxValue >> (64 - bitCount);
     }
-
     #region [ Count Leading/Trailing Zeros ]
-
     /// <summary>
     /// Counts the number of consecutive 0's starting from the lowest bit working up.
     /// </summary>
@@ -307,7 +277,6 @@ public static class BitMathExtension
         }
         return position;
     }
-
     /// <summary>
     /// Counts the number of consecutive 0's starting from the lowest bit working up.
     /// </summary>
@@ -352,7 +321,6 @@ public static class BitMathExtension
         }
         return position;
     }
-
     /// <summary>
     /// Counts the number of consecutive 0's starting from the highest bit working down.
     /// </summary>
@@ -394,7 +362,6 @@ public static class BitMathExtension
         }
         return position;
     }
-
     /// <summary>
     /// Counts the number of consecutive 0's starting from the highest bit working down.
     /// </summary>
@@ -439,11 +406,8 @@ public static class BitMathExtension
         }
         return position;
     }
-
     #endregion
-
     #region [ Count Leading/Trailing Ones ]
-
     /// <summary>
     /// Counts the number of consecutive 1's starting from the lowest bit working up.
     /// </summary>
@@ -452,7 +416,6 @@ public static class BitMathExtension
     {
         return CountTrailingZeros(~value);
     }
-
     /// <summary>
     /// Counts the number of consecutive 1's starting from the lowest bit working up.
     /// </summary>
@@ -461,7 +424,6 @@ public static class BitMathExtension
     {
         return CountTrailingZeros(~value);
     }
-
     /// <summary>
     /// Counts the number of consecutive 1's starting from the highest bit working down.
     /// </summary>
@@ -470,7 +432,6 @@ public static class BitMathExtension
     {
         return CountLeadingZeros(~value);
     }
-
     /// <summary>
     /// Counts the number of consecutive 1's starting from the highest bit working down.
     /// </summary>
@@ -479,9 +440,7 @@ public static class BitMathExtension
     {
         return CountLeadingZeros(~value);
     }
-
     #endregion
-
     /// <summary>
     /// Returns the bit position for every bit that is set in the provided value.
     /// Bit positions are defined as 0-63;
@@ -498,7 +457,6 @@ public static class BitMathExtension
                 yield return x;
         }
     }
-
     /// <summary>
     /// Returns the bit position for every bit that is set in the provided value.
     /// Bit positions are defined as 0-31;
@@ -515,7 +473,6 @@ public static class BitMathExtension
                 yield return x;
         }
     }
-
     /// <summary>
     /// Returns the bit position for every bit that is cleared in the provided value.
     /// Bit positions are defined as 0-31;
@@ -538,10 +495,7 @@ public static class BitMathExtension
     {
         return GetSetBitPositions(~value);
     }
-
-
     #region Odd Even
-
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
@@ -551,7 +505,6 @@ public static class BitMathExtension
         //vb: (value And 1) = 1
         return (value & 1L) == 1;
     }
-
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
@@ -561,7 +514,6 @@ public static class BitMathExtension
         //vb: (value And 1) = 1
         return (value & 1UL) == 1;
     }
-
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
@@ -571,8 +523,6 @@ public static class BitMathExtension
         //vb: (value And 1) = 1
         return (value & 1) == 1;
     }
-
-
     /// <summary>
     /// 判断是否是奇数
     /// </summary>
@@ -582,8 +532,6 @@ public static class BitMathExtension
         //vb: (value And 1) = 1
         return (value & 1u) == 1U;
     }
-
-
 
     /// <summary>
     /// 判断是否是偶数
@@ -601,8 +549,6 @@ public static class BitMathExtension
         return !((value & 1L) == 1L);
     }
 
-
-
     /// <summary>
     /// 判断是否是偶数
     /// </summary>
@@ -618,8 +564,6 @@ public static class BitMathExtension
         //! 才是逻辑非
         return !((value & 1UL) == 1ul);
     }
-
-
 
     /// <summary>
     /// 判断是否是偶数
@@ -637,8 +581,6 @@ public static class BitMathExtension
         return !((value & 1) == 1);
     }
 
-
-
     /// <summary>
     /// 判断是否是偶数
     /// </summary>
@@ -655,17 +597,6 @@ public static class BitMathExtension
         return !((value & 1U) == 1U);
     }
 
-
-
-
-
     #endregion
 
-
-
-
-
 }
-
-
-

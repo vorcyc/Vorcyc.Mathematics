@@ -1,10 +1,7 @@
-﻿using System.Numerics;
-
+using System.Numerics;
 namespace Vorcyc.Mathematics.SignalProcessing.Transforms;
-
 public static class ZTransform
 {
-
     public static ComplexFp32[] Transform(float[] input, int numPoints)
     {
         ComplexFp32[] result = new ComplexFp32[numPoints];
@@ -13,7 +10,6 @@ public static class ZTransform
             float angle = -2f * ConstantsFp32.PI * k / numPoints;
             ComplexFp32 zk = new ComplexFp32(MathF.Cos(angle), MathF.Sin(angle));
             ComplexFp32 sum = ComplexFp32.Zero;
-
             for (int n = 0; n < input.Length; n++)
             {
                 sum += input[n] * ComplexFp32.Pow(zk, -n);
@@ -22,7 +18,6 @@ public static class ZTransform
         }
         return result;
     }
-
     /// <summary>
     /// 频率响应
     /// </summary>
@@ -38,7 +33,6 @@ public static class ZTransform
         ComplexFp32 z = ComplexFp32.Exp(ComplexFp32.ImaginaryOne * omega);
         ComplexFp32 numerator = ComplexFp32.Zero;
         ComplexFp32 denominator = ComplexFp32.Zero;
-
         for (int i = 0; i < b.Length; i++)
         {
             numerator += b[i] * ComplexFp32.Pow(z, -i);
@@ -49,7 +43,6 @@ public static class ZTransform
         }
         return numerator / denominator;
     }
-
     /// <summary>
     /// 极点和零点
     /// </summary>
@@ -63,7 +56,6 @@ public static class ZTransform
         int degree = zTransform.Length - 1;
         ComplexFp32[] poles = new ComplexFp32[degree];
         ComplexFp32[] zeros = new ComplexFp32[degree];
-
         // 计算极点和零点
         for (int i = 0; i < degree; i++)
         {
@@ -71,39 +63,7 @@ public static class ZTransform
             zeros[i] = zTransform[i] == 0 ? ComplexFp32.One : ComplexFp32.Zero;
         }
         return (poles, zeros);
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public static Complex<T>[] Transform<T>(T[] input, int numPoints)
         where T : struct, INumberBase<T>, IFloatingPointIeee754<T>, IMinMaxValue<T>
@@ -114,7 +74,6 @@ public static class ZTransform
             T angle = -Constants<T>.Two * Constants<T>.Pi * T.CreateChecked(k / numPoints);
             var zk = new Complex<T>(T.Cos(angle), T.Sin(angle));
             var sum = Complex<T>.Zero;
-
             for (int n = 0; n < input.Length; n++)
             {
                 sum += input[n] * Complex<T>.Pow(zk, -n);
@@ -123,5 +82,4 @@ public static class ZTransform
         }
         return result;
     }
-
 }

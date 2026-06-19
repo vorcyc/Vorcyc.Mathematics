@@ -1,10 +1,7 @@
-﻿namespace Vorcyc.Mathematics.Experimental.CurveFitting;
-
+namespace Vorcyc.Mathematics.Experimental.CurveFitting;
 using System;
 using System.Numerics;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
-
-
 /// <summary>
 /// 提供静态方法用于执行不同类型的曲线拟合。
 /// </summary>
@@ -15,7 +12,6 @@ using Vorcyc.Mathematics.SignalProcessing.Signals;
 public static class CurveFitter<T>
     where T : unmanaged, IFloatingPointIeee754<T>
 {
-
     // 检查输入数据的有效性
     private static void ValidateInput(Span<T> xData, Span<T> yData)
     {
@@ -24,7 +20,6 @@ public static class CurveFitter<T>
         if (xData.Length != yData.Length || xData.Length == 0)
             throw new ArgumentException("xData and yData must have the same non-zero length.");
     }
-
     private static void ValidateInput(DataRow<T>[] xData, Span<T> yData)
     {
         if (xData.Length == 0 || yData.IsEmpty)
@@ -32,15 +27,11 @@ public static class CurveFitter<T>
         if (xData.Length != yData.Length || xData.Length == 0)
             throw new ArgumentException("xData and yData must have the same non-zero length.");
     }
-
-
     private static void ValidateType()
     {
         if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
             throw new NotSupportedException("Only float and double are supported.");
     }
-
-
     /// <summary>
     /// 线性回归：拟合直线 y = ax + b，使用 SIMD 优化。
     /// </summary>
@@ -60,8 +51,6 @@ public static class CurveFitter<T>
             return LinearRegession.Fit_SIMD(xData, yData);
         }
     }
-
-
 
     /// <summary>
     /// 多项式回归：拟合 y = a0 + a1*x + a2*x^2 + ... + an*x^n。
@@ -83,8 +72,6 @@ public static class CurveFitter<T>
             return PolynomialRegression.Fit_SIMD(xData, yData, degree);
         }
     }
-
-
     /// <summary>
     /// 指数回归：拟合 y = a * e^(bx)。
     /// </summary>
@@ -105,7 +92,6 @@ public static class CurveFitter<T>
             return ExponentialRegression.Fit_SIMD(xData, yData);
         }
     }
-
     /// <summary>
     /// 对数回归：拟合 y = a + b * ln(x)。
     /// </summary>
@@ -126,7 +112,6 @@ public static class CurveFitter<T>
             return LogarithmicRegression.Fit_SIMD(xData, yData);
         }
     }
-
     /// <summary>
     ///  幂回归：拟合 y = a * x^b。
     /// </summary>
@@ -147,7 +132,6 @@ public static class CurveFitter<T>
             return PowerRegression.Fit_SIMD(xData, yData);
         }
     }
-
     /// <summary>
     /// 正弦回归：拟合 y = A * sin(Bx + C) + D。
     /// </summary>
@@ -161,8 +145,6 @@ public static class CurveFitter<T>
         ValidateType();
         return SinusoidalRegression.Fit_Normal(xData, yData, maxIterations);
     }
-
-
     /// <summary>
     /// 三次样条插值拟合：通过给定的点生成平滑曲线。
     /// </summary>
@@ -175,7 +157,6 @@ public static class CurveFitter<T>
         ValidateType();
         return CubicSplineInterpolation<T>.Fit_CubicSpline(xData, yData);
     }
-
     /// <summary>
     /// 局部加权回归 (LOWESS)：局部趋势拟合。
     /// </summary>
@@ -188,13 +169,10 @@ public static class CurveFitter<T>
     {
         if (xData.Length != yData.Length || xData.Length < 2)
             throw new ArgumentException("数据点数量必须相等且至少有2个点");
-
         // 创建 LocallyWeightedRegression 实例并调用 Fit 方法
         var lowess = new LocallyWeightedRegression<T>(xData, yData, bandwidth);
         return lowess.Fit();
     }
-
-
 
     /// <summary>
     /// 移动平均拟合：平滑时间序列数据。
@@ -205,8 +183,6 @@ public static class CurveFitter<T>
         ValidateInput(xData, yData);
         return MovingAverageFitter.Fit_Normal(xData, yData, windowSize);
     }
-
-
     /// <summary>
     /// 非线性回归：拟合复杂非线性模型。
     /// </summary>
@@ -221,10 +197,7 @@ public static class CurveFitter<T>
     {
         ValidateInput(xData, yData);
         return NonlinearRegression.Fit_Normal(xData, yData, model, initialParams);
-
     }
-
-
     /// <summary>
     /// 非线性回归：拟合复杂非线性模型。
     /// </summary>
@@ -253,8 +226,6 @@ public static class CurveFitter<T>
     {
         return NonlinearRegression.Fit_Normal(xData, yData, model, initialParams, maxIterations, tolerance, initialLambda, lambdaIncreaseFactor, lambdaDecreaseFactor, stepSize, residualTolerance);
     }
-
-
     /// <summary>
     /// 非线性回归：拟合复杂非线性模型，支持多变量输入。
     /// </summary>
@@ -283,7 +254,6 @@ public static class CurveFitter<T>
     {
         return NonlinearRegression.Fit_MultiColumn_Normal(xData, yData, model, initialParams, maxIterations, tolerance, initialLambda, lambdaIncreaseFactor, lambdaDecreaseFactor, stepSize, residualTolerance);
     }
-
     /// <summary>
     /// 高斯过程回归 (GPR)：单列输入，平滑预测。
     /// </summary>
@@ -300,7 +270,6 @@ public static class CurveFitter<T>
         ValidateInput(xData, yData);
         return GaussianProcessRegression.Fit(xData, yData, lengthScale, signalVariance, noiseVariance);
     }
-
     /// <summary>
     /// 高斯过程回归 (GPR)：多列输入，平滑预测带置信区间。
     /// </summary>
@@ -317,8 +286,6 @@ public static class CurveFitter<T>
         ValidateInput(xData, yData);
         return GaussianProcessRegression.Fit(xData, yData, lengthScale, signalVariance, noiseVariance);
     }
-
-
     /// <summary>
     /// 使用神经网络进行回归拟合，适用于单列输入数据，旨在捕捉复杂非线性关系。
     /// 该方法通过多层感知器（MLP）训练一个神经网络，返回拟合结果。
@@ -373,7 +340,6 @@ public static class CurveFitter<T>
         return NeuralNetworkFitter.Fit_SingleColumn(
             xData, yData, epochs, hiddenNodes, learningRate, trainingProgressCallback, trainingOptions);
     }
-
     /// <summary>
     /// 使用神经网络进行回归拟合，适用于多列输入数据，旨在捕捉复杂非线性关系。
     /// 该方法通过多层感知器（MLP）训练一个神经网络，返回拟合结果，支持多列输入预测。
@@ -431,7 +397,6 @@ public static class CurveFitter<T>
         return NeuralNetworkFitter.Fit_MultiColumn(
             xData, yData, epochs, hiddenNodes, learningRate, trainingProgressCallback, trainingOptions);
     }
-
     /// <summary>
     /// 使用神经网络对 <see cref="Signal"/> 特征进行回归拟合。
     /// 每个信号经 DSP 特征打包后送入 <see cref="Vorcyc.Mathematics.DeepLearning.Training.MlpRegressor"/>。
@@ -453,7 +418,6 @@ public static class CurveFitter<T>
         {
             throw new ArgumentException("signals and yData must have the same non-zero length.");
         }
-
         ValidateType();
         return SignalNeuralNetworkFitter.Fit(
             signals,
@@ -465,7 +429,6 @@ public static class CurveFitter<T>
             trainingProgressCallback,
             trainingOptions);
     }
-
     /// <summary>
     /// <see cref="NeuralNetwork(IReadOnlyList{Signal}, Span{T}, SignalNeuralNetworkOptions?, int, int, T?, TrainingProgressHandler{T}?, NeuralNetworkTrainingOptions?)"/> 的便捷重载。
     /// </summary>
@@ -480,10 +443,7 @@ public static class CurveFitter<T>
         NeuralNetworkTrainingOptions? trainingOptions = null)
         => NeuralNetwork([signal], [target], signalOptions, epochs, hiddenNodes, learningRate, trainingProgressCallback, trainingOptions);
 
-
-
     //失败
-
     ///// <summary>
     ///// 支持向量回归 (SVR)：鲁棒非线性拟合。
     ///// </summary>
@@ -493,7 +453,6 @@ public static class CurveFitter<T>
     //    // 建议使用 Accord.NET
     //    throw new NotImplementedException("Requires SVR library.");
     //}
-
     ///// <summary>
     ///// 贝叶斯回归：带参数不确定性估计。
     ///// </summary>
@@ -503,7 +462,6 @@ public static class CurveFitter<T>
     //    // 建议使用统计库
     //    throw new NotImplementedException("Requires Bayesian inference library.");
     //}
-
     /// <summary>
     /// 贝叶斯回归：带参数不确定性估计。
     /// </summary>
@@ -513,5 +471,4 @@ public static class CurveFitter<T>
         // 建议使用统计库
         return BayesianLinearRegression<T>.Fit(xData, yData, alpha, beta);
     }
-
 }

@@ -3,43 +3,44 @@
 using System.Numerics;
 
 /// <summary>
-/// 表示有理数的结构体。
+/// Represents a structure for rational numbers.
 /// </summary>
-/// <typeparam name="T">必须实现 <see cref="IBinaryInteger{T}"/> 接口的泛型类型。</typeparam>
+/// <typeparam name="T">A generic type that must implement the <see cref="IBinaryInteger{T}"/> interface.</typeparam>
 /// <remarks>
-/// 有理数是可以表示为两个整数之比的数，即形如 a/b 的数，其中 a 和 b 是整数，且 b 不等于零。
-/// 有理数的特点包括：
+/// A rational number is a number that can be expressed as the ratio of two integers, that is, a number of the form a/b, where a and b are integers and b is not equal to zero.
+/// Characteristics of rational numbers include:
 /// <list type="bullet">
-/// <item><description>有理数的集合包括所有整数和所有可以表示为两个整数之比的数。</description></item>
-/// <item><description>有理数可以表示为有限小数或无限循环小数。例如，1/2 = 0.5 是有限小数，而 1/3 = 0.333... 是无限循环小数。</description></item>
-/// <item><description>有理数在加法、减法、乘法和除法（除数不为零）下是封闭的，这意味着对有理数进行这些运算的结果仍然是有理数。</description></item>
+/// <item><description>The set of rational numbers includes all integers and all numbers that can be expressed as the ratio of two integers.</description></item>
+/// <item><description>A rational number can be represented as a finite decimal or an infinite repeating decimal. For example, 1/2 = 0.5 is a finite decimal, while 1/3 = 0.333... is an infinite repeating decimal.</description></item>
+/// <item><description>Rational numbers are closed under addition, subtraction, multiplication, and division (with a nonzero divisor), which means that the result of these operations on rational numbers is still a rational number.</description></item>
 /// </list>
-/// 有理数的常见操作包括：
+/// Common operations on rational numbers include:
 /// <list type="bullet">
-/// <item><description>加法：两个有理数相加需要找到一个公分母，然后将分子相加。</description></item>
-/// <item><description>减法：两个有理数相减需要找到一个公分母，然后将分子相减。</description></item>
-/// <item><description>乘法：两个有理数相乘只需将分子相乘，分母相乘。</description></item>
-/// <item><description>除法：将一个有理数除以另一个有理数只需将第一个有理数乘以第二个有理数的倒数。</description></item>
-/// <item><description>简化：简化有理数需要将分子和分母除以它们的最大公约数（GCD）。</description></item>
-/// <item><description>比较：可以通过交叉相乘来比较两个有理数，以避免除法。</description></item>
-/// <item><description>取反：有理数的取反通过将分子取反来实现。</description></item>
-/// <item><description>倒数：有理数的倒数通过交换分子和分母来实现。</description></item>
-/// <item><description>绝对值：有理数的绝对值通过取分子和分母的绝对值来实现。</description></item>
-/// <item><description>转换为小数：有理数可以通过将分子除以分母来转换为小数形式。</description></item>
+/// <item><description>Addition: adding two rational numbers requires finding a common denominator and then adding the numerators.</description></item>
+/// <item><description>Subtraction: subtracting two rational numbers requires finding a common denominator and then subtracting the numerators.</description></item>
+/// <item><description>Multiplication: multiplying two rational numbers simply requires multiplying the numerators and multiplying the denominators.</description></item>
+/// <item><description>Division: dividing one rational number by another simply requires multiplying the first rational number by the reciprocal of the second.</description></item>
+/// <item><description>Simplification: simplifying a rational number requires dividing the numerator and denominator by their greatest common divisor (GCD).</description></item>
+/// <item><description>Comparison: two rational numbers can be compared by cross-multiplication to avoid division.</description></item>
+/// <item><description>Negation: negating a rational number is done by negating the numerator.</description></item>
+/// <item><description>Reciprocal: the reciprocal of a rational number is obtained by swapping the numerator and denominator.</description></item>
+/// <item><description>Absolute value: the absolute value of a rational number is obtained by taking the absolute values of the numerator and denominator.</description></item>
+/// <item><description>Conversion to decimal: a rational number can be converted to decimal form by dividing the numerator by the denominator.</description></item>
 /// </list>
 /// </remarks>
 public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Rational<T>>
     where T : IBinaryInteger<T>
 {
+
     #region Properties
 
     /// <summary>
-    /// 获取有理数的分子。
+    /// Gets the numerator of the rational number.
     /// </summary>
     public T Numerator { get; }
 
     /// <summary>
-    /// 获取有理数的分母。
+    /// Gets the denominator of the rational number.
     /// </summary>
     public T Denominator { get; }
 
@@ -48,11 +49,11 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     #region Constructors
 
     /// <summary>
-    /// 初始化 <see cref="Rational{T}"/> 结构的新实例。
+    /// Initializes a new instance of the <see cref="Rational{T}"/> structure.
     /// </summary>
-    /// <param name="numerator">分子。</param>
-    /// <param name="denominator">分母。</param>
-    /// <exception cref="DivideByZeroException">当分母为零时引发。</exception>
+    /// <param name="numerator">The numerator.</param>
+    /// <param name="denominator">The denominator.</param>
+    /// <exception cref="DivideByZeroException">Thrown when the denominator is zero.</exception>
     public Rational(T numerator, T denominator)
     {
         if (denominator == T.Zero)
@@ -76,11 +77,11 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     #region Operator Overloads
 
     /// <summary>
-    /// 实现两个 <see cref="Rational{T}"/> 实例的加法运算。
+    /// Implements the addition operation of two <see cref="Rational{T}"/> instances.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>两个 <see cref="Rational{T}"/> 实例的和。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns>The sum of the two <see cref="Rational{T}"/> instances.</returns>
     public static Rational<T> operator +(Rational<T> a, Rational<T> b)
     {
         return new Rational<T>(
@@ -90,11 +91,11 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     }
 
     /// <summary>
-    /// 实现两个 <see cref="Rational{T}"/> 实例的减法运算。
+    /// Implements the subtraction operation of two <see cref="Rational{T}"/> instances.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>两个 <see cref="Rational{T}"/> 实例的差。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns>The difference of the two <see cref="Rational{T}"/> instances.</returns>
     public static Rational<T> operator -(Rational<T> a, Rational<T> b)
     {
         return new Rational<T>(
@@ -104,11 +105,11 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     }
 
     /// <summary>
-    /// 实现两个 <see cref="Rational{T}"/> 实例的乘法运算。
+    /// Implements the multiplication operation of two <see cref="Rational{T}"/> instances.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>两个 <see cref="Rational{T}"/> 实例的积。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns>The product of the two <see cref="Rational{T}"/> instances.</returns>
     public static Rational<T> operator *(Rational<T> a, Rational<T> b)
     {
         return new Rational<T>(
@@ -118,12 +119,12 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     }
 
     /// <summary>
-    /// 实现两个 <see cref="Rational{T}"/> 实例的除法运算。
+    /// Implements the division operation of two <see cref="Rational{T}"/> instances.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>两个 <see cref="Rational{T}"/> 实例的商。</returns>
-    /// <exception cref="DivideByZeroException">当分母为零时引发。</exception>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns>The quotient of the two <see cref="Rational{T}"/> instances.</returns>
+    /// <exception cref="DivideByZeroException">Thrown when the denominator is zero.</exception>
     public static Rational<T> operator /(Rational<T> a, Rational<T> b)
     {
         if (b.Numerator == T.Zero)
@@ -136,66 +137,66 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     }
 
     /// <summary>
-    /// 判断两个 <see cref="Rational{T}"/> 实例是否相等。
+    /// Determines whether two <see cref="Rational{T}"/> instances are equal.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果两个实例相等，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if the two instances are equal; otherwise, <c>false</c>.</returns>
     public static bool operator ==(Rational<T> a, Rational<T> b)
     {
         return a.Equals(b);
     }
 
     /// <summary>
-    /// 判断两个 <see cref="Rational{T}"/> 实例是否不相等。
+    /// Determines whether two <see cref="Rational{T}"/> instances are not equal.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果两个实例不相等，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if the two instances are not equal; otherwise, <c>false</c>.</returns>
     public static bool operator !=(Rational<T> a, Rational<T> b)
     {
         return !a.Equals(b);
     }
 
     /// <summary>
-    /// 判断第一个 <see cref="Rational{T}"/> 实例是否小于第二个实例。
+    /// Determines whether the first <see cref="Rational{T}"/> instance is less than the second instance.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果第一个实例小于第二个实例，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if the first instance is less than the second instance; otherwise, <c>false</c>.</returns>
     public static bool operator <(Rational<T> a, Rational<T> b)
     {
         return a.CompareTo(b) < 0;
     }
 
     /// <summary>
-    /// 判断第一个 <see cref="Rational{T}"/> 实例是否大于第二个实例。
+    /// Determines whether the first <see cref="Rational{T}"/> instance is greater than the second instance.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果第一个实例大于第二个实例，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if the first instance is greater than the second instance; otherwise, <c>false</c>.</returns>
     public static bool operator >(Rational<T> a, Rational<T> b)
     {
         return a.CompareTo(b) > 0;
     }
 
     /// <summary>
-    /// 判断第一个 <see cref="Rational{T}"/> 实例是否小于或等于第二个实例。
+    /// Determines whether the first <see cref="Rational{T}"/> instance is less than or equal to the second instance.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果第一个实例小于或等于第二个实例，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if the first instance is less than or equal to the second instance; otherwise, <c>false</c>.</returns>
     public static bool operator <=(Rational<T> a, Rational<T> b)
     {
         return a.CompareTo(b) <= 0;
     }
 
     /// <summary>
-    /// 判断第一个 <see cref="Rational{T}"/> 实例是否大于或等于第二个实例。
+    /// Determines whether the first <see cref="Rational{T}"/> instance is greater than or equal to the second instance.
     /// </summary>
-    /// <param name="a">第一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <param name="b">第二个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果第一个实例大于或等于第二个实例，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="a">The first <see cref="Rational{T}"/> instance.</param>
+    /// <param name="b">The second <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if the first instance is greater than or equal to the second instance; otherwise, <c>false</c>.</returns>
     public static bool operator >=(Rational<T> a, Rational<T> b)
     {
         return a.CompareTo(b) >= 0;
@@ -206,59 +207,59 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     #region Methods
 
     /// <summary>
-    /// 比较当前实例与另一个 <see cref="Rational{T}"/> 实例。
+    /// Compares the current instance with another <see cref="Rational{T}"/> instance.
     /// </summary>
-    /// <param name="other">另一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>一个值，指示当前实例是否小于、等于或大于另一个实例。</returns>
+    /// <param name="other">Another <see cref="Rational{T}"/> instance.</param>
+    /// <returns>A value indicating whether the current instance is less than, equal to, or greater than the other instance.</returns>
     public int CompareTo(Rational<T> other)
     {
         return (Numerator * other.Denominator).CompareTo(other.Numerator * Denominator);
     }
 
     /// <summary>
-    /// 判断当前实例是否与另一个 <see cref="Rational{T}"/> 实例相等。
+    /// Determines whether the current instance is equal to another <see cref="Rational{T}"/> instance.
     /// </summary>
-    /// <param name="other">另一个 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果两个实例相等，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="other">Another <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if the two instances are equal; otherwise, <c>false</c>.</returns>
     public bool Equals(Rational<T> other)
     {
         return Numerator == other.Numerator && Denominator == other.Denominator;
     }
 
     /// <summary>
-    /// 判断当前实例是否与另一个对象相等。
+    /// Determines whether the current instance is equal to another object.
     /// </summary>
-    /// <param name="obj">要与当前实例进行比较的对象。</param>
-    /// <returns>如果对象是 <see cref="Rational{T}"/> 并且与当前实例相等，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="obj">The object to compare with the current instance.</param>
+    /// <returns><c>true</c> if the object is a <see cref="Rational{T}"/> and is equal to the current instance; otherwise, <c>false</c>.</returns>
     public override bool Equals(object? obj)
     {
         return obj is Rational<T> other && Equals(other);
     }
 
     /// <summary>
-    /// 返回当前实例的哈希代码。
+    /// Returns the hash code for the current instance.
     /// </summary>
-    /// <returns>当前实例的哈希代码。</returns>
+    /// <returns>The hash code for the current instance.</returns>
     public override int GetHashCode()
     {
         return HashCode.Combine(Numerator, Denominator);
     }
 
     /// <summary>
-    /// 返回当前实例的字符串表示形式。
+    /// Returns the string representation of the current instance.
     /// </summary>
-    /// <returns>当前实例的字符串表示形式。</returns>
+    /// <returns>The string representation of the current instance.</returns>
     public override string ToString()
     {
         return $"{Numerator}/{Denominator}";
     }
 
     /// <summary>
-    /// 将字符串表示形式解析为 <see cref="Rational{T}"/> 实例。
+    /// Parses a string representation into a <see cref="Rational{T}"/> instance.
     /// </summary>
-    /// <param name="s">要解析的字符串。</param>
-    /// <returns>解析后的 <see cref="Rational{T}"/> 实例。</returns>
-    /// <exception cref="FormatException">当字符串格式无效时引发。</exception>
+    /// <param name="s">The string to parse.</param>
+    /// <returns>The parsed <see cref="Rational{T}"/> instance.</returns>
+    /// <exception cref="FormatException">Thrown when the string format is invalid.</exception>
     public static Rational<T> Parse(string s)
     {
         var parts = s.Split('/');
@@ -272,11 +273,11 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     }
 
     /// <summary>
-    /// 尝试将字符串表示形式解析为 <see cref="Rational{T}"/> 实例。
+    /// Tries to parse a string representation into a <see cref="Rational{T}"/> instance.
     /// </summary>
-    /// <param name="s">要解析的字符串。</param>
-    /// <param name="result">解析后的 <see cref="Rational{T}"/> 实例。</param>
-    /// <returns>如果解析成功，则返回 <c>true</c>；否则返回 <c>false</c>。</returns>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="result">The parsed <see cref="Rational{T}"/> instance.</param>
+    /// <returns><c>true</c> if parsing succeeds; otherwise, <c>false</c>.</returns>
     public static bool TryParse(string s, out Rational<T> result)
     {
         result = default;
@@ -295,19 +296,19 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     }
 
     /// <summary>
-    /// 返回当前有理数的取反数。
+    /// Returns the negation of the current rational number.
     /// </summary>
-    /// <returns>当前有理数的取反数。</returns>
+    /// <returns>The negation of the current rational number.</returns>
     public Rational<T> Negate()
     {
         return new Rational<T>(-Numerator, Denominator);
     }
 
     /// <summary>
-    /// 返回当前有理数的倒数。
+    /// Returns the reciprocal of the current rational number.
     /// </summary>
-    /// <returns>当前有理数的倒数。</returns>
-    /// <exception cref="DivideByZeroException">当分子为零时引发。</exception>
+    /// <returns>The reciprocal of the current rational number.</returns>
+    /// <exception cref="DivideByZeroException">Thrown when the numerator is zero.</exception>
     public Rational<T> Reciprocal()
     {
         if (Numerator == T.Zero)
@@ -317,28 +318,28 @@ public readonly struct Rational<T> : IComparable<Rational<T>>, IEquatable<Ration
     }
 
     /// <summary>
-    /// 返回当前有理数的绝对值。
+    /// Returns the absolute value of the current rational number.
     /// </summary>
-    /// <returns>当前有理数的绝对值。</returns>
+    /// <returns>The absolute value of the current rational number.</returns>
     public Rational<T> Abs()
     {
         return new Rational<T>(T.Abs(Numerator), T.Abs(Denominator));
     }
 
     /// <summary>
-    /// 将当前有理数转换为小数表示形式。
+    /// Converts the current rational number to its decimal representation.
     /// </summary>
-    /// <returns>当前有理数的小数表示形式。</returns>
+    /// <returns>The decimal representation of the current rational number.</returns>
     public double ToDouble()
     {
         return (double)(dynamic)Numerator / (double)(dynamic)Denominator;
     }
 
     /// <summary>
-    /// 将当前有理数转换为指定的浮点数类型。
+    /// Converts the current rational number to the specified floating-point type.
     /// </summary>
-    /// <typeparam name="TFloatingNumber">要转换的浮点数类型。</typeparam>
-    /// <returns>当前有理数的浮点数表示形式。</returns>
+    /// <typeparam name="TFloatingNumber">The floating-point type to convert to.</typeparam>
+    /// <returns>The floating-point representation of the current rational number.</returns>
     public TFloatingNumber ToFloatingPointNumber<TFloatingNumber>()
         where TFloatingNumber : IFloatingPointIeee754<TFloatingNumber>
     {

@@ -1,8 +1,6 @@
-﻿namespace Vorcyc.Mathematics;
-
+namespace Vorcyc.Mathematics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-
 /// <summary>
 /// Extra math functions for Offlet and 32-bit floating-point number.
 /// </summary>
@@ -19,11 +17,7 @@ using System.Runtime.CompilerServices;
 public static partial class VMath
 {
 
-
-
     #region 最大公约数 或 最小公倍数
-
-
     /// <summary>
     /// 使用欧几里得算法计算两个整数的最大公约数（GCD）。
     /// </summary>
@@ -42,8 +36,6 @@ public static partial class VMath
         // 返回最大公约数
         return n;
     }
-
-
     /// <summary>
     /// 使用欧几里得算法计算两个泛型整数的最大公约数（GCD）。
     /// </summary>
@@ -62,7 +54,6 @@ public static partial class VMath
         }
         return a;
     }
-
     /// <summary>
     /// 计算两个整数的最大公约数（HCF），使用递归方法。
     /// </summary>
@@ -86,18 +77,13 @@ public static partial class VMath
         return Hcf(a - b, b);
     }
 
-
-
     ////另一种写法
     //public static int f(int a, int b)//最大公约数 
     //{
     //    if (a < b) { a = a + b; b = a - b; a = a - b; }
     //    return (a % b == 0) ? b : f(a % b, b);
     //}
-
-
     //Accord.net Tools.cs里边的另一种写法
-
     ///// <summary>
     /////   Gets the greatest common divisor between two integers.
     ///// </summary>
@@ -118,8 +104,6 @@ public static partial class VMath
     //    }
     //    return b;
     //}
-
-
     /// <summary>
     /// 求最小公倍数.
     /// 几个数共有的倍数叫做这几个数的公倍数，其中除0以外最小的一个公倍数，叫做这几个数的最小公倍数。
@@ -133,7 +117,6 @@ public static partial class VMath
     {
         return a * b / Hcf(a, b);
     }
-
     //Fraction
     /// <summary>
     /// 取分数的最简整数比
@@ -146,12 +129,7 @@ public static partial class VMath
         var hcf = Hcf(numerator, denominator);
         return (numerator / hcf, denominator / hcf);
     }
-
-
     #endregion
-
-
-
 
     /// <summary>
     /// 算三角形斜边
@@ -166,7 +144,6 @@ public static partial class VMath
         double r = 0.0;
         double absA = System.Math.Abs(a);
         double absB = System.Math.Abs(b);
-
         if (absA > absB)
         {
             r = b / a;
@@ -177,11 +154,8 @@ public static partial class VMath
             r = a / b;
             r = absB * System.Math.Sqrt(1 + r * r);
         }
-
         return r;
     }
-
-
 
     /// <summary>
     ///   Hypotenuse calculus without overflow/underflow
@@ -195,7 +169,6 @@ public static partial class VMath
         float r = 0f;
         float absA = System.Math.Abs(a);
         float absB = System.Math.Abs(b);
-
         if (absA > absB)
         {
             r = b / a;
@@ -206,10 +179,8 @@ public static partial class VMath
             r = a / b;
             r = absB * MathF.Sqrt(1 + r * r);
         }
-
         return r;
     }
-
     /// <summary>
     ///   Gets the proper modulus operation for
     ///   an integer value x and modulo m.
@@ -219,12 +190,9 @@ public static partial class VMath
     {
         if (m < 0)
             m = -m;
-
         int r = x % m;
-
         return r < 0 ? r + m : r;
     }
-
     /// <summary>
     ///   Gets the proper modulus operation for
     ///   a real value x and modulo m.
@@ -234,13 +202,9 @@ public static partial class VMath
     {
         if (m < 0)
             m = -m;
-
         double r = x % m;
-
         return r < 0 ? r + m : r;
     }
-
-
     /// <summary>
     ///   Gets the proper modulus operation for
     ///   a real value x and modulo m.
@@ -250,14 +214,9 @@ public static partial class VMath
     {
         if (m < 0)
             m = -m;
-
         float r = x % m;
-
         return r < 0 ? r + m : r;
     }
-
-
-
 
     /// <summary>
     ///   Returns the factorial falling power of the specified value.
@@ -270,7 +229,6 @@ public static partial class VMath
             t *= degree--;
         return t;
     }
-
     /// <summary>
     ///   Truncated power function.
     /// </summary>
@@ -280,8 +238,6 @@ public static partial class VMath
         double x = System.Math.Pow(value, degree);
         return (x > 0) ? x : 0.0;
     }
-
-
 
     /// <summary>
     ///   Fast inverse floating-point square root.
@@ -299,7 +255,6 @@ public static partial class VMath
             return f;
         }
     }
-
     /// <summary>
     ///   Fast inverse floating-point square root.
     /// </summary>
@@ -316,8 +271,6 @@ public static partial class VMath
             return f;
         }
     }
-
-
 
     /// <summary>
     ///   Gets the maximum value among three values.
@@ -345,7 +298,6 @@ public static partial class VMath
             return b;
         }
     }
-
     /// <summary>
     ///   Gets the maximum value among three values.
     /// </summary>
@@ -372,7 +324,6 @@ public static partial class VMath
             return b;
         }
     }
-
     /// <summary>
     ///   Gets the minimum value among three values.
     /// </summary>
@@ -399,7 +350,6 @@ public static partial class VMath
             return b;
         }
     }
-
     /// <summary>
     ///   Gets the minimum value among three values.
     /// </summary>
@@ -426,7 +376,6 @@ public static partial class VMath
             return b;
         }
     }
-
     /// <summary>
     /// Calculates power of 2.
     /// </summary>
@@ -440,8 +389,6 @@ public static partial class VMath
     {
         return ((power >= 0) && (power <= 30)) ? (1 << power) : 0;
     }
-
-
     /// <summary>
     /// Get base of binary logarithm.
     /// </summary>
@@ -510,7 +457,6 @@ public static partial class VMath
                 return 15;
             return 16;
         }
-
         if (x <= 16777216)
         {
             if (x <= 1048576)
@@ -556,9 +502,6 @@ public static partial class VMath
         return 31;
     }
 
-
-
-
     ///// <summary>  
     ///// 快速整数版本的以2为底的对数
     ///// </summary>
@@ -573,7 +516,6 @@ public static partial class VMath
     //        // Cannot have the log of 0
     //        throw new Exception("Log2 of zero.");
     //    }
-
     //    // Get the max index --- x - 1
     //    x--;
     //    int i = 0;
@@ -581,9 +523,7 @@ public static partial class VMath
     //        x >>= 1;
     //    return i;
     //}
-
     /* 被注释的版本不要了，只要最快的int那个版本，另外再提供一个泛型版本的 */
-
     /// <summary>
     /// 计算泛型整数的以2为底的对数。
     /// </summary>
@@ -601,7 +541,6 @@ public static partial class VMath
             // Cannot have the log of 0
             throw new ArgumentOutOfRangeException("Log2 of zero.");
         }
-
         // Get the max index --- x - 1
         x--;
         T i = T.Zero;
@@ -609,10 +548,7 @@ public static partial class VMath
             x >>= 1;
         return i;
     }
-
     #region 阶乘
-
-
     /// <summary>
     /// 计算一个整数的阶乘。
     /// </summary>
@@ -630,14 +566,12 @@ public static partial class VMath
         {
             throw new ArgumentOutOfRangeException(nameof(n), "阶乘未定义负数。");
         }
-
         if (n == 0)
         {
             return 1;
         }
         return n * Factorial(n - 1);
     }
-
     /// <summary>
     /// 计算一个泛型整数的阶乘。
     /// </summary>
@@ -656,21 +590,14 @@ public static partial class VMath
         {
             throw new ArgumentOutOfRangeException(nameof(n), "阶乘未定义负数。");
         }
-
         if (n == T.Zero)
         {
             return T.One;
         }
         return n * Factorial(n - T.One);
     }
-
-
     #endregion
-
-
     #region gamma函数
-
-
     /// <summary>
     /// 使用近似公式计算Gamma函数。
     /// </summary>
@@ -706,12 +633,9 @@ public static partial class VMath
             9.9843695780195716e-6,
             1.5056327351493116e-7
         ];
-
         const double TWO_PI = 2 * Math.PI;
-
         int g = 7;
         if (x < 0.5) return Math.PI / (Math.Sin(Math.PI * x) * Gamma(1 - x));
-
         x -= 1;
         double a = p[0];
         double t = x + g + 0.5;
@@ -719,10 +643,8 @@ public static partial class VMath
         {
             a += p[i] / (x + i);
         }
-
         return Math.Sqrt(TWO_PI) * Math.Pow(t, x + 0.5) * Math.Exp(-t) * a;
     }
-
     /// <summary>
     /// 计算Gamma函数的自然对数。
     /// </summary>
@@ -730,8 +652,6 @@ public static partial class VMath
     /// <returns>Gamma函数的值的自然对数</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double GammaLog(double x) => Math.Log(Gamma(x));
-
-
     /// <summary>
     /// 使用近似公式计算Gamma函数。
     /// </summary>
@@ -767,10 +687,8 @@ public static partial class VMath
             9.9843695780195716e-6f,
             1.5056327351493116e-7f
         ];
-
         int g = 7;
         if (x < 0.5f) return ConstantsFp32.PI / (MathF.Sin(ConstantsFp32.PI * x) * Gamma(1f - x));
-
         x -= 1;
         float a = p[0];
         float t = x + g + 0.5f;
@@ -778,10 +696,8 @@ public static partial class VMath
         {
             a += p[i] / (x + i);
         }
-
         return MathF.Sqrt(ConstantsFp32.TWO_PI) * MathF.Pow(t, x + 0.5f) * MathF.Exp(-t) * a;
     }
-
     /// <summary>
     /// 计算Gamma函数的自然对数。
     /// </summary>
@@ -789,7 +705,6 @@ public static partial class VMath
     /// <returns>Gamma函数的值的自然对数</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float GammaLog(float x) => MathF.Log(Gamma(x));
-
     /// <summary>
     /// 使用近似公式计算Gamma函数。
     /// </summary>
@@ -826,18 +741,15 @@ public static partial class VMath
             T.CreateChecked(9.9843695780195716e-6),
             T.CreateChecked(1.5056327351493116e-7)
         ];
-
         T g = T.CreateChecked(7);
         T half = T.One / T.CreateChecked(2);
         T one = T.One;
         T pi = T.CreateChecked(Math.PI);
         T twoPi = T.CreateChecked(2 * Math.PI);
-
         if (x < half)
         {
             return pi / (T.Sin(pi * x) * Gamma(one - x));
         }
-
         x -= one;
         T a = p[0];
         T t = x + g + half;
@@ -845,10 +757,8 @@ public static partial class VMath
         {
             a += p[i] / (x + T.CreateChecked(i));
         }
-
         return T.Sqrt(twoPi) * T.Pow(t, x + half) * T.Exp(-t) * a;
     }
-
     /// <summary>
     /// 计算Gamma函数的自然对数。
     /// </summary>
@@ -861,10 +771,7 @@ public static partial class VMath
         return T.Log(Gamma(x));
     }
     #endregion
-
-
     #region 误差函数
-
     /// <summary>
     /// 计算误差函数（Error Function）。
     /// </summary>
@@ -903,26 +810,18 @@ public static partial class VMath
         // 使用近似公式计算误差函数
         T sign = x < T.Zero ? T.NegativeOne : T.One;
         x = T.Abs(x);
-
         T a1 = T.CreateChecked(0.254829592);
         T a2 = T.CreateChecked(-0.284496736);
         T a3 = T.CreateChecked(1.421413741);
         T a4 = T.CreateChecked(-1.453152027);
         T a5 = T.CreateChecked(1.061405429);
         T p = T.CreateChecked(0.3275911);
-
         T t = T.One / (T.One + p * x);
         T y = T.One - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * T.Exp(-x * x);
-
         return sign * y;
     }
-
-
     #endregion
-
-
     #region 不完全Gamma函数
-
     /// <summary>
     /// 使用近似公式计算下不完全Gamma函数。
     /// </summary>
@@ -947,13 +846,8 @@ public static partial class VMath
         }
         return sum;
     }
-
-
     #endregion
-
-
     #region Beta
-
     /// <summary>
     /// 计算 Beta 函数的值。
     /// </summary>
@@ -974,7 +868,6 @@ public static partial class VMath
     {
         return VMath.Gamma(alpha) * VMath.Gamma(beta) / VMath.Gamma(alpha + beta);
     }
-
     /// <summary>
     /// 计算正则化不完全 Beta 函数的值。
     /// </summary>
@@ -1004,7 +897,6 @@ public static partial class VMath
             return T.One - bt * BetaContinuedFraction(T.One - x, beta, alpha) / beta;
         }
     }
-
     /// <summary>
     /// 使用连分数展开计算 Beta 函数的值。
     /// </summary>
@@ -1048,11 +940,7 @@ public static partial class VMath
         return h;
     }
 
-
-
     #endregion
-
-
     /// <summary>
     ///   Returns the square root of the specified <see cref="decimal"/> number.
     /// </summary>
@@ -1061,9 +949,7 @@ public static partial class VMath
     {
         if (x < 0)
             throw new OverflowException("Cannot calculate square root from a negative number.");
-
         decimal current = (decimal)Math.Sqrt((double)x), previous;
-
         do
         {
             previous = current;
@@ -1071,11 +957,8 @@ public static partial class VMath
             current = (previous + x / previous) / 2;
         }
         while (Math.Abs(previous - current) > epsilon);
-
         return current;
     }
-
-
     /// <summary>
     /// 计算输入值的最后一位单位（ULP），即相邻两个浮点数之间可能的最小差异。
     /// </summary>
@@ -1092,10 +975,8 @@ public static partial class VMath
         var bits = BitConverter.DoubleToInt64Bits(value);
         var nextValue = BitConverter.Int64BitsToDouble(bits + 1);
         var result = nextValue - value;
-
         return result;
     }
-
     /// <summary>
     /// 计算输入值的最后一位单位（ULP），即相邻两个浮点数之间可能的最小差异。
     /// </summary>
@@ -1112,10 +993,8 @@ public static partial class VMath
         var bits = BitConverter.SingleToInt32Bits(value);
         var nextValue = BitConverter.Int32BitsToSingle(bits + 1);
         var result = nextValue - value;
-
         return result;
     }
-
     /// <summary>
     /// 计算输入值的最后一位单位（ULP），即相邻两个半精度浮点数之间可能的最小差异。
     /// </summary>
@@ -1132,7 +1011,6 @@ public static partial class VMath
         var bits = BitConverter.HalfToInt16Bits(value);
         var nextValue = BitConverter.Int16BitsToHalf((short)(bits + 1));
         var result = nextValue - value;
-
         return result;
     }
 }

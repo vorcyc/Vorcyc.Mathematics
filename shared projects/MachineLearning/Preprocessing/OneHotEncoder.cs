@@ -1,7 +1,7 @@
 namespace Vorcyc.Mathematics.MachineLearning.Preprocessing;
 
 /// <summary>
-/// 对字符串类别特征做 One-Hot 编码。
+/// Applies One-Hot encoding to string categorical features.
 /// </summary>
 public sealed class OneHotEncoder : IMachineLearning
 {
@@ -10,12 +10,12 @@ public sealed class OneHotEncoder : IMachineLearning
     /// <inheritdoc />
     public MachineLearningTask Task => MachineLearningTask.None;
 
-    /// <summary>每列的类别列表。</summary>
+    /// <summary>The category list for each column.</summary>
     public IReadOnlyList<IReadOnlyList<string>> Categories =>
         _categories.Select(c => (IReadOnlyList<string>)c).ToArray();
 
     /// <summary>
-    /// 拟合编码器。输入为 [样本数, 特征数] 的字符串矩阵。
+    /// Fits the encoder. The input is a [samples, features] string matrix.
     /// </summary>
     public void Fit(string[,] x)
     {
@@ -24,7 +24,7 @@ public sealed class OneHotEncoder : IMachineLearning
         int rows = x.GetLength(0);
         int cols = x.GetLength(1);
         if (rows == 0 || cols == 0)
-            throw new ArgumentException("输入不能为空。");
+            throw new ArgumentException("Input cannot be empty.");
 
         _categories = new List<string>[cols];
         for (int j = 0; j < cols; j++)
@@ -37,14 +37,14 @@ public sealed class OneHotEncoder : IMachineLearning
     }
 
     /// <summary>
-    /// 变换为 double 矩阵。
+    /// Transforms into a double matrix.
     /// </summary>
     public double[,] Transform(string[,] x)
     {
         if (_categories.Length == 0)
-            throw new InvalidOperationException("编码器尚未拟合。");
+            throw new InvalidOperationException("The encoder has not been fitted yet.");
         if (x.GetLength(1) != _categories.Length)
-            throw new ArgumentException("特征列数不匹配。");
+            throw new ArgumentException("The number of feature columns does not match.");
 
         int rows = x.GetLength(0);
         int outCols = _categories.Sum(c => c.Count);
@@ -57,7 +57,7 @@ public sealed class OneHotEncoder : IMachineLearning
             {
                 int index = _categories[j].IndexOf(x[i, j]);
                 if (index < 0)
-                    throw new ArgumentException($"未知类别值: {x[i, j]}");
+                    throw new ArgumentException($"Unknown category value: {x[i, j]}");
                 result[i, col + index] = 1.0;
                 col += _categories[j].Count;
             }
@@ -66,12 +66,12 @@ public sealed class OneHotEncoder : IMachineLearning
     }
 
     /// <summary>
-    /// 变换单行样本。
+    /// Transforms a single-row sample.
     /// </summary>
     public double[] Transform(string[] sample)
     {
         if (sample.Length != _categories.Length)
-            throw new ArgumentException("特征维度不匹配。");
+            throw new ArgumentException("The feature dimensionality does not match.");
 
         var row = new string[1, sample.Length];
         for (int j = 0; j < sample.Length; j++)

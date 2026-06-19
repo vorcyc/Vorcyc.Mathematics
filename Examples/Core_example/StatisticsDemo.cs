@@ -19,7 +19,7 @@ internal static class StatisticsDemo
         float sumSimd = values.Sum(ComputingContext.Simd);
         float sumParallel = values.Sum(ComputingContext.Parallel);
         float avg = values.Average(ComputingContext.Normal);
-        float std = values.StdDev(ComputingContext.Normal);
+        float std = values.StandardDeviation(ComputingContext.Normal);
 
         Console.WriteLine($"长度: {values.Length}");
         Console.WriteLine($"Sum: default={sumDefault:F4}, SIMD={sumSimd:F4}, Parallel={sumParallel:F4}");

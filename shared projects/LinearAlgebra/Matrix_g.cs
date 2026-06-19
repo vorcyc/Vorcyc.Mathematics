@@ -1,11 +1,7 @@
-﻿
 namespace Vorcyc.Mathematics.LinearAlgebra;
-
 using System.Numerics;
 using Vorcyc.Mathematics;
 using System.Text;
-
-
 /// <summary>
 /// 表示一个二维矩阵，提供高效的矩阵操作和分解方法。
 /// </summary>
@@ -20,25 +16,20 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     private readonly T[] _values; // 存储矩阵元素的连续数组
     private readonly int _rows;   // 矩阵行数
     private readonly int _columns; // 矩阵列数
-
     /// <summary>
     /// 获取矩阵的行数。
     /// </summary>
     public int Rows => _rows;
-
     /// <summary>
     /// 获取矩阵的列数。
     /// </summary>
     public int Columns => _columns;
-
     /// <summary>
     /// 获取底层数据数组（仅限内部使用）。
     /// </summary>
     /// <returns>底层数据的一维数组。</returns>
     internal T[] GetInternalData() => _values;
-
     #region 构造器
-
     /// <summary>
     /// 使用指定的行数和列数构造一个矩阵。
     /// </summary>
@@ -50,12 +41,10 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     {
         GuardAgainstNonPositive(rows, nameof(rows));
         GuardAgainstNonPositive(columns, nameof(columns));
-
         _rows = rows;
         _columns = columns;
         _values = new T[rows * columns];
     }
-
     /// <summary>
     /// 使用指定的大小构造一个方阵。
     /// </summary>
@@ -63,7 +52,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <exception cref="ArgumentException">当 <paramref name="size"/> 小于等于 0 时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Matrix(int size) : this(size, size) { }
-
     ///// <summary>
     ///// 使用二维数组构造一个矩阵。
     ///// </summary>
@@ -76,7 +64,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     //    _values = new T[_rows * _columns];
     //    initialValues.CopyTo(_values, 0);
     //}
-
     /// <summary>
     /// 使用二维数组构造一个矩阵。
     /// </summary>
@@ -97,13 +84,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
     }
 
-
-
-
     #endregion
-
     #region Indexer
-
     /// <summary>
     /// 获取或设置指定位置的元素。
     /// </summary>
@@ -120,11 +102,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             return ref _values[row * _columns + column];
         }
     }
-
     #endregion
-
     #region 隐式转换
-
     /// <summary>
     /// 隐式转换为二维数组 <see cref="T[,]"/>。
     /// </summary>
@@ -136,7 +115,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         matrix._values.CopyTo(result, 0);
         return result;
     }
-
     /// <summary>
     /// 隐式转换为交错数组 <see cref="T[][]"/>。
     /// </summary>
@@ -152,7 +130,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
         return result;
     }
-
     /// <summary>
     /// 隐式从交错数组 <see cref="T[][]"/> 转换为矩阵。
     /// </summary>
@@ -167,18 +144,14 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             values[i].CopyTo(matrix.GetRow(i));
         return matrix;
     }
-
     /// <summary>
     /// 隐式从二维数组 <see cref="T[,]"/> 转换为矩阵。
     /// </summary>
     /// <param name="values">二维数组形式的初始数据。</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Matrix<T>(T[,] values) => new Matrix<T>(values);
-
     #endregion
-
     #region operators
-
     /// <summary>
     /// 矩阵加法运算符。
     /// </summary>
@@ -194,7 +167,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         VectorAdd(a._values, b._values, result._values);
         return result;
     }
-
     /// <summary>
     /// 矩阵减法运算符。
     /// </summary>
@@ -210,7 +182,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         VectorSubtract(a._values, b._values, result._values);
         return result;
     }
-
     /// <summary>
     /// 矩阵乘法运算符。
     /// </summary>
@@ -220,7 +191,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     /// <exception cref="ArgumentException">当矩阵维度不匹配时抛出。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Matrix<T> operator *(Matrix<T> a, Matrix<T> b) => Multiply(a, b);
-
     /// <summary>
     /// Multiplies two matrices with an optional execution policy.
     /// </summary>
@@ -228,12 +198,10 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     {
         if (a.Columns != b.Rows)
             throw new ArgumentException("矩阵维度不匹配，无法相乘。");
-
         var result = new Matrix<T>(a.Rows, b.Columns);
         MatrixMultiply.Multiply(a._values, a.Rows, a.Columns, b._values, b.Rows, b.Columns, result._values, context);
         return result;
     }
-
     /// <summary>
     /// 矩阵与标量乘法运算符。
     /// </summary>
@@ -247,7 +215,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         VectorMultiplyScalar(matrix._values, scalar, result._values);
         return result;
     }
-
     /// <summary>
     /// 矩阵除以标量运算符。
     /// </summary>
@@ -261,11 +228,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         VectorDivideScalar(matrix._values, scalar, result._values);
         return result;
     }
-
     #endregion
-
     #region GetRow or GetColumn
-
     /// <summary>
     /// 获取指定行的元素。
     /// </summary>
@@ -281,7 +245,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         ValidateRowIndex(rowIndex);
         return _values.AsSpan(rowIndex * _columns, _columns);
     }
-
     /// <summary>
     /// 获取指定列的元素。
     /// </summary>
@@ -297,7 +260,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             column[i] = this[i, columnIndex];
         return column;
     }
-
     /// <summary>
     /// 计算矩阵与列向量的乘积，结果写入 <paramref name="result"/>。
     /// </summary>
@@ -306,7 +268,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Multiply(ReadOnlySpan<T> vector, Span<T> result)
         => Multiply(vector, result, context: null);
-
     /// <summary>
     /// 计算矩阵与列向量的乘积，结果写入 <paramref name="result"/>。
     /// </summary>
@@ -316,7 +277,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             throw new ArgumentException("向量长度必须与矩阵列数匹配。", nameof(vector));
         if (result.Length != _rows)
             throw new ArgumentException("结果向量长度必须与矩阵行数匹配。", nameof(result));
-
         int problemSize = _rows * _columns;
         if (ComputingContextExecution.UseParallel(context, problemSize, ComputingContextExecution.ParallelMatrixMultiplyThreshold))
         {
@@ -331,19 +291,16 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                 {
                     sum += matrix[row + j] * vectorData[j];
                 }
-
                 buffer[i] = sum;
             }, _columns);
             buffer.AsSpan().CopyTo(result);
             return;
         }
-
         for (int i = 0; i < _rows; i++)
         {
             result[i] = VectorSpan.Dot(_values.AsSpan(i * _columns, _columns), vector, context);
         }
     }
-
     /// <summary>
     /// 计算矩阵与列向量的乘积。
     /// </summary>
@@ -356,11 +313,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         Multiply(vector, result);
         return result;
     }
-
     #endregion
-
     #region 矩阵操作
-
     /// <summary>
     /// 矩阵转置。
     /// </summary>
@@ -374,7 +328,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                 result[j, i] = this[i, j];
         return result;
     }
-
     /// <summary>
     /// 计算矩阵的行列式。
     /// </summary>
@@ -387,7 +340,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             throw new InvalidOperationException("矩阵必须是方阵才能计算行列式。");
         return CalculateDeterminant(_values.AsSpan(), _rows);
     }
-
     /// <summary>
     /// 递归计算矩阵的行列式（内部方法）。
     /// </summary>
@@ -399,7 +351,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     {
         if (n == 1) return values[0];
         if (n == 2) return values[0] * values[3] - values[1] * values[2];
-
         T det = T.Zero;
         var subMatrix = new T[(n - 1) * (n - 1)];
         for (int p = 0; p < n; p++)
@@ -413,7 +364,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
         return det;
     }
-
     /// <summary>
     /// 计算矩阵的逆矩阵。
     /// </summary>
@@ -424,11 +374,9 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     {
         if (_rows != _columns)
             throw new InvalidOperationException("矩阵必须是方阵才能计算逆矩阵。");
-
         T det = Determinant();
         if (T.Abs(det) < T.CreateChecked(1e-10))
             throw new InvalidOperationException("矩阵不可逆。");
-
         var result = new Matrix<T>(_rows, _columns);
         var adjoint = Adjoint(_values.AsSpan(), _rows);
         for (int i = 0; i < _rows; i++)
@@ -436,7 +384,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                 result[i, j] = adjoint[i * _columns + j] / det;
         return result;
     }
-
     /// <summary>
     /// 计算矩阵的伴随矩阵（内部方法）。
     /// </summary>
@@ -463,11 +410,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
         return adjoint;
     }
-
     #endregion
-
     #region Decomposition
-
     /// <summary>
     /// 执行 LU 分解（带部分主元选择）。
     /// </summary>
@@ -483,15 +427,12 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     {
         if (_rows != _columns)
             throw new InvalidOperationException("矩阵必须是方阵。");
-
         int n = _rows;
         L = new Matrix<T>(n, n);
         U = new Matrix<T>(n, n);
         P = new int[n];
         var A = Clone();
-
         for (int i = 0; i < n; i++) P[i] = i;
-
         for (int k = 0; k < n; k++)
         {
             T max = T.Abs(A[k, k]);
@@ -502,10 +443,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                     max = T.Abs(A[i, k]);
                     pivot = i;
                 }
-
             if (max < T.CreateChecked(1e-6))
                 throw new InvalidOperationException("矩阵不可逆。");
-
             if (pivot != k)
             {
                 SwapRows(A, k, pivot);
@@ -513,7 +452,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                     (L[k, j], L[pivot, j]) = (L[pivot, j], L[k, j]);
                 (P[k], P[pivot]) = (P[pivot], P[k]);
             }
-
             L[k, k] = T.One;
             for (int i = k + 1; i < n; i++)
             {
@@ -522,12 +460,10 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                     A[i, j] -= L[i, k] * A[k, j];
                 A[i, k] = T.Zero;
             }
-
             for (int j = k; j < n; j++)
                 U[k, j] = A[k, j];
         }
     }
-
     /// <summary>
     /// 执行 QR 分解。
     /// </summary>
@@ -543,7 +479,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         int n = _columns;
         Q = new Matrix<T>(m, m);
         R = new Matrix<T>(m, n);
-
         var A = _values.ToArray();
         for (int k = 0; k < n; k++)
         {
@@ -551,11 +486,9 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             for (int i = 0; i < m; i++)
                 norm += A[i * n + k] * A[i * n + k];
             norm = T.Sqrt(norm);
-
             R[k, k] = norm;
             for (int i = 0; i < m; i++)
                 Q[i, k] = A[i * n + k] / norm;
-
             for (int j = k + 1; j < n; j++)
             {
                 T dotProduct = T.Zero;
@@ -567,7 +500,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             }
         }
     }
-
     /// <summary>
     /// 执行 Cholesky 分解。
     /// </summary>
@@ -581,7 +513,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
     {
         if (_rows != _columns)
             throw new InvalidOperationException("矩阵必须是方阵。");
-
         var L = new Matrix<T>(_rows, _columns);
         for (int i = 0; i < _rows; i++)
         {
@@ -590,7 +521,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
                 T sum = T.Zero;
                 for (int k = 0; k < j; k++)
                     sum += L[i, k] * L[j, k];
-
                 if (i == j)
                 {
                     T diag = this[i, i] - sum;
@@ -604,45 +534,37 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
         return L;
     }
-
     #endregion
-
     #region Linear Solving
-
     /// <summary>
     /// 求解方阵线性方程组 Ax = b（LU 分解）。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T[] Solve(T[] b) => LinearEquationSolver.LUSolve(this, b);
-
     /// <summary>
     /// 求解方阵线性方程组 Ax = b，结果写入 <paramref name="x"/>。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Solve(ReadOnlySpan<T> b, Span<T> x)
         => LinearEquationSolver.GaussianEliminationSolve(this, b, x);
-
     /// <summary>
     /// 求解对称正定方程组 Ax = b（Cholesky 分解）。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T[] SolveSymmetricPositiveDefinite(T[] b)
         => LinearEquationSolver.CholeskySolve(this, b);
-
     /// <summary>
     /// 作为设计矩阵求解最小二乘 min ‖Ax - y‖²。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T[] SolveLeastSquares(ReadOnlySpan<T> observations)
         => LinearEquationSolver.SolveLeastSquares(this, observations);
-
     /// <summary>
     /// 使用薄 SVD 伪逆求解最小二乘，适用于秩亏或病态设计矩阵。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T[] SolveLeastSquaresSvd(ReadOnlySpan<T> observations, T? tolerance = null)
         => LinearEquationSolver.SolveLeastSquaresSvd(this, observations, tolerance);
-
     /// <summary>
     /// 求解岭回归 min ‖Ax - y‖² + λ‖β‖²。
     /// </summary>
@@ -652,32 +574,26 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         T lambda,
         bool regularizeIntercept = true)
         => LinearEquationSolver.SolveRidgeLeastSquares(this, observations, lambda, regularizeIntercept);
-
     #endregion
-
     #region Utility Methods
-
     /// <summary>
     /// Estimates κ₂(A) ≈ σ_max / σ_min from a thin SVD.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T ConditionNumber(T? tolerance = null)
         => MatrixDiagnostics.ConditionNumber(this, tolerance);
-
     /// <summary>
     /// Returns true when the estimated condition number exceeds <paramref name="threshold"/>.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsIllConditioned(T threshold, T? tolerance = null)
         => MatrixDiagnostics.IsIllConditioned(this, threshold, tolerance);
-
     /// <summary>
     /// Checks whether this square matrix is symmetric within <paramref name="tolerance"/>.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsSymmetric(T? tolerance = null)
         => MatrixDiagnostics.IsSymmetric(this, tolerance);
-
     /// <summary>
     /// 创建一个单位矩阵。
     /// </summary>
@@ -693,7 +609,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             eye[i, i] = T.One;
         return eye;
     }
-
     /// <summary>
     /// 用随机数填充矩阵。
     /// </summary>
@@ -707,7 +622,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         for (int i = 0; i < span.Length; i++)
             span[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
-
     /// <summary>
     /// 创建一个伴随矩阵。
     /// </summary>
@@ -724,7 +638,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             throw new ArgumentException("输入数组长度必须至少为 2。");
         if (T.Abs(a[0]) < T.CreateSaturating(1e-30))
             throw new ArgumentException("第一个系数不能为零。");
-
         int size = a.Length - 1;
         var companion = new Matrix<T>(size);
         for (int i = 0; i < size; i++)
@@ -733,7 +646,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
             companion[i, i - 1] = T.One;
         return companion;
     }
-
     /// <summary>
     /// 创建矩阵的深拷贝。
     /// </summary>
@@ -745,7 +657,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         _values.CopyTo(clone._values, 0);
         return clone;
     }
-
     /// <summary>
     /// 返回矩阵的字符串表示形式。
     /// </summary>
@@ -764,11 +675,8 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         }
         return sb.ToString();
     }
-
     #endregion
-
     #region 私有辅助方法
-
     /// <summary>
     /// 使用向量化方式执行矩阵加法。
     /// </summary>
@@ -786,7 +694,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         for (; i < a.Length; i++)
             result[i] = a[i] + b[i];
     }
-
     /// <summary>
     /// 使用向量化方式执行矩阵减法。
     /// </summary>
@@ -804,7 +711,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         for (; i < a.Length; i++)
             result[i] = a[i] - b[i];
     }
-
     /// <summary>
     /// 使用向量化方式执行矩阵与标量乘法。
     /// </summary>
@@ -822,7 +728,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         for (; i < source.Length; i++)
             result[i] = source[i] * scalar;
     }
-
     /// <summary>
     /// 使用向量化方式执行矩阵与标量除法。
     /// </summary>
@@ -840,7 +745,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         for (; i < source.Length; i++)
             result[i] = source[i] / scalar;
     }
-
     /// <summary>
     /// 交换矩阵的两行。
     /// </summary>
@@ -853,7 +757,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         for (int j = 0; j < matrix.Columns; j++)
             (span[start1 + j], span[start2 + j]) = (span[start2 + j], span[start1 + j]);
     }
-
     /// <summary>
     /// 验证索引是否在有效范围内。
     /// </summary>
@@ -863,19 +766,16 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         if ((uint)row >= (uint)_rows || (uint)column >= (uint)_columns)
             throw new IndexOutOfRangeException("索引超出范围。");
     }
-
     /// <summary>
     /// 验证行索引是否有效。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ValidateRowIndex(int row) => ValidateIndices(row, 0);
-
     /// <summary>
     /// 验证列索引是否有效。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ValidateColumnIndex(int column) => ValidateIndices(0, column);
-
     /// <summary>
     /// 检查值是否为正整数。
     /// </summary>
@@ -885,7 +785,6 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         if (value <= 0)
             throw new ArgumentException($"{name} 必须为正整数。");
     }
-
     /// <summary>
     /// 验证两个矩阵的维度是否匹配。
     /// </summary>
@@ -895,6 +794,5 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         if (a.Rows != b.Rows || a.Columns != b.Columns)
             throw new ArgumentException($"矩阵维度不匹配，无法执行 {operation}。");
     }
-
     #endregion
 }

@@ -4,56 +4,64 @@ using System.Text.Json;
 using System.Numerics;
 
 /// <summary>
-/// 表示矢量量化算法的类。
+/// Represents the vector quantization algorithm.
 /// </summary>
-/// <typeparam name="T">矢量元素的类型，必须实现 <see cref="IFloatingPointIeee754{T}"/> 和 <see cref="IMinMaxValue{T}"/> 接口。</typeparam>
+/// <typeparam name="T">The element type of the vectors, which must implement the <see cref="IFloatingPointIeee754{T}"/> and <see cref="IMinMaxValue{T}"/> interfaces.</typeparam>
 /// <remarks>
-/// 矢量量化（Vector Quantization, VQ）是一种经典的信号处理技术，广泛应用于数据压缩、图像处理和模式识别等领域。
-/// 其基本思想是将高维空间中的矢量映射到一个有限的矢量集合（码书）中，从而实现数据的压缩和特征提取。
+/// Vector Quantization (VQ) is a classic signal-processing technique widely used in data compression, image processing, and pattern recognition.
+/// Its basic idea is to map vectors in a high-dimensional space to a finite set of vectors (the codebook), thereby achieving data compression and feature extraction.
 /// 
-/// 在训练过程中，算法通过迭代优化码书中的矢量，使其更好地代表输入数据集。每次迭代将输入矢量分配到最近的码矢量，并更新码矢量为其对应聚类的质心。
+/// During training, the algorithm iteratively optimizes the vectors in the codebook so that they better represent the input data set. Each iteration assigns the input vectors to the nearest code vector and updates the code vectors to the centroids of their corresponding clusters.
 /// 
-/// 该类使用 <see cref="T"/> 数组表示矢量，并在必要时通过 <see cref="Span{T}"/> 或 <see cref="ReadOnlySpan{T}"/> 进行高效操作。
+/// This class uses <see cref="T"/> arrays to represent vectors and performs efficient operations via <see cref="Span{T}"/> or <see cref="ReadOnlySpan{T}"/> when necessary.
 /// </remarks>
 public class VectorQuantization<T> : IMachineLearning
     where T : struct, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
-    private readonly List<T[]> _codebook; // 码书，存储矢量的数组列表
-    private readonly int _dimensions;     // 矢量的维度
+    private readonly List<T[]> _codebook; // The codebook, storing the list of vector arrays
+    private readonly int _dimensions;     // The dimension of the vectors
 
     /// <summary>
-    /// 获取码书。
+    /// Gets the codebook.
     /// </summary>
     public IReadOnlyList<T[]> Codebook => _codebook;
 
     /// <summary>
-    /// 获取机器学习任务类型。
+    /// Gets the machine learning task type.
     /// </summary>
     public MachineLearningTask Task => MachineLearningTask.Clustering;
 
     /// <summary>
-    /// 初始化 <see cref="VectorQuantization{T}"/> 类的新实例。
+    /// Execution policy honored by the training loops. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
     /// </summary>
-    /// <param name="codebookSize">码书的大小，必须为正整数。</param>
-    /// <param name="dimensions">矢量的维度，必须为正整数。</param>
-    /// <exception cref="ArgumentException">当 <paramref name="codebookSize"/> 或 <paramref name="dimensions"/> 小于等于 0 时抛出。</exception>
-    public VectorQuantization(int codebookSize, int dimensions)
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="VectorQuantization{T}"/> class.
+    /// </summary>
+    /// <param name="codebookSize">The size of the codebook, which must be a positive integer.</param>
+    /// <param name="dimensions">The dimension of the vectors, which must be a positive integer.</param>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="codebookSize"/> or <paramref name="dimensions"/> is less than or equal to 0.</exception>
+    public VectorQuantization(int codebookSize, int dimensions, ComputingContext? context = null)
     {
         if (codebookSize <= 0)
-            throw new ArgumentException("码书大小必须为正整数。", nameof(codebookSize));
+            throw new ArgumentException("The codebook size must be a positive integer.", nameof(codebookSize));
         if (dimensions <= 0)
-            throw new ArgumentException("矢量维度必须为正整数。", nameof(dimensions));
+            throw new ArgumentException("The vector dimension must be a positive integer.", nameof(dimensions));
 
         _dimensions = dimensions;
         _codebook = InitializeCodebook(codebookSize, dimensions);
+        Context = context;
     }
 
     /// <summary>
-    /// 初始化码书。
+    /// Initializes the codebook.
     /// </summary>
-    /// <param name="codebookSize">码书的大小。</param>
-    /// <param name="dimensions">矢量的维度。</param>
-    /// <returns>初始化后的码书。</returns>
+    /// <param name="codebookSize">The size of the codebook.</param>
+    /// <param name="dimensions">The dimension of the vectors.</param>
+    /// <returns>The initialized codebook.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private List<T[]> InitializeCodebook(int codebookSize, int dimensions)
     {
@@ -71,41 +79,51 @@ public class VectorQuantization<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 训练矢量量化模型。
+    /// Trains the vector quantization model.
     /// </summary>
-    /// <param name="data">训练数据，包含多个矢量。</param>
-    /// <param name="maxIterations">最大迭代次数，默认值为 100。</param>
-    /// <returns>每次迭代的误差列表。</returns>
-    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    /// <exception cref="ArgumentException">当 <paramref name="data"/> 为空或矢量维度不匹配时抛出。</exception>
+    /// <param name="data">The training data, containing multiple vectors.</param>
+    /// <param name="maxIterations">The maximum number of iterations; the default is 100.</param>
+    /// <returns>The list of errors for each iteration.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="data"/> is empty or the vector dimension does not match.</exception>
     public List<T> Train(IEnumerable<T[]> data, int maxIterations = 100)
     {
         if (data == null)
-            throw new ArgumentNullException(nameof(data), "训练数据不能为 null。");
+            throw new ArgumentNullException(nameof(data), "The training data cannot be null.");
         var dataList = data.ToList();
         if (dataList.Count == 0)
-            throw new ArgumentException("训练数据不能为空。", nameof(data));
+            throw new ArgumentException("The training data cannot be empty.", nameof(data));
         if (dataList[0].Length != _dimensions)
-            throw new ArgumentException("输入矢量的维度与码书维度不匹配。", nameof(data));
+            throw new ArgumentException("The dimension of the input vectors does not match the codebook dimension.", nameof(data));
 
         var errors = new List<T>(maxIterations);
         var clusters = new List<List<T[]>>(_codebook.Count);
 
         for (int iteration = 0; iteration < maxIterations; iteration++)
         {
-            // 重置聚类
+            // Reset clusters
             clusters.Clear();
             for (int i = 0; i < _codebook.Count; i++)
                 clusters.Add(new List<T[]>());
 
-            // 分配矢量到最近的码矢量
-            foreach (var vector in dataList)
+            // Assign vectors to the nearest code vector
+            int[] nearestIndices = new int[dataList.Count];
+            ComputingContextExecution.ForEach(
+                Context,
+                0,
+                dataList.Count,
+                idx =>
+                {
+                    nearestIndices[idx] = FindNearestCodeVector(dataList[idx]);
+                },
+                workPerItem: (long)_codebook.Count * _dimensions);
+
+            for (int idx = 0; idx < dataList.Count; idx++)
             {
-                int nearestIndex = FindNearestCodeVector(vector);
-                clusters[nearestIndex].Add(vector);
+                clusters[nearestIndices[idx]].Add(dataList[idx]);
             }
 
-            // 更新码矢量
+            // Update the code vectors
             bool anyChange = false;
             for (int i = 0; i < _codebook.Count; i++)
             {
@@ -120,7 +138,7 @@ public class VectorQuantization<T> : IMachineLearning
                 }
             }
 
-            // 计算误差并检查收敛
+            // Compute the error and check for convergence
             T error = CalculateError(dataList);
             errors.Add(error);
 
@@ -132,10 +150,10 @@ public class VectorQuantization<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 查找与给定矢量最近的码矢量。
+    /// Finds the code vector nearest to the given vector.
     /// </summary>
-    /// <param name="vector">给定的矢量。</param>
-    /// <returns>最近的码矢量的索引。</returns>
+    /// <param name="vector">The given vector.</param>
+    /// <returns>The index of the nearest code vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int FindNearestCodeVector(ReadOnlySpan<T> vector)
     {
@@ -156,11 +174,11 @@ public class VectorQuantization<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算两个矢量的欧几里得距离。
+    /// Computes the Euclidean distance between two vectors.
     /// </summary>
-    /// <param name="a">第一个矢量。</param>
-    /// <param name="b">第二个矢量。</param>
-    /// <returns>欧几里得距离。</returns>
+    /// <param name="a">The first vector.</param>
+    /// <param name="b">The second vector.</param>
+    /// <returns>The Euclidean distance.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private T CalculateEuclideanDistance(ReadOnlySpan<T> a, ReadOnlySpan<T> b)
     {
@@ -174,10 +192,10 @@ public class VectorQuantization<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算给定矢量列表的质心。
+    /// Computes the centroid of the given list of vectors.
     /// </summary>
-    /// <param name="vectors">矢量列表。</param>
-    /// <returns>质心矢量的元素数组。</returns>
+    /// <param name="vectors">The list of vectors.</param>
+    /// <returns>The element array of the centroid vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private T[] CalculateCentroid(List<T[]> vectors)
     {
@@ -202,10 +220,10 @@ public class VectorQuantization<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算当前码书与数据集之间的误差。
+    /// Computes the error between the current codebook and the data set.
     /// </summary>
-    /// <param name="data">数据集。</param>
-    /// <returns>误差值。</returns>
+    /// <param name="data">The data set.</param>
+    /// <returns>The error value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private T CalculateError(IReadOnlyList<T[]> data)
     {
@@ -219,28 +237,28 @@ public class VectorQuantization<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 根据输入矢量找到最近的码矢量。
+    /// Finds the nearest code vector for the input vector.
     /// </summary>
-    /// <param name="vector">输入矢量。</param>
-    /// <returns>最近的码矢量。</returns>
-    /// <exception cref="ArgumentException">当 <paramref name="vector"/> 的维度与码书不匹配时抛出。</exception>
+    /// <param name="vector">The input vector.</param>
+    /// <returns>The nearest code vector.</returns>
+    /// <exception cref="ArgumentException">Thrown when the dimension of <paramref name="vector"/> does not match the codebook.</exception>
     public T[] Predict(T[] vector)
     {
         if (vector == null || vector.Length != _dimensions)
-            throw new ArgumentException("输入矢量的维度与码书维度不匹配。", nameof(vector));
+            throw new ArgumentException("The dimension of the input vector does not match the codebook dimension.", nameof(vector));
         int nearestIndex = FindNearestCodeVector(vector);
         return _codebook[nearestIndex];
     }
 
     /// <summary>
-    /// 将码书保存到文件中。
+    /// Saves the codebook to a file.
     /// </summary>
-    /// <param name="filePath">文件路径。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="filePath"/> 为 null 或空时抛出。</exception>
+    /// <param name="filePath">The file path.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="filePath"/> is null or empty.</exception>
     public void SaveCodebook(string filePath)
     {
         if (string.IsNullOrEmpty(filePath))
-            throw new ArgumentNullException(nameof(filePath), "文件路径不能为空。");
+            throw new ArgumentNullException(nameof(filePath), "The file path cannot be empty.");
 
         var options = new JsonSerializerOptions { WriteIndented = true };
         string json = JsonSerializer.Serialize(_codebook, options);
@@ -248,24 +266,24 @@ public class VectorQuantization<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 从文件中加载码书。
+    /// Loads the codebook from a file.
     /// </summary>
-    /// <param name="filePath">文件路径。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="filePath"/> 为 null 或空时抛出。</exception>
-    /// <exception cref="FileNotFoundException">当文件不存在时抛出。</exception>
+    /// <param name="filePath">The file path.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="filePath"/> is null or empty.</exception>
+    /// <exception cref="FileNotFoundException">Thrown when the file does not exist.</exception>
     public void LoadCodebook(string filePath)
     {
         if (string.IsNullOrEmpty(filePath))
-            throw new ArgumentNullException(nameof(filePath), "文件路径不能为空。");
+            throw new ArgumentNullException(nameof(filePath), "The file path cannot be empty.");
         if (!File.Exists(filePath))
-            throw new FileNotFoundException("指定的文件不存在。", filePath);
+            throw new FileNotFoundException("The specified file does not exist.", filePath);
 
         string json = File.ReadAllText(filePath);
         var loadedCodebook = JsonSerializer.Deserialize<List<T[]>>(json);
         if (loadedCodebook == null || loadedCodebook.Count == 0)
-            throw new InvalidOperationException("加载的码书为空或无效。");
+            throw new InvalidOperationException("The loaded codebook is empty or invalid.");
         if (loadedCodebook[0].Length != _dimensions)
-            throw new InvalidOperationException("加载的码书维度与当前实例不匹配。");
+            throw new InvalidOperationException("The dimension of the loaded codebook does not match the current instance.");
 
         _codebook.Clear();
         _codebook.AddRange(loadedCodebook);

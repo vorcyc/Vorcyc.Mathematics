@@ -1,8 +1,6 @@
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
-
 namespace Vorcyc.Mathematics.SignalProcessing.Signals;
-
 /// <summary>
 /// Provides extension methods for resampling time-domain signals and signal segments to a specified sampling rate.
 /// </summary>
@@ -12,10 +10,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Signals;
 /// methods to convert signals to different sampling rates for processing or analysis.</remarks>
 internal static class SignalResamplingExtension
 {
-
     extension(Signal signal)
     {
-
         /// <summary>
         /// Resamples the signal to the specified destination sampling rate using sinc interpolation and optional
         /// filtering.
@@ -42,50 +38,36 @@ internal static class SignalResamplingExtension
                 //return sameResult;
                 return signal.Clone();
             }
-
             var g = destnationSamplingRate / signal.SamplingRate;
-
             var input = signal.Samples;
             var output = new float[(int)(input.Length * g)];
-
             if (g < 1 && filter is null)
             {
                 filter = new FirFilter(DesignFilter.FirWinLp(101, g / 2));
-
                 input = filter.ProcessAllSamples(signal.Samples);  // filter.ApplyTo(signal).Samples;
             }
-
             var step = 1 / g;
-
             for (var n = 0; n < output.Length; n++)
             {
                 var x = n * step;
-
                 for (var i = -order; i < order; i++)
                 {
                     var j = (int)Math.Floor(x) - i;
-
                     if (j < 0 || j >= input.Length)
                     {
                         continue;
                     }
-
                     var t = x - j;
                     float w = 0.5f * (1.0f + MathF.Cos(t / order * ConstantsFp32.PI));    // Hann window
                     float sinc = TrigonometryHelper.Sinc(t);                             // Sinc function
                     output[n] += w * sinc * input[j];
                 }
             }
-
             var result = new Signal(output.Length, destnationSamplingRate);
             output.CopyTo(result.Samples);
             return result;
         }
-
-
     }
-
-
     extension(ModifiableTimeDomainSignal signal)
     {
         /// <summary>
@@ -114,54 +96,40 @@ internal static class SignalResamplingExtension
                 //return sameResult;
                 return signal.Clone();
             }
-
             var g = destnationSamplingRate / signal.SamplingRate;
-
             var input = signal.Samples;
             var output = new float[(int)(signal.Length * g)];
-
             if (g < 1 && filter is null)
             {
                 filter = new FirFilter(DesignFilter.FirWinLp(101, g / 2));
-
                 var temp = filter.ProcessAllSamples(input.Span);  // filter.ApplyTo(signal).Samples;
                 temp.CopyTo(input.Span);
             }
-
             var step = 1 / g;
-
             for (var n = 0; n < output.Length; n++)
             {
                 var x = n * step;
-
                 for (var i = -order; i < order; i++)
                 {
                     var j = (int)Math.Floor(x) - i;
-
                     if (j < 0 || j >= signal.Length)
                     {
                         continue;
                     }
-
                     var t = x - j;
                     float w = 0.5f * (1.0f + MathF.Cos(t / order * ConstantsFp32.PI));    // Hann window
                     float sinc = TrigonometryHelper.Sinc(t);                             // Sinc function
                     output[n] += w * sinc * input.Span[j];
                 }
             }
-
             var result = new ModifiableTimeDomainSignal(output.Length, destnationSamplingRate);
             output.CopyTo(result.Samples.Span);
             return result;
         }
-
     }
-
-
 
     extension(SignalSegment segment)
     {
-
         /// <summary>
         /// Resamples the signal to the specified destination sampling rate using sinc interpolation and optional
         /// filtering.
@@ -185,46 +153,34 @@ internal static class SignalResamplingExtension
             {
                 return segment.Decouple();
             }
-
             var g = destnationSamplingRate / segment.Signal.SamplingRate;
-
             var input = segment.Samples;
             var output = new float[(int)(input.Length * g)];
-
             if (g < 1 && filter is null)
             {
                 filter = new FirFilter(DesignFilter.FirWinLp(101, g / 2));
-
                 input = filter.ProcessAllSamples(segment.Samples);  // filter.ApplyTo(signal).Samples;
             }
-
             var step = 1 / g;
-
             for (var n = 0; n < output.Length; n++)
             {
                 var x = n * step;
-
                 for (var i = -order; i < order; i++)
                 {
                     var j = (int)Math.Floor(x) - i;
-
                     if (j < 0 || j >= input.Length)
                     {
                         continue;
                     }
-
                     var t = x - j;
                     float w = 0.5f * (1.0f + MathF.Cos(t / order * ConstantsFp32.PI));    // Hann window
                     float sinc = TrigonometryHelper.Sinc(t);                             // Sinc function
                     output[n] += w * sinc * input[j];
                 }
             }
-
             var result = new Signal(output.Length, destnationSamplingRate);
             output.CopyTo(result.Samples);
             return result;
         }
     }
-
-
 }

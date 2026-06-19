@@ -1,33 +1,24 @@
-﻿/* duan linli aka cyclone_dll
+/* duan linli aka cyclone_dll
  * 19.11.5  , 25.1.8 基于Span<T> 重构
  * VORCYC CO,.LTD
  */
-
 //tex:
 //Formula 1: $$(a+b)^2 = a^2 + 2ab + b^2$$
 //Formula 2: $$a^2-b^2 = (a+b)(a-b)$$
-
 //! 8.0f * Atan(1.0f)  = 2* Constants.M_PI
-
 namespace Vorcyc.Mathematics.SignalProcessing.Windowing;
-
 using System.Buffers;
 using System.Numerics;
 using static System.MathF;
 using static Vorcyc.Mathematics.TrigonometryHelper;
 using static Vorcyc.Mathematics.VMath;
-
-
 public static partial class WindowApplier
 {
     /// <summary>
     /// 8192×4=32KB，安全栈上限
     /// </summary>
     const int STACK_THRESHOLD = 8192;
-
-
     #region SIMD Helper
-
     /// <summary>
     /// 通用 SIMD 权重应用函数：values[i] *= weights[i]（向量化主循环 + 尾部标量）
     /// </summary>
@@ -37,21 +28,17 @@ public static partial class WindowApplier
         int n = values.Length;
         if (n <= 1)
             return;
-
         int vecSize = Vector<float>.Count;
         int i = 0;
-
         for (; i <= n - vecSize; i += vecSize)
         {
             var vVals = new Vector<float>(values.Slice(i, vecSize));
             var vW = new Vector<float>(weights.Slice(i, vecSize));
             (vVals * vW).CopyTo(values.Slice(i, vecSize));
         }
-
         for (; i < n; i++)
             values[i] *= weights[i];
     }
-
     /// <summary>
     /// 使用 recurrence 关系生成 cos(k*theta) 序列：cos(0), cos(theta), cos(2theta), ...
     /// 比逐个 Vector.Cos 快很多，尤其在 .NET 8/9/10 上
@@ -61,24 +48,19 @@ public static partial class WindowApplier
     {
         int n = cosOut.Length;
         if (n == 0) return;
-
         float cosTheta = MathF.Cos(theta);
         float sinTheta = MathF.Sin(theta);
-
         float c = 1f;  // cos(0)
         float s = 0f;  // sin(0)
-
         for (int i = 0; i < n; i++)
         {
             cosOut[i] = c;
-
             float cn = c * cosTheta - s * sinTheta;
             float sn = s * cosTheta + c * sinTheta;
             c = cn;
             s = sn;
         }
     }
-
     /// <summary>
     /// 生成多谐波 cos 序列：cos(kθ), cos(2kθ), cos(3kθ), cos(4kθ)
     /// 使用 recurrence 生成基础 cos(kθ)，再用 Chebyshev 多项式计算高次谐波（更快、更精确）
@@ -90,9 +72,7 @@ public static partial class WindowApplier
     {
         int n = cos1.Length;
         if (n == 0) return;
-
         GenerateCosSequence(cos1, theta);  // 先生成 cos1 = cos(kθ)
-
         for (int i = 0; i < n; i++)
         {
             float c = cos1[i];
@@ -101,14 +81,9 @@ public static partial class WindowApplier
             cos4[i] = 8f * c * c * c * c - 8f * c * c + 1f; // cos(4x)
         }
     }
-
     #endregion
-
-
     #region Rectangular
-
     //tex:$$ w(n) = 1 $$
-
     /// <summary>
     /// 计算矩形窗函数。
     /// </summary>
@@ -116,15 +91,9 @@ public static partial class WindowApplier
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Rectangular(Span<float> values)
     { }
-
     #endregion
-
-
     #region Triangular
-
     //tex:$$ w(n) = 1 - \left| \frac{n - (N-1)/2}{(N-1)/2} \right| $$
-
-
 
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public static void Triangular(Span<float> values)
@@ -141,7 +110,6 @@ public static partial class WindowApplier
     //        values[i] *= tri;
     //    }
     //}
-
     /// <summary>
     /// Applies a triangular window function to the elements of the specified span in place.
     /// </summary>
@@ -155,23 +123,19 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = 2.0f / (n - 1);
         int mid = (n - 1) >> 1;
-
         // 左半段（含中点）：w(i) = factor * i
         for (int i = 0; i <= mid; i++)
         {
             values[i] *= factor * i;
         }
-
         // 右半段：w(i) = 2 - factor * i
         for (int i = mid + 1; i < n; i++)
         {
             values[i] *= 2.0f - factor * i;
         }
     }
-
     /// <summary>
     /// Applies a symmetric triangular window to the specified span of single-precision floating-point values in place.
     /// </summary>
@@ -184,38 +148,28 @@ public static partial class WindowApplier
     public static void Triangular_SIMD(Span<float> values)
     {
         int n = values.Length;
-
         if (n <= 1) return;
-
-
         float inv = 2f / (n - 1);
-
         var vInv = new Vector<float>(inv);
         var vTwo = new Vector<float>(2f);
         var vOne = new Vector<float>(1f);
-
         // 预生成 lane 偏移
         Span<float> lane = stackalloc float[Vector<float>.Count];
         for (int k = 0; k < lane.Length; k++) lane[k] = k;
         var vLane = new Vector<float>(lane);
-
         int i = 0;
         int vecEnd = n - (n % Vector<float>.Count);
-
         while (i < vecEnd)
         {
             var vIdx = new Vector<float>(i) + vLane;
             var vX = vIdx * vInv;                     // 2*n/(N-1)
             var vAbs = Vector.Abs(vX - vOne);         // |2*n/(N-1) - 1|
             var vW = vOne - vAbs;                     // 1 - |...|
-
             var vData = new Vector<float>(values.Slice(i));
             vData *= vW;
             vData.CopyTo(values.Slice(i));
-
             i += Vector<float>.Count;
         }
-
         // 尾巴
         for (; i < n; i++)
         {
@@ -223,15 +177,9 @@ public static partial class WindowApplier
             values[i] *= 1f - MathF.Abs(x - 1f);
         }
     }
-
     #endregion
-
-
     #region Hamming
-
     //tex:$$ w(n) = 0.54 - 0.46 \cos\left( \frac{2\pi n}{N-1} \right) $$
-
-
     /// <summary>
     /// Applies a Hamming window to the specified span of values in place.
     /// </summary>
@@ -246,7 +194,6 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / (n - 1); // symmetric
         for (int i = 0; i < n; i++)
         {
@@ -254,7 +201,6 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
     /// <summary>
     /// Applies the Hamming window function to the specified span of single-precision floating-point values in place
     /// using SIMD acceleration.
@@ -270,22 +216,14 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float theta = ConstantsFp32.TWO_PI / (n - 1);
-
         Span<float> weights = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];  // 小 n 时栈分配，性能极好
         Span<float> cos = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
-
         GenerateCosSequence(cos, theta);
-
         for (int i = 0; i < n; i++)
             weights[i] = 0.54f - 0.46f * cos[i];
-
         ApplyWeights_SIMD(values, weights);
     }
-
-
-
 
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public static void Hamming2(Span<float> values)
@@ -299,7 +237,6 @@ public static partial class WindowApplier
     //        Unsafe.Add(ref r, n) *= ham;
     //    }
     //}
-
     /// <summary>
     /// Applies an in-place periodic Hamming window to the specified span of single-precision floating-point values.
     /// </summary>
@@ -314,7 +251,6 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / n; // periodic
         for (int i = 0; i < n; i++)
         {
@@ -322,7 +258,6 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
     /// <summary>
     /// Applies a periodic Hamming window to the specified span of single-precision floating-point values in place using
     /// SIMD acceleration where possible.
@@ -338,22 +273,17 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / n; // periodic
-
         int vecWidth = Vector<float>.Count;
         var vFactor = new Vector<float>(factor);
-
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
         {
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         Span<float> angle = stackalloc float[vecWidth];
         Span<float> weights = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
         while (i < vecEnd)
@@ -361,35 +291,26 @@ public static partial class WindowApplier
             var vBase = new Vector<float>(i);
             var vIdx = vBase + vLane;
             var vArg = vIdx * vFactor;
-
             vArg.CopyTo(angle);
             for (int k = 0; k < vecWidth; k++)
             {
                 weights[k] = 0.54f - 0.46f * Cos(angle[k]);
             }
-
             var vW = new Vector<float>(weights);
             var vVals = new Vector<float>(values.Slice(i, vecWidth));
             vVals *= vW;
             vVals.CopyTo(values.Slice(i, vecWidth));
-
             i += vecWidth;
         }
-
         for (; i < n; i++)
         {
             float w = 0.54f - 0.46f * Cos(factor * i);
             values[i] *= w;
         }
     }
-
     #endregion
-
-
     #region Blackman
-
     //tex:$$ w(n) = 0.42 - 0.5 \cos\left( \frac{2\pi n}{N-1} \right) + 0.08 \cos\left( \frac{4\pi n}{N-1} \right) $$
-
     /// <summary>
     /// Applies a Blackman window to the specified span of values in place.
     /// </summary>
@@ -403,7 +324,6 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / (n - 1);
         for (int i = 0; i < n; i++)
         {
@@ -412,8 +332,6 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
-
     /// <summary>
     /// Applies the Blackman window function to the specified span of single-precision floating-point values in place.
     /// </summary>
@@ -427,25 +345,19 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float theta = ConstantsFp32.TWO_PI / (n - 1);
-
         Span<float> weights = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos1 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos2 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
-
         GenerateCosSequence(cos1, theta);
-
         for (int i = 0; i < n; i++)
         {
             float c1 = cos1[i];
             float c2 = 2f * c1 * c1 - 1f;
             weights[i] = 0.42f - 0.5f * c1 + 0.08f * c2;
         }
-
         ApplyWeights_SIMD(values, weights);
     }
-
     /// <summary>
     /// Applies a periodic Blackman window to the specified span of single-precision floating-point values in place.
     /// </summary>
@@ -459,7 +371,6 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / n;
         for (int i = 0; i < n; i++)
         {
@@ -468,8 +379,6 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
-
     /// <summary>
     /// Applies a periodic Blackman window to the specified span of single-precision floating-point values in place
     /// using SIMD acceleration where possible.
@@ -484,34 +393,22 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float theta = ConstantsFp32.TWO_PI / n;
-
         Span<float> weights = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos1 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos2 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
-
         GenerateCosSequence(cos1, theta);
-
         for (int i = 0; i < n; i++)
         {
             float c1 = cos1[i];
             float c2 = 2f * c1 * c1 - 1f;
             weights[i] = 0.42f - 0.5f * c1 + 0.08f * c2;
         }
-
         ApplyWeights_SIMD(values, weights);
     }
-
     #endregion
-
-
     #region Hann
-
-
     //tex:$$ w(n) = 0.5 \left( 1 - \cos\left( \frac{2\pi n}{N-1} \right) \right) $$
-
-
 
     /// <summary>
     /// Applies the Hann window function to the specified span of values in place.
@@ -527,7 +424,6 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / (n - 1); // symmetric
         for (int i = 0; i < n; i++)
         {
@@ -535,7 +431,6 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
     /// <summary>
     /// Applies an in-place Hann window to the specified span of single-precision floating-point values using SIMD
     /// acceleration where possible.
@@ -553,19 +448,14 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float theta = ConstantsFp32.TWO_PI / (n - 1);
         var weights = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         var cos = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
-
         GenerateCosSequence(cos, theta);
-
         for (int i = 0; i < n; i++)
             weights[i] = 0.5f * (1f - cos[i]);
-
         ApplyWeights_SIMD(values, weights);
     }
-
     /// <summary>
     /// Applies a periodic Hann window to the specified span of values in place.
     /// </summary>
@@ -579,7 +469,6 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / n; // periodic
         for (int i = 0; i < n; i++)
         {
@@ -587,7 +476,6 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
     /// <summary>
     /// Applies an in-place periodic Hann window to the specified span of single-precision floating-point values using
     /// SIMD acceleration where possible.
@@ -602,30 +490,18 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float theta = ConstantsFp32.TWO_PI / n;  // 注意：periodic 用 /n
-
         Span<float> weights = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
-
         GenerateCosSequence(cos, theta);
-
         for (int i = 0; i < n; i++)
             weights[i] = 0.5f * (1f - cos[i]);
-
         ApplyWeights_SIMD(values, weights);
     }
 
-
-
     #endregion
-
-
     #region Gaussian
-
-
     //tex:$$ w(n) = \exp\left( -0.5 \left( \frac{n - (N-1)/2}{\sigma (N-1)/2} \right)^2 \right) $$
-
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public static void Gaussian_old(Span<float> values)
     //{
@@ -636,7 +512,6 @@ public static partial class WindowApplier
     //        values[i] *= gaussian;
     //    }
     //}
-
     /// <summary>
     /// Applies a Gaussian window to the specified span of values in place.
     /// </summary>
@@ -650,11 +525,9 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float mid = (n - 1) * 0.5f;
         float sigma = 0.4f;
         float denom = sigma * mid;
-
         for (int i = 0; i < n; i++)
         {
             float t = (i - mid) / denom;
@@ -662,7 +535,6 @@ public static partial class WindowApplier
             values[i] *= g;
         }
     }
-
     /// <summary>
     /// Applies a Gaussian window to the specified span of single-precision floating-point values in place using SIMD
     /// acceleration.
@@ -676,33 +548,25 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float mid = (n - 1) * 0.5f;
         float sigma = 0.4f;
         float denom = sigma * mid;
         if (denom <= 0f) return;
-
         float invDenom = 1f / denom;
-
         int vecWidth = Vector<float>.Count;
         Span<float> lane = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++) lane[k] = k;
         var vLane = new Vector<float>(lane);
-
         var vMid = new Vector<float>(mid);
         var vInvDenom = new Vector<float>(invDenom);
-
         Span<float> tBuf = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
-
         while (i < vecEnd)
         {
             var vIdx = new Vector<float>(i) + vLane;
             var vT = (vIdx - vMid) * vInvDenom;
             vT.CopyTo(tBuf);
-
             // 逐 lane 标量 exp + 直接写回（最快路径）
             for (int k = 0; k < vecWidth; k++)
             {
@@ -710,10 +574,8 @@ public static partial class WindowApplier
                 float g = MathF.Exp(-0.5f * t * t);
                 values[i + k] *= g;
             }
-
             i += vecWidth;
         }
-
         // 尾部标量
         for (; i < n; i++)
         {
@@ -721,7 +583,6 @@ public static partial class WindowApplier
             values[i] *= MathF.Exp(-0.5f * t * t);
         }
     }
-
     /// <summary>
     /// Applies a Gaussian weighting to the elements of the specified span in place, using the provided standard
     /// deviation.
@@ -736,10 +597,8 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1 || sigma <= 0f) return;
-
         float mid = (n - 1) * 0.5f;
         float denom = sigma * mid;
-
         for (int i = 0; i < n; i++)
         {
             float t = (i - mid) / denom;
@@ -747,7 +606,6 @@ public static partial class WindowApplier
             values[i] *= g;
         }
     }
-
     /// <summary>
     /// Applies a Gaussian weighting to each element in the specified span using the provided standard deviation.
     /// </summary>
@@ -763,12 +621,9 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1 || sigma <= 0f) return;
-
         float mid = (n - 1) * 0.5f;
         float denom = sigma * mid;
-
         int vecWidth = Vector<float>.Count;
-
         // lanes: 0..(vecWidth-1)
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
@@ -776,24 +631,19 @@ public static partial class WindowApplier
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         var vMid = new Vector<float>(mid);
         var vDenom = new Vector<float>(denom);
-
         // 临时标量缓冲用于 Exp 逐 lane 计算
         Span<float> tBuf = stackalloc float[vecWidth];
         Span<float> wBuf = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
         while (i < vecEnd)
         {
             var vBase = new Vector<float>(i);
             var vIdx = vBase + vLane;
-
             // t = (i - mid) / denom
             var vT = (vIdx - vMid) / vDenom;
-
             // g = exp(-0.5 * t^2) 逐标量计算
             vT.CopyTo(tBuf);
             for (int lane = 0; lane < vecWidth; lane++)
@@ -801,15 +651,12 @@ public static partial class WindowApplier
                 float t = tBuf[lane];
                 wBuf[lane] = Exp(-0.5f * t * t);
             }
-
             var vW = new Vector<float>(wBuf);
             var vVals = new Vector<float>(values.Slice(i, vecWidth));
             vVals *= vW;
             vVals.CopyTo(values.Slice(i, vecWidth));
-
             i += vecWidth;
         }
-
         // 尾部
         for (; i < n; i++)
         {
@@ -818,17 +665,9 @@ public static partial class WindowApplier
             values[i] *= g;
         }
     }
-
-
     #endregion
-
-
     #region Kaiser
-
-
     //tex:$$ w(n) = \frac{I_0\left( \alpha \sqrt{1 - \left( \frac{2n}{N-1} - 1 \right)^2} \right)}{I_0(\alpha)} $$
-
-
     /// <summary>
     /// Applies a Kaiser window to the specified sequence of values in place.
     /// </summary>
@@ -845,7 +684,6 @@ public static partial class WindowApplier
     {
         var n = values.Length;
         if (n <= 1) return;
-
         float factor = 2.0f / (n - 1);
         for (int i = 0; i < n; i++)
         {
@@ -853,7 +691,6 @@ public static partial class WindowApplier
             values[i] *= kaiser;
         }
     }
-
     /// <summary>
     /// Applies an in-place Kaiser window to the specified span of single-precision floating-point values using SIMD
     /// acceleration.
@@ -870,14 +707,11 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = 2.0f / (n - 1);
         float i0Alpha = I0(alpha);
-
         int vecWidth = Vector<float>.Count;
         var vFactor = new Vector<float>(factor);
         var vOne = new Vector<float>(1.0f);
-
         // lanes: 0..(vecWidth-1)
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
@@ -885,24 +719,19 @@ public static partial class WindowApplier
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         // 临时缓冲用于逐 lane 计算 I0(...)
         Span<float> tBuf = stackalloc float[vecWidth];
         Span<float> wBuf = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
         while (i < vecEnd)
         {
             var vBase = new Vector<float>(i);
             var vIdx = vBase + vLane;
-
             // x = i*factor - 1
             var vX = vIdx * vFactor - vOne;
-
             // rad = sqrt(1 - x*x)
             var vRadSq = vOne - (vX * vX);
-
             // 拷到标量缓冲后逐 lane 计算 w = I0(alpha * sqrt(...)) / I0(alpha)
             vRadSq.CopyTo(tBuf);
             for (int k = 0; k < vecWidth; k++)
@@ -911,20 +740,16 @@ public static partial class WindowApplier
                 // 数值上 radSq 可能出现极小负数（浮点误差），钳制到 [0,1]
                 if (radSq < 0f) radSq = 0f;
                 if (radSq > 1f) radSq = 1f;
-
                 float rad = Sqrt(radSq);
                 float w = I0(alpha * rad) / i0Alpha;
                 wBuf[k] = w;
             }
-
             var vW = new Vector<float>(wBuf);
             var vVals = new Vector<float>(values.Slice(i, vecWidth));
             vVals *= vW;
             vVals.CopyTo(values.Slice(i, vecWidth));
-
             i += vecWidth;
         }
-
         // 尾部
         for (; i < n; i++)
         {
@@ -932,21 +757,13 @@ public static partial class WindowApplier
             float radSq = 1f - x * x;
             if (radSq < 0f) radSq = 0f;
             if (radSq > 1f) radSq = 1f;
-
             float w = I0(alpha * Sqrt(radSq)) / i0Alpha;
             values[i] *= w;
         }
     }
-
     #endregion
-
-
     #region Kbd
-
-
     //tex:$$ w(n) = \sqrt{\frac{\sum_{k=0}^{n} I_0\left( \pi \alpha \sqrt{1 - \left( \frac{2k}{N} - 1 \right)^2} \right)}{\sum_{k=0}^{N/2} I_0\left( \pi \alpha \sqrt{1 - \left( \frac{2k}{N} - 1 \right)^2} \right)}} $$
-
-
     /// <summary>
     /// Applies a Kaiser-Bessel derived (KBD) window to the specified sequence of values in place.
     /// </summary>
@@ -962,29 +779,22 @@ public static partial class WindowApplier
     {
         var n = values.Length;
         if (n <= 1) return;
-
         var window = new float[n / 2 + 1];
-
         float factor = 4.0f / n;
         float sum = 0f;
-
         for (int i = 0; i <= n / 2; i++)
         {
             sum += I0(ConstantsFp32.PI * alpha * Sqrt(1 - (i * factor - 1) * (i * factor - 1)));
             window[i] = sum;
         }
-
         for (int i = 0; i < n / 2; i++)
         {
             var v = Sqrt(window[i] / sum);
             values[i] *= v;
-
             var backwardIndex = n - 1 - i;
             values[backwardIndex] *= v;
         }
     }
-
-
     /// <summary>
     /// Applies a Kaiser–Bessel-derived (KBD) window to the specified values using SIMD acceleration.
     /// </summary>
@@ -1001,30 +811,24 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         int half = n >> 1; // floor(n/2)
                            // 缓存半窗累计和，长度为 half+1（包含 k=half）
         var window = new float[half + 1];
-
         float factor = 4.0f / n;                  // 等于 2*(2/N)
         float scale = ConstantsFp32.PI * alpha;   // π α
-
         // SIMD 批量生成 radSq = 1 - (k*factor - 1)^2，然后逐 lane 计算 I0(scale * sqrt(radSq))
         int vecWidth = Vector<float>.Count;
         var vFactor = new Vector<float>(factor);
         var vOne = new Vector<float>(1.0f);
         var vScale = new Vector<float>(scale);
-
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
         {
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         // 临时缓冲用于逐 lane 标量 I0 计算
         Span<float> tmp = stackalloc float[vecWidth];
-
         float sum = 0f;
         int i = 0;
         int vecEnd = (half + 1) - ((half + 1) % vecWidth);
@@ -1034,7 +838,6 @@ public static partial class WindowApplier
             var vIdx = vBase + vLane;            // k = i + lane
             var vX = vIdx * vFactor - vOne;      // x = k*factor - 1
             var vRadSq = vOne - (vX * vX);       // 1 - x^2
-
             // 逐 lane：I0(scale * sqrt(radSq))
             vRadSq.CopyTo(tmp);
             for (int lane = 0; lane < vecWidth; lane++)
@@ -1042,16 +845,13 @@ public static partial class WindowApplier
                 float radSq = tmp[lane];
                 if (radSq < 0f) radSq = 0f;      // 浮点误差钳制
                 if (radSq > 1f) radSq = 1f;
-
                 float rad = Sqrt(radSq);
                 float term = I0(scale * rad);
                 sum += term;
                 window[i + lane] = sum;
             }
-
             i += vecWidth;
         }
-
         // 尾部逐标量
         for (; i <= half; i++)
         {
@@ -1059,22 +859,18 @@ public static partial class WindowApplier
             float radSq = 1f - x * x;
             if (radSq < 0f) radSq = 0f;
             if (radSq > 1f) radSq = 1f;
-
             float term = I0(scale * Sqrt(radSq));
             sum += term;
             window[i] = sum;
         }
-
         // 归一化并镜像到两端，平方根
         for (int k = 0; k < half; k++)
         {
             float w = Sqrt(window[k] / sum);
             values[k] *= w;
-
             int r = n - 1 - k;
             values[r] *= w;
         }
-
         // 当 n 为奇数时，中心元素单独处理（k == half）
         if ((n & 1) == 1)
         {
@@ -1083,13 +879,8 @@ public static partial class WindowApplier
         }
     }
     #endregion
-
-
     #region Bartlett_Hann
-
-
     //tex:$$ w(n) = 0.62 - 0.48 \left| \frac{n}{N-1} - 0.5 \right| - 0.38 \cos\left( \frac{2\pi n}{N-1} \right) $$
-
     /// <summary>
     /// Applies the Bartlett-Hann window function to the specified span of values in place.
     /// </summary>
@@ -1103,7 +894,6 @@ public static partial class WindowApplier
     {
         var n = values.Length;
         if (n <= 1) return;
-
         float factor = 1.0f / (n - 1);
         for (int i = 0; i < n; i++)
         {
@@ -1111,7 +901,6 @@ public static partial class WindowApplier
             values[i] *= bh;
         }
     }
-
     /// <summary>
     /// Applies the Bartlett-Hann window function to the specified span of single-precision floating-point values in place
     /// using SIMD acceleration where possible.
@@ -1126,12 +915,9 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = 1.0f / (n - 1);
         float twoPi = ConstantsFp32.TWO_PI;
-
         int vecWidth = Vector<float>.Count;
-
         // lanes: 0..(vecWidth-1)
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
@@ -1139,18 +925,15 @@ public static partial class WindowApplier
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         // 临时缓冲用于逐 lane 计算权重
         Span<float> idxBuf = stackalloc float[vecWidth];
         Span<float> wBuf = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
         while (i < vecEnd)
         {
             var vBase = new Vector<float>(i);
             var vIdx = vBase + vLane; // i + lane
-
             // 将索引拷到标量缓冲，逐 lane 计算权重：
             // w = 0.62 - 0.48 * |i*factor - 0.5| - 0.38 * cos(2π * i * factor)
             vIdx.CopyTo(idxBuf);
@@ -1160,15 +943,12 @@ public static partial class WindowApplier
                 float w = 0.62f - 0.48f * Abs(x - 0.5f) - 0.38f * Cos(twoPi * x);
                 wBuf[k] = w;
             }
-
             var vW = new Vector<float>(wBuf);
             var vVals = new Vector<float>(values.Slice(i, vecWidth));
             vVals *= vW;
             vVals.CopyTo(values.Slice(i, vecWidth));
-
             i += vecWidth;
         }
-
         // 尾部
         for (; i < n; i++)
         {
@@ -1178,13 +958,8 @@ public static partial class WindowApplier
         }
     }
     #endregion
-
-
     #region Lanczos
-
-
     //tex:$$ w(n) = \text{sinc}\left( \frac{2n}{N-1} - 1 \right) $$
-
     /// <summary>
     /// Applies the Lanczos window function to the specified span of values in place.
     /// </summary>
@@ -1198,7 +973,6 @@ public static partial class WindowApplier
     {
         var n = values.Length;
         if (n <= 1) return;
-
         float factor = 2.0f / (n - 1);
         for (int i = 0; i < n; i++)
         {
@@ -1206,7 +980,6 @@ public static partial class WindowApplier
             values[i] *= lanczos;
         }
     }
-
     /// <summary>
     /// Applies the Lanczos window function to the specified span of single-precision floating-point values in place
     /// using SIMD acceleration.
@@ -1221,11 +994,8 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = 2.0f / (n - 1);
-
         int vecWidth = Vector<float>.Count;
-
         // lanes: 0..(vecWidth-1)
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
@@ -1233,36 +1003,29 @@ public static partial class WindowApplier
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         // 临时缓冲：x 参数与权重
         Span<float> xBuf = stackalloc float[vecWidth];
         Span<float> wBuf = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
         while (i < vecEnd)
         {
             var vBase = new Vector<float>(i);
             var vIdx = vBase + vLane;      // i + lane
-
             // x = i*factor - 1
             var vX = vIdx * new Vector<float>(factor) - new Vector<float>(1.0f);
-
             vX.CopyTo(xBuf);
             for (int k = 0; k < vecWidth; k++)
             {
                 // w = sinc(x)
                 wBuf[k] = Sinc(xBuf[k]);
             }
-
             var vW = new Vector<float>(wBuf);
             var vVals = new Vector<float>(values.Slice(i, vecWidth));
             vVals *= vW;
             vVals.CopyTo(values.Slice(i, vecWidth));
-
             i += vecWidth;
         }
-
         // 尾部元素
         for (; i < n; i++)
         {
@@ -1271,16 +1034,9 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
     #endregion
-
-
     #region PowerOfSine
-
-
     //tex:$$ w(n) = \sin^\alpha\left( \frac{\pi n}{N} \right) $$
-
-
     /// <summary>
     /// Applies a power-of-sine window to the specified values in place.
     /// </summary>
@@ -1296,7 +1052,6 @@ public static partial class WindowApplier
     {
         var n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.PI / n;
         for (int i = 0; i < n; i++)
         {
@@ -1304,7 +1059,6 @@ public static partial class WindowApplier
             values[i] *= v;
         }
     }
-
     /// <summary>
     /// Applies an in-place transformation to each element in the specified span by multiplying it by the sine of its
     /// normalized index raised to the specified power.
@@ -1319,11 +1073,8 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.PI / n;
-
         int vecWidth = Vector<float>.Count;
-
         // lanes: 0..(vecWidth-1)
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
@@ -1331,10 +1082,8 @@ public static partial class WindowApplier
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         Span<float> angle = stackalloc float[vecWidth];
         Span<float> weights = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
         while (i < vecEnd)
@@ -1342,7 +1091,6 @@ public static partial class WindowApplier
             var vBase = new Vector<float>(i);
             var vIdx = vBase + vLane;                 // i + lane
             var vArg = vIdx * new Vector<float>(factor);
-
             // 逐 lane: w = sin(arg)^alpha
             vArg.CopyTo(angle);
             for (int k = 0; k < vecWidth; k++)
@@ -1350,15 +1098,12 @@ public static partial class WindowApplier
                 float s = Sin(angle[k]);
                 weights[k] = Pow(s, alpha);
             }
-
             var vW = new Vector<float>(weights);
             var vVals = new Vector<float>(values.Slice(i, vecWidth));
             vVals *= vW;
             vVals.CopyTo(values.Slice(i, vecWidth));
-
             i += vecWidth;
         }
-
         // 尾部
         for (; i < n; i++)
         {
@@ -1366,16 +1111,9 @@ public static partial class WindowApplier
             values[i] *= w;
         }
     }
-
     #endregion
-
-
     #region Flattop
-
-
     //tex:$$ w(n) = 0.216 - 0.417 \cos\left( \frac{2\pi n}{N-1} \right) + 0.278 \cos\left( \frac{4\pi n}{N-1} \right) - 0.084 \cos\left( \frac{6\pi n}{N-1} \right) + 0.007 \cos\left( \frac{8\pi n}{N-1} \right) $$
-
-
     /// <summary>
     /// Applies a Flattop window function to the specified span of values in place.
     /// </summary>
@@ -1389,16 +1127,13 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / (n - 1);
-
         for (int i = 0; i < n; i++)
         {
             var v = 0.216f - 0.417f * Cos(i * factor) + 0.278f * Cos(2 * i * factor) - 0.084f * Cos(3 * i * factor) + 0.007f * Cos(4 * i * factor);
             values[i] *= v;
         }
     }
-
     /// <summary>
     /// Applies a flat top window function to the specified span of single-precision floating-point values in place
     /// using SIMD acceleration where possible.
@@ -1414,17 +1149,13 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float theta = ConstantsFp32.TWO_PI / (n - 1);
-
         Span<float> weights = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos1 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos2 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos3 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         Span<float> cos4 = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
-
         GenerateCosMultiHarmonics(cos1, cos2, cos3, cos4, theta);
-
         for (int i = 0; i < n; i++)
         {
             weights[i] = 0.216f
@@ -1433,18 +1164,11 @@ public static partial class WindowApplier
                        - 0.084f * cos3[i]
                        + 0.007f * cos4[i];
         }
-
         ApplyWeights_SIMD(values, weights);
     }
-
     #endregion
-
-
     #region Liftering
-
-
     //tex:$$ w(n) = 1 + \frac{L}{2} \sin\left( \frac{\pi n}{L} \right) $$
-
     /// <summary>
     /// Applies sinusoidal liftering to the specified sequence of cepstral coefficients in place.
     /// </summary>
@@ -1459,15 +1183,12 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1 || l <= 0) return;
-
         for (int i = 0; i < n; i++)
         {
             float v = 1f + l * Sin(ConstantsFp32.PI * i / l) / 2f;
             values[i] *= v;
         }
     }
-
-
     /// <summary>
     /// Applies sinusoidal liftering to the specified sequence of values using SIMD acceleration where possible.
     /// </summary>
@@ -1478,18 +1199,14 @@ public static partial class WindowApplier
     /// <param name="values">The sequence of values to be liftered. The liftering is performed in place, modifying the contents of this span.</param>
     /// <param name="l">The liftering parameter that determines the strength and periodicity of the liftering function. Must be greater
     /// than 0. The default value is 22.</param>
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Liftering_SIMD(Span<float> values, int l = 22)
     {
         int n = values.Length;
         if (n <= 1 || l <= 0) return;
-
         float factor = ConstantsFp32.PI / l;
         float halfL = l * 0.5f;
-
         int vecWidth = Vector<float>.Count;
-
         // lanes: 0..(vecWidth-1)
         Span<float> laneSpan = stackalloc float[vecWidth];
         for (int k = 0; k < vecWidth; k++)
@@ -1497,10 +1214,8 @@ public static partial class WindowApplier
             laneSpan[k] = k;
         }
         var vLane = new Vector<float>(laneSpan);
-
         Span<float> angle = stackalloc float[vecWidth];
         Span<float> weights = stackalloc float[vecWidth];
-
         int i = 0;
         int vecEnd = n - (n % vecWidth);
         while (i < vecEnd)
@@ -1508,7 +1223,6 @@ public static partial class WindowApplier
             var vBase = new Vector<float>(i);
             var vIdx = vBase + vLane;
             var vArg = vIdx * new Vector<float>(factor);
-
             vArg.CopyTo(angle);
             for (int k = 0; k < vecWidth; k++)
             {
@@ -1516,15 +1230,12 @@ public static partial class WindowApplier
                 float w = 1f + halfL * Sin(angle[k]);
                 weights[k] = w;
             }
-
             var vW = new Vector<float>(weights);
             var vVals = new Vector<float>(values.Slice(i, vecWidth));
             vVals *= vW;
             vVals.CopyTo(values.Slice(i, vecWidth));
-
             i += vecWidth;
         }
-
         for (; i < n; i++)
         {
             float w = 1f + halfL * Sin(factor * i);
@@ -1532,17 +1243,9 @@ public static partial class WindowApplier
         }
     }
 
-
-
     #endregion
-
-
     #region Blackman_Harris
-
-
     //tex:$$ w(n) = 0.35875 - 0.48829 \cos\left( \frac{2\pi n}{N} \right) + 0.14128 \cos\left( \frac{4\pi n}{N} \right) - 0.01168 \cos\left( \frac{6\pi n}{N} \right) $$
-
-
     /// <summary>
     /// Applies the Blackman-Harris window function to the specified span of values in place.
     /// </summary>
@@ -1557,7 +1260,6 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float factor = ConstantsFp32.TWO_PI / n;
         for (int i = 0; i < n; i++)
         {
@@ -1567,11 +1269,9 @@ public static partial class WindowApplier
                 0.48829f * Cos(arg) +
                 0.14128f * Cos(2 * arg) -
                 0.01168f * Cos(3 * arg);
-
             values[i] *= harris;
         }
     }
-
     /// <summary>
     /// Applies the Blackman-Harris window function to the specified span of single-precision floating-point values in
     /// place.
@@ -1586,36 +1286,25 @@ public static partial class WindowApplier
     {
         int n = values.Length;
         if (n <= 1) return;
-
         float theta = ConstantsFp32.TWO_PI / n;
-
         var weights = n <= STACK_THRESHOLD ? stackalloc float[n] : new float[n];
         var cos1 = n < STACK_THRESHOLD ? stackalloc float[n] : new float[n];
-
         GenerateCosSequence(cos1, theta);
-
         for (int i = 0; i < n; i++)
         {
             float c1 = cos1[i];
             float c2 = 2f * c1 * c1 - 1f;                          // cos(2x)
             float c3 = 4f * c1 * c1 * c1 - 3f * c1;                // cos(3x)
-
             float w = 0.35875f
                     - 0.48829f * c1
                     + 0.14128f * c2
                     - 0.01168f * c3;
             weights[i] = w;
         }
-
         ApplyWeights_SIMD(values, weights);
     }
-
-
     #endregion
-
-
     #region Apply
-
     /// <summary>
     /// Applies the specified window function to the elements of the given span in place.
     /// </summary>
@@ -1685,7 +1374,6 @@ public static partial class WindowApplier
                 break;
         }
     }
-
     /// <summary>
     /// Applies the specified window using SIMD-optimized implementations where available.
     /// Falls back to the scalar implementation if a SIMD variant is not provided.
@@ -1700,77 +1388,58 @@ public static partial class WindowApplier
             case WindowType.Rectangular:
                 Rectangular(values); // no-op
                 break;
-
             case WindowType.Triangular:
                 Triangular_SIMD(values);
                 break;
-
             case WindowType.Hamming:
                 Hamming_SIMD(values);
                 break;
-
             case WindowType.HammingPeriodic:
                 Hamming_Periodic_SIMD(values);
                 break;
-
             case WindowType.Blackman:
                 Blackman_SIMD(values);
                 break;
-
             case WindowType.BlackmanPeriodic:
                 Blackman_Periodic_SIMD(values);
                 break;
-
             case WindowType.Hann:
                 Hann_SIMD(values);
                 break;
-
             case WindowType.HannPeriodic:
                 Hann_Periodic_SIMD(values);
                 break;
-
             case WindowType.Gaussian:
                 Gaussian_SIMD(values);
                 break;
-
             case WindowType.Kaiser:
                 Kaiser_SIMD(values);
                 break;
-
             case WindowType.Kbd:
                 Kbd_SIMD(values);
                 break;
-
             case WindowType.BartlettHann:
                 Bartlett_Hann_SIMD(values);
                 break;
-
             case WindowType.Lanczos:
                 Lanczos_SIMD(values);
                 break;
-
             case WindowType.PowerOfSine:
                 PowerOfSine_SIMD(values);
                 break;
-
             case WindowType.Flattop:
                 Flattop_SIMD(values);
                 break;
-
             case WindowType.Liftering:
                 Liftering_SIMD(values);
                 break;
-
             case WindowType.BlackmanHarris:
                 Blackman_Harris_SIMD(values);
                 break;
-
             default:
                 break;
         }
     }
-
-
     /// <summary>
     /// Applies the specified window function to the elements of the provided span in place.
     /// </summary>
@@ -1791,11 +1460,7 @@ public static partial class WindowApplier
         else
             Apply_Normal(values, windowType);
     }
-
     #endregion
-
-
-
 
     internal readonly struct WindowCompareResult
     {
@@ -1805,7 +1470,6 @@ public static partial class WindowApplier
         public float Tolerance { get; }
         public int MismatchIndex { get; }
         public float MaxAbsDiff { get; }
-
         public WindowCompareResult(string name, bool equal, int length, float tolerance, int mismatchIndex, float maxAbsDiff)
         {
             Name = name;
@@ -1815,11 +1479,9 @@ public static partial class WindowApplier
             MismatchIndex = mismatchIndex;
             MaxAbsDiff = maxAbsDiff;
         }
-
         public override string ToString()
             => $"{Name}: Equal={Equal}, N={Length}, tol={Tolerance}, maxDiff={MaxAbsDiff}, mismatchIndex={MismatchIndex}";
     }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool CompareWindowCoefficientsCore(
         Action<Span<float>> windowA,
@@ -1831,25 +1493,20 @@ public static partial class WindowApplier
     {
         mismatchIndex = -1;
         maxAbsDiff = 0f;
-
         if (length <= 0 || windowA is null || windowB is null || tolerance < 0f)
         {
             return false;
         }
-
         var a = new float[length];
         var b = new float[length];
-
         // 全 1 向量，应用窗得到系数
         for (int i = 0; i < length; i++)
         {
             a[i] = 1f;
             b[i] = 1f;
         }
-
         windowA(a);
         windowB(b);
-
         bool equal = true;
         for (int i = 0; i < length; i++)
         {
@@ -1866,7 +1523,6 @@ public static partial class WindowApplier
         }
         return equal;
     }
-
     /// <summary>
     /// 对比所有常规/新的 SIMD 方法对的结果一致性。
     /// </summary>
@@ -1877,75 +1533,56 @@ public static partial class WindowApplier
     internal static WindowCompareResult[] CompareAllWindowPairs(int length, float tolerance = 1e-6f)
     {
         var results = new List<WindowCompareResult>(16);
-
         void Add(string name, Action<Span<float>> std, Action<Span<float>> simd)
         {
             int idx; float maxDiff;
             bool equal = CompareWindowCoefficientsCore(std, simd, length, tolerance, out idx, out maxDiff);
             results.Add(new WindowCompareResult(name, equal, length, tolerance, idx, maxDiff));
         }
-
         // Triangular
         Add("Triangular vs Triangular_SIMD", Triangular, Triangular_SIMD);
-
         // Hamming (symmetric form)
         Add("Hamming vs Hamming_SIMD", Hamming, Hamming_SIMD);
-
         // Hamming (periodic form)
         Add("Hamming_Periodic vs Hamming_Periodic_SIMD", Hamming_Periodic, Hamming_Periodic_SIMD);
-
         // Blackman (symmetric)
         Add("Blackman vs Blackman_SIMD", Blackman, Blackman_SIMD);
-
         // Blackman (periodic)
         Add("Blackman_Periodic vs Blackman_Periodic_SIMD", Blackman_Periodic, Blackman_Periodic_SIMD);
-
         // Hann (symmetric)
         Add("Hann vs Hann_SIMD", Hann, Hann_SIMD);
-
         // Hann (periodic)
         Add("Hann_Periodic vs Hann_Periodic_SIMD", Hann_Periodic, Hann_Periodic_SIMD);
-
         // Gaussian (fixed sigma=0.4)
         Add("Gaussian vs Gaussian_SIMD", Gaussian, Gaussian_SIMD);
-
         // Gaussian (parametric) —— 以 sigma=0.4 为例，可根据需要改参数
         Add("Gaussian(sigma=0.4) vs Gaussian_SIMD(sigma=0.4)",
             (Span<float> v) => Gaussian(v, 0.4f),
             (Span<float> v) => Gaussian_SIMD(v, 0.4f));
-
         // Kaiser (alpha=12)
         Add("Kaiser(alpha=12) vs Kaiser_SIMD(alpha=12)",
             (Span<float> v) => Kaiser(v, 12f),
             (Span<float> v) => Kaiser_SIMD(v, 12f));
-
         // KBD (alpha=4)
         Add("Kbd(alpha=4) vs Kbd_SIMD(alpha=4)",
             (Span<float> v) => Kbd(v, 4f),
             (Span<float> v) => Kbd_SIMD(v, 4f));
-
         // Bartlett-Hann
         Add("Bartlett_Hann vs Bartlett_Hann_SIMD", Bartlett_Hann, Bartlett_Hann_SIMD);
-
         // Lanczos
         Add("Lanczos vs Lanczos_SIMD", Lanczos, Lanczos_SIMD);
-
         // PowerOfSine (alpha=1.5)
         Add("PowerOfSine(alpha=1.5) vs PowerOfSine_SIMD(alpha=1.5)",
             (Span<float> v) => PowerOfSine(v, 1.5f),
             (Span<float> v) => PowerOfSine_SIMD(v, 1.5f));
-
         // Flattop
         Add("Flattop vs Flattop_SIMD", Flattop, Flattop_SIMD);
-
         // Liftering (l=22)
         Add("Liftering(l=22) vs Liftering_SIMD(l=22)",
             (Span<float> v) => Liftering(v, 22),
             (Span<float> v) => Liftering_SIMD(v, 22));
-
         // Blackman-Harris (periodic)
         Add("Blackman_Harris vs Blackman_Harris_SIMD", Blackman_Harris, Blackman_Harris_SIMD);
-
         return results.ToArray();
     }
 }

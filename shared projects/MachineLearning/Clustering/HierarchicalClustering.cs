@@ -3,9 +3,9 @@
 namespace Vorcyc.Mathematics.MachineLearning.Clustering;
 
 /// <summary>
-/// 表示用于二维平面点的层次聚类算法。
+/// Represents a hierarchical clustering algorithm for points in a two-dimensional plane.
 /// </summary>
-/// <typeparam name="T">坐标的数值类型。</typeparam>
+/// <typeparam name="T">The numeric type of the coordinates.</typeparam>
 public class HierarchicalClustering<T> : IMachineLearning
     where T : struct, IFloatingPointIeee754<T>
 {
@@ -14,19 +14,27 @@ public class HierarchicalClustering<T> : IMachineLearning
     public MachineLearningTask Task => MachineLearningTask.Clustering;
 
     /// <summary>
-    /// 使用指定的点初始化 <see cref="HierarchicalClustering{T}"/> 类的新实例。
+    /// Execution policy honored by the pairwise distance search. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
     /// </summary>
-    /// <param name="points">要聚类的点。</param>
-    public HierarchicalClustering(Point<T>[] points)
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="HierarchicalClustering{T}"/> class with the specified points.
+    /// </summary>
+    /// <param name="points">The points to cluster.</param>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    public HierarchicalClustering(Point<T>[] points, ComputingContext? context = null)
     {
         _clusters = points.Select(p => new List<Point<T>> { p }).ToList();
+        Context = context;
     }
 
     /// <summary>
-    /// 对点执行层次聚类，直到达到指定数量的聚类。
+    /// Performs hierarchical clustering on the points until the specified number of clusters is reached.
     /// </summary>
-    /// <param name="k">所需的聚类数量。</param>
-    /// <returns>聚类的列表，每个聚类是一个点的列表。</returns>
+    /// <param name="k">The desired number of clusters.</param>
+    /// <returns>A list of clusters, where each cluster is a list of points.</returns>
     public List<List<Point<T>>> Cluster(int k)
     {
         while (_clusters.Count > k)
@@ -41,25 +49,48 @@ public class HierarchicalClustering<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 查找最接近的两个聚类。
+    /// Finds the two closest clusters.
     /// </summary>
-    /// <returns>最接近的两个聚类的索引和它们之间的距离。</returns>
+    /// <returns>The indices of the two closest clusters and the distance between them.</returns>
     private (int cluster1, int cluster2, T minDistance) FindClosestClusters()
     {
+        int count = _clusters.Count;
+        var rowBestDistance = new T[count];
+        var rowBestJ = new int[count];
+
+        // Each row i independently finds its closest partner j > i (ascending j wins ties).
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            count,
+            i =>
+            {
+                T localMin = T.PositiveInfinity;
+                int localJ = 0;
+                for (int j = i + 1; j < count; j++)
+                {
+                    T distance = AverageLinkage(_clusters[i], _clusters[j]);
+                    if (distance < localMin)
+                    {
+                        localMin = distance;
+                        localJ = j;
+                    }
+                }
+                rowBestDistance[i] = localMin;
+                rowBestJ[i] = localJ;
+            },
+            workPerItem: count);
+
+        // Serial reduction in ascending i order preserves the original tie-breaking.
         T minDistance = T.PositiveInfinity;
         int cluster1 = 0, cluster2 = 0;
-
-        for (int i = 0; i < _clusters.Count; i++)
+        for (int i = 0; i < count; i++)
         {
-            for (int j = i + 1; j < _clusters.Count; j++)
+            if (rowBestDistance[i] < minDistance)
             {
-                T distance = AverageLinkage(_clusters[i], _clusters[j]);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    cluster1 = i;
-                    cluster2 = j;
-                }
+                minDistance = rowBestDistance[i];
+                cluster1 = i;
+                cluster2 = rowBestJ[i];
             }
         }
 
@@ -67,11 +98,11 @@ public class HierarchicalClustering<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算两个聚类之间的平均连接距离。
+    /// Computes the average linkage distance between two clusters.
     /// </summary>
-    /// <param name="cluster1">第一个聚类。</param>
-    /// <param name="cluster2">第二个聚类。</param>
-    /// <returns>两个聚类之间的平均连接距离。</returns>
+    /// <param name="cluster1">The first cluster.</param>
+    /// <param name="cluster2">The second cluster.</param>
+    /// <returns>The average linkage distance between the two clusters.</returns>
     private T AverageLinkage(List<Point<T>> cluster1, List<Point<T>> cluster2)
     {
         T totalDistance = T.Zero;
@@ -90,11 +121,11 @@ public class HierarchicalClustering<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算两个点之间的欧几里得距离。
+    /// Computes the Euclidean distance between two points.
     /// </summary>
-    /// <param name="a">第一个点。</param>
-    /// <param name="b">第二个点。</param>
-    /// <returns>两个点之间的欧几里得距离。</returns>
+    /// <param name="a">The first point.</param>
+    /// <param name="b">The second point.</param>
+    /// <returns>The Euclidean distance between the two points.</returns>
     private T Distance(Point<T> a, Point<T> b)
     {
         T dx = a.X - b.X;

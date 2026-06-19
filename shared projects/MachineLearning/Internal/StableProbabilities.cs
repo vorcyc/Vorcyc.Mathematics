@@ -3,12 +3,12 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning.Internal;
 
 /// <summary>
-/// 数值稳定的概率归一化。
+/// Numerically stable probability normalization.
 /// </summary>
 internal static class StableProbabilities
 {
     /// <summary>
-    /// 将 logits 原地转换为 softmax 概率（log-sum-exp 稳定化）。
+    /// Converts logits to softmax probabilities in place (log-sum-exp stabilization).
     /// </summary>
     public static void Softmax<T>(Span<T> values)
         where T : struct, IFloatingPointIeee754<T>
@@ -29,13 +29,13 @@ internal static class StableProbabilities
     }
 
     /// <summary>
-    /// 将 logits 写入 probabilities（两者可不同缓冲区）。
+    /// Writes the softmax of logits into probabilities (the two may be different buffers).
     /// </summary>
     public static void Softmax<T>(ReadOnlySpan<T> logits, Span<T> probabilities)
         where T : struct, IFloatingPointIeee754<T>
     {
         if (logits.Length != probabilities.Length)
-            throw new ArgumentException("logits 与 probabilities 长度必须相同。");
+            throw new ArgumentException("logits and probabilities must have the same length.");
 
         T max = logits[0];
         for (int i = 1; i < logits.Length; i++)

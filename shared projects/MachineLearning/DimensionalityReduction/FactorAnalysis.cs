@@ -4,24 +4,24 @@ using Vorcyc.Mathematics.LinearAlgebra;
 namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 
 /// <summary>
-/// 因子分析类，用于执行因子分析。
+/// Factor analysis class used to perform factor analysis.
 /// </summary>
-/// <typeparam name="T">数值类型，必须实现 INumber 接口。</typeparam>
+/// <typeparam name="T">The numeric type, which must implement the INumber interface.</typeparam>
 public class FactorAnalysis<T> :IMachineLearning
     where T : struct, IFloatingPointIeee754<T>
 {
     /// <summary>
-    /// 因子载荷矩阵。
+    /// The factor loading matrix.
     /// </summary>
     public Matrix<T> Loadings { get; private set; }
 
     /// <summary>
-    /// 共同性数组。
+    /// The communalities array.
     /// </summary>
     public T[] Communalities { get; private set; }
 
     /// <summary>
-    /// 特异性方差数组。
+    /// The specific variances array.
     /// </summary>
     public T[] SpecificVariances { get; private set; }
 
@@ -29,39 +29,54 @@ public class FactorAnalysis<T> :IMachineLearning
     public MachineLearningTask Task => MachineLearningTask.DimensionalityReduction;
 
     /// <summary>
-    /// 执行因子分析。
+    /// Execution policy honored by this estimator. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
     /// </summary>
-    /// <param name="data">数据矩阵，每行代表一个样本，每列代表一个变量。</param>
-    /// <param name="numFactors">因子数量。</param>
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FactorAnalysis{T}"/> class.
+    /// </summary>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    public FactorAnalysis(ComputingContext? context = null)
+    {
+        Context = context;
+    }
+
+    /// <summary>
+    /// Performs factor analysis.
+    /// </summary>
+    /// <param name="data">The data matrix, where each row represents a sample and each column represents a variable.</param>
+    /// <param name="numFactors">The number of factors.</param>
     public void Analyze(Matrix<T> data, int numFactors)
     {
-        // 标准化数据
+        // Standardize the data
         var standardizedData = StandardizeData(data);
 
-        // 计算协方差矩阵
+        // Compute the covariance matrix
         var covarianceMatrix = CalculateCovarianceMatrix(standardizedData);
 
-        // 计算特征值和特征向量
+        // Compute eigenvalues and eigenvectors
         var eig = MatrixDecomposition.SymmetricEigendecomposition(covarianceMatrix);
         var eigenvalues = eig.Eigenvalues;
         var eigenvectors = eig.Eigenvectors;
 
-        // 选择前 numFactors 个特征向量
+        // Select the top numFactors eigenvectors
         var selectedEigenvectors = SelectTopEigenvectors(eigenvectors, numFactors);
 
-        // 计算因子载荷矩阵
+        // Compute the factor loading matrix
         Loadings = CalculateLoadings(selectedEigenvectors, eigenvalues, numFactors);
 
-        // 计算共同性和特异性方差
+        // Compute communalities and specific variances
         Communalities = CalculateCommunalities(Loadings);
         SpecificVariances = CalculateSpecificVariances(Communalities, data.Columns);
     }
 
     /// <summary>
-    /// 标准化数据矩阵。
+    /// Standardizes the data matrix.
     /// </summary>
-    /// <param name="data">数据矩阵。</param>
-    /// <returns>标准化后的数据矩阵。</returns>
+    /// <param name="data">The data matrix.</param>
+    /// <returns>The standardized data matrix.</returns>
     private Matrix<T> StandardizeData(Matrix<T> data)
     {
         int rows = data.Rows;
@@ -95,38 +110,43 @@ public class FactorAnalysis<T> :IMachineLearning
     }
 
     /// <summary>
-    /// 计算协方差矩阵。
+    /// Computes the covariance matrix.
     /// </summary>
-    /// <param name="data">标准化后的数据矩阵。</param>
-    /// <returns>协方差矩阵。</returns>
+    /// <param name="data">The standardized data matrix.</param>
+    /// <returns>The covariance matrix.</returns>
     private Matrix<T> CalculateCovarianceMatrix(Matrix<T> data)
     {
         int rows = data.Rows;
         int cols = data.Columns;
         Matrix<T> covarianceMatrix = new(cols, cols);
 
-        for (int i = 0; i < cols; i++)
-        {
-            for (int j = 0; j < cols; j++)
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            cols,
+            i =>
             {
-                T covariance = T.Zero;
-                for (int k = 0; k < rows; k++)
+                for (int j = 0; j < cols; j++)
                 {
-                    covariance += data[k, i] * data[k, j];
+                    T covariance = T.Zero;
+                    for (int k = 0; k < rows; k++)
+                    {
+                        covariance += data[k, i] * data[k, j];
+                    }
+                    covarianceMatrix[i, j] = covariance / T.CreateChecked(rows - 1);
                 }
-                covarianceMatrix[i, j] = covariance / T.CreateChecked(rows - 1);
-            }
-        }
+            },
+            workPerItem: (long)cols * rows);
 
         return covarianceMatrix;
     }
 
     /// <summary>
-    /// 选择前 numFactors 个特征向量。
+    /// Selects the top numFactors eigenvectors.
     /// </summary>
-    /// <param name="eigenvectors">特征向量矩阵。</param>
-    /// <param name="numFactors">因子数量。</param>
-    /// <returns>选择的特征向量矩阵。</returns>
+    /// <param name="eigenvectors">The eigenvector matrix.</param>
+    /// <param name="numFactors">The number of factors.</param>
+    /// <returns>The selected eigenvector matrix.</returns>
     private Matrix<T> SelectTopEigenvectors(Matrix<T> eigenvectors, int numFactors)
     {
         int rows = eigenvectors.Rows;
@@ -144,12 +164,12 @@ public class FactorAnalysis<T> :IMachineLearning
     }
 
     /// <summary>
-    /// 计算因子载荷矩阵。
+    /// Computes the factor loading matrix.
     /// </summary>
-    /// <param name="eigenvectors">特征向量矩阵。</param>
-    /// <param name="eigenvalues">特征值数组。</param>
-    /// <param name="numFactors">因子数量。</param>
-    /// <returns>因子载荷矩阵。</returns>
+    /// <param name="eigenvectors">The eigenvector matrix.</param>
+    /// <param name="eigenvalues">The eigenvalues array.</param>
+    /// <param name="numFactors">The number of factors.</param>
+    /// <returns>The factor loading matrix.</returns>
     private Matrix<T> CalculateLoadings(Matrix<T> eigenvectors, T[] eigenvalues, int numFactors)
     {
         int rows = eigenvectors.Rows;
@@ -167,10 +187,10 @@ public class FactorAnalysis<T> :IMachineLearning
     }
 
     /// <summary>
-    /// 计算共同性数组。
+    /// Computes the communalities array.
     /// </summary>
-    /// <param name="loadings">因子载荷矩阵。</param>
-    /// <returns>共同性数组。</returns>
+    /// <param name="loadings">The factor loading matrix.</param>
+    /// <returns>The communalities array.</returns>
     private T[] CalculateCommunalities(Matrix<T> loadings)
     {
         int rows = loadings.Rows;
@@ -191,11 +211,11 @@ public class FactorAnalysis<T> :IMachineLearning
     }
 
     /// <summary>
-    /// 计算特异性方差数组。
+    /// Computes the specific variances array.
     /// </summary>
-    /// <param name="communalities">共同性数组。</param>
-    /// <param name="numVariables">变量数量。</param>
-    /// <returns>特异性方差数组。</returns>
+    /// <param name="communalities">The communalities array.</param>
+    /// <param name="numVariables">The number of variables.</param>
+    /// <returns>The specific variances array.</returns>
     private T[] CalculateSpecificVariances(T[] communalities, int numVariables)
     {
         T[] specificVariances = new T[numVariables];

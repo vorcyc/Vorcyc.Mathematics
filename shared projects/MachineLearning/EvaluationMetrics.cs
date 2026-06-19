@@ -3,20 +3,20 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning;
 
 /// <summary>
-/// 常用机器学习评估指标。
+/// Common machine learning evaluation metrics.
 /// </summary>
 public static class EvaluationMetrics
 {
     /// <summary>
-    /// 计算均方误差 (MSE)。
+    /// Computes the mean squared error (MSE).
     /// </summary>
     public static T MeanSquaredError<T>(ReadOnlySpan<T> actual, ReadOnlySpan<T> predicted)
         where T : struct, IFloatingPointIeee754<T>
     {
         if (actual.Length != predicted.Length)
-            throw new ArgumentException("实际值与预测值长度必须相同。");
+            throw new ArgumentException("The actual and predicted values must have the same length.");
         if (actual.Length == 0)
-            throw new ArgumentException("输入不能为空。");
+            throw new ArgumentException("The input cannot be empty.");
 
         T sum = T.Zero;
         for (int i = 0; i < actual.Length; i++)
@@ -28,22 +28,22 @@ public static class EvaluationMetrics
     }
 
     /// <summary>
-    /// 计算均方根误差 (RMSE)。
+    /// Computes the root mean squared error (RMSE).
     /// </summary>
     public static T RootMeanSquaredError<T>(ReadOnlySpan<T> actual, ReadOnlySpan<T> predicted)
         where T : struct, IFloatingPointIeee754<T>
         => T.Sqrt(MeanSquaredError(actual, predicted));
 
     /// <summary>
-    /// 计算平均绝对误差 (MAE)。
+    /// Computes the mean absolute error (MAE).
     /// </summary>
     public static T MeanAbsoluteError<T>(ReadOnlySpan<T> actual, ReadOnlySpan<T> predicted)
         where T : struct, IFloatingPointIeee754<T>
     {
         if (actual.Length != predicted.Length)
-            throw new ArgumentException("实际值与预测值长度必须相同。");
+            throw new ArgumentException("The actual and predicted values must have the same length.");
         if (actual.Length == 0)
-            throw new ArgumentException("输入不能为空。");
+            throw new ArgumentException("The input cannot be empty.");
 
         T sum = T.Zero;
         for (int i = 0; i < actual.Length; i++)
@@ -52,14 +52,14 @@ public static class EvaluationMetrics
     }
 
     /// <summary>
-    /// 计算分类准确率。
+    /// Computes the classification accuracy.
     /// </summary>
     public static double Accuracy(ReadOnlySpan<string> actual, ReadOnlySpan<string> predicted)
     {
         if (actual.Length != predicted.Length)
-            throw new ArgumentException("实际标签与预测标签长度必须相同。");
+            throw new ArgumentException("The actual and predicted labels must have the same length.");
         if (actual.Length == 0)
-            throw new ArgumentException("输入不能为空。");
+            throw new ArgumentException("The input cannot be empty.");
 
         int correct = 0;
         for (int i = 0; i < actual.Length; i++)
@@ -71,14 +71,14 @@ public static class EvaluationMetrics
     }
 
     /// <summary>
-    /// 计算整数标签分类准确率。
+    /// Computes the integer-label classification accuracy.
     /// </summary>
     public static double Accuracy(ReadOnlySpan<int> actual, ReadOnlySpan<int> predicted)
     {
         if (actual.Length != predicted.Length)
-            throw new ArgumentException("实际标签与预测标签长度必须相同。");
+            throw new ArgumentException("The actual and predicted labels must have the same length.");
         if (actual.Length == 0)
-            throw new ArgumentException("输入不能为空。");
+            throw new ArgumentException("The input cannot be empty.");
 
         int correct = 0;
         for (int i = 0; i < actual.Length; i++)

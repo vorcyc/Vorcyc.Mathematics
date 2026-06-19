@@ -1,3 +1,4 @@
+using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.MachineLearning;
 using Vorcyc.Mathematics.MachineLearning.Classfication;
 using Vorcyc.Mathematics.MachineLearning.Preprocessing;
@@ -17,6 +18,7 @@ internal static class Program
                 "overview" or "all" => RunOverview(),
                 "classify" or "classification" => RunClassificationDemo(),
                 "regression" => RunRegressionDemo(),
+                "computing" or "computingcontext" or "parallel" => RunComputingContextDemo(),
                 "help" or "-h" or "--help" => PrintHelp(),
                 _ => UnknownCommand(command),
             };
@@ -141,6 +143,64 @@ internal static class Program
         return 0;
     }
 
+    static int RunComputingContextDemo()
+    {
+        Console.WriteLine("=== Vorcyc.Mathematics.MachineLearning — ComputingContext 示例 (0.9) ===\n");
+
+        // 较大的数据集，使并行/SIMD 的差异更易观察
+        var (x, y) = BlobDataset.CreateThreeBlob(pointsPerClass: 1500, seed: 42);
+        var (xTrain, yTrain, xTest, yTest) = DataSplit.TrainTestSplit(x, y, testRatio: 0.25, seed: 7);
+
+        // 1) 按模型设置 Context：随机森林的训练与批量预测均按所选策略执行
+        Console.WriteLine("--- 按模型 Context（NumericRandomForest）---");
+        foreach (var ctx in new[] { ComputingContext.Normal, ComputingContext.Parallel })
+        {
+            var forest = new NumericRandomForest<double>(numTrees: 60, maxFeatures: 2, maxDepth: 12, seed: 11)
+            {
+                Context = ctx
+            };
+            (int[] preds, double ms) = Timed(() =>
+            {
+                forest.Fit(xTrain, yTrain);
+                return forest.PredictBatch(xTest);
+            });
+            double acc = EvaluationMetrics.Accuracy(yTest, preds);
+            Console.WriteLine($"{ctx.CpuMode,-8} | fit+predict {ms,7:F1} ms | accuracy {acc:P1}");
+        }
+
+        // 2) 按作用域：Context 未设置时，模型与指标都遵循环境作用域
+        Console.WriteLine("\n--- 按作用域 ComputingScope（KnnClassifier + 指标）---");
+        var knn = new KnnClassifier<double>(k: 5);
+        knn.Fit(xTrain, yTrain);
+        using (ComputingScope.Enter(ComputingContext.Parallel))
+        {
+            int[] preds = knn.PredictBatch(xTest);                        // 遵循作用域并行
+            var confusion = ClassificationMetrics.ConfusionMatrix(yTest, preds); // 同样遵循作用域
+            double acc = EvaluationMetrics.Accuracy(yTest, preds);
+            double macroF1 = ClassificationMetrics.MacroF1(confusion);
+            Console.WriteLine($"Scope=Parallel | accuracy {acc:P1}, Macro-F1 {macroF1:F3}");
+        }
+
+        // 3) 单次调用覆盖：ModelBatchExtensions.PredictBatch 接受显式 context（用于泛型回退）
+        // AdaBoostClassifier 未实现 IBatchClassifier，因此走遵循 context 参数的泛型批量预测路径。
+        Console.WriteLine("\n--- 单次调用覆盖（ModelBatchExtensions.PredictBatch context）---");
+        var ada = new AdaBoostClassifier<double>(nEstimators: 50);
+        ada.Fit(xTrain, yTrain);
+        int[] simdPreds = ModelBatchExtensions.PredictBatch(ada, xTest, ComputingContext.Parallel);
+        Console.WriteLine($"context=Parallel | accuracy {EvaluationMetrics.Accuracy(yTest, simdPreds):P1}");
+
+        Console.WriteLine("\n提示: 并行/串行结果在数值上完全一致，差异仅在于执行策略与速度。");
+        return 0;
+    }
+
+    static (TResult result, double elapsedMs) Timed<TResult>(Func<TResult> action)
+    {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        var result = action();
+        sw.Stop();
+        return (result, sw.Elapsed.TotalMilliseconds);
+    }
+
     static void Evaluate(string name, IClassifier<double> model, double[,] xTrain, int[] yTrain, double[,] xTest, int[] yTest)
     {
         Console.WriteLine($"--- {name} ---");
@@ -170,6 +230,7 @@ internal static class Program
               overview    分类 + 回归全部演示（默认）
               classify    三簇合成数据上的分类器、流水线、网格搜索与交叉验证
               regression  KnnRegressor、回归流水线批量预测与交叉验证
+              computing   ComputingContext / ComputingScope 并行执行演示
               help        显示本帮助
             """);
         return 0;

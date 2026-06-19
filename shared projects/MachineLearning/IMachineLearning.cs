@@ -9,38 +9,43 @@ public interface IMachineLearning
 }
 
 /// <summary>
-/// 表示机器学习任务的枚举。
+/// Represents the kind of machine learning task.
 /// </summary>
 [Flags]
 public enum MachineLearningTask
 {
     /// <summary>
-    /// 无任务。
+    /// No task.
     /// </summary>
     None = 0,
 
     /// <summary>
-    /// 分类任务。
+    /// Classification task.
     /// </summary>
     Classification = 1 << 0, // 1
 
     /// <summary>
-    /// 聚类任务。
+    /// Clustering task.
     /// </summary>
     Clustering = 1 << 1,     // 2
 
     /// <summary>
-    /// 回归任务。
+    /// Regression task.
     /// </summary>
     Regression = 1 << 2,     // 4
 
     /// <summary>
-    /// 异常检测任务。
+    /// Anomaly detection task.
     /// </summary>
     AnomalyDetection = 1 << 3, // 8
 
     /// <summary>
-    /// 降维任务。
+    /// Dimensionality reduction task.
     /// </summary>
-    DimensionalityReduction = 1 << 4 // 16
+    DimensionalityReduction = 1 << 4, // 16
+
+    /// <summary>
+    /// Blind source separation task (e.g. Independent Component Analysis).
+    /// </summary>
+    SourceSeparation = 1 << 5 // 32
 }

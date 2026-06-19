@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning.Preprocessing;
 
 /// <summary>
-/// 最小-最大缩放：x' = (x - min) / (max - min)。
+/// Min-max scaling: x' = (x - min) / (max - min).
 /// </summary>
 public class MinMaxScaler<T> : IMatrixTransformInto<T>
     where T : struct, IFloatingPointIeee754<T>
@@ -16,7 +16,7 @@ public class MinMaxScaler<T> : IMatrixTransformInto<T>
     public MachineLearningTask Task => MachineLearningTask.None;
 
     /// <summary>
-    /// 拟合缩放参数。
+    /// Fits the scaling parameters.
     /// </summary>
     public void Fit(T[,] x)
     {
@@ -25,7 +25,7 @@ public class MinMaxScaler<T> : IMatrixTransformInto<T>
         int rows = x.GetLength(0);
         int cols = x.GetLength(1);
         if (rows == 0 || cols == 0)
-            throw new ArgumentException("输入矩阵不能为空。");
+            throw new ArgumentException("The input matrix cannot be empty.");
 
         _min = new T[cols];
         _range = new T[cols];
@@ -48,7 +48,7 @@ public class MinMaxScaler<T> : IMatrixTransformInto<T>
     }
 
     /// <summary>
-    /// 拟合并变换。
+    /// Fits and transforms.
     /// </summary>
     public T[,] FitTransform(T[,] x)
     {
@@ -57,14 +57,14 @@ public class MinMaxScaler<T> : IMatrixTransformInto<T>
     }
 
     /// <summary>
-    /// 变换矩阵。
+    /// Transforms a matrix.
     /// </summary>
     public T[,] Transform(T[,] x)
     {
         if (!_isFitted)
-            throw new InvalidOperationException("缩放器尚未拟合。");
+            throw new InvalidOperationException("The scaler has not been fitted yet.");
         if (x.GetLength(1) != _min.Length)
-            throw new ArgumentException("特征维度不匹配。");
+            throw new ArgumentException("The feature dimensionality does not match.");
 
         int rows = x.GetLength(0);
         int cols = x.GetLength(1);
@@ -77,14 +77,14 @@ public class MinMaxScaler<T> : IMatrixTransformInto<T>
     public void TransformInto(T[,] source, T[,] destination)
     {
         if (!_isFitted)
-            throw new InvalidOperationException("缩放器尚未拟合。");
+            throw new InvalidOperationException("The scaler has not been fitted yet.");
         if (source.GetLength(1) != _min.Length)
-            throw new ArgumentException("特征维度不匹配。");
+            throw new ArgumentException("The feature dimensionality does not match.");
 
         int rows = source.GetLength(0);
         int cols = source.GetLength(1);
         if (destination.GetLength(0) != rows || destination.GetLength(1) != cols)
-            throw new ArgumentException("destination 形状须与 source 一致。", nameof(destination));
+            throw new ArgumentException("The destination shape must match the source.", nameof(destination));
 
         for (int i = 0; i < rows; i++)
         {
@@ -94,14 +94,14 @@ public class MinMaxScaler<T> : IMatrixTransformInto<T>
     }
 
     /// <summary>
-    /// 变换单向量。
+    /// Transforms a single vector.
     /// </summary>
     public T[] Transform(T[] x)
     {
         if (!_isFitted)
-            throw new InvalidOperationException("缩放器尚未拟合。");
+            throw new InvalidOperationException("The scaler has not been fitted yet.");
         if (x == null || x.Length != _min.Length)
-            throw new ArgumentException("特征维度不匹配。", nameof(x));
+            throw new ArgumentException("The feature dimensionality does not match.", nameof(x));
 
         var result = new T[x.Length];
         for (int j = 0; j < x.Length; j++)

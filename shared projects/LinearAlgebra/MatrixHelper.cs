@@ -1,29 +1,22 @@
-﻿/*
+/*
  *  Based on the Accord.NET Framework project.
  */
-
 namespace Vorcyc.Mathematics.LinearAlgebra;
-
 using System.Collections;
-
 public static class MatrixHelper
 {
-
     internal static int GetLength<T>(T[][] values, int dimension)
     {
         if (dimension == 1)
             return values.Length;
         return values[0].Length;
     }
-
     internal static int GetLength<T>(T[,] values, int dimension)
     {
         if (dimension == 1)
             return values.GetLength(0);
         return values.GetLength(1);
     }
-
-
     /// <summary>
     ///   Gets the total length over all dimensions of an array.
     /// </summary>
@@ -45,11 +38,8 @@ public static class MatrixHelper
                 return sum;
             }
         }
-
         return array.Length;
     }
-
-
     /// <summary>
     ///   Gets the length of each dimension of an array.
     /// </summary>
@@ -64,12 +54,10 @@ public static class MatrixHelper
     {
         if (array.Rank == 0)
             return new int[0];
-
         if (deep && IsJagged(array))
         {
             if (array.Length == 0)
                 return new int[0];
-
             int[] rest;
             if (!max)
             {
@@ -82,7 +70,6 @@ public static class MatrixHelper
                 for (int i = 1; i < array.Length; i++)
                 {
                     int[] r = GetLength(array.GetValue(i) as Array, deep);
-
                     for (int j = 0; j < r.Length; j++)
                     {
                         if (r[j] > rest[j])
@@ -90,17 +77,13 @@ public static class MatrixHelper
                     }
                 }
             }
-
             return array.Length.Concatenate(rest);
         }
-
         int[] vector = new int[array.Rank];
         for (int i = 0; i < vector.Length; i++)
             vector[i] = array.GetUpperBound(i) + 1;
         return vector;
     }
-
-
     /// <summary>
     ///   Determines whether an array is a jagged array 
     ///   (containing inner arrays as its elements).
@@ -112,7 +95,6 @@ public static class MatrixHelper
             return array.Rank == 1;
         return array.Rank == 1 && array.GetValue(0) is Array;
     }
-
     /// <summary>
     ///   Determines whether an array is an multidimensional array.
     /// </summary>
@@ -121,7 +103,6 @@ public static class MatrixHelper
     {
         return array.Rank > 1;
     }
-
     /// <summary>
     ///   Determines whether an array is a vector.
     /// </summary>
@@ -130,8 +111,6 @@ public static class MatrixHelper
     {
         return array.Rank == 1 && !IsJagged(array);
     }
-
-
     #region Combine
     /// <summary>
     ///   Combines two vectors horizontally.
@@ -144,10 +123,8 @@ public static class MatrixHelper
             r[i] = a[i];
         for (int i = 0; i < b.Length; i++)
             r[i + a.Length] = b[i];
-
         return r;
     }
-
     /// <summary>
     ///   Combines a vector and a element horizontally.
     /// </summary>
@@ -157,12 +134,9 @@ public static class MatrixHelper
         T[] r = new T[vector.Length + 1];
         for (int i = 0; i < vector.Length; i++)
             r[i] = vector[i];
-
         r[vector.Length] = element;
-
         return r;
     }
-
     /// <summary>
     ///   Combines a vector and a element horizontally.
     /// </summary>
@@ -170,15 +144,11 @@ public static class MatrixHelper
     public static T[] Concatenate<T>(this T element, T[] vector)
     {
         T[] r = new T[vector.Length + 1];
-
         r[0] = element;
-
         for (int i = 0; i < vector.Length; i++)
             r[i + 1] = vector[i];
-
         return r;
     }
-
     ///// <summary>
     /////   Combines a matrix and a vector horizontally.
     ///// </summary>
@@ -187,7 +157,6 @@ public static class MatrixHelper
     //{
     //    return matrix.InsertColumn(vector);
     //}
-
     /// <summary>
     ///   Combines two matrices horizontally.
     /// </summary>
@@ -196,7 +165,6 @@ public static class MatrixHelper
     {
         return Concatenate(new[] { a, b });
     }
-
     /// <summary>
     ///   Combines two matrices horizontally.
     /// </summary>
@@ -205,7 +173,6 @@ public static class MatrixHelper
     {
         return Concatenate(new[] { a, b });
     }
-
     /// <summary>
     ///   Combines a matrix and a vector horizontally.
     /// </summary>
@@ -214,23 +181,18 @@ public static class MatrixHelper
     {
         int rows = 0;
         int cols = 0;
-
         for (int i = 0; i < matrices.Length; i++)
         {
             cols += matrices[i].GetLength(1);
             if (matrices[i].GetLength(0) > rows)
                 rows = matrices[i].GetLength(0);
         }
-
         T[,] r = new T[rows, cols];
-
-
         int c = 0;
         for (int k = 0; k < matrices.Length; k++)
         {
             int currentRows = matrices[k].GetLength(0);
             int currentCols = matrices[k].GetLength(1);
-
             for (int j = 0; j < currentCols; j++)
             {
                 for (int i = 0; i < currentRows; i++)
@@ -240,10 +202,8 @@ public static class MatrixHelper
                 c++;
             }
         }
-
         return r;
     }
-
     /// <summary>
     ///   Combines a matrix and a vector horizontally.
     /// </summary>
@@ -252,25 +212,20 @@ public static class MatrixHelper
     {
         int rows = 0;
         int cols = 0;
-
         for (int i = 0; i < matrices.Length; i++)
         {
             cols += matrices[i][0].Length;
             if (matrices[i].Length > rows)
                 rows = matrices[i].Length;
         }
-
         T[][] r = new T[rows][];
         for (int i = 0; i < r.Length; i++)
             r[i] = new T[cols];
-
-
         int c = 0;
         for (int k = 0; k < matrices.Length; k++)
         {
             int currentRows = matrices[k].Length;
             int currentCols = matrices[k][0].Length;
-
             for (int j = 0; j < currentCols; j++)
             {
                 for (int i = 0; i < currentRows; i++)
@@ -280,10 +235,8 @@ public static class MatrixHelper
                 c++;
             }
         }
-
         return r;
     }
-
     /// <summary>
     ///   Combine vectors horizontally.
     /// </summary>
@@ -293,17 +246,13 @@ public static class MatrixHelper
         int size = 0;
         for (int i = 0; i < vectors.Length; i++)
             size += vectors[i].Length;
-
         T[] r = new T[size];
-
         int c = 0;
         for (int i = 0; i < vectors.Length; i++)
             for (int j = 0; j < vectors[i].Length; j++)
                 r[c++] = vectors[i][j];
-
         return r;
     }
-
     ///// <summary>
     /////   Combines vectors vertically.
     ///// </summary>
@@ -312,7 +261,6 @@ public static class MatrixHelper
     //{
     //    return Stack(new[] { a, b });
     //}
-
     /// <summary>
     ///   Combines vectors vertically.
     /// </summary>
@@ -321,7 +269,6 @@ public static class MatrixHelper
     {
         return Stack(new T[][][] { a, b });
     }
-
     ///// <summary>
     /////   Combines vectors vertically.
     ///// </summary>
@@ -330,7 +277,6 @@ public static class MatrixHelper
     //{
     //    return vectors.ToMatrix();
     //}
-
     /// <summary>
     ///   Combines vectors vertically.
     /// </summary>
@@ -339,7 +285,6 @@ public static class MatrixHelper
     {
         return elements.Transpose();
     }
-
     /// <summary>
     ///   Combines vectors vertically.
     /// </summary>
@@ -348,7 +293,6 @@ public static class MatrixHelper
     {
         return vector.Concatenate(element).Transpose();
     }
-
     /// <summary>
     ///   Combines matrices vertically.
     /// </summary>
@@ -357,16 +301,13 @@ public static class MatrixHelper
     {
         int rows = 0;
         int cols = 0;
-
         for (int i = 0; i < matrices.Length; i++)
         {
             rows += matrices[i].GetLength(0);
             if (matrices[i].GetLength(1) > cols)
                 cols = matrices[i].GetLength(1);
         }
-
         T[,] r = new T[rows, cols];
-
         int c = 0;
         for (int i = 0; i < matrices.Length; i++)
         {
@@ -377,10 +318,8 @@ public static class MatrixHelper
                 c++;
             }
         }
-
         return r;
     }
-
     /// <summary>
     ///   Combines matrices vertically.
     /// </summary>
@@ -389,17 +328,12 @@ public static class MatrixHelper
     {
         int rows = matrix.GetLength(0);
         int cols = matrix.GetLength(1);
-
         T[,] r = new T[rows + 1, cols];
-
         Array.Copy(matrix, r, matrix.Length);
-
         for (int i = 0; i < vector.Length; i++)
             r[rows, i] = vector[i];
-
         return r;
     }
-
     /// <summary>
     ///   Combines matrices vertically.
     /// </summary>
@@ -407,21 +341,17 @@ public static class MatrixHelper
     {
         int rows = 0;
         int cols = 0;
-
         for (int i = 0; i < matrices.Length; i++)
         {
             rows += matrices[i].Length;
             if (matrices[i].Length == 0)
                 continue;
-
             if (matrices[i][0].Length > cols)
                 cols = matrices[i][0].Length;
         }
-
         T[][] r = new T[rows][];
         for (int i = 0; i < rows; i++)
             r[i] = new T[cols];
-
         int c = 0;
         for (int i = 0; i < matrices.Length; i++)
         {
@@ -432,13 +362,10 @@ public static class MatrixHelper
                 c++;
             }
         }
-
         return r;
     }
     #endregion
-
     #region Transpose
-
     /// <summary>
     ///   Gets the transpose of a matrix.
     /// </summary>
@@ -451,7 +378,6 @@ public static class MatrixHelper
     {
         return Transpose(matrix, false);
     }
-
     /// <summary>
     ///   Gets the transpose of a matrix.
     /// </summary>
@@ -467,16 +393,13 @@ public static class MatrixHelper
     {
         int rows = matrix.GetLength(0);
         int cols = matrix.GetLength(1);
-
         if (inPlace)
         {
             if (rows != cols)
                 throw new ArgumentException("Only square matrices can be transposed in place.", "matrix");
-
 #if DEBUG
             T[,] expected = matrix.Transpose();
 #endif
-
             for (int i = 0; i < rows; i++)
             {
                 for (int j = i; j < cols; j++)
@@ -486,12 +409,10 @@ public static class MatrixHelper
                     matrix[i, j] = element;
                 }
             }
-
             //#if DEBUG
             //            if (!expected.IsEqual(matrix))
             //                throw new Exception();
             //#endif
-
             return matrix;
         }
         else
@@ -500,12 +421,9 @@ public static class MatrixHelper
             for (int i = 0; i < rows; i++)
                 for (int j = 0; j < cols; j++)
                     result[j, i] = matrix[i, j];
-
             return result;
         }
     }
-
-
 
     /// <summary>
     ///   Gets the transpose of a row vector.
@@ -522,7 +440,6 @@ public static class MatrixHelper
             result[i, 0] = rowVector[i];
         return result;
     }
-
     /// <summary>
     ///   Gets the transpose of a row vector.
     /// </summary>
@@ -538,8 +455,6 @@ public static class MatrixHelper
             result[i, 0] = rowVector[i];
         return result;
     }
-
-
     /// <summary>
     ///   Gets the generalized transpose of a tensor.
     /// </summary>
@@ -553,7 +468,6 @@ public static class MatrixHelper
     {
         return transpose(array, order);
     }
-
     /// <summary>
     ///   Gets the generalized transpose of a tensor.
     /// </summary>
@@ -567,25 +481,19 @@ public static class MatrixHelper
         where T : class, IList
     {
         Array arr = array as Array;
-
         if (arr == null)
             throw new ArgumentException("The given object must inherit from System.Array.", "array");
-
         return transpose(arr, order) as T;
     }
-
     private static Array transpose(Array array, int[] order)
     {
         if (array.Length == 1 || array.Length == 0)
             return array;
-
         // Get the number of samples at each dimension
         int[] size = new int[array.Rank];
         for (int i = 0; i < size.Length; i++)
             size[i] = array.GetLength(i);
-
         Array r = Array.CreateInstance(array.GetType().GetElementType(), size.Get(order));
-
         // Generate all indices for accessing the matrix 
         foreach (int[] pos in Combinatorics.Sequences(size, true))
         {
@@ -593,13 +501,9 @@ public static class MatrixHelper
             object value = array.GetValue(pos);
             r.SetValue(value, newPos);
         }
-
         return r;
     }
-
     #endregion
-
-
 
     #region Get
     /// <summary>
@@ -617,7 +521,6 @@ public static class MatrixHelper
     {
         return get(source, null, startRow, endRow, startColumn, endColumn);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -634,27 +537,20 @@ public static class MatrixHelper
     {
         if (destination == null)
             throw new ArgumentNullException("destination");
-
         int rows = source.Rows();
         int cols = source.Columns();
-
         startRow = index(startRow, rows);
         startColumn = index(startColumn, cols);
-
         endRow = end(endRow, rows);
         endColumn = end(endColumn, cols);
-
         if (destination.GetLength(0) < endRow - startRow)
             throw new DimensionMismatchException("destination",
                 "The destination matrix must be big enough to accommodate the results.");
-
         if (destination.GetLength(1) < endColumn - startColumn)
             throw new DimensionMismatchException("destination",
                 "The destination matrix must be big enough to accommodate the results.");
-
         return get(source, destination, startRow, endRow, startColumn, endColumn);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -668,7 +564,6 @@ public static class MatrixHelper
     {
         return get(source, result, rowIndexes, columnIndexes);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -682,7 +577,6 @@ public static class MatrixHelper
     {
         return get(source, result, rowMask.Find(x => x), columnMask.Find(x => x));
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -696,10 +590,8 @@ public static class MatrixHelper
     {
         if (destination == null)
             throw new ArgumentNullException("destination");
-
         return get(source, destination, rowIndexes, columnIndexes);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -711,7 +603,6 @@ public static class MatrixHelper
     {
         return get(source, null, rowIndexes, null);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -729,32 +620,24 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         int rows = source.Rows();
         int cols = source.Columns();
-
         startRow = index(startRow, rows);
         endRow = end(endRow, rows);
-
         int newRows = endRow - startRow;
         int newCols = cols;
-
         if ((startRow > endRow) || (startRow < 0) || (startRow > rows) || (endRow < 0) || (endRow > rows))
         {
             throw new ArgumentException("Argument out of range.");
         }
-
         T[,] destination;
-
         if (columnIndexes != null)
         {
             newCols = columnIndexes.Length;
             for (int j = 0; j < columnIndexes.Length; j++)
                 if ((columnIndexes[j] < 0) || (columnIndexes[j] >= cols))
                     throw new ArgumentException("Argument out of range.");
-
             destination = new T[newRows, newCols];
-
             for (int i = startRow; i < endRow; i++)
                 for (int j = 0; j < columnIndexes.Length; j++)
                     destination[i - startRow, j] = source[i, columnIndexes[j]];
@@ -763,17 +646,13 @@ public static class MatrixHelper
         {
             if (startRow == 0 && endRow == rows)
                 return source;
-
             destination = new T[newRows, newCols];
-
             for (int i = startRow; i < endRow; i++)
                 for (int j = 0; j < newCols; j++)
                     destination[i - startRow, j] = source[i, j];
         }
-
         return destination;
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -791,32 +670,24 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         int rows = source.Rows();
         int cols = source.Columns();
-
         startColumn = index(startColumn, cols);
         endColumn = end(endColumn, cols);
-
         int newRows = rows;
         int newCols = endColumn - startColumn;
-
         if ((startColumn > endColumn) || (startColumn < 0) || (startColumn > cols) || (endColumn < 0) || (endColumn > cols))
         {
             throw new ArgumentException("Argument out of range.");
         }
-
         T[,] destination;
-
         if (rowIndexes != null)
         {
             newRows = rowIndexes.Length;
             for (int j = 0; j < rowIndexes.Length; j++)
                 if ((rowIndexes[j] < 0) || (rowIndexes[j] >= rows))
                     throw new ArgumentException("Argument out of range.");
-
             destination = new T[newRows, newCols];
-
             for (int i = 0; i < rowIndexes.Length; i++)
                 for (int j = startColumn; j < endColumn; j++)
                     destination[i, j - startColumn] = source[rowIndexes[i], j];
@@ -825,34 +696,25 @@ public static class MatrixHelper
         {
             if (startColumn == 0 && endColumn == cols)
                 return source;
-
             destination = new T[newRows, newCols];
-
             for (int i = 0; i < newRows; i++)
                 for (int j = startColumn; j < endColumn; j++)
                     destination[i, j - startColumn] = source[i, j];
         }
-
         return destination;
     }
-
     private static int end(int end, int length)
     {
         if (end <= 0)
             end = length + end;
         return end;
     }
-
     private static int index(int end, int length)
     {
         if (end < 0)
             end = length + end;
         return end;
     }
-
-
-
-
 
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
@@ -869,7 +731,6 @@ public static class MatrixHelper
     {
         return get(source, null, startRow, endRow, startColumn, endColumn, false);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -886,7 +747,6 @@ public static class MatrixHelper
     {
         return set(destination, values, startRow, endRow, startColumn, endColumn);
     }
-
     /// <summary>
     ///   Sets elements from a matrix to a given value.
     /// </summary>
@@ -906,10 +766,8 @@ public static class MatrixHelper
                     values[i][j] = value;
             }
         }
-
         return values;
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -928,7 +786,6 @@ public static class MatrixHelper
     {
         return get(source, result, rowIndexes, columnIndexes, reuseMemory);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -947,7 +804,6 @@ public static class MatrixHelper
     {
         return get(source, result, rowMask.Find(x => x), columnMask.Find(x => x), reuseMemory);
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -962,17 +818,13 @@ public static class MatrixHelper
             throw new ArgumentNullException("source");
         if (indexes == null)
             throw new ArgumentNullException("indexes");
-
         int rows = source.Length;
         if (rows == 0) return new T[0][];
         int cols = source[0].Length;
-
         T[][] destination;
-
         if (transpose)
         {
             destination = new T[cols][];
-
             for (int j = 0; j < destination.Length; j++)
             {
                 destination[j] = new T[indexes.Length];
@@ -983,15 +835,11 @@ public static class MatrixHelper
         else
         {
             destination = new T[indexes.Length][];
-
             for (int i = 0; i < indexes.Length; i++)
                 destination[i] = source[indexes[i]];
         }
-
         return destination;
     }
-
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -1014,36 +862,27 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         int rows = source.Length;
         if (rows == 0)
             return new T[0][];
         int cols = source[0].Length;
-
         startColumn = index(startColumn, cols);
         endColumn = end(endColumn, cols);
-
         int newRows = rows;
         int newCols = endColumn - startColumn;
-
         if ((startColumn > endColumn) || (startColumn < 0) || (startColumn > cols) || (endColumn < 0) || (endColumn > cols))
         {
             throw new ArgumentException("Argument out of range.");
         }
-
         T[][] destination;
-
         bool canReuseMemory = startColumn == 0 && endColumn == cols;
-
         if (rowIndexes != null)
         {
             newRows = rowIndexes.Length;
             for (int j = 0; j < rowIndexes.Length; j++)
                 if ((rowIndexes[j] < 0) || (rowIndexes[j] >= rows))
                     throw new ArgumentException("Argument out of range.");
-
             destination = new T[newRows][];
-
             if (canReuseMemory && reuseMemory)
             {
                 for (int i = 0; i < rowIndexes.Length; i++)
@@ -1063,9 +902,7 @@ public static class MatrixHelper
         {
             if (startColumn == 0 && endColumn == cols)
                 return source;
-
             destination = new T[newRows][];
-
             for (int i = 0; i < destination.Length; i++)
             {
                 var row = destination[i] = new T[newCols];
@@ -1073,10 +910,8 @@ public static class MatrixHelper
                     row[j - startColumn] = source[i][j];
             }
         }
-
         return destination;
     }
-
     /// <summary>
     ///   Returns a sub matrix extracted from the current matrix.
     /// </summary>
@@ -1094,37 +929,28 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         int rows = source.Length;
         if (rows == 0)
             return new T[0][];
         int cols = source[0].Length;
-
         startRow = index(startRow, rows);
         endRow = end(endRow, rows);
-
         int newRows = endRow - startRow;
         int newCols = cols;
-
         if ((startRow > endRow) || (startRow < 0) || (startRow > rows) || (endRow < 0) || (endRow > rows))
         {
             throw new ArgumentException("Argument out of range");
         }
-
-
         T[][] destination;
-
         if (columnIndexes != null)
         {
             newCols = columnIndexes.Length;
             for (int j = 0; j < columnIndexes.Length; j++)
                 if ((columnIndexes[j] < 0) || (columnIndexes[j] >= cols))
                     throw new ArgumentException("Argument out of range.");
-
             destination = new T[newRows][];
             for (int i = 0; i < destination.Length; i++)
                 destination[i] = new T[newCols];
-
             for (int i = startRow; i < endRow; i++)
             {
                 for (int j = 0; j < columnIndexes.Length; j++)
@@ -1135,21 +961,15 @@ public static class MatrixHelper
         {
             if (startRow == 0 && endRow == rows)
                 return source;
-
             destination = new T[newRows][];
             for (int i = 0; i < destination.Length; i++)
                 destination[i] = new T[newCols];
-
             for (int i = startRow; i < endRow; i++)
                 for (int j = 0; j < newCols; j++)
                     destination[i - startRow][j] = source[i][j];
         }
-
         return destination;
     }
-
-
-
 
     /// <summary>
     ///   Returns a subvector extracted from the current vector.
@@ -1164,13 +984,10 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         if (indexes == null)
             throw new ArgumentNullException("indexes");
-
         if (inPlace && source.Length != indexes.Length)
             throw new DimensionMismatchException("Source and indexes arrays must have the same dimension for in-place operations.");
-
         var destination = new T[indexes.Length];
         for (int i = 0; i < indexes.Length; i++)
         {
@@ -1180,16 +997,13 @@ public static class MatrixHelper
             else
                 destination[i] = source[source.Length + j];
         }
-
         if (inPlace)
         {
             for (int i = 0; i < destination.Length; i++)
                 source[i] = destination[i];
         }
-
         return destination;
     }
-
     /// <summary>
     ///   Returns a subvector extracted from the current vector.
     /// </summary>
@@ -1201,19 +1015,14 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         if (indexes == null)
             throw new ArgumentNullException("indexes");
-
         var destination = new T[indexes.Count];
-
         int i = 0;
         foreach (var j in indexes)
             destination[i++] = source[j];
-
         return destination;
     }
-
     /// <summary>
     ///   Returns a subvector extracted from the current vector.
     /// </summary>
@@ -1229,13 +1038,11 @@ public static class MatrixHelper
     {
         startRow = index(startRow, source.Length);
         endRow = end(endRow, source.Length);
-
         var destination = new T[endRow - startRow];
         for (int i = startRow; i < endRow; i++)
             destination[i - startRow] = source[i];
         return destination;
     }
-
     /// <summary>
     ///   Returns a value extracted from the current vector.
     /// </summary>
@@ -1244,16 +1051,11 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         if (index >= source.Length)
             throw new ArgumentOutOfRangeException("index");
-
         index = MatrixHelper.index(index, source.Length);
-
         return source[index];
     }
-
-
 
     /// <summary>
     ///   Returns a subvector extracted from the current vector.
@@ -1266,19 +1068,13 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         if (indexes == null)
             throw new ArgumentNullException("indexes");
-
         var destination = new List<T>();
         for (int i = 0; i < indexes.Length; i++)
             destination.Add(source[indexes[i]]);
-
         return destination;
     }
-
-
-
 
     /// <summary>
     ///   Extracts a selected area from a matrix.
@@ -1293,16 +1089,12 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         int rows = source.Rows();
         int cols = source.Columns();
-
         startRow = index(startRow, rows);
         startColumn = index(startColumn, cols);
-
         endRow = end(endRow, rows);
         endColumn = end(endColumn, cols);
-
         if ((startRow > endRow) || (startColumn > endColumn) || (startRow < 0) ||
             (startRow > rows) || (endRow < 0) || (endRow > rows) ||
             (startColumn < 0) || (startColumn > cols) || (endColumn < 0) ||
@@ -1310,17 +1102,13 @@ public static class MatrixHelper
         {
             throw new ArgumentException("Argument out of range.");
         }
-
         if (destination == null)
             destination = new T[endRow - startRow, endColumn - startColumn];
-
         for (int i = startRow; i < endRow; i++)
             for (int j = startColumn; j < endColumn; j++)
                 destination[i - startRow, j - startColumn] = source[i, j];
-
         return destination;
     }
-
     /// <summary>
     ///   Extracts a selected area from a matrix.
     /// </summary>
@@ -1333,18 +1121,14 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         int rows = source.GetLength(0);
         int cols = source.GetLength(1);
-
         int newRows = rows;
         int newCols = cols;
-
         if (rowIndexes == null && columnIndexes == null)
         {
             return source;
         }
-
         if (rowIndexes != null)
         {
             newRows = rowIndexes.Length;
@@ -1359,8 +1143,6 @@ public static class MatrixHelper
                 if ((columnIndexes[i] < 0) || (columnIndexes[i] >= cols))
                     throw new ArgumentException("Argument out of range.");
         }
-
-
         if (destination != null)
         {
             if (destination.GetLength(0) < newRows || destination.GetLength(1) < newCols)
@@ -1371,7 +1153,6 @@ public static class MatrixHelper
         {
             destination = new T[newRows, newCols];
         }
-
         if (columnIndexes == null)
         {
             for (int i = 0; i < rowIndexes.Length; i++)
@@ -1390,10 +1171,8 @@ public static class MatrixHelper
                 for (int j = 0; j < columnIndexes.Length; j++)
                     destination[i, j] = source[rowIndexes[i], columnIndexes[j]];
         }
-
         return destination;
     }
-
     /// <summary>
     ///   Extracts a selected area from a matrix.
     /// </summary>
@@ -1407,21 +1186,16 @@ public static class MatrixHelper
     {
         if (source == null)
             throw new ArgumentNullException("source");
-
         if (source.Length == 0)
             return new T[0][];
-
         int rows = source.Length;
         int cols = source[0].Length;
-
         int newRows = rows;
         int newCols = cols;
-
         if (rowIndexes == null && columnIndexes == null)
         {
             return source;
         }
-
         if (rowIndexes != null)
         {
             newRows = rowIndexes.Length;
@@ -1429,7 +1203,6 @@ public static class MatrixHelper
                 if ((rowIndexes[i] < 0) || (rowIndexes[i] >= rows))
                     throw new ArgumentException("Argument out of range.");
         }
-
         if (columnIndexes != null)
         {
             newCols = columnIndexes.Length;
@@ -1437,8 +1210,6 @@ public static class MatrixHelper
                 if ((columnIndexes[i] < 0) || (columnIndexes[i] >= cols))
                     throw new ArgumentException("Argument out of range.");
         }
-
-
         if (destination != null)
         {
             if (destination.Length < newRows)
@@ -1454,8 +1225,6 @@ public static class MatrixHelper
                     destination[i] = new T[newCols];
             }
         }
-
-
         if (columnIndexes == null)
         {
             if (reuseMemory)
@@ -1481,10 +1250,8 @@ public static class MatrixHelper
                 for (int j = 0; j < columnIndexes.Length; j++)
                     destination[i][j] = source[rowIndexes[i]][columnIndexes[j]];
         }
-
         return destination;
     }
-
     /// <summary>
     ///   Extracts a selected area from a matrix.
     /// </summary>
@@ -1498,13 +1265,10 @@ public static class MatrixHelper
     {
         int rows = source.Length;
         int cols = source[0].Length;
-
         startRow = index(startRow, rows);
         startColumn = index(startColumn, cols);
-
         endRow = end(endRow, rows);
         endColumn = end(endColumn, cols);
-
         if ((startRow > endRow) || (startColumn > endColumn) || (startRow < 0) ||
             (startRow > rows) || (endRow < 0) || (endRow > rows) ||
             (startColumn < 0) || (startColumn > cols) || (endColumn < 0) ||
@@ -1512,22 +1276,17 @@ public static class MatrixHelper
         {
             throw new ArgumentException("Argument out of range.");
         }
-
         bool canAvoidAllocation = startColumn == 0 && endColumn == rows;
-
         int newCols = endColumn - startColumn;
-
         if (destination == null)
         {
             destination = new T[endRow - startRow][];
-
             if (!canAvoidAllocation || !reuseMemory)
             {
                 for (int i = 0; i < destination.Length; i++)
                     destination[i] = new T[newCols];
             }
         }
-
         if (reuseMemory && canAvoidAllocation)
         {
             for (int i = startRow; i < endRow; i++)
@@ -1539,10 +1298,8 @@ public static class MatrixHelper
                 for (int j = startColumn; j < endColumn; j++)
                     destination[i - startRow][j - startColumn] = source[i][j];
         }
-
         return destination;
     }
-
     /// <summary>
     ///   Extracts a selected area from a matrix.
     /// </summary>
@@ -1556,13 +1313,10 @@ public static class MatrixHelper
     {
         int rows = destination.Length;
         int cols = destination[0].Length;
-
         startRow = index(startRow, rows);
         startColumn = index(startColumn, cols);
-
         endRow = end(endRow, rows);
         endColumn = end(endColumn, cols);
-
         if ((startRow > endRow) || (startColumn > endColumn) || (startRow < 0) ||
             (startRow > rows) || (endRow < 0) || (endRow > rows) ||
             (startColumn < 0) || (startColumn > cols) || (endColumn < 0) ||
@@ -1570,19 +1324,13 @@ public static class MatrixHelper
         {
             throw new ArgumentException("Argument out of range.");
         }
-
         for (int i = startRow; i < endRow; i++)
             for (int j = startColumn; j < endColumn; j++)
                 destination[i - startRow][j - startColumn] = source[i][j];
-
         return destination;
     }
 
-
-
     #endregion
-
-
     /// <summary>
     ///   Gets the number of rows in a vector.
     /// </summary>
@@ -1596,7 +1344,6 @@ public static class MatrixHelper
     {
         return vector.Length;
     }
-
     /// <summary>
     ///   Gets the number of rows in a multidimensional matrix.
     /// </summary>
@@ -1610,7 +1357,6 @@ public static class MatrixHelper
     {
         return matrix.GetLength(0);
     }
-
     /// <summary>
     ///   Gets the number of columns in a multidimensional matrix.
     /// </summary>
@@ -1624,10 +1370,7 @@ public static class MatrixHelper
     {
         return matrix.GetLength(1);
     }
-
-
     #region Element search
-
     /// <summary>
     ///   Gets the number of elements matching a certain criteria.
     /// </summary>
@@ -1643,7 +1386,6 @@ public static class MatrixHelper
             if (func(data[i])) count++;
         return count;
     }
-
     /// <summary>
     ///   Gets the indices of the first element matching a certain criteria.
     /// </summary>
@@ -1657,7 +1399,6 @@ public static class MatrixHelper
     {
         return Find(data, func, firstOnly: true)[0];
     }
-
     /// <summary>
     ///   Gets the indices of the first element matching a certain criteria, or null if the element could not be found.
     /// </summary>
@@ -1674,7 +1415,6 @@ public static class MatrixHelper
             return null;
         return r[0];
     }
-
     /// <summary>
     ///   Searches for the specified value and returns the index of the first occurrence within the array.
     /// </summary>
@@ -1690,7 +1430,6 @@ public static class MatrixHelper
     {
         return Array.IndexOf(data, value);
     }
-
     /// <summary>
     ///   Gets the indices of all elements matching a certain criteria.
     /// </summary>
@@ -1705,14 +1444,11 @@ public static class MatrixHelper
     public static int[] Find<T>(this T[] data, Func<T, bool> func)
     {
         List<int> idx = new List<int>();
-
         for (int i = 0; i < data.Length; i++)
             if (func(data[i]))
                 idx.Add(i);
-
         return idx.ToArray();
     }
-
     /// <summary>
     ///   Gets the indices of all elements matching a certain criteria.
     /// </summary>
@@ -1737,7 +1473,6 @@ public static class MatrixHelper
         }
         return idx.ToArray();
     }
-
     /// <summary>
     ///   Gets the indices of all elements matching a certain criteria.
     /// </summary>
@@ -1748,7 +1483,6 @@ public static class MatrixHelper
     {
         return Find(data, func, false);
     }
-
     /// <summary>
     ///   Gets the indices of all elements matching a certain criteria.
     /// </summary>

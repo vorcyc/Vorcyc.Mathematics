@@ -1,8 +1,6 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
+using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
-
 namespace Vorcyc.Mathematics.SignalProcessing.Filters.Base;
-
 /// <summary>
 /// Represents Finite Impulse Response (FIR) filter.
 /// </summary>
@@ -12,13 +10,11 @@ public class FirFilter : LtiFilter
     /// Gets copy of the filter kernel (impulse response).
     /// </summary>
     public float[] Kernel => _b.Take(_kernelSize).ToArray();
-
     /// <summary>
     /// Numerator part coefficients in filter's transfer function 
     /// (non-recursive part in difference equations).
     /// </summary>
     protected readonly float[] _b;
-
     // 
     // Since the number of coefficients can be really big,
     // we store only float versions and they are used for filtering.
@@ -31,17 +27,14 @@ public class FirFilter : LtiFilter
     // 
     // Such memory layout leads to significant speed-up of online filtering.
     //
-
     /// <summary>
     /// Kernel length.
     /// </summary>
     protected int _kernelSize;
-
     /// <summary>
     /// Transfer function.
     /// </summary>
     protected TransferFunction _tf;
-
     /// <summary>
     /// Gets transfer function.
     /// </summary>
@@ -51,22 +44,18 @@ public class FirFilter : LtiFilter
         get => _tf ?? new TransferFunction(_b.Take(_kernelSize).ToArray());
         protected set => _tf = value;
     }
-
     /// <summary>
     /// Gets or sets the minimum kernel length for switching to OverlapSave algorithm in auto mode.
     /// </summary>
     public int KernelSizeForBlockConvolution { get; set; } = 64;
-
     /// <summary>
     /// Internal buffer for delay line.
     /// </summary>
     protected float[] _delayLine;
-
     /// <summary>
     /// Current offset in delay line.
     /// </summary>
     protected int _delayLineOffset;
-
     /// <summary>
     /// Constructs <see cref="FirFilter"/> from <paramref name="kernel"/>.
     /// </summary>
@@ -74,18 +63,14 @@ public class FirFilter : LtiFilter
     public FirFilter(IEnumerable<float> kernel)
     {
         _kernelSize = kernel.Count();
-
         _b = new float[_kernelSize * 2];
-
         for (var i = 0; i < _kernelSize; i++)
         {
             _b[i] = _b[_kernelSize + i] = kernel.ElementAt(i);
         }
-
         _delayLine = new float[_kernelSize];
         _delayLineOffset = _kernelSize - 1;
     }
-
     /// <summary>
     /// <para>Constructs <see cref="FirFilter"/> from 64-bit <paramref name="kernel"/>.</para>
     /// <para>
@@ -98,7 +83,6 @@ public class FirFilter : LtiFilter
     public FirFilter(IEnumerable<double> kernel) : this(kernel.ToFloats())
     {
     }
-
     /// <summary>
     /// <para>Constructs <see cref="FirFilter"/> from transfer function <paramref name="tf"/>.</para>
     /// <para>
@@ -111,7 +95,6 @@ public class FirFilter : LtiFilter
     {
         Tf = tf;
     }
-
     /// <summary>
     /// Applies filter to entire <paramref name="signal"/> and returns new filtered signal.
     /// </summary>
@@ -123,7 +106,6 @@ public class FirFilter : LtiFilter
         {
             method = FilteringMethod.OverlapSave;
         }
-
         switch (method)
         {
             case FilteringMethod.OverlapAdd:
@@ -148,7 +130,6 @@ public class FirFilter : LtiFilter
                 }
         }
     }
-
     /// <summary>
     /// Processes one sample.
     /// </summary>
@@ -156,22 +137,17 @@ public class FirFilter : LtiFilter
     public override float Process(float sample)
     {
         _delayLine[_delayLineOffset] = sample;
-
         var output = 0f;
-
         for (int i = 0, j = _kernelSize - _delayLineOffset; i < _kernelSize; i++, j++)
         {
             output += _delayLine[i] * _b[j];
         }
-
         if (--_delayLineOffset < 0)
         {
             _delayLineOffset = _kernelSize - 1;
         }
-
         return output;
     }
-
     /// <summary>
     /// Processes all <paramref name="samples"/> in loop.
     /// </summary>
@@ -180,37 +156,28 @@ public class FirFilter : LtiFilter
     {
         // The Process() code is inlined here in the loop for better performance
         // (especially for smaller kernels).
-
         var filtered = new float[samples.Length + _kernelSize - 1];
-
         var k = 0;
         while (k < samples.Length)
         {
             _delayLine[_delayLineOffset] = samples[k];
-
             var output = 0f;
-
             for (int i = 0, j = _kernelSize - _delayLineOffset; i < _kernelSize; i++, j++)
             {
                 output += _delayLine[i] * _b[j];
             }
-
             if (--_delayLineOffset < 0)
             {
                 _delayLineOffset = _kernelSize - 1;
             }
-
             filtered[k++] = output;
         }
-
         while (k < filtered.Length)
         {
             filtered[k++] = Process(0);
         }
-
         return filtered;
     }
-
     /// <summary>
     /// Processes all <paramref name="samples"/> in loop.
     /// </summary>
@@ -219,38 +186,28 @@ public class FirFilter : LtiFilter
     {
         // The Process() code is inlined here in the loop for better performance
         // (especially for smaller kernels).
-
         var filtered = new float[samples.Length + _kernelSize - 1];
-
         var k = 0;
         while (k < samples.Length)
         {
             _delayLine[_delayLineOffset] = samples[k];
-
             var output = 0f;
-
             for (int i = 0, j = _kernelSize - _delayLineOffset; i < _kernelSize; i++, j++)
             {
                 output += _delayLine[i] * _b[j];
             }
-
             if (--_delayLineOffset < 0)
             {
                 _delayLineOffset = _kernelSize - 1;
             }
-
             filtered[k++] = output;
         }
-
         while (k < filtered.Length)
         {
             filtered[k++] = Process(0);
         }
-
         return filtered;
     }
-
-
 
     /// <summary>
     /// The most straightforward implementation of the difference equation: 
@@ -260,9 +217,7 @@ public class FirFilter : LtiFilter
     protected Signal ApplyFilterDirectly(Signal signal)
     {
         var input = signal.Samples;
-
         var output = new float[input.Length + _kernelSize - 1];
-
         for (var n = 0; n < output.Length; n++)
         {
             for (var k = 0; k < _kernelSize; k++)
@@ -273,10 +228,8 @@ public class FirFilter : LtiFilter
                 }
             }
         }
-
         return Signal.FromCopy(output, signal.SamplingRate);
     }
-
     /// <summary>
     /// Changes filter kernel online.
     /// </summary>
@@ -284,13 +237,11 @@ public class FirFilter : LtiFilter
     public void ChangeKernel(float[] kernel)
     {
         if (kernel.Length != _kernelSize) return;
-
         for (var i = 0; i < _kernelSize; i++)
         {
             _b[i] = _b[_kernelSize + i] = kernel[i];
         }
     }
-
     /// <summary>
     /// Resets filter.
     /// </summary>
@@ -299,7 +250,6 @@ public class FirFilter : LtiFilter
         _delayLineOffset = _kernelSize - 1;
         Array.Clear(_delayLine, 0, _kernelSize);
     }
-
     /// <summary>
     /// Creates <see cref="FirFilter"/> from sequential connection of two FIR filters <paramref name="filter1"/> and <paramref name="filter2"/>.
     /// </summary>
@@ -308,10 +258,8 @@ public class FirFilter : LtiFilter
     public static FirFilter operator *(FirFilter filter1, FirFilter filter2)
     {
         var tf = filter1.Tf * filter2.Tf;
-
         return new FirFilter(tf.Numerator);
     }
-
     /// <summary>
     /// Creates <see cref="IirFilter"/> from sequential connection of FIR <paramref name="filter1"/> and IIR <paramref name="filter2"/>.
     /// </summary>
@@ -320,10 +268,8 @@ public class FirFilter : LtiFilter
     public static IirFilter operator *(FirFilter filter1, IirFilter filter2)
     {
         var tf = filter1.Tf * filter2.Tf;
-
         return new IirFilter(tf.Numerator, tf.Denominator);
     }
-
     /// <summary>
     /// Creates <see cref="FirFilter"/> from parallel connection of two FIR filters <paramref name="filter1"/> and <paramref name="filter2"/>.
     /// </summary>
@@ -332,10 +278,8 @@ public class FirFilter : LtiFilter
     public static FirFilter operator +(FirFilter filter1, FirFilter filter2)
     {
         var tf = filter1.Tf + filter2.Tf;
-
         return new FirFilter(tf.Numerator);
     }
-
     /// <summary>
     /// Creates <see cref="IirFilter"/> from parallel connection of FIR <paramref name="filter1"/> and IIR <paramref name="filter2"/>.
     /// </summary>
@@ -344,7 +288,6 @@ public class FirFilter : LtiFilter
     public static IirFilter operator +(FirFilter filter1, IirFilter filter2)
     {
         var tf = filter1.Tf + filter2.Tf;
-
         return new IirFilter(tf.Numerator, tf.Denominator);
     }
 }

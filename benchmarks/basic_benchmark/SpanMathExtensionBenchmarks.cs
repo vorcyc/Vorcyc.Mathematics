@@ -1,20 +1,13 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using Vorcyc.Mathematics.Helpers;
-
 namespace basic_benchmark;
-
 public class SpanMathExtensionBenchmarks
 {
-
     private float[] data;
     private int value;
     private float[] data2;
-
-
     [Params(500, 5000, 50000, 500000, 5000000)]
     public int N;
-
-
     [GlobalSetup]
     public void Setup()
     {
@@ -27,7 +20,6 @@ public class SpanMathExtensionBenchmarks
             data2[i] = i;
         }
     }
-
     [Benchmark]
     public void AddOriginal()
     {
@@ -36,13 +28,11 @@ public class SpanMathExtensionBenchmarks
             data[i] += value;
         }
     }
-
     [Benchmark]
     public void AddSIMD()
     {
         data.AsSpan().Add(value);
     }
-
     [Benchmark]
     public void AddOriginalSpan()
     {
@@ -51,14 +41,10 @@ public class SpanMathExtensionBenchmarks
             data[i] += data2[i];
         }
     }
-
     [Benchmark]
     public void AddSIMDSpan()
     {
         data.AsSpan().Add(data2);
     }
-
-
-
 
 }

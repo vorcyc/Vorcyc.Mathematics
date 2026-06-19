@@ -3,7 +3,7 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning;
 
 /// <summary>
-/// 网格搜索结果。
+/// Grid search result.
 /// </summary>
 public sealed class GridSearchResult<TOptions>
 {
@@ -12,12 +12,12 @@ public sealed class GridSearchResult<TOptions>
 }
 
 /// <summary>
-/// 基于交叉验证的网格搜索。
+/// Grid search based on cross-validation.
 /// </summary>
 public static class GridSearch
 {
     /// <summary>
-    /// 在候选参数上搜索最佳分类器配置（以宏平均 F1 为准）。
+    /// Searches for the best classifier configuration over the candidate parameters (using macro-averaged F1).
     /// </summary>
     public static GridSearchResult<TOptions> SearchClassifier<T, TOptions>(
         T[,] x,
@@ -29,7 +29,7 @@ public static class GridSearch
         where T : struct
     {
         if (candidates == null || candidates.Count == 0)
-            throw new ArgumentException("至少需要一个候选参数。", nameof(candidates));
+            throw new ArgumentException("At least one candidate parameter is required.", nameof(candidates));
         if (factory == null)
             throw new ArgumentNullException(nameof(factory));
 
@@ -54,7 +54,7 @@ public static class GridSearch
     }
 
     /// <summary>
-    /// 使用 <see cref="IClassifier{T}"/> 工厂进行网格搜索。
+    /// Performs grid search using an <see cref="IClassifier{T}"/> factory.
     /// </summary>
     public static GridSearchResult<TOptions> SearchClassifier<T, TOptions>(
         T[,] x,

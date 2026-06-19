@@ -6,10 +6,10 @@ namespace Vorcyc.Mathematics.Numerics;
 /// A class that represents a number as a list of digits
 /// </summary>
 /// <remarks>
-/// 该类型支持所有数值类型的操作 + - * / 移位
+/// This type supports the operations + - * / and shifting for all numeric types.
 /// </remarks>
 /// <example>
-/// 以下代码演示如何使用理论上无限精度的两个数值并对它们做乘法。
+/// The following code demonstrates how to use two numbers with theoretically unlimited precision and multiply them.
 /// <code>
 /// Number n1 = new Number("9999999999999999999999999999999999999999999999999999999999999999.99999999999999999");
 /// Number n2 = new Number("1111111111111111111111111111111111111111111111.11111111111111111");
@@ -19,7 +19,7 @@ namespace Vorcyc.Mathematics.Numerics;
 /// 99999999999999999999999999999999999999999999999999999999999999999999999999999
 /// 999999999999999999988888888888888888888888888888.8888888888888888888888888888888889
 /// </code>
-/// 可以从系统内建的数值类型进行转换
+/// Conversion from the built-in numeric types is supported.
 /// <code>
 /// Number number = 123456; // from int32
 /// Number number2 = 123123L; // from int64

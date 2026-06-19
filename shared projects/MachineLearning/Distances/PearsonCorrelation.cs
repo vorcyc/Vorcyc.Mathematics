@@ -27,27 +27,6 @@ public class PearsonCorrelation<TSelf>
     /// 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TSelf Similarity(TSelf[] x, TSelf[] y)
-    {
-        TSelf p = TSelf.Zero;
-        TSelf q = TSelf.Zero;
-        TSelf p2 = TSelf.Zero;
-        TSelf q2 = TSelf.Zero;
-        TSelf sum = TSelf.Zero;
-
-        for (int i = 0; i < x.Length; i++)
-        {
-            p += x[i];
-            q += y[i];
-            p2 += x[i] * x[i];
-            q2 += y[i] * y[i];
-            sum += x[i] * y[i];
-        }
-
-        TSelf n = TSelf.CreateTruncating(x.Length);
-        TSelf num = sum - (p * q) / n;
-        TSelf den = TSelf.Sqrt((p2 - (p * p) / n) * (q2 - (q * q) / n));
-
-        return (den == TSelf.Zero) ? TSelf.Zero : num / den;
-    }
+        => Statistics.Correlation.PearsonCorrelation<TSelf>(x, y);
 
 }

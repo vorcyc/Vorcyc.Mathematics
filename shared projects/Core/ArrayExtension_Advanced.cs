@@ -1,30 +1,18 @@
-﻿namespace Vorcyc.Mathematics;
-
+namespace Vorcyc.Mathematics;
 using System.Runtime.CompilerServices;
-
-
 /// <summary>
 /// Advanced array opertions.
 /// </summary>
 public static partial class ArrayExtension
 {
-
     //    主要区别
     //分割方式：
-
     //Split<T> 按固定长度 segmentLength 分割，并处理剩余元素。
-
     //Zip<T> 通过计算每段的步长 xStep 分割，每段的长度尽量相等。
-
     //应用场景：
-
     //Split<T> 适用于需要按固定长度分割数组的场景，适合精确控制每段的长度。
-
     //Zip<T> 适用于需要将数组分割成尽量相等长度的段的场景，更适合用于对数组进行均匀分割。
-
     #region Split
-
-
     /// <summary>
     /// Splits an array into segments of specified length.
     /// </summary>
@@ -37,22 +25,17 @@ public static partial class ArrayExtension
     {
         if (segmentLength <= 0)
             throw new ArgumentException("Segment length must be greater than zero.", nameof(segmentLength));
-
         // 计算余数
         var remainder = array.Length % segmentLength;
-
         // 将数组分割成段
         for (int i = 0; i < array.Length - remainder; i += segmentLength)
         {
             yield return new ArraySegment<T>(array, i, segmentLength);
         }
-
         // 处理剩余元素
         if (remainder != 0)
             yield return new ArraySegment<T>(array, array.Length - remainder, remainder);
     }
-
-
 
     /// <summary>
     /// Splits a portion of an array into segments of specified length.
@@ -72,24 +55,19 @@ public static partial class ArrayExtension
             throw new ArgumentException("Length must be greater than zero.", nameof(length));
         if (segmentLength <= 0)
             throw new ArgumentException("Segment length must be greater than zero.", nameof(segmentLength));
-
         // 计算有效处理长度
         var len = System.Math.Min(length, array.Length - start);
         // 计算余数
         var remainder = len % segmentLength;
-
         // 将数组分割成段
         for (int i = start; i < start + len - remainder; i += segmentLength)
         {
             yield return new ArraySegment<T>(array, i, segmentLength);
         }
-
         // 处理剩余元素
         if (remainder != 0)
             yield return new ArraySegment<T>(array, start + len - remainder, remainder);
     }
-
-
 
     /// <summary>
     /// Splits the array into segments of specified length and returns the start index and length of each segment.
@@ -107,22 +85,17 @@ public static partial class ArrayExtension
     {
         //if (segmentLength <= 0)
         //    throw new ArgumentException("Segment length must be greater than zero.", nameof(segmentLength));
-
         // 计算余数
         var remainder = array.Length % segmentLength;
-
         // 将数组分割成段
         for (int i = 0; i < array.Length - remainder; i += segmentLength)
         {
             yield return (i, segmentLength);
         }
-
         // 处理剩余元素
         if (remainder != 0)
             yield return (array.Length - remainder, remainder);
     }
-
-
 
     /// <summary>
     /// Splits the array into segments of specified length starting from a given index and returns the start index and length of each segment.
@@ -147,29 +120,21 @@ public static partial class ArrayExtension
             throw new ArgumentException("Length must be greater than zero.", nameof(length));
         if (segmentLength <= 0)
             throw new ArgumentException("Segment length must be greater than zero.", nameof(segmentLength));
-
         // 计算有效处理长度
         var len = System.Math.Min(length, array.Length - start);
         // 计算余数
         var remainder = len % segmentLength;
-
         // 将数组分割成段
         for (int i = start; i < start + len - remainder; i += segmentLength)
         {
             yield return (i, segmentLength);
         }
-
         // 处理剩余元素
         if (remainder != 0)
             yield return (start + len - remainder, remainder);
     }
-
     #endregion
-
-
     #region Zip
-
-
     /// <summary>
     /// 对数组进行压缩并生成数组片段序列，确保没有数据被遗漏。
     /// </summary>
@@ -197,8 +162,6 @@ public static partial class ArrayExtension
             currentStart = nextStart;
         }
     }
-
-
     /// <summary>
     /// 对数组进行压缩并生成数组片段序列，确保没有数据被遗漏。
     /// </summary>
@@ -231,8 +194,6 @@ public static partial class ArrayExtension
             currentStart = nextStart;
         }
     }
-
-
     /// <summary>
     /// 对数组进行压缩并生成标记序列，确保没有数据被遗漏。
     /// </summary>
@@ -260,8 +221,6 @@ public static partial class ArrayExtension
             segmentStart = nextStart;
         }
     }
-
-
     /// <summary>
     /// 对数组进行压缩并生成标记序列，确保没有数据被遗漏。
     /// </summary>
@@ -295,17 +254,9 @@ public static partial class ArrayExtension
         }
     }
 
-
-
-
     #endregion
 
-
-
-
     #region TransformArray
-
-
 
     /// <summary>
     /// Transforms an array of floats into a new array of a specified length by averaging segments of the original array.
@@ -318,15 +269,12 @@ public static partial class ArrayExtension
     {
         //四舍五入的，给TV用。往大了走，正好给TV多出余数的一帧
         var segmentLength = (int)Math.Ceiling((double)array.Length / targetLength);
-
         var splited = Split(array, segmentLength);
-
         foreach (var s in splited)
         {
             yield return Statistics.Basic.Average(s);
         }
     }
-
     /// <summary>
     /// Transforms an array of floats into a new array of a specified length by averaging segments of the original array.
     /// </summary>
@@ -337,7 +285,6 @@ public static partial class ArrayExtension
     {
         return TransformToArray(array, 0, array.Length, targetLength);
     }
-
     /// <summary>
     /// Transforms a specified range of an array of floats into a new array of a specified length by averaging segments of the original array.
     /// </summary>
@@ -349,17 +296,11 @@ public static partial class ArrayExtension
     public static float[] TransformToArray(float[] array, int start, int length, int targetLength)
     {
         if (targetLength <= 0) return null;
-
         var len = System.Math.Min(length, array.Length - start);
-
         var segmentLength = (int)Math.Round((double)len / targetLength);
-
         var splited = Split(array, start, length, segmentLength);
-
         var result = new float[targetLength];
-
         int i = 0;
-
         foreach (var s in splited)
         {
             if (i > targetLength - 1) break;
@@ -370,11 +311,7 @@ public static partial class ArrayExtension
         //Set the last one.
         var sub = splited.Skip(targetLength - 1);
         result[targetLength - 1] = Statistics.Basic.Average(sub);
-
-
         return result;
     }
-
     #endregion
-
 }

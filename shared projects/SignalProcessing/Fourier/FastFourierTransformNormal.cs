@@ -1,47 +1,30 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
-
+namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
 /* duan linli aka cyclone_dll
  * 这个版本是最早期的基础实现，后来直到2025.5.10又增加了SIMD和Parallel版本的。
  * 所以这个也同时改名成 Normal。
  * 19.11.5
  * VORCYC CO,.LTD
  */
-
-
 //var input = new float[10] { -1, 2, -3, 4, -5, 6, -7, 8, -9, 10 };//, -11, 12, -13, 14, -15, 16 };
 //FastFourierTransform.Forward(input, 0, out ComplexFP32[] output, 16);
-
-
 //            foreach (var x in output)
 //                Console.WriteLine(x);
-
 //            Console.WriteLine("----------------");
-
 //            FastFourierTransform.Inverse(output, 0, 16);
-
 //            foreach (var x in output)
 //                Console.WriteLine(x);
-
 //不给足够的实际数组量也可以正确执行，结果只要关注实际数量即可
-
-
-
 
 #if NET6_0_OR_GREATER
 using static System.MathF;
 #else
     using static Vorcyc.Offlet.Math.VMath;
 #endif
-
 internal static class FastFourierTransformNormal
 {
-
     private const float PI = 3.14159265358979323846f;
-
     private const float Negative_PI = -3.14159265358979323846f;
-
     #region private methods
-
     //R to C
     private static unsafe void Rearrange(float* input, ComplexFp32* output, int N)
     {
@@ -62,8 +45,6 @@ internal static class FastFourierTransformNormal
             target |= mask;
         }
     }
-
-
     private static void Rearrange(ReadOnlySpan<float> input, Span<ComplexFp32> output)
     {
         //  data entry position
@@ -83,8 +64,6 @@ internal static class FastFourierTransformNormal
             target |= mask;
         }
     }
-
-
     //C to C
     private static unsafe void Rearrange(ComplexFp32* input, ComplexFp32* output, int N)
     {
@@ -105,8 +84,6 @@ internal static class FastFourierTransformNormal
             target |= mask;
         }
     }
-
-
     private static void Rearrange(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output)
     {
         //   data entry position
@@ -126,8 +103,6 @@ internal static class FastFourierTransformNormal
             target |= mask;
         }
     }
-
-
     //C to C , inplace
     private static unsafe void Rearrange(ComplexFp32* data, int N)
     {
@@ -154,8 +129,6 @@ internal static class FastFourierTransformNormal
             target |= mask;
         }
     }
-
-
     private static void Rearrange(Span<ComplexFp32> data)
     {
         //   Swap position
@@ -181,8 +154,6 @@ internal static class FastFourierTransformNormal
             target |= mask;
         }
     }
-
-
     //FFT implementation
     private static unsafe void Perform(ComplexFp32* data, int N, bool inverse = false)
     {
@@ -220,8 +191,6 @@ internal static class FastFourierTransformNormal
             }
         }
     }
-
-
     private static void Perform(Span<ComplexFp32> data, bool inverse = false)
     {
         float pi = inverse ? PI : Negative_PI;
@@ -258,8 +227,6 @@ internal static class FastFourierTransformNormal
             }
         }
     }
-
-
     //Scaling of inverse FFT result
     private static unsafe void Scale(ComplexFp32* data, int N)
     {
@@ -268,8 +235,6 @@ internal static class FastFourierTransformNormal
         for (int position = 0; position < N; ++position)
             data[position] *= factor;
     }
-
-
     private static void Scale(Span<ComplexFp32> data)
     {
         float factor = 1.0f / data.Length;
@@ -277,11 +242,8 @@ internal static class FastFourierTransformNormal
         for (int position = 0; position < data.Length; ++position)
             data[position] *= factor;
     }
-
     #endregion
-
     #region Forward
-
     /// <summary>
     /// Forward fast fourier transform , Real-number to Complex-number.
     /// </summary>
@@ -301,7 +263,6 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
     //过渡版本
     private static unsafe bool Forward(float[] input, int offset, ComplexFp32* output, int N)
     {
@@ -310,7 +271,6 @@ internal static class FastFourierTransformNormal
             return Forward(pIn + offset, output, N);
         }
     }
-
     /// <summary>
     /// Forward fast fourier transform , Real-number to Complex-number.
     /// </summary>
@@ -333,8 +293,6 @@ internal static class FastFourierTransformNormal
         }
     }
 
-
-
     public static bool Forward(ReadOnlySpan<float> input, Span<ComplexFp32> output)
     {
         //   Check input parameters
@@ -347,8 +305,6 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
-
 
     /// <summary>
     /// Forward fast fourier transform , Complex-number to Complex-number.
@@ -369,8 +325,6 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
-
     public static unsafe bool Forward(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output)
     {
         var N = input.Length;
@@ -384,8 +338,6 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
-
 
     /// <summary>
     /// Forward fast fourier transform , Complex-number to Complex-number.
@@ -405,7 +357,6 @@ internal static class FastFourierTransformNormal
             }
         }
     }
-
     /// <summary>
     /// Forward fast fourier transform , Inplace Version.
     /// </summary>
@@ -425,8 +376,6 @@ internal static class FastFourierTransformNormal
         return true;
     }
 
-
-
     /// <summary>
     /// Forward fast fourier transform , Inplace Version.
     /// </summary>
@@ -444,8 +393,6 @@ internal static class FastFourierTransformNormal
             }
         }
     }
-
-
     public static bool Forward(Span<ComplexFp32> data)
     {
         var N = data.Length;
@@ -459,12 +406,8 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
-
     #endregion
-
     #region Inverse
-
     /// <summary>
     /// Inverse fast fourier transform , Complex-number to complex-number.
     /// </summary>
@@ -488,7 +431,6 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
     /// <summary>
     /// Inverse fast fourier transform , Complex-number to complex-number.
     /// </summary>
@@ -512,8 +454,6 @@ internal static class FastFourierTransformNormal
             }
         }
     }
-
-
     public static unsafe bool Inverse(ReadOnlySpan<ComplexFp32> input, Span<ComplexFp32> output, bool scale = true)
     {
         var N = input.Length;
@@ -530,8 +470,6 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
-
     /// <summary>
     /// Inverse fast fourier transform , Inplace Version
     /// </summary>
@@ -554,7 +492,6 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
     /// <summary>
     /// Inverse fast fourier transform , Inplace Version
     /// </summary>
@@ -573,8 +510,6 @@ internal static class FastFourierTransformNormal
             }
         }
     }
-
-
     public static unsafe bool Inverse(Span<ComplexFp32> data, bool scale = true)
     {
         var N = data.Length;
@@ -591,9 +526,5 @@ internal static class FastFourierTransformNormal
         //   Succeeded
         return true;
     }
-
-
     #endregion
-
 }
-

@@ -1,8 +1,5 @@
-﻿//namespace Vorcyc.Mathematics;
-
+//namespace Vorcyc.Mathematics;
 //public class ComputingContext
 //{
-
-
 
 //}

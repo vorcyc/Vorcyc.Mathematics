@@ -32,8 +32,8 @@ internal static class ComputingContextDemo
             Console.WriteLine($"Scope Parallel 内显式 Normal 优先: {scopeWins:F1}");
         }
 
-        Console.WriteLine($"Resolve(null) → Default: {ComputingContext.Resolve(null).Mode}");
-        Console.WriteLine($"ParallelReductionThreshold: {ComputingContext.ParallelReductionThreshold:N0}");
+        Console.WriteLine($"Resolve(null) → Default: {ComputingContext.Resolve(null).CpuMode}");
+        Console.WriteLine($"ParallelReductionThreshold: {ComputingContextExecution.ParallelReductionThreshold:N0}");
         return 0;
     }
 }

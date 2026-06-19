@@ -4,7 +4,7 @@ using Vorcyc.Mathematics.LinearAlgebra;
 namespace Vorcyc.Mathematics.MachineLearning.Regression;
 
 /// <summary>
-/// 回归算法共享的矩阵构建与最小二乘求解工具。
+/// Shared matrix construction and least-squares solving utilities for regression algorithms.
 /// </summary>
 internal static class RegressionMathHelper
 {

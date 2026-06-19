@@ -1,77 +1,64 @@
 namespace Vorcyc.Mathematics.SignalProcessing.Signals;
-
 /// <summary>
-/// 定义信号生成时的行为选项。
+/// 瀹氫箟淇″彿鐢熸垚鏃剁殑琛屼负閫夐」銆?
 /// </summary>
 public enum Behaviour
 {
     /// <summary>
-    /// 替换现有信号。
+    /// 鏇挎崲鐜版湁淇″彿銆?
     /// </summary>
     Replace,
-
     /// <summary>
-    /// 与现有信号逐元素相加。
+    /// 涓庣幇鏈変俊鍙烽€愬厓绱犵浉鍔犮€?
     /// </summary>
     ElementWiseAdd,
-
     /// <summary>
-    /// 与现有信号逐元素相减。
+    /// 涓庣幇鏈変俊鍙烽€愬厓绱犵浉鍑忋€?
     /// </summary>
     ElementWiseSubtract,
-
     /// <summary>
-    /// 与现有信号逐元素相乘。
+    /// 涓庣幇鏈変俊鍙烽€愬厓绱犵浉涔樸€?
     /// </summary>
     ElementWiseMultiply,
-
     /// <summary>
-    /// 与现有信号逐元素相除。
+    /// 涓庣幇鏈変俊鍙烽€愬厓绱犵浉闄ゃ€?
     /// </summary>
     ElementWiseDivide,
 }
-
 /// <summary>
-/// 定义不同的波形类型。
+/// 瀹氫箟涓嶅悓鐨勬尝褰㈢被鍨嬨€?
 /// </summary>
 public enum WaveShape
 {
     /// <summary>
-    /// 正弦波。
+    /// 姝ｅ鸡娉€?
     /// </summary>
     Sine,
-
     /// <summary>
-    /// 余弦波。
+    /// 浣欏鸡娉€?
     /// </summary>
     Cosine,
-
     /// <summary>
-    /// 方波。
+    /// 鏂规尝銆?
     /// </summary>
     Square,
-
     /// <summary>
-    /// 锯齿波。
+    /// 閿娇娉€?
     /// </summary>
     Sawtooth,
-
     /// <summary>
-    /// 三角波。
+    /// 涓夎娉€?
     /// </summary>
     Triangle,
-
     /// <summary>
-    /// 白噪声。
+    /// 鐧藉櫔澹般€?
     /// </summary>
     WhiteNoise,
-
     /// <summary>
-    /// 粉红噪声。
+    /// 绮夌孩鍣０銆?
     /// </summary>
     PinkNoise
 }
-
 /// <summary>
 /// Provides extension methods for generating and applying various waveforms and noise types to time-domain signals.
 /// </summary>
@@ -82,7 +69,6 @@ public enum WaveShape
 /// signal processing scenarios where programmatic waveform synthesis or signal manipulation is required.</remarks>
 public static class SignalGeneratingExtension
 {
-
     /// <summary>
     /// Generates a waveform of the specified shape and frequency, and applies it to the signal using the specified
     /// behavior.
@@ -119,7 +105,6 @@ public static class SignalGeneratingExtension
             default:
                 break;
         }
-
         switch (shape)
         {
             case WaveShape.Sine:
@@ -146,11 +131,8 @@ public static class SignalGeneratingExtension
             default:
                 throw new ArgumentOutOfRangeException(nameof(shape), shape, null);
         }
-
         signal.NotifySamplesModified();
     }
-
-
     //public static void GenerateWave(this IModifiableTimeDomainSignal signal, WaveShape shape, float frequency, Behaviour behaviour = Behaviour.Replace)
     //{
     //    Action<int, float> action = null;
@@ -177,7 +159,6 @@ public static class SignalGeneratingExtension
     //        default:
     //            break;
     //    }
-
     //    switch (shape)
     //    {
     //        case WaveShape.Sine:
@@ -205,14 +186,13 @@ public static class SignalGeneratingExtension
     //            throw new ArgumentOutOfRangeException(nameof(shape), shape, null);
     //    }
     //}
-
     ///// <summary>
-    ///// 生成指定波形，并根据行为对信号进行处理。
+    ///// 鐢熸垚鎸囧畾娉㈠舰锛屽苟鏍规嵁琛屼负瀵逛俊鍙疯繘琛屽鐞嗐€?
     ///// </summary>
-    ///// <param name="signal">表示信号的对象。</param>
-    ///// <param name="shape">波形类型。</param>
-    ///// <param name="frequency">波形的频率。</param>
-    ///// <param name="behaviour">处理行为。</param>
+    ///// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    ///// <param name="shape">娉㈠舰绫诲瀷銆?/param>
+    ///// <param name="frequency">娉㈠舰鐨勯鐜囥€?/param>
+    ///// <param name="behaviour">澶勭悊琛屼负銆?/param>
     //public static void GenerateWave(this ITimeDomainSignal signal, WaveShape shape, float frequency, Behaviour behaviour = Behaviour.Replace)
     //{
     //    switch (shape)
@@ -481,57 +461,49 @@ public static class SignalGeneratingExtension
     //    }
     //}
 
-
-
     /// <summary>
-    /// 生成正弦波，并对每个生成的值执行指定操作。
+    /// 鐢熸垚姝ｅ鸡娉紝骞跺姣忎釜鐢熸垚鐨勫€兼墽琛屾寚瀹氭搷浣溿€?
     /// </summary>
-    /// <param name="signal">表示信号的对象。</param>
-    /// <param name="frequency">正弦波的频率。</param>
-    /// <param name="action">对每个生成的值执行的操作。</param>
+    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    /// <param name="frequency">姝ｅ鸡娉㈢殑棰戠巼銆?/param>
+    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateSineWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
         float increment = ConstantsFp32.TWO_PI * frequency / signal.SamplingRate;
         float phase = 0f;
-
         for (int i = 0; i < signal.Length; i++)
         {
             var value = MathF.Sin(phase);
             action(i, value);
             phase += increment;
-
-            // 确保相位在0到2π之间
+            // 纭繚鐩镐綅鍦?鍒?蟺涔嬮棿
             if (phase >= ConstantsFp32.TWO_PI)
             {
                 phase -= ConstantsFp32.TWO_PI;
             }
         }
     }
-
     /// <summary>
-    /// 生成余弦波，并对每个生成的值执行指定操作。
+    /// 鐢熸垚浣欏鸡娉紝骞跺姣忎釜鐢熸垚鐨勫€兼墽琛屾寚瀹氭搷浣溿€?
     /// </summary>
-    /// <param name="signal">表示信号的对象。</param>
-    /// <param name="frequency">余弦波的频率。</param>
-    /// <param name="action">对每个生成的值执行的操作。</param>
+    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    /// <param name="frequency">浣欏鸡娉㈢殑棰戠巼銆?/param>
+    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateCosineWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
         float omega = 2 * ConstantsFp32.PI * frequency / signal.SamplingRate;
-
         for (int i = 0; i < signal.Length; i++)
         {
             var value = MathF.Cos(omega * i);
             action(i, value);
         }
-
     }
-
     /// <summary>
-    /// 生成方波，并对每个生成的值执行指定操作。
+    /// 鐢熸垚鏂规尝锛屽苟瀵规瘡涓敓鎴愮殑鍊兼墽琛屾寚瀹氭搷浣溿€?
     /// </summary>
-    /// <param name="signal">表示信号的对象。</param>
-    /// <param name="frequency">方波的频率。</param>
-    /// <param name="action">对每个生成的值执行的操作。</param>
+    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    /// <param name="frequency">鏂规尝鐨勯鐜囥€?/param>
+    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateSquareWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
         //float increment = ConstantsFp32.TWO_PI * frequency / signal.SamplingRate;
@@ -540,7 +512,6 @@ public static class SignalGeneratingExtension
         //    var value = MathF.Sign(MathF.Sin(increment * i));
         //    action(i, value);
         //}
-
         //var multiple = 2.0f * frequency / signal.SamplingRate;
         //for (int i = 0; i < signal.Length; i++)
         //{
@@ -548,84 +519,73 @@ public static class SignalGeneratingExtension
         //    var sample = sampleSaw > 0 ? 1 : -1;
         //    action(i, sample);
         //}
-
         var period = signal.SamplingRate / frequency;
         for (int i = 0; i < signal.Length; i++)
         {
             var sample = (i % period) < (period / 2) ? 1.0f : -1.0f;
             action(i, sample);
         }
-
     }
-
     /// <summary>
-    /// 生成锯齿波，并对每个生成的值执行指定操作。
+    /// 鐢熸垚閿娇娉紝骞跺姣忎釜鐢熸垚鐨勫€兼墽琛屾寚瀹氭搷浣溿€?
     /// </summary>
-    /// <param name="signal">表示信号的对象。</param>
-    /// <param name="frequency">锯齿波的频率。</param>
-    /// <param name="action">对每个生成的值执行的操作。</param>
+    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    /// <param name="frequency">閿娇娉㈢殑棰戠巼銆?/param>
+    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateSawtoothWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
         float increment = frequency / signal.SamplingRate;
-
         for (int i = 0; i < signal.Length; i++)
         {
             var value = 2 * (i * increment - MathF.Floor(0.5f + i * increment));
             action(i, value);
         }
     }
-
     /// <summary>
-    /// 生成三角波，并对每个生成的值执行指定操作。
+    /// 鐢熸垚涓夎娉紝骞跺姣忎釜鐢熸垚鐨勫€兼墽琛屾寚瀹氭搷浣溿€?
     /// </summary>
-    /// <param name="signal">表示信号的对象。</param>
-    /// <param name="frequency">三角波的频率。</param>
-    /// <param name="action">对每个生成的值执行的操作。</param>
+    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    /// <param name="frequency">涓夎娉㈢殑棰戠巼銆?/param>
+    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateTriangleWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
         float increment = frequency / signal.SamplingRate;
-
         for (int i = 0; i < signal.Length; i++)
         {
             var value = 2 * MathF.Abs(2 * (i * increment - MathF.Floor(i * increment + 0.5f))) - 1;
             action(i, value);
         }
     }
-
     /// <summary>
-    /// 生成白噪声，并对每个生成的值执行指定操作。
+    /// 鐢熸垚鐧藉櫔澹帮紝骞跺姣忎釜鐢熸垚鐨勫€兼墽琛屾寚瀹氭搷浣溿€?
     /// </summary>
-    /// <param name="signal">表示信号的对象。</param>
-    /// <param name="action">对每个生成的值执行的操作。</param>
+    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateWhiteNoise(ITimeDomainSignal signal, Action<int, float> action)
     {
         for (int i = 0; i < signal.Length; i++)
         {
-            var value = 2f * Random.Shared.NextSingle() - 1f; // 生成范围在 -1 到 1 之间的随机数
+            var value = 2f * Random.Shared.NextSingle() - 1f; // 鐢熸垚鑼冨洿鍦?-1 鍒?1 涔嬮棿鐨勯殢鏈烘暟
             action(i, value);
         }
     }
-
     /// <summary>
-    /// 生成粉红噪声，并对每个生成的值执行指定操作。
+    /// 鐢熸垚绮夌孩鍣０锛屽苟瀵规瘡涓敓鎴愮殑鍊兼墽琛屾寚瀹氭搷浣溿€?
     /// </summary>
-    /// <param name="signal">表示信号的对象。</param>
-    /// <param name="action">对每个生成的值执行的操作。</param>
+    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
+    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GeneratePinkNoise(ITimeDomainSignal signal, Action<int, float> action)
     {
         float[] whiteNoise = new float[signal.Length];
-
-        // 生成白噪声
+        // 鐢熸垚鐧藉櫔澹?
         for (int i = 0; i < signal.Length; i++)
         {
-            whiteNoise[i] = 2 * Random.Shared.NextSingle() - 1; // 生成范围在 -1 到 1 之间的随机数
+            whiteNoise[i] = 2 * Random.Shared.NextSingle() - 1; // 鐢熸垚鑼冨洿鍦?-1 鍒?1 涔嬮棿鐨勯殢鏈烘暟
         }
-
-        // 使用简单的一极滤波器生成粉红噪声
+        // 浣跨敤绠€鍗曠殑涓€鏋佹护娉㈠櫒鐢熸垚绮夌孩鍣０
         float b0 = 0.99765f, b1 = 0.96300f, b2 = 0.57000f;
         float a0 = 0.96400f, a1 = 0.76700f, a2 = 0.53500f;
         float[] noiseHistory = new float[7];
-
         for (int i = 0; i < signal.Length; i++)
         {
             noiseHistory[0] = b0 * whiteNoise[i] + b1 * noiseHistory[1] + b2 * noiseHistory[2] - a0 * noiseHistory[3] - a1 * noiseHistory[4] - a2 * noiseHistory[5];
@@ -633,5 +593,4 @@ public static class SignalGeneratingExtension
             Array.Copy(noiseHistory, 0, noiseHistory, 1, 6);
         }
     }
-
 }

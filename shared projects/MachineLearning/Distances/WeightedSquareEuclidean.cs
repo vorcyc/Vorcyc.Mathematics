@@ -1,8 +1,6 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-
 namespace Vorcyc.Mathematics.MachineLearning.Distances;
-
 /// <summary>
 ///   Weighted Square-Euclidean distance and similarity. Please note that this
 ///   distance is not a metric as it doesn't obey the triangle inequality.
@@ -11,9 +9,7 @@ public class WeightedSquareEuclidean<TSelf>
     : IDistance<TSelf>, ISimilarity<TSelf>
     where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
 {
-
     private static TSelf[] _weights;
-
     /// <summary>
     /// Gets or sets the weights for each dimension. Default is a vector of ones.
     /// </summary>
@@ -25,8 +21,6 @@ public class WeightedSquareEuclidean<TSelf>
         get { return _weights; }
         set { _weights = value; }
     }
-
-
     /// <summary>
     /// Sets <see cref="Weights"/> to ones with specified dim.
     /// </summary>
@@ -37,8 +31,6 @@ public class WeightedSquareEuclidean<TSelf>
         for (int i = 0; i < _weights.Length; i++)
             _weights[i] = TSelf.One;
     }
-
-
 
     /// <summary>
     ///   Computes the distance <c>d(x,y)</c> between points
@@ -64,8 +56,6 @@ public class WeightedSquareEuclidean<TSelf>
         }
         return sum;
     }
-
-
     /// <summary>
     ///   Gets a similarity measure between two points.
     /// </summary>
@@ -79,6 +69,4 @@ public class WeightedSquareEuclidean<TSelf>
     {
         return TSelf.One / (TSelf.One + Distance(x, y));
     }
-
-
 }

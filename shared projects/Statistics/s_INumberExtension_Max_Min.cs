@@ -1,13 +1,9 @@
-﻿namespace Vorcyc.Mathematics.Statistics;
-
+namespace Vorcyc.Mathematics.Statistics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-
-
 /// <summary>Extension methods for <see cref="INumber{T}"/> and <see cref="ValueType"/> ('struct') with SIMD support.</summary>
 public static class INumberExtension
 {
-
     //public static double Max(double a ,double b)
     //{
     //    if (a > b)
@@ -15,8 +11,6 @@ public static class INumberExtension
     //    else
     //        return b;            
     //}
-
-
     //public static double Max(double a ,double b)
     //{
     //    if (a >= b)
@@ -24,30 +18,21 @@ public static class INumberExtension
     //    else
     //        return b;            
     //}
-
-
     //public static double Max(double a, double b)
     //{
     //    if (a > b) return a;
     //    return b;
     //}
 
-
-
     //public static double Max(double a, double b)
     //{
     //    return a > b ? a : b;
     //}
-
-
     //public static double Max(double a, double b) => a > b ? a : b;
     //public static double Max(float a, float b) => a > b ? a : b;
     //public static double Max(int a, int b) => a > b ? a : b;
 
-
-
     #region 针对 Span<T> and INumber<T>  的 MAX 方法
-
     /// <summary>
     /// Gets the max value in <see cref="Span{T}"/> of type <see cref="INumberBase{TSelf}"/>.
     /// </summary>
@@ -60,7 +45,6 @@ public static class INumberExtension
     {
         if (span.Length == 0)
             throw new ArgumentException("Span cannot be empty.", nameof(span));
-
         if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
         {
             var maxVector = new Vector<T>(span.Slice(0, Vector<T>.Count).ToArray());
@@ -70,20 +54,17 @@ public static class INumberExtension
                 var currentVector = new Vector<T>(span.Slice(i, Vector<T>.Count).ToArray());
                 maxVector = Vector.Max(maxVector, currentVector);
             }
-
             T max = maxVector[0];
             for (int j = 1; j < Vector<T>.Count; j++)
             {
                 if (maxVector[j] > max)
                     max = maxVector[j];
             }
-
             for (; i < span.Length; i++)
             {
                 if (span[i] > max)
                     max = span[i];
             }
-
             return max;
         }
         else
@@ -97,7 +78,6 @@ public static class INumberExtension
             return result;
         }
     }
-
     /// <summary>
     /// Finds the maximum value in an array of values.
     /// </summary>
@@ -111,10 +91,8 @@ public static class INumberExtension
     {
         if (values.Length == 0)
             throw new ArgumentException("Array cannot be empty.", nameof(values));
-
         return Max(values.AsSpan());
     }
-
     /// <summary>
     /// Finds the maximum value in a subset of an array of values.
     /// </summary>
@@ -130,16 +108,10 @@ public static class INumberExtension
     {
         if (start < 0 || length < 0 || start + length > values.Length)
             throw new ArgumentException("Invalid subset specified.", nameof(values));
-
         return Max(values.AsSpan(start, length));
     }
-
-
     #endregion
-
-
     #region LocateMax
-
     /// <summary>
     /// Gets the max value and it's index in <see cref="Span{T}"/> of type <see cref="INumberBase{TSelf}"/>.
     /// </summary>
@@ -162,8 +134,6 @@ public static class INumberExtension
         }
         return (resultIndex, result);
     }
-
-
     /// <summary>
     /// Gets the maximum value and its index in an array of values.
     /// </summary>
@@ -177,7 +147,6 @@ public static class INumberExtension
     {
         if (values.Length == 0)
             throw new ArgumentException("Array cannot be empty.", nameof(values));
-
         T result = values[0];
         int resultIndex = 0;
         for (int i = 0; i < values.Length; i++)
@@ -190,7 +159,6 @@ public static class INumberExtension
         }
         return (resultIndex, result);
     }
-
     /// <summary>
     /// Gets the maximum value and its index in a subset of an array of values.
     /// </summary>
@@ -206,7 +174,6 @@ public static class INumberExtension
     {
         if (start < 0 || length < 0 || start + length > values.Length)
             throw new ArgumentException("Invalid subset specified.", nameof(values));
-
         T result = values[start];
         int resultIndex = start;
         for (int i = start; i < start + length; i++)
@@ -219,14 +186,8 @@ public static class INumberExtension
         }
         return (resultIndex, result);
     }
-
-
     #endregion
-
-
     #region Min
-
-
     /// <summary>
     /// Finds the minimum value in a span of values.
     /// </summary>
@@ -240,7 +201,6 @@ public static class INumberExtension
     {
         if (span.Length == 0)
             throw new ArgumentException("Span cannot be empty.", nameof(span));
-
         if (Vector.IsHardwareAccelerated && span.Length >= Vector<T>.Count)
         {
             var minVector = new Vector<T>(span.Slice(0, Vector<T>.Count).ToArray());
@@ -250,20 +210,17 @@ public static class INumberExtension
                 var currentVector = new Vector<T>(span.Slice(i, Vector<T>.Count).ToArray());
                 minVector = Vector.Min(minVector, currentVector);
             }
-
             T min = minVector[0];
             for (int j = 1; j < Vector<T>.Count; j++)
             {
                 if (minVector[j] < min)
                     min = minVector[j];
             }
-
             for (; i < span.Length; i++)
             {
                 if (span[i] < min)
                     min = span[i];
             }
-
             return min;
         }
         else
@@ -277,7 +234,6 @@ public static class INumberExtension
             return result;
         }
     }
-
     /// <summary>
     /// Finds the minimum value in an array of values.
     /// </summary>
@@ -291,10 +247,8 @@ public static class INumberExtension
     {
         if (values.Length == 0)
             throw new ArgumentException("Array cannot be empty.", nameof(values));
-
         return Min(values.AsSpan());
     }
-
     /// <summary>
     /// Finds the minimum value in a subset of an array of values.
     /// </summary>
@@ -310,16 +264,10 @@ public static class INumberExtension
     {
         if (start < 0 || length < 0 || start + length > values.Length)
             throw new ArgumentException("Invalid subset specified.", nameof(values));
-
         return Min(values.AsSpan(start, length));
     }
-
-
     #endregion
-
-
     #region LocateMin
-
     /// <summary>
     /// Gets the min value and it's index in <see cref="Span{T}"/> of type <see cref="INumberBase{TSelf}"/>.
     /// </summary>
@@ -342,7 +290,6 @@ public static class INumberExtension
         }
         return (resultIndex, result);
     }
-
     /// <summary>
     /// Gets the minimum value and its index in an array of values.
     /// </summary>
@@ -356,7 +303,6 @@ public static class INumberExtension
     {
         if (values.Length == 0)
             throw new ArgumentException("Array cannot be empty.", nameof(values));
-
         T result = values[0];
         int resultIndex = 0;
         for (int i = 0; i < values.Length; i++)
@@ -369,7 +315,6 @@ public static class INumberExtension
         }
         return (resultIndex, result);
     }
-
     /// <summary>
     /// Gets the minimum value and its index in a subset of an array of values.
     /// </summary>
@@ -385,7 +330,6 @@ public static class INumberExtension
     {
         if (start < 0 || length < 0 || start + length > values.Length)
             throw new ArgumentException("Invalid subset specified.", nameof(values));
-
         T result = values[start];
         int resultIndex = start;
         for (int i = start; i < start + length; i++)
@@ -398,8 +342,5 @@ public static class INumberExtension
         }
         return (resultIndex, result);
     }
-
     #endregion
-
-
 }

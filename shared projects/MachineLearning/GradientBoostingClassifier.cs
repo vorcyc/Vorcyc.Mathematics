@@ -4,7 +4,7 @@ using Vorcyc.Mathematics.MachineLearning.Internal;
 namespace Vorcyc.Mathematics.MachineLearning;
 
 /// <summary>
-/// 梯度提升分类器（多分类，对数损失 + 回归树弱学习器）。
+/// Gradient boosting classifier (multiclass, log loss + regression-tree weak learners).
 /// </summary>
 public class GradientBoostingClassifier<T> : IClassifier<T>
     where T : struct, IFloatingPointIeee754<T>
@@ -14,17 +14,18 @@ public class GradientBoostingClassifier<T> : IClassifier<T>
     private int _numClasses;
 
     /// <summary>
-    /// 初始化梯度提升分类器。
+    /// Initializes the gradient boosting classifier.
     /// </summary>
-    /// <param name="nEstimators">提升轮数。</param>
-    /// <param name="learningRate">学习率（收缩因子）。</param>
-    /// <param name="maxDepth">弱学习器最大深度。</param>
-    /// <param name="minSamplesSplit">分裂所需最小样本数。</param>
+    /// <param name="nEstimators">The number of boosting rounds.</param>
+    /// <param name="learningRate">The learning rate (shrinkage factor).</param>
+    /// <param name="maxDepth">The maximum depth of the weak learners.</param>
+    /// <param name="minSamplesSplit">The minimum number of samples required to split.</param>
     public GradientBoostingClassifier(
         int nEstimators = 50,
         T learningRate = default,
         int maxDepth = 3,
-        int minSamplesSplit = 2)
+        int minSamplesSplit = 2,
+        ComputingContext? context = null)
     {
         if (nEstimators <= 0)
             throw new ArgumentOutOfRangeException(nameof(nEstimators));
@@ -37,36 +38,43 @@ public class GradientBoostingClassifier<T> : IClassifier<T>
         LearningRate = learningRate.Equals(default) ? T.CreateChecked(0.1) : learningRate;
         MaxDepth = maxDepth;
         MinSamplesSplit = minSamplesSplit;
+        Context = context;
     }
 
-    /// <summary>提升轮数。</summary>
+    /// <summary>The number of boosting rounds.</summary>
     public int NEstimators { get; }
 
-    /// <summary>学习率。</summary>
+    /// <summary>The learning rate.</summary>
     public T LearningRate { get; }
 
-    /// <summary>弱学习器最大深度。</summary>
+    /// <summary>The maximum depth of the weak learners.</summary>
     public int MaxDepth { get; }
 
-    /// <summary>分裂最小样本数。</summary>
+    /// <summary>The minimum number of samples to split.</summary>
     public int MinSamplesSplit { get; }
+
+    /// <summary>
+    /// Execution policy honored by this estimator. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
+    /// </summary>
+    public ComputingContext? Context { get; set; }
 
     /// <inheritdoc />
     public MachineLearningTask Task => MachineLearningTask.Classification;
 
     /// <summary>
-    /// 拟合多分类模型。标签为非负整数。
+    /// Fits the multiclass model. Labels must be non-negative integers.
     /// </summary>
     public void Fit(T[,] x, int[] y)
     {
         if (x == null || y == null)
-            throw new ArgumentException("输入不能为 null。");
+            throw new ArgumentException("Input cannot be null.");
 
         int rows = x.GetLength(0);
         if (rows == 0 || y.Length == 0 || rows != y.Length)
-            throw new ArgumentException("样本数与标签数不匹配。");
+            throw new ArgumentException("The number of samples does not match the number of labels.");
         if (y.Min() < 0)
-            throw new ArgumentException("标签必须为非负整数。");
+            throw new ArgumentException("Labels must be non-negative integers.");
 
         _numClasses = y.Max() + 1;
         _baseScores = ComputeBaseScores(y, _numClasses);
@@ -78,27 +86,32 @@ public class GradientBoostingClassifier<T> : IClassifier<T>
             scores[i] = (T[])_baseScores.Clone();
         }
 
-        var probabilities = new T[_numClasses];
-        var residuals = new T[rows];
-
         for (int stage = 0; stage < NEstimators; stage++)
         {
             var trees = new RegressionTree[_numClasses];
-            for (int c = 0; c < _numClasses; c++)
-            {
-                for (int i = 0; i < rows; i++)
+            ComputingContextExecution.ForEach(
+                Context,
+                0,
+                _numClasses,
+                c =>
                 {
-                    StableProbabilities.Softmax(scores[i], probabilities);
-                    T target = y[i] == c ? T.One : T.Zero;
-                    residuals[i] = target - probabilities[c];
-                }
+                    // Per-class scratch buffers keep this loop safe to run in parallel.
+                    var localProbabilities = new T[_numClasses];
+                    var localResiduals = new T[rows];
+                    for (int i = 0; i < rows; i++)
+                    {
+                        StableProbabilities.Softmax(scores[i], localProbabilities);
+                        T target = y[i] == c ? T.One : T.Zero;
+                        localResiduals[i] = target - localProbabilities[c];
+                    }
 
-                trees[c] = RegressionTree.Fit(
-                    x,
-                    residuals,
-                    MaxDepth,
-                    MinSamplesSplit);
-            }
+                    trees[c] = RegressionTree.Fit(
+                        x,
+                        localResiduals,
+                        MaxDepth,
+                        MinSamplesSplit);
+                },
+                workPerItem: (long)rows * MaxDepth);
 
             _stages.Add(trees);
 
@@ -113,12 +126,12 @@ public class GradientBoostingClassifier<T> : IClassifier<T>
     }
 
     /// <summary>
-    /// 预测类别。
+    /// Predicts the class.
     /// </summary>
     public int Predict(T[] sample)
     {
         if (_baseScores == null || _stages == null)
-            throw new InvalidOperationException("模型尚未拟合。");
+            throw new InvalidOperationException("The model has not been fitted yet.");
         if (sample == null)
             throw new ArgumentNullException(nameof(sample));
 
@@ -164,7 +177,7 @@ public class GradientBoostingClassifier<T> : IClassifier<T>
 
         public T Predict(T[] sample)
         {
-            var node = _root ?? throw new InvalidOperationException("树未构建。");
+            var node = _root ?? throw new InvalidOperationException("The tree has not been built.");
             while (!node.IsLeaf)
                 node = sample[node.FeatureIndex] <= node.Threshold ? node.Left! : node.Right!;
             return node.Value;

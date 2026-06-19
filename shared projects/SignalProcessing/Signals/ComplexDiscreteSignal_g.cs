@@ -1,8 +1,6 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Signals;
-
+namespace Vorcyc.Mathematics.SignalProcessing.Signals;
 using System.Numerics;
 using Vorcyc.Mathematics.Numerics;
-
 /// <summary>
 /// Represents a finite complex-valued discrete-time signal.
 /// The signal is stored as two arrays of data (real parts and imaginary parts) sampled at a certain sampling rate.
@@ -12,28 +10,22 @@ using Vorcyc.Mathematics.Numerics;
 public class ComplexDiscreteSignal<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
-
-
     /// <summary>
     /// Gets sampling rate (number of samples per one second).
     /// </summary>
     public int SamplingRate { get; }
-
     /// <summary>
     /// Gets the real parts of complex-valued samples.
     /// </summary>
     public T[] Real { get; }
-
     /// <summary>
     /// Gets the imaginary parts of complex-valued samples.
     /// </summary>
     public T[] Imag { get; }
-
     /// <summary>
     /// Gets the length of the signal.
     /// </summary>
     public int Length => Real.Length;
-
     /// <summary>
     /// The most efficient constructor for initializing complex discrete signals. 
     /// By default, it just wraps <see cref="ComplexDiscreteSignal"/> 
@@ -47,16 +39,12 @@ public class ComplexDiscreteSignal<T>
     public ComplexDiscreteSignal(int samplingRate, T[] real, T[]? imag = null, bool allocateNew = false)
     {
         Guard.AgainstNonPositive(samplingRate, "Sampling rate");
-
         SamplingRate = samplingRate;
         Real = allocateNew ? real.Copy() : real;
-
         // additional logic for imaginary part initialization
-
         if (imag != null)
         {
             Guard.AgainstInequality(real.Length, imag.Length, "Number of real parts", "number of imaginary parts");
-
             Imag = allocateNew ? imag.Copy() : imag;
         }
         else
@@ -64,7 +52,6 @@ public class ComplexDiscreteSignal<T>
             Imag = new T[real.Length];
         }
     }
-
     /// <summary>
     /// Constructs complex signal from collections of <paramref name="real"/> and <paramref name="imag"/> parts.
     /// </summary>
@@ -75,7 +62,6 @@ public class ComplexDiscreteSignal<T>
         : this(samplingRate, real.ToArray(), imag?.ToArray())
     {
     }
-
     /// <summary>
     /// Constructs signal from collection of <paramref name="samples"/> sampled at <paramref name="samplingRate"/>.
     /// </summary>
@@ -85,7 +71,6 @@ public class ComplexDiscreteSignal<T>
         : this(samplingRate, samples.Select(s => s.Real), samples.Select(s => s.Imaginary))
     {
     }
-
     /// <summary>
     /// Constructs signal of given <paramref name="length"/> filled with specified values.
     /// </summary>
@@ -96,9 +81,7 @@ public class ComplexDiscreteSignal<T>
     public ComplexDiscreteSignal(int samplingRate, int length, T real = default, T imag = default)
     {
         Guard.AgainstNonPositive(samplingRate, "Sampling rate");
-
         SamplingRate = samplingRate;
-
         var reals = new T[length];
         var imags = new T[length];
         for (var i = 0; i < length; i++)
@@ -109,7 +92,6 @@ public class ComplexDiscreteSignal<T>
         Real = reals;
         Imag = imags;
     }
-
     /// <summary>
     /// Constructs signal from collection of integer <paramref name="samples"/> sampled at given <paramref name="samplingRate"/>.
     /// </summary>
@@ -119,23 +101,17 @@ public class ComplexDiscreteSignal<T>
     public ComplexDiscreteSignal(int samplingRate, IEnumerable<T> samples, T? normalizeFactor = null)
     {
         Guard.AgainstNonPositive(samplingRate, "Sampling rate");
-
         normalizeFactor ??= T.One;
-
         SamplingRate = samplingRate;
-
         var intSamples = samples.ToArray();
         var realSamples = new T[intSamples.Length];
-
         for (var i = 0; i < intSamples.Length; i++)
         {
             realSamples[i] = intSamples[i] / normalizeFactor.Value;
         }
-
         Real = realSamples;
         Imag = new T[intSamples.Length];
     }
-
     /// <summary>
     /// Creates deep copy of the signal.
     /// </summary>
@@ -143,7 +119,6 @@ public class ComplexDiscreteSignal<T>
     {
         return new ComplexDiscreteSignal<T>(SamplingRate, Real, Imag, allocateNew: true);
     }
-
     /// <summary>
     /// Sample indexer. Works only with array of real parts of samples. Use it with caution.
     /// </summary>
@@ -152,7 +127,6 @@ public class ComplexDiscreteSignal<T>
         get => Real[index];
         set => Real[index] = value;
     }
-
     /// <summary>
     /// Creates the slice of the signal: 
     /// <code>
@@ -166,15 +140,12 @@ public class ComplexDiscreteSignal<T>
         get
         {
             Guard.AgainstInvalidRange(startPos, endPos, "Left index", "Right index");
-
             var rangeLength = endPos - startPos;
-
             return new ComplexDiscreteSignal<T>(SamplingRate,
                                 Real.FastCopyFragment(rangeLength, startPos),
                                 Imag.FastCopyFragment(rangeLength, startPos));
         }
     }
-
     /// <summary>
     /// Gets the magnitudes of complex-valued samples.
     /// </summary>
@@ -184,17 +155,14 @@ public class ComplexDiscreteSignal<T>
         {
             var real = Real;
             var imag = Imag;
-
             var magnitude = new T[real.Length];
             for (var i = 0; i < magnitude.Length; i++)
             {
                 magnitude[i] = T.Sqrt(real[i] * real[i] + imag[i] * imag[i]);
             }
-
             return magnitude;
         }
     }
-
     /// <summary>
     /// Gets the power (squared magnitudes) of complex-valued samples.
     /// </summary>
@@ -204,17 +172,14 @@ public class ComplexDiscreteSignal<T>
         {
             var real = Real;
             var imag = Imag;
-
             var magnitude = new T[real.Length];
             for (var i = 0; i < magnitude.Length; i++)
             {
                 magnitude[i] = real[i] * real[i] + imag[i] * imag[i];
             }
-
             return magnitude;
         }
     }
-
     /// <summary>
     /// Gets the phases of complex-valued samples.
     /// </summary>
@@ -224,25 +189,19 @@ public class ComplexDiscreteSignal<T>
         {
             var real = Real;
             var imag = Imag;
-
             var phase = new T[real.Length];
             for (var i = 0; i < phase.Length; i++)
             {
                 phase[i] = T.Atan2(imag[i], real[i]);
             }
-
             return phase;
         }
     }
-
     /// <summary>
     /// Gets the unwrapped phases of complex-valued samples.
     /// </summary>
     public T[] PhaseUnwrapped => ComplexDiscreteSignalExtensions.Unwrap<T>(Phase);// Phase.Unwrap();
-
-
     #region overloaded operators
-
     /// <summary>
     /// Creates new signal by superimposing signals <paramref name="s1"/> and <paramref name="s2"/>. 
     /// If sizes are different then the smaller signal is broadcast to fit the size of the larger signal.
@@ -253,7 +212,6 @@ public class ComplexDiscreteSignal<T>
     {
         return s1.Superimpose(s2);
     }
-
     /// <summary>
     /// Creates new signal by adding <paramref name="constant"/> to signal <paramref name="s"/>.
     /// </summary>
@@ -263,7 +221,6 @@ public class ComplexDiscreteSignal<T>
     {
         return new ComplexDiscreteSignal<T>(s.SamplingRate, s.Real.Select(x => x + constant), imag: null);
     }
-
     /// <summary>
     /// Creates new signal by subtracting <paramref name="constant"/> from signal <paramref name="s"/>.
     /// </summary>
@@ -273,7 +230,6 @@ public class ComplexDiscreteSignal<T>
     {
         return new ComplexDiscreteSignal<T>(s.SamplingRate, s.Real.Select(x => x - constant), imag: null);
     }
-
     /// <summary>
     /// Creates new signal by multiplying <paramref name="s"/> by <paramref name="coeff"/> (amplification/attenuation).
     /// </summary>
@@ -285,11 +241,6 @@ public class ComplexDiscreteSignal<T>
         signal.Amplify(coeff);
         return signal;
     }
-
     #endregion
-
-
-
-
 
 }

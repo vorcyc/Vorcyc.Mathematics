@@ -3,14 +3,14 @@ using System.Numerics;
 namespace Vorcyc.Mathematics.MachineLearning;
 
 /// <summary>
-/// 统一的整数标签分类器接口。
+/// A unified integer-label classifier interface.
 /// </summary>
 public interface IClassifier<T> : IMachineLearning
     where T : struct, IFloatingPointIeee754<T>
 {
-    /// <summary>拟合分类模型。</summary>
+    /// <summary>Fits the classification model.</summary>
     void Fit(T[,] x, int[] y);
 
-    /// <summary>预测类别。</summary>
+    /// <summary>Predicts the class.</summary>
     int Predict(T[] sample);
 }

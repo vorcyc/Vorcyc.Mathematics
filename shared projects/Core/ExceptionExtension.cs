@@ -1,8 +1,6 @@
-﻿using System.Numerics;
+using System.Numerics;
 using Vorcyc.Mathematics.Buffers;
-
 namespace Vorcyc.Mathematics;
-
 /// <summary>
 /// Provides extension methods for validating arguments and throwing <see cref="ArgumentNullException"/> when null,
 /// empty, or invalid values are detected.
@@ -12,10 +10,8 @@ namespace Vorcyc.Mathematics;
 /// exceptions when validation fails.</remarks>
 public static class ArgumentNullExceptionExtension
 {
-
     extension(ArgumentNullException)
     {
-
         /// <summary>
         /// Throws an exception if the specified pointer is zero.
         /// </summary>
@@ -28,7 +24,6 @@ public static class ArgumentNullExceptionExtension
                 throw new ArgumentNullException(nameof(ptr), "Pointer is null.");
             }
         }
-
         /// <summary>
         /// Throws an exception if the specified object is null.
         /// </summary>
@@ -44,7 +39,6 @@ public static class ArgumentNullExceptionExtension
                 throw new ArgumentNullException(nameof(obj), "Object is null.");
             }
         }
-
         /// <summary>
         /// Throws an exception if the specified string is null or empty.
         /// </summary>
@@ -57,7 +51,6 @@ public static class ArgumentNullExceptionExtension
                 throw new ArgumentNullException(nameof(str), "String is null or empty.");
             }
         }
-
         /// <summary>
         /// Throws an exception if the specified unmanaged pointer is null.
         /// </summary>
@@ -70,7 +63,6 @@ public static class ArgumentNullExceptionExtension
                 throw new ArgumentNullException(nameof(ptr), "Pointer is null.");
             }
         }
-
         /// <summary>
         /// Throws an exception if the specified span is empty.
         /// </summary>
@@ -86,8 +78,6 @@ public static class ArgumentNullExceptionExtension
                 throw new ArgumentNullException(nameof(span), "Span is empty.");
             }
         }
-
-
         /// <summary>
         /// Throws an exception if the specified span is empty.
         /// </summary>
@@ -104,11 +94,8 @@ public static class ArgumentNullExceptionExtension
             }
         }
 
-
-
     }
 }
-
 /// <summary>
 /// Provides extension methods for validating argument values and throwing exceptions when argument conditions are not
 /// met.
@@ -118,10 +105,8 @@ public static class ArgumentNullExceptionExtension
 /// cref="ArgumentException"/> to enforce argument constraints and improve code readability.</remarks>
 public static class ArgumentExceptionExtension
 {
-
     extension(ArgumentException)
     {
-
         /// <summary>
         /// Throws an exception if the lengths of the specified arrays are not equal.
         /// </summary>
@@ -142,8 +127,6 @@ public static class ArgumentExceptionExtension
             }
         }
 
-
-
         /// <summary>
         /// Throws an exception if the specified arrays do not have equal lengths.
         /// </summary>
@@ -161,8 +144,6 @@ public static class ArgumentExceptionExtension
             }
         }
 
-
-
         /// <summary>
         /// Throws an exception if the lengths of the specified spans are not equal.
         /// </summary>
@@ -179,8 +160,6 @@ public static class ArgumentExceptionExtension
                 throw new ArgumentException(message ?? $"Array lengths are not equal. {nameof(arr1)}.Length: {arr1.Length}, {nameof(arr2)}.Length: {arr2.Length}");
             }
         }
-
-
         /// <summary>
         /// Throws an exception if the lengths of the specified spans are not equal.
         /// </summary>
@@ -197,10 +176,8 @@ public static class ArgumentExceptionExtension
                 throw new ArgumentException(message ?? $"Array lengths are not equal. {nameof(arr1)}.Length: {arr1.Length}, {nameof(arr2)}.Length: {arr2.Length}");
             }
         }
-
     }
 }
-
 /// <summary>
 /// Provides extension methods for validating operation conditions and throwing an <see
 /// cref="InvalidOperationException"/> when required.
@@ -210,10 +187,8 @@ public static class ArgumentExceptionExtension
 /// detected early and reported with meaningful exceptions.</remarks>
 public static class InvalidOperationExceptionExtension
 {
-
     extension(InvalidOperationException)
     {
-
         /// <summary>
         /// Throws an exception if the specified pointer is zero.
         /// </summary>
@@ -227,8 +202,6 @@ public static class InvalidOperationExceptionExtension
                 throw new InvalidOperationException(message ?? "Pointer is null.");
             }
         }
-
-
         /// <summary>
         /// Throws an exception if the specified <see cref="PinnableArray{T}"/> instance is not pinned.
         /// </summary>
@@ -244,7 +217,5 @@ public static class InvalidOperationExceptionExtension
                 throw new InvalidOperationException("PinnableArray is not pinned.");
             }
         }
-
     }
 }
-

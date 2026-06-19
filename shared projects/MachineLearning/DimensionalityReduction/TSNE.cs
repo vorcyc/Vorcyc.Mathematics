@@ -4,9 +4,9 @@ using Vorcyc.Mathematics.LinearAlgebra;
 namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 
 /// <summary>
-/// t-SNE 算法类，用于降维和数据可视化。
+/// t-SNE algorithm class, used for dimensionality reduction and data visualization.
 /// </summary>
-/// <typeparam name="T">数值类型，必须实现 IFloatingPointIeee754 接口。</typeparam>
+/// <typeparam name="T">The numeric type, which must implement the IFloatingPointIeee754 interface.</typeparam>
 public class TSNE<T> : IMachineLearning
     where T : struct, IFloatingPointIeee754<T>
 {
@@ -16,38 +16,46 @@ public class TSNE<T> : IMachineLearning
     private readonly Action<int, T>? _progressCallback;
 
     /// <summary>
-    /// 构造 t-SNE 算法实例。
+    /// Execution policy honored by this estimator. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
     /// </summary>
-    /// <param name="perplexity">困惑度参数。</param>
-    /// <param name="maxIter">最大迭代次数。</param>
-    /// <param name="learningRate">学习率。</param>
-    /// <param name="progressCallback">可选进度回调 (iteration, cost)。</param>
-    public TSNE(int perplexity = 30, int maxIter = 1000, T learningRate = default, Action<int, T>? progressCallback = null)
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>
+    /// Constructs a t-SNE algorithm instance.
+    /// </summary>
+    /// <param name="perplexity">The perplexity parameter.</param>
+    /// <param name="maxIter">The maximum number of iterations.</param>
+    /// <param name="learningRate">The learning rate.</param>
+    /// <param name="progressCallback">An optional progress callback (iteration, cost).</param>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    public TSNE(int perplexity = 30, int maxIter = 1000, T learningRate = default, Action<int, T>? progressCallback = null, ComputingContext? context = null)
     {
         _perplexity = perplexity;
         _maxIter = maxIter;
         _learningRate = learningRate.Equals(default) ? T.CreateChecked(200.0) : learningRate;
         _progressCallback = progressCallback;
+        Context = context;
     }
 
     /// <inheritdoc />
     public MachineLearningTask Task => MachineLearningTask.DimensionalityReduction;
 
     /// <summary>
-    /// 执行 t-SNE 算法并返回降维后的矩阵。
+    /// Runs the t-SNE algorithm and returns the dimensionality-reduced matrix.
     /// </summary>
-    /// <param name="data">输入的高维数据矩阵。</param>
-    /// <returns>降维后的矩阵。</returns>
+    /// <param name="data">The input high-dimensional data matrix.</param>
+    /// <returns>The dimensionality-reduced matrix.</returns>
     public Matrix<T> FitTransform(Matrix<T> data)
     {
         int n = data.Rows;
         int d = data.Columns;
         int outputDims = 2;
 
-        // 第一步：计算高维空间中的成对相似性
+        // Step 1: compute the pairwise affinities in the high-dimensional space
         Matrix<T> P = ComputePairwiseAffinities(data, _perplexity);
 
-        // 第二步：随机初始化低维空间
+        // Step 2: randomly initialize the low-dimensional space
         Random rand = new Random();
         Matrix<T> Y = new Matrix<T>(n, outputDims);
         for (int i = 0; i < n; i++)
@@ -58,13 +66,13 @@ public class TSNE<T> : IMachineLearning
             }
         }
 
-        // 第三步：梯度下降
+        // Step 3: gradient descent
         for (int iter = 0; iter < _maxIter; iter++)
         {
             Matrix<T> Q = ComputeLowDimensionalAffinities(Y);
             Matrix<T> grads = ComputeGradients(P, Q, Y);
 
-            // 更新 Y
+            // Update Y
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < outputDims; j++)
@@ -81,40 +89,45 @@ public class TSNE<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算高维空间中的成对相似性。
+    /// Computes the pairwise affinities in the high-dimensional space.
     /// </summary>
-    /// <param name="data">输入的高维数据矩阵。</param>
-    /// <param name="perplexity">困惑度参数。</param>
-    /// <returns>成对相似性矩阵。</returns>
+    /// <param name="data">The input high-dimensional data matrix.</param>
+    /// <param name="perplexity">The perplexity parameter.</param>
+    /// <returns>The pairwise affinity matrix.</returns>
     private Matrix<T> ComputePairwiseAffinities(Matrix<T> data, int perplexity)
     {
         int n = data.Rows;
         Matrix<T> P = new Matrix<T>(n, n);
 
-        for (int i = 0; i < n; i++)
-        {
-            T[] distances = new T[n];
-            for (int j = 0; j < n; j++)
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            n,
+            i =>
             {
-                distances[j] = EuclideanDistance(data, i, j);
-            }
+                T[] distances = new T[n];
+                for (int j = 0; j < n; j++)
+                {
+                    distances[j] = EuclideanDistance(data, i, j);
+                }
 
-            T[] affinities = ComputeAffinities(distances, perplexity);
-            for (int j = 0; j < n; j++)
-            {
-                P[i, j] = affinities[j];
-            }
-        }
+                T[] affinities = ComputeAffinities(distances, perplexity);
+                for (int j = 0; j < n; j++)
+                {
+                    P[i, j] = affinities[j];
+                }
+            },
+            workPerItem: (long)n * data.Columns);
 
         return P;
     }
 
     /// <summary>
-    /// 计算成对距离的相似性。
+    /// Computes the affinities for pairwise distances.
     /// </summary>
-    /// <param name="distances">成对距离数组。</param>
-    /// <param name="perplexity">困惑度参数。</param>
-    /// <returns>相似性数组。</returns>
+    /// <param name="distances">The pairwise distance array.</param>
+    /// <param name="perplexity">The perplexity parameter.</param>
+    /// <returns>The affinity array.</returns>
     private T[] ComputeAffinities(T[] distances, int perplexity)
     {
         int n = distances.Length;
@@ -157,12 +170,12 @@ public class TSNE<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算两个数据点之间的欧几里得距离。
+    /// Computes the Euclidean distance between two data points.
     /// </summary>
-    /// <param name="data">数据矩阵。</param>
-    /// <param name="i">第一个数据点的索引。</param>
-    /// <param name="j">第二个数据点的索引。</param>
-    /// <returns>欧几里得距离。</returns>
+    /// <param name="data">The data matrix.</param>
+    /// <param name="i">The index of the first data point.</param>
+    /// <param name="j">The index of the second data point.</param>
+    /// <returns>The Euclidean distance.</returns>
     private T EuclideanDistance(Matrix<T> data, int i, int j)
     {
         T sum = T.Zero;
@@ -175,10 +188,10 @@ public class TSNE<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算低维空间中的成对相似性。
+    /// Computes the pairwise affinities in the low-dimensional space.
     /// </summary>
-    /// <param name="Y">低维数据矩阵。</param>
-    /// <returns>成对相似性矩阵。</returns>
+    /// <param name="Y">The low-dimensional data matrix.</param>
+    /// <returns>The pairwise affinity matrix.</returns>
     private Matrix<T> ComputeLowDimensionalAffinities(Matrix<T> Y)
     {
         int n = Y.Rows;
@@ -210,43 +223,48 @@ public class TSNE<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 计算梯度。
+    /// Computes the gradients.
     /// </summary>
-    /// <param name="P">高维空间中的成对相似性矩阵。</param>
-    /// <param name="Q">低维空间中的成对相似性矩阵。</param>
-    /// <param name="Y">低维数据矩阵。</param>
-    /// <returns>梯度矩阵。</returns>
+    /// <param name="P">The pairwise affinity matrix in the high-dimensional space.</param>
+    /// <param name="Q">The pairwise affinity matrix in the low-dimensional space.</param>
+    /// <param name="Y">The low-dimensional data matrix.</param>
+    /// <returns>The gradient matrix.</returns>
     private Matrix<T> ComputeGradients(Matrix<T> P, Matrix<T> Q, Matrix<T> Y)
     {
         int n = Y.Rows;
         int d = Y.Columns;
         Matrix<T> grads = new Matrix<T>(n, d);
 
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < n; j++)
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            n,
+            i =>
             {
-                if (i != j)
+                for (int j = 0; j < n; j++)
                 {
-                    T dist = EuclideanDistance(Y, i, j);
-                    T coeff = T.CreateChecked(4) * (P[i, j] - Q[i, j]) * Q[i, j] / (T.One + dist * dist);
-                    for (int k = 0; k < d; k++)
+                    if (i != j)
                     {
-                        grads[i, k] += coeff * (Y[i, k] - Y[j, k]);
+                        T dist = EuclideanDistance(Y, i, j);
+                        T coeff = T.CreateChecked(4) * (P[i, j] - Q[i, j]) * Q[i, j] / (T.One + dist * dist);
+                        for (int k = 0; k < d; k++)
+                        {
+                            grads[i, k] += coeff * (Y[i, k] - Y[j, k]);
+                        }
                     }
                 }
-            }
-        }
+            },
+            workPerItem: (long)n * d);
 
         return grads;
     }
 
     /// <summary>
-    /// 计算成本函数值。
+    /// Computes the cost function value.
     /// </summary>
-    /// <param name="P">高维空间中的成对相似性矩阵。</param>
-    /// <param name="Q">低维空间中的成对相似性矩阵。</param>
-    /// <returns>成本函数值。</returns>
+    /// <param name="P">The pairwise affinity matrix in the high-dimensional space.</param>
+    /// <param name="Q">The pairwise affinity matrix in the low-dimensional space.</param>
+    /// <returns>The cost function value.</returns>
     private T ComputeCost(Matrix<T> P, Matrix<T> Q)
     {
         int n = P.Rows;

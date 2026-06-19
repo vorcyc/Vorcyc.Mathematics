@@ -4,35 +4,36 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// 表示一个整数范围，具有最小值和最大值。
+/// Represents an integer range with a minimum and a maximum value.
 /// </summary>
 /// <remarks>
-/// 该类表示一个包含最小值和最大值的整数范围，其中范围的最小值和最大值都包含在内。
-/// 这种范围的数学表示法为 <b>[min, max]</b>。
+/// This type represents an integer range that includes both the minimum and maximum values,
+/// where both the minimum and maximum of the range are inclusive.
+/// The mathematical notation for such a range is <b>[min, max]</b>.
 /// </remarks>
 [Serializable]
 public struct IntRange : IEquatable<IntRange>, IEnumerable<int>
 {
     /// <summary>
-    /// 获取或设置范围的最小值。
+    /// Gets or sets the minimum value of the range.
     /// </summary>
     public int Min { get; set; }
 
     /// <summary>
-    /// 获取或设置范围的最大值。
+    /// Gets or sets the maximum value of the range.
     /// </summary>
     public int Max { get; set; }
 
     /// <summary>
-    /// 获取范围的长度，定义为 (max - min)。
+    /// Gets the length of the range, defined as (max - min).
     /// </summary>
     public int Length => Max - Min;
 
     /// <summary>
-    /// 初始化 <see cref="IntRange"/> 类的新实例。
+    /// Initializes a new instance of the <see cref="IntRange"/> class.
     /// </summary>
-    /// <param name="min">范围的最小值。</param>
-    /// <param name="max">范围的最大值。</param>
+    /// <param name="min">The minimum value of the range.</param>
+    /// <param name="max">The maximum value of the range.</param>
     public IntRange(int min, int max)
     {
         Min = min;
@@ -40,61 +41,61 @@ public struct IntRange : IEquatable<IntRange>, IEnumerable<int>
     }
 
     /// <summary>
-    /// 检查指定值是否在范围内。
+    /// Checks whether the specified value is inside the range.
     /// </summary>
-    /// <param name="x">要检查的值。</param>
-    /// <returns>如果指定值在范围内，则为 <b>true</b>；否则为 <b>false</b>。</returns>
+    /// <param name="x">The value to check.</param>
+    /// <returns><b>true</b> if the specified value is inside the range; otherwise, <b>false</b>.</returns>
     public bool IsInside(int x) => x >= Min && x <= Max;
 
     /// <summary>
-    /// 计算两个范围之间的交集。
+    /// Computes the intersection between two ranges.
     /// </summary>
-    /// <param name="range">要计算交集的第二个范围。</param>
-    /// <returns>包含此范围与作为参数给定的 <paramref name="range"/> 之间交集的新 <see cref="IntRange"/> 结构。</returns>
+    /// <param name="range">The second range to compute the intersection with.</param>
+    /// <returns>A new <see cref="IntRange"/> structure containing the intersection between this range and the <paramref name="range"/> given as a parameter.</returns>
     public IntRange Intersection(IntRange range) => new IntRange(Math.Max(Min, range.Min), Math.Min(Max, range.Max));
 
     /// <summary>
-    /// 检查指定范围是否在范围内。
+    /// Checks whether the specified range is inside this range.
     /// </summary>
-    /// <param name="range">要检查的范围。</param>
-    /// <returns>如果指定范围在范围内，则为 <b>true</b>；否则为 <b>false</b>。</returns>
+    /// <param name="range">The range to check.</param>
+    /// <returns><b>true</b> if the specified range is inside this range; otherwise, <b>false</b>.</returns>
     public bool IsInside(IntRange range) => IsInside(range.Min) && IsInside(range.Max);
 
     /// <summary>
-    /// 检查指定范围是否与范围重叠。
+    /// Checks whether the specified range overlaps with this range.
     /// </summary>
-    /// <param name="range">要检查重叠的范围。</param>
-    /// <returns>如果指定范围与范围重叠，则为 <b>true</b>；否则为 <b>false</b>。</returns>
+    /// <param name="range">The range to check for overlap.</param>
+    /// <returns><b>true</b> if the specified range overlaps with this range; otherwise, <b>false</b>.</returns>
     public bool IsOverlapping(IntRange range) => IsInside(range.Min) || IsInside(range.Max) || range.IsInside(Min) || range.IsInside(Max);
 
     /// <summary>
-    /// 确定两个实例是否相等。
+    /// Determines whether two instances are equal.
     /// </summary>
     public static bool operator ==(IntRange range1, IntRange range2) => range1.Min == range2.Min && range1.Max == range2.Max;
 
     /// <summary>
-    /// 确定两个实例是否不相等。
+    /// Determines whether two instances are not equal.
     /// </summary>
     public static bool operator !=(IntRange range1, IntRange range2) => !(range1 == range2);
 
     /// <summary>
-    /// 指示当前对象是否等于同一类型的另一个对象。
+    /// Indicates whether the current object is equal to another object of the same type.
     /// </summary>
-    /// <param name="other">要与此对象进行比较的对象。</param>
-    /// <returns>如果当前对象等于 <paramref name="other"/> 参数，则为 true；否则为 false。</returns>
+    /// <param name="other">The object to compare with this object.</param>
+    /// <returns>true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.</returns>
     public bool Equals(IntRange other) => this == other;
 
     /// <summary>
-    /// 确定指定的 <see cref="System.Object"/> 是否等于此实例。
+    /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
     /// </summary>
-    /// <param name="obj">要与此实例进行比较的 <see cref="System.Object"/>。</param>
-    /// <returns>如果指定的 <see cref="System.Object"/> 等于此实例，则为 true；否则为 false。</returns>
+    /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
+    /// <returns>true if the specified <see cref="System.Object"/> is equal to this instance; otherwise, false.</returns>
     public override bool Equals(object obj) => obj is IntRange range && this == range;
 
     /// <summary>
-    /// 返回此实例的哈希代码。
+    /// Returns the hash code for this instance.
     /// </summary>
-    /// <returns>此实例的哈希代码，适用于哈希算法和数据结构（如哈希表）。</returns>
+    /// <returns>The hash code for this instance, suitable for use in hashing algorithms and data structures such as a hash table.</returns>
     public override int GetHashCode()
     {
         unchecked
@@ -107,23 +108,23 @@ public struct IntRange : IEquatable<IntRange>, IEnumerable<int>
     }
 
     /// <summary>
-    /// 返回表示此实例的 <see cref="System.String"/>。
+    /// Returns a <see cref="System.String"/> that represents this instance.
     /// </summary>
-    /// <returns>表示此实例的 <see cref="System.String"/>。</returns>
+    /// <returns>A <see cref="System.String"/> that represents this instance.</returns>
     public override string ToString() => $"[{Min}, {Max}]";
 
     /// <summary>
-    /// 返回表示此实例的 <see cref="System.String"/>。
+    /// Returns a <see cref="System.String"/> that represents this instance.
     /// </summary>
-    /// <param name="format">格式字符串。</param>
-    /// <param name="formatProvider">格式提供程序。</param>
-    /// <returns>表示此实例的 <see cref="System.String"/>。</returns>
+    /// <param name="format">The format string.</param>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <returns>A <see cref="System.String"/> that represents this instance.</returns>
     public string ToString(string format, IFormatProvider formatProvider) => $"[{Min.ToString(format, formatProvider)}, {Max.ToString(format, formatProvider)}]";
 
     /// <summary>
-    /// 返回一个枚举器，该枚举器遍历集合。
+    /// Returns an enumerator that iterates through the collection.
     /// </summary>
-    /// <returns>可用于遍历集合的 <see cref="T:System.Collections.IEnumerator"/> 对象。</returns>
+    /// <returns>An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.</returns>
     public IEnumerator<int> GetEnumerator()
     {
         for (int i = Min; i <= Max; i++)
@@ -131,8 +132,8 @@ public struct IntRange : IEquatable<IntRange>, IEnumerable<int>
     }
 
     /// <summary>
-    /// 返回一个枚举器，该枚举器遍历集合。
+    /// Returns an enumerator that iterates through the collection.
     /// </summary>
-    /// <returns>可用于遍历集合的 <see cref="T:System.Collections.IEnumerator"/> 对象。</returns>
+    /// <returns>An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.</returns>
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 }

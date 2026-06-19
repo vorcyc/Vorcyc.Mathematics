@@ -4,75 +4,76 @@ using Vorcyc.Mathematics.LinearAlgebra;
 namespace Vorcyc.Mathematics.MachineLearning.Clustering;
 
 /// <summary>
-/// 表示高斯混合模型（GMM）的实现。
+/// Represents an implementation of the Gaussian Mixture Model (GMM).
 /// </summary>
-/// <typeparam name="T">元素类型，必须实现 <see cref="IFloatingPointIeee754{T}"/>、<see cref="IFloatingPointConstants{T}"/> 和 <see cref="IMinMaxValue{T}"/> 接口。</typeparam>
+/// <typeparam name="T">The element type, which must implement the <see cref="IFloatingPointIeee754{T}"/>, <see cref="IFloatingPointConstants{T}"/>, and <see cref="IMinMaxValue{T}"/> interfaces.</typeparam>
 /// <remarks>
-/// 高斯混合模型（GMM）是一种概率模型，用于表示具有多个高斯分布的混合分布。它主要用于聚类分析和密度估计。
+/// The Gaussian Mixture Model (GMM) is a probabilistic model used to represent a mixture distribution composed of multiple Gaussian distributions. It is mainly used for cluster analysis and density estimation.
 /// 
-/// GMM算法包括两个主要步骤：
-/// 1. 期望步骤（E步）：计算每个数据点属于每个高斯分布的责任值。
-/// 2. 最大化步骤（M步）：根据责任值更新模型参数（均值、协方差矩阵和权重）。
+/// The GMM algorithm consists of two main steps:
+/// 1. Expectation step (E-step): computes the responsibility value of each data point for each Gaussian distribution.
+/// 2. Maximization step (M-step): updates the model parameters (means, covariance matrices, and weights) based on the responsibility values.
 /// 
-/// 该实现假设数据点服从多元高斯分布，并使用EM算法进行参数估计。优化版本添加了收敛检查、预测功能和性能改进。
+/// This implementation assumes that the data points follow a multivariate Gaussian distribution and uses the EM algorithm for parameter estimation. The optimized version adds convergence checks, prediction functionality, and performance improvements.
 /// </remarks>
 public class GMM<T> : EMBase<T>, IMachineLearning
     where T : unmanaged, IFloatingPointIeee754<T>, IFloatingPointConstants<T>, IMinMaxValue<T>
 {
-    private readonly int _maxIterations; // 最大迭代次数
-    private readonly T _tolerance;       // 收敛容差
+    private readonly int _maxIterations; // Maximum number of iterations
+    private readonly T _tolerance;       // Convergence tolerance
 
     /// <summary>
-    /// 初始化 <see cref="GMM{T}"/> 类的新实例。
+    /// Initializes a new instance of the <see cref="GMM{T}"/> class.
     /// </summary>
-    /// <param name="numComponents">高斯分布的数量，必须为正整数。</param>
-    /// <param name="maxIterations">最大迭代次数，默认值为 100。</param>
-    /// <param name="tolerance">对数似然函数的收敛容差，默认值为 1e-6。</param>
-    /// <exception cref="ArgumentException">当 <paramref name="numComponents"/> 或 <paramref name="maxIterations"/> 小于等于 0 时抛出。</exception>
-    public GMM(int numComponents, int maxIterations = 100, T tolerance = default)
-        : base(numComponents)
+    /// <param name="numComponents">The number of Gaussian distributions, which must be a positive integer.</param>
+    /// <param name="maxIterations">The maximum number of iterations; the default is 100.</param>
+    /// <param name="tolerance">The convergence tolerance for the log-likelihood function; the default is 1e-6.</param>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="numComponents"/> or <paramref name="maxIterations"/> is less than or equal to 0.</exception>
+    public GMM(int numComponents, int maxIterations = 100, T tolerance = default, ComputingContext? context = null)
+        : base(numComponents, context)
     {
         if (maxIterations <= 0)
-            throw new ArgumentException("最大迭代次数必须为正整数。", nameof(maxIterations));
+            throw new ArgumentException("The maximum number of iterations must be a positive integer.", nameof(maxIterations));
 
         _maxIterations = maxIterations;
         _tolerance = tolerance == default ? T.CreateChecked(1e-6) : tolerance;
     }
 
     /// <summary>
-    /// 获取聚类中心（均值）。
+    /// Gets the cluster centers (means).
     /// </summary>
     public IReadOnlyList<T[]> Means => _means;
 
     /// <summary>
-    /// 获取协方差矩阵。
+    /// Gets the covariance matrices.
     /// </summary>
     public IReadOnlyList<Matrix<T>> Covariances => _covariances;
 
     /// <summary>
-    /// 获取权重。
+    /// Gets the weights.
     /// </summary>
     public IReadOnlyList<T> Weights => _weights;
 
     /// <summary>
-    /// 获取机器学习任务类型。
+    /// Gets the machine learning task type.
     /// </summary>
     public MachineLearningTask Task => MachineLearningTask.Clustering;
 
     /// <summary>
-    /// 使用高斯混合模型拟合数据。
+    /// Fits the data using the Gaussian Mixture Model.
     /// </summary>
-    /// <param name="data">要拟合的数据，表示为数组的列表。</param>
-    /// <exception cref="ArgumentNullException">当 <paramref name="data"/> 为 null 时抛出。</exception>
-    /// <exception cref="ArgumentException">当 <paramref name="data"/> 为空或维度无效时抛出。</exception>
+    /// <param name="data">The data to fit, represented as a list of arrays.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="data"/> is empty or its dimension is invalid.</exception>
     public void Fit(List<T[]> data)
     {
         if (data == null)
-            throw new ArgumentNullException(nameof(data), "数据不能为 null。");
+            throw new ArgumentNullException(nameof(data), "The data cannot be null.");
         if (data.Count == 0)
-            throw new ArgumentException("数据列表不能为空。", nameof(data));
+            throw new ArgumentException("The data list cannot be empty.", nameof(data));
         if (data[0].Length == 0)
-            throw new ArgumentException("数据维度必须大于 0。", nameof(data));
+            throw new ArgumentException("The data dimension must be greater than 0.", nameof(data));
 
         _data = data;
         _numDimensions = data[0].Length;
@@ -93,15 +94,15 @@ public class GMM<T> : EMBase<T>, IMachineLearning
     }
 
     /// <summary>
-    /// 预测数据点所属的聚类。
+    /// Predicts the cluster to which a data point belongs.
     /// </summary>
-    /// <param name="dataPoint">要预测的数据点。</param>
-    /// <returns>数据点所属聚类的索引。</returns>
-    /// <exception cref="ArgumentException">当 <paramref name="dataPoint"/> 的维度与模型不匹配时抛出。</exception>
+    /// <param name="dataPoint">The data point to predict.</param>
+    /// <returns>The index of the cluster to which the data point belongs.</returns>
+    /// <exception cref="ArgumentException">Thrown when the dimension of <paramref name="dataPoint"/> does not match the model.</exception>
     public int Predict(T[] dataPoint)
     {
         if (dataPoint == null || dataPoint.Length != _numDimensions)
-            throw new ArgumentException("输入数据点的维度与模型不匹配。", nameof(dataPoint));
+            throw new ArgumentException("The dimension of the input data point does not match the model.", nameof(dataPoint));
 
         T maxProb = T.NegativeInfinity;
         int bestCluster = 0;
@@ -120,10 +121,10 @@ public class GMM<T> : EMBase<T>, IMachineLearning
     }
 
     /// <summary>
-    /// 计算对数似然函数值。
+    /// Computes the log-likelihood function value.
     /// </summary>
-    /// <param name="data">要拟合的数据，表示为数组的列表。</param>
-    /// <returns>对数似然函数值。</returns>
+    /// <param name="data">The data to fit, represented as a list of arrays.</param>
+    /// <returns>The log-likelihood function value.</returns>
     private T ComputeLogLikelihood(List<T[]> data)
     {
         T logLikelihood = T.Zero;
@@ -134,7 +135,7 @@ public class GMM<T> : EMBase<T>, IMachineLearning
             {
                 sum += _weights[j] * MultivariateGaussian(data[i], _means[j], _covariances[j]);
             }
-            logLikelihood += T.Log(sum > T.Zero ? sum : T.CreateChecked(1e-10)); // 避免 log(0)
+            logLikelihood += T.Log(sum > T.Zero ? sum : T.CreateChecked(1e-10)); // Avoid log(0)
         }
         return logLikelihood;
     }

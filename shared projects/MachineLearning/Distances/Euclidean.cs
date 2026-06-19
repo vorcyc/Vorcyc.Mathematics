@@ -1,10 +1,7 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using static System.MathF;
-
 namespace Vorcyc.Mathematics.MachineLearning.Distances;
-
-
 /// <summary>
 ///   Euclidean distance metric.
 /// </summary>
@@ -15,10 +12,7 @@ public class Euclidean
 where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
 #endif
 {
-
 #if NET7_0_OR_GREATER
-
-
     /// <summary>
     ///   Computes the distance <c>d(x,y)</c> between points
     ///   <paramref name="x"/> and <paramref name="y"/>.
@@ -37,8 +31,6 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
     {
         return TSelf.Abs(x - y);
     }
-
-
     /// <summary>
     ///   Gets the Euclidean distance between two points. Note: this function 
     ///   is dangerous as it is too easy to invert its arguments by mistake. 
@@ -59,7 +51,6 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
         TSelf dy = vector1y - vector2y;
         return TSelf.Sqrt(dx * dx + dy * dy);
     }
-
     /// <summary>
     ///   Gets a similarity measure between two points.
     /// </summary>
@@ -80,8 +71,6 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
         }
         return TSelf.Sqrt(sum);
     }
-
-
     /// <summary>
     ///   Gets a similarity measure between two points.
     /// </summary>
@@ -96,8 +85,6 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
     {
         return TSelf.One / (TSelf.One + TSelf.Abs(x - y));
     }
-
-
     /// <summary>
     ///   Gets a similarity measure between two points.
     /// </summary>
@@ -111,26 +98,19 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
     public static TSelf Similarity(TSelf[] x, TSelf[] y)
     {
         TSelf sum = TSelf.Zero;
-
         for (int i = 0; i < x.Length; i++)
         {
             TSelf u = x[i] - y[i];
             sum += u * u;
         }
-
         return TSelf.One / (TSelf.One * TSelf.Sqrt(sum));
     }
-
-
 #endif
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Distance(float x, float y)
     {
         return Abs(x - y);
     }
-
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Distance(float[] x, float[] y)
     {
@@ -142,8 +122,6 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
         }
         return Sqrt(sum);
     }
-
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Distance(float vector1x, float vector1y, float vector2x, float vector2y)
     {
@@ -152,14 +130,11 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
         return Sqrt(dx * dx + dy * dy);
     }
 
-
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Similarity(float x, float y)
     {
         return 1.0f / (1.0f + Abs(x - y));
     }
-
     /// <summary>
     /// 
     /// </summary>
@@ -173,15 +148,11 @@ where TSelf : INumber<TSelf>, IRootFunctions<TSelf>
     public static float Similarity(float[] x, float[] y)
     {
         float sum = 0.0f;
-
         for (int i = 0; i < x.Length; i++)
         {
             float u = x[i] - y[i];
             sum += u * u;
         }
-
         return 1.0f / (1.0f + Sqrt(sum));
     }
-
-
 }

@@ -1,13 +1,9 @@
-﻿namespace Vorcyc.Mathematics;
-
+namespace Vorcyc.Mathematics;
 using System;
 using System.Numerics;
 using Vorcyc.Mathematics.Numerics;
-
 public static partial class VMath
 {
-
-
     ///// <summary>
     ///// Returns next power of 2 closest to the given number <paramref name="n"/>.
     ///// </summary>
@@ -15,7 +11,6 @@ public static partial class VMath
     //{
     //    return (int)Math.Pow(2, Math.Ceiling(Math.Log(n, 2)));
     //}
-
     ///// <summary>
     ///// Modulo function that works correctly with negative numbers (as np.mod).
     ///// </summary>
@@ -24,20 +19,15 @@ public static partial class VMath
     //    return ((a % b) + b) % b;
     //}
 
-
-
     ///// <summary>
     ///// Computes factorial <paramref name="n"/>!.
     ///// </summary>
     //public static double Factorial(int n)
     //{
     //    var f = 1.0;
-
     //    for (var i = 2; i <= n; f *= i++) ;
-
     //    return f;
     //}
-
     /// <summary>
     /// Evaluates Binomial coefficient.
     /// </summary>
@@ -47,15 +37,12 @@ public static partial class VMath
         return Factorial(n) / (Factorial(k) * Factorial(n - k));
     }
 
-
-
     /// <summary>
     /// Evaluate discrete difference of <paramref name="samples"/> (array of the 1st order derivatives).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Diff(float[] samples, float[] diff)
         => Diff(samples.AsSpan(), diff);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Diff(ReadOnlySpan<float> samples, Span<float> diff)
     {
@@ -63,28 +50,23 @@ public static partial class VMath
         {
             return;
         }
-
         diff[0] = samples[0];
-
         for (var i = 1; i < samples.Length && i < diff.Length; i++)
         {
             diff[i] = samples[i] - samples[i - 1];
         }
     }
-
     /// <summary>
     /// Does linear interpolation (as numpy.interp).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InterpolateLinear(float[] x, float[] y, float[] arg, float[] interp)
         => InterpolateLinear(x, y.AsSpan(), arg, interp);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InterpolateLinear(float[] x, ReadOnlySpan<float> y, float[] arg, float[] interp)
     {
         var left = 0;
         var right = 1;
-
         for (var i = 0; i < arg.Length; i++)
         {
             while (arg[i] > x[right] && right < x.Length - 1)
@@ -92,11 +74,9 @@ public static partial class VMath
                 right++;
                 left++;
             }
-
             interp[i] = y[left] + (y[right] - y[left]) * (arg[i] - x[left]) / (x[right] - x[left]);
         }
     }
-
     /// <summary>
     /// Does bilinear transform (in-place).
     /// </summary>
@@ -111,21 +91,16 @@ public static partial class VMath
             re[k] = (1 - re[k] * re[k] - im[k] * im[k]) / den;
             im[k] = 2 * im[k] / den;
         }
-
         // equivalent to:
-
         //for (var k = 0; k < re.Length; k++)
         //{
         //      var c1 = new Complex(1 + re[k],  im[k]);
         //      var c2 = new Complex(1 - re[k], -im[k]);
         //      var c = c1 / c2;
-
         //      re[k] = c.Real;
         //      im[k] = c.Imaginary;
         //}
     }
-
-
     /// <summary>
     /// Does bilinear transform (in-place).
     /// </summary>
@@ -140,20 +115,16 @@ public static partial class VMath
             re[k] = (1 - re[k] * re[k] - im[k] * im[k]) / den;
             im[k] = 2 * im[k] / den;
         }
-
         // equivalent to:
-
         //for (var k = 0; k < re.Length; k++)
         //{
         //      var c1 = new Complex(1 + re[k],  im[k]);
         //      var c2 = new Complex(1 - re[k], -im[k]);
         //      var c = c1 / c2;
-
         //      re[k] = c.Real;
         //      im[k] = c.Imaginary;
         //}
     }
-
     /// <summary>
     /// Unwraps phase.
     /// </summary>
@@ -163,13 +134,10 @@ public static partial class VMath
     public static double[] Unwrap(double[] phase, double tolerance = Math.PI)
     {
         var unwrapped = phase.FastCopy();
-
         var offset = 0.0;
-
         for (var n = 1; n < phase.Length; n++)
         {
             var delta = phase[n] - phase[n - 1];
-
             if (delta > tolerance)
             {
                 offset -= tolerance * 2;
@@ -178,13 +146,10 @@ public static partial class VMath
             {
                 offset += tolerance * 2;
             }
-
             unwrapped[n] = phase[n] + offset;
         }
-
         return unwrapped;
     }
-
     /// <summary>
     /// Unwraps phase.
     /// </summary>
@@ -194,13 +159,10 @@ public static partial class VMath
     public static float[] Unwrap(float[] phase, float tolerance = ConstantsFp32.PI)
     {
         var unwrapped = phase.FastCopy();
-
         var offset = 0.0f;
-
         for (var n = 1; n < phase.Length; n++)
         {
             var delta = phase[n] - phase[n - 1];
-
             if (delta > tolerance)
             {
                 offset -= tolerance * 2;
@@ -209,13 +171,10 @@ public static partial class VMath
             {
                 offset += tolerance * 2;
             }
-
             unwrapped[n] = phase[n] + offset;
         }
-
         return unwrapped;
     }
-
     /// <summary>
     /// Unwraps phase.
     /// </summary>
@@ -225,17 +184,12 @@ public static partial class VMath
     public static T[] Unwrap<T>(T[] phase, T? tolerance = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-
         tolerance = T.Pi;
-
         var unwrapped = phase.Copy();
-
         T offset = T.Zero;
-
         for (var n = 1; n < phase.Length; n++)
         {
             var delta = phase[n] - phase[n - 1];
-
             if (delta > tolerance)
             {
                 offset -= tolerance.Value * T.CreateTruncating(2);
@@ -244,13 +198,10 @@ public static partial class VMath
             {
                 offset += tolerance.Value * T.CreateTruncating(2);
             }
-
             unwrapped[n] = phase[n] + offset;
         }
-
         return unwrapped;
     }
-
     /// <summary>
     /// Wraps phase.
     /// </summary>
@@ -260,11 +211,9 @@ public static partial class VMath
     public static double[] Wrap(double[] phase, double tolerance = Math.PI)
     {
         var wrapped = phase.FastCopy();
-
         for (var n = 0; n < phase.Length; n++)
         {
             var offset = phase[n] % (tolerance * 2);
-
             if (offset > tolerance)
             {
                 offset -= tolerance * 2;
@@ -273,14 +222,10 @@ public static partial class VMath
             {
                 offset += tolerance * 2;
             }
-
             wrapped[n] = offset;
         }
-
         return wrapped;
     }
-
-
     /// <summary>
     /// Wraps phase.
     /// </summary>
@@ -290,11 +235,9 @@ public static partial class VMath
     public static float[] Wrap(float[] phase, float tolerance = ConstantsFp32.PI)
     {
         var wrapped = phase.FastCopy();
-
         for (var n = 0; n < phase.Length; n++)
         {
             var offset = phase[n] % (tolerance * 2);
-
             if (offset > tolerance)
             {
                 offset -= tolerance * 2;
@@ -303,14 +246,10 @@ public static partial class VMath
             {
                 offset += tolerance * 2;
             }
-
             wrapped[n] = offset;
         }
-
         return wrapped;
     }
-
-
     /// <summary>
     /// Finds the n-th order statistic (n-th smallest value) in the array <paramref name="a"/>.
     /// </summary>
@@ -345,7 +284,6 @@ public static partial class VMath
             a[end] = a[pivot];
             a[pivot] = tmp;
             // ========================================
-
             if (pivot == n)
             {
                 return a[pivot];
@@ -360,7 +298,6 @@ public static partial class VMath
             }
         }
     }
-
     /// <summary>
     /// Finds the element at the specified zero-based index in the sorted order of the span, without fully sorting the span.
     /// </summary>
@@ -377,7 +314,6 @@ public static partial class VMath
     {
         int start = 0;
         int end = span.Length - 1;
-
         while (true)
         {
             // ============== Partitioning =============
@@ -398,7 +334,6 @@ public static partial class VMath
             span[end] = span[pivot];
             span[pivot] = tmp;
             // ========================================
-
             if (pivot == n)
             {
                 return span[pivot];
@@ -413,8 +348,6 @@ public static partial class VMath
             }
         }
     }
-
-
     /// <summary>
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
@@ -424,9 +357,7 @@ public static partial class VMath
     {
         var y = 1.0;
         var prev = 1.0;
-
         var i = 1;
-
         while (Math.Abs(prev) > 1e-20)
         {
             var summand = prev * x * x / (4 * i * i);
@@ -434,11 +365,8 @@ public static partial class VMath
             prev = summand;
             i++;
         }
-
         return y;
     }
-
-
     /// <summary>
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
@@ -448,9 +376,7 @@ public static partial class VMath
     {
         var y = 1.0f;
         var prev = 1.0f;
-
         var i = 1;
-
         while (MathF.Abs(prev) > 1e-20f)
         {
             var summand = prev * x * x / (4 * i * i);
@@ -458,11 +384,8 @@ public static partial class VMath
             prev = summand;
             i++;
         }
-
         return y;
     }
-
-
     /// <summary>
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
@@ -473,9 +396,7 @@ public static partial class VMath
     {
         var y = T.One;// 1.0f;
         var prev = T.One;// 1.0f;
-
         var i = 1;
-
         while (T.Abs(prev) > T.CreateTruncating(1e-20f))
         {
             var summand = prev * x * x / T.CreateChecked(4 * i * i);
@@ -483,11 +404,8 @@ public static partial class VMath
             prev = summand;
             i++;
         }
-
         return y;
     }
-
-
     /// <summary>
     /// Modified Bessel function I0(<paramref name="x"/>) of the 1st kind 
     /// (using Taylor series, not very precise method).
@@ -498,9 +416,7 @@ public static partial class VMath
     {
         var y = Complex<T>.One;// 1.0f;
         var prev = Complex<T>.One;// 1.0f;
-
         var i = 1;
-
         while (Complex<T>.Abs(prev) > T.CreateTruncating(1e-20f))
         {
             var summand = prev * x * x / T.CreateChecked(4 * i * i);
@@ -508,18 +424,13 @@ public static partial class VMath
             prev = summand;
             i++;
         }
-
         return y;
     }
-
-
     #region polynomials
-
     /// <summary>
     /// Number of iterations in Durand-Kerner algorithm for evaluating polynomial roots.
     /// </summary>
     public const int PolyRootsIterations = 25000;
-
     /// <summary>
     /// Evaluates complex roots of polynomials using Durand-Kerner algorithm. 
     /// Works for polynomials of order up to approx. 50.
@@ -534,27 +445,21 @@ public static partial class VMath
         {
             return null;
         }
-
         var c1 = Complex.One;
-
         var rootsPrev = new Complex[a.Length - 1];
         var roots = new Complex[a.Length - 1];
-
         var result = new Complex(0.4, 0.9);
         rootsPrev[0] = c1;
-
         for (var i = 1; i < rootsPrev.Length; i++)
         {
             rootsPrev[i] = rootsPrev[i - 1] * result;
         }
-
         var iter = 0;
         while (true)
         {
             for (int i = 0; i < rootsPrev.Length; i++)
             {
                 result = c1;
-
                 for (int j = 0; j < rootsPrev.Length; j++)
                 {
                     if (i != j)
@@ -562,21 +467,16 @@ public static partial class VMath
                         result = (rootsPrev[i] - rootsPrev[j]) * result;
                     }
                 }
-
                 roots[i] = rootsPrev[i] - (EvaluatePolynomial(a, rootsPrev[i]) / result);
             }
-
             if (++iter > maxIterations || ArraysAreEqual(rootsPrev, roots))
             {
                 break;
             }
-
             Array.Copy(roots, rootsPrev, roots.Length);
         }
-
         return roots;
     }
-
     /// <summary>
     /// Evaluates complex roots of polynomials using Durand-Kerner algorithm. 
     /// Works for polynomials of order up to approx. 50.
@@ -591,27 +491,21 @@ public static partial class VMath
         {
             return null;
         }
-
         var c1 = ComplexFp32.One;
-
         var rootsPrev = new ComplexFp32[a.Length - 1];
         var roots = new ComplexFp32[a.Length - 1];
-
         var result = new ComplexFp32(0.4f, 0.9f);
         rootsPrev[0] = c1;
-
         for (var i = 1; i < rootsPrev.Length; i++)
         {
             rootsPrev[i] = rootsPrev[i - 1] * result;
         }
-
         var iter = 0;
         while (true)
         {
             for (int i = 0; i < rootsPrev.Length; i++)
             {
                 result = c1;
-
                 for (int j = 0; j < rootsPrev.Length; j++)
                 {
                     if (i != j)
@@ -619,21 +513,16 @@ public static partial class VMath
                         result = (rootsPrev[i] - rootsPrev[j]) * result;
                     }
                 }
-
                 roots[i] = rootsPrev[i] - (EvaluatePolynomial(a, rootsPrev[i]) / result);
             }
-
             if (++iter > maxIterations || ArraysAreEqual(rootsPrev, roots))
             {
                 break;
             }
-
             Array.Copy(roots, rootsPrev, roots.Length);
         }
-
         return roots;
     }
-
     /// <summary>
     /// Checks if two arrays of complex numbers are essentially identical.
     /// </summary>
@@ -647,11 +536,8 @@ public static partial class VMath
                 return false;
             }
         }
-
         return true;
     }
-
-
     /// <summary>
     /// Checks if two arrays of complex numbers are essentially identical.
     /// </summary>
@@ -665,10 +551,8 @@ public static partial class VMath
                 return false;
             }
         }
-
         return true;
     }
-
     /// <summary>
     /// Evaluates polynomial according to Horner scheme.
     /// </summary>
@@ -678,17 +562,13 @@ public static partial class VMath
     public static Complex EvaluatePolynomial(double[] a, Complex x)
     {
         var res = new Complex(a[0], 0);
-
         for (var i = 1; i < a.Length; i++)
         {
             res *= x;
             res += a[i];
         }
-
         return res;
     }
-
-
     /// <summary>
     /// Evaluates polynomial according to Horner scheme.
     /// </summary>
@@ -698,17 +578,13 @@ public static partial class VMath
     public static ComplexFp32 EvaluatePolynomial(float[] a, ComplexFp32 x)
     {
         var res = new ComplexFp32(a[0], 0);
-
         for (var i = 1; i < a.Length; i++)
         {
             res *= x;
             res += a[i];
         }
-
         return res;
     }
-
-
     /// <summary>
     /// Multiplies polynomials.
     /// </summary>
@@ -717,7 +593,6 @@ public static partial class VMath
     {
         var length = poly1.Length + poly2.Length - 1;
         var result = new Complex[length];
-
         for (var i = 0; i < poly1.Length; i++)
         {
             for (var j = 0; j < poly2.Length; j++)
@@ -725,11 +600,8 @@ public static partial class VMath
                 result[i + j] += poly1[i] * poly2[j];
             }
         }
-
         return result;
     }
-
-
     /// <summary>
     /// Multiplies polynomials.
     /// </summary>
@@ -738,7 +610,6 @@ public static partial class VMath
     {
         var length = poly1.Length + poly2.Length - 1;
         var result = new ComplexFp32[length];
-
         for (var i = 0; i < poly1.Length; i++)
         {
             for (var j = 0; j < poly2.Length; j++)
@@ -746,10 +617,8 @@ public static partial class VMath
                 result[i + j] += poly1[i] * poly2[j];
             }
         }
-
         return result;
     }
-
     /// <summary>
     /// Divides polynomials.
     /// </summary>
@@ -758,11 +627,9 @@ public static partial class VMath
     {
         var output = (Complex[])dividend.Clone();
         var normalizer = divisor[0];
-
         for (var i = 0; i < dividend.Length - divisor.Length + 1; i++)
         {
             output[i] /= normalizer;
-
             var coeff = output[i];
             if (Math.Abs(coeff.Real) > 1e-10 || Math.Abs(coeff.Imaginary) > 1e-10)
             {
@@ -772,19 +639,13 @@ public static partial class VMath
                 }
             }
         }
-
         var separator = output.Length - divisor.Length + 1;
-
         var q = new Complex[separator];
         var r = new Complex[output.Length - separator];
-
         Array.Copy(output, 0, q, 0, separator);
         Array.Copy(output, separator, r, 0, output.Length - separator);
-
         return [q, r];
     }
-
-
     /// <summary>
     /// Divides polynomials.
     /// </summary>
@@ -793,11 +654,9 @@ public static partial class VMath
     {
         var output = (ComplexFp32[])dividend.Clone();
         var normalizer = divisor[0];
-
         for (var i = 0; i < dividend.Length - divisor.Length + 1; i++)
         {
             output[i] /= normalizer;
-
             var coeff = output[i];
             if (MathF.Abs(coeff.Real) > 1e-10f || MathF.Abs(coeff.Imaginary) > 1e-10f)
             {
@@ -807,33 +666,13 @@ public static partial class VMath
                 }
             }
         }
-
         var separator = output.Length - divisor.Length + 1;
-
         var q = new ComplexFp32[separator];
         var r = new ComplexFp32[output.Length - separator];
-
         Array.Copy(output, 0, q, 0, separator);
         Array.Copy(output, separator, r, 0, output.Length - separator);
-
         return new[] { q, r };
     }
-
-
     #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

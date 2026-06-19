@@ -50,11 +50,5 @@ public class Hellinger
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TSelf Distance(TSelf[] x, TSelf[] y)
-    {
-        TSelf sum = TSelf.Zero;
-        for (int i = 0; i < x.Length; i++)
-            sum += TSelf.Pow(TSelf.Sqrt(x[i]) - TSelf.Sqrt(y[i]), TSelf.CreateChecked(2));
-
-        return sum / TSelf.Sqrt(TSelf.CreateChecked(2));
-    }
+        => Statistics.Divergence.HellingerDistance<TSelf>(x, y);
 }

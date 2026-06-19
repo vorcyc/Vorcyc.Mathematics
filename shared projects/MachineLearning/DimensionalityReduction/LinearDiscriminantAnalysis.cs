@@ -4,7 +4,7 @@ using Vorcyc.Mathematics.LinearAlgebra;
 namespace Vorcyc.Mathematics.MachineLearning.DimensionalityReduction;
 
 /// <summary>
-/// 线性判别分析 (LDA)，用于有监督降维与分类。
+/// Linear Discriminant Analysis (LDA), used for supervised dimensionality reduction and classification.
 /// </summary>
 public class LinearDiscriminantAnalysis<T> : IMachineLearning
     where T : struct, IFloatingPointIeee754<T>
@@ -16,36 +16,44 @@ public class LinearDiscriminantAnalysis<T> : IMachineLearning
     private T[][] _projectionMatrix = [];
 
     /// <summary>
-    /// 初始化 LDA。
+    /// Initializes LDA.
     /// </summary>
-    /// <param name="numComponents">投影维度，默认为 1。</param>
-    public LinearDiscriminantAnalysis(int numComponents = 1)
+    /// <param name="numComponents">The projection dimensionality, default is 1.</param>
+    /// <param name="context">Optional execution policy; when null the ambient scope or default context is used.</param>
+    public LinearDiscriminantAnalysis(int numComponents = 1, ComputingContext? context = null)
     {
         if (numComponents <= 0)
-            throw new ArgumentException("投影维度必须大于 0。", nameof(numComponents));
+            throw new ArgumentException("The projection dimensionality must be greater than 0.", nameof(numComponents));
         _numComponents = numComponents;
+        Context = context;
     }
 
     /// <inheritdoc />
     public MachineLearningTask Task =>
         MachineLearningTask.DimensionalityReduction | MachineLearningTask.Classification;
 
-    /// <summary>判别投影矩阵，每行一个方向。</summary>
+    /// <summary>
+    /// Execution policy honored by this estimator. When null, the ambient
+    /// <see cref="ComputingScope"/> and then <see cref="ComputingContext.Default"/> are used.
+    /// </summary>
+    public ComputingContext? Context { get; set; }
+
+    /// <summary>The discriminant projection matrix, one direction per row.</summary>
     public T[][] ProjectionMatrix => _projectionMatrix;
 
     /// <summary>
-    /// 拟合 LDA 模型。
+    /// Fits the LDA model.
     /// </summary>
     public void Fit(T[,] x, int[] labels)
     {
         if (x == null || labels == null)
-            throw new ArgumentException("输入不能为 null。");
+            throw new ArgumentException("Input cannot be null.");
         int rows = x.GetLength(0);
         int cols = x.GetLength(1);
         if (rows == 0 || cols == 0 || labels.Length == 0)
-            throw new ArgumentException("训练数据不能为空。");
+            throw new ArgumentException("Training data cannot be empty.");
         if (rows != labels.Length)
-            throw new ArgumentException("样本数与标签数不匹配。");
+            throw new ArgumentException("The number of samples does not match the number of labels.");
 
         ComputeClassStatistics(x, labels);
         var sw = ComputeWithinClassScatter(x, labels);
@@ -62,35 +70,35 @@ public class LinearDiscriminantAnalysis<T> : IMachineLearning
     }
 
     /// <summary>
-    /// 将样本投影到 LDA 子空间。
+    /// Projects a sample into the LDA subspace.
     /// </summary>
     public T[] Transform(T[] sample)
     {
         if (_projectionMatrix.Length == 0)
-            throw new InvalidOperationException("模型尚未拟合。");
+            throw new InvalidOperationException("The model has not been fitted yet.");
         if (sample.Length != _overallMean.Length)
-            throw new ArgumentException("特征维度不匹配。", nameof(sample));
+            throw new ArgumentException("The feature dimensionality does not match.", nameof(sample));
 
         return ProjectCentered(CenterSample(sample));
     }
 
     /// <summary>
-    /// 投影整个矩阵。
+    /// Projects the entire matrix.
     /// </summary>
     public T[,] Transform(T[,] x)
     {
         if (_projectionMatrix.Length == 0)
-            throw new InvalidOperationException("模型尚未拟合。");
+            throw new InvalidOperationException("The model has not been fitted yet.");
         return ProjectMatrix(x);
     }
 
     /// <summary>
-    /// 预测类别（在 LDA 空间中取最近类中心）。
+    /// Predicts the class (by taking the nearest class center in the LDA space).
     /// </summary>
     public int Predict(T[] sample)
     {
         if (_classMeans.Count == 0)
-            throw new InvalidOperationException("模型尚未拟合。");
+            throw new InvalidOperationException("The model has not been fitted yet.");
 
         var projected = Transform(sample);
         int bestClass = _classMeans.Keys.First();
@@ -257,17 +265,23 @@ public class LinearDiscriminantAnalysis<T> : IMachineLearning
     private T[,] ProjectMatrix(T[,] x)
     {
         int rows = x.GetLength(0);
+        int cols = x.GetLength(1);
         int components = _projectionMatrix.Length;
         var result = new T[rows, components];
-        for (int i = 0; i < rows; i++)
-        {
-            var row = new T[x.GetLength(1)];
-            for (int j = 0; j < row.Length; j++)
-                row[j] = x[i, j];
-            var projected = Transform(row);
-            for (int k = 0; k < components; k++)
-                result[i, k] = projected[k];
-        }
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            rows,
+            i =>
+            {
+                var row = new T[cols];
+                for (int j = 0; j < cols; j++)
+                    row[j] = x[i, j];
+                var projected = Transform(row);
+                for (int k = 0; k < components; k++)
+                    result[i, k] = projected[k];
+            },
+            workPerItem: (long)cols * components);
         return result;
     }
 }

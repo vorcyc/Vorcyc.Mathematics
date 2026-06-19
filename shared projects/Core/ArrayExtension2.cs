@@ -1,22 +1,14 @@
-﻿//using System;
+//using System;
 //using System.Collections.Generic;
 //using System.Text;
-
 //namespace Vorcyc.Mathematics;
-
 //public static class ArrayExtension2
 //{
-
-
 //#if NET10_0_OR_GREATER
 
-
-
 //    #region For [source] instance array
-
 //    extension<T>(T[] source)
 //    {
-
 //        /// <summary>
 //        /// Creates a new array that is a copy of the source array.
 //        /// </summary>
@@ -29,7 +21,6 @@
 //            Array.Copy(source, copy, source.Length);
 //            return copy;
 //        }
-
 //        /// <summary>
 //        /// Creates a new array containing a copy of the first specified number of elements from the source array.
 //        /// </summary>
@@ -44,8 +35,6 @@
 //            Array.Copy(source, result, length);
 //            return result;
 //        }
-
-
 //        /// <summary>
 //        /// 用指定值填充数组的指定范围。
 //        /// </summary>
@@ -60,26 +49,16 @@
 //        public void Fill(int start, int end, T value)
 //        {
 //            ArgumentNullException.ThrowIfNull(source);
-
 //            if (start < 0 || start > end)
 //                throw new ArgumentOutOfRangeException(nameof(start));
-
 //            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(end, source.Length);
-
 //            for (int i = start; i < end; i++)
 //            {
 //                source[i] = value;
 //            }
 //        }
-
 //    }
-
 //    #endregion
-
-
-
-
-
 
 //#endif
 //}

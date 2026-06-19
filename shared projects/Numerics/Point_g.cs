@@ -4,9 +4,9 @@ namespace Vorcyc.Mathematics.Numerics;
 using System.Numerics;
 
 /// <summary>
-/// 表示一个二维平面上的点，支持泛型数学运算。
+/// Represents a point on a two-dimensional plane, supporting generic mathematical operations.
 /// </summary>
-/// <typeparam name="T">坐标的数值类型。</typeparam>
+/// <typeparam name="T">The numeric type of the coordinates.</typeparam>
 public struct Point<T> :
     IAdditionOperators<Point<T>, Size<T>, Point<T>>,
     IAdditionOperators<Point<T>, (T width, T height), Point<T>>,
@@ -18,25 +18,25 @@ public struct Point<T> :
     where T : struct, INumber<T>
 {
     /// <summary>
-    /// 表示一个空点。
+    /// Represents an empty point.
     /// </summary>
     public static readonly Point<T> Empty = new(T.Zero, T.Zero);
 
     /// <summary>
-    /// 获取或设置点的 X 坐标。
+    /// Gets or sets the X coordinate of the point.
     /// </summary>
     public T X { get; set; }
 
     /// <summary>
-    /// 获取或设置点的 Y 坐标。
+    /// Gets or sets the Y coordinate of the point.
     /// </summary>
     public T Y { get; set; }
 
     /// <summary>
-    /// 初始化 <see cref="Point{T}"/> 结构体的新实例，具有指定的坐标。
+    /// Initializes a new instance of the <see cref="Point{T}"/> struct with the specified coordinates.
     /// </summary>
-    /// <param name="x">点的 X 坐标。</param>
-    /// <param name="y">点的 Y 坐标。</param>
+    /// <param name="x">The X coordinate of the point.</param>
+    /// <param name="y">The Y coordinate of the point.</param>
     public Point(T x, T y)
     {
         X = x;
@@ -44,15 +44,15 @@ public struct Point<T> :
     }
 
     /// <summary>
-    /// 获取一个值，该值指示此点是否为空。
+    /// Gets a value indicating whether this point is empty.
     /// </summary>
     public readonly bool IsEmpty => X == T.Zero && Y == T.Zero;
 
     /// <summary>
-    /// 将点解构为其 X 和 Y 坐标。
+    /// Deconstructs the point into its X and Y coordinates.
     /// </summary>
-    /// <param name="x">X 坐标。</param>
-    /// <param name="y">Y 坐标。</param>
+    /// <param name="x">The X coordinate.</param>
+    /// <param name="y">The Y coordinate.</param>
     public void Deconstruct(out T x, out T y)
     {
         x = X;
@@ -60,76 +60,76 @@ public struct Point<T> :
     }
 
     /// <summary>
-    /// 将大小添加到点。
+    /// Adds a size to a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="sz">大小。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="sz">The size.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> Add(Point<T> pt, Size<T> sz) => new(pt.X + sz.Width, pt.Y + sz.Height);
 
     /// <summary>
-    /// 从点中减去大小。
+    /// Subtracts a size from a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="sz">大小。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="sz">The size.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> Subtract(Point<T> pt, Size<T> sz) => new(pt.X - sz.Width, pt.Y - sz.Height);
 
     /// <summary>
-    /// 将大小添加到点。
+    /// Adds a size to a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="sz">大小。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="sz">The size.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> operator +(Point<T> pt, Size<T> sz) => Add(pt, sz);
 
     /// <summary>
-    /// 将元组添加到点。
+    /// Adds a tuple to a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="sz">表示大小的元组。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="sz">A tuple representing a size.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> operator +(Point<T> pt, (T width, T height) sz) => new(pt.X + sz.width, pt.Y + sz.height);
 
     /// <summary>
-    /// 将标量添加到点。
+    /// Adds a scalar to a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="scalar">标量值。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="scalar">The scalar value.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> operator +(Point<T> pt, T scalar) => new(pt.X + scalar, pt.Y + scalar);
 
     /// <summary>
-    /// 从点中减去大小。
+    /// Subtracts a size from a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="sz">大小。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="sz">The size.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> operator -(Point<T> pt, Size<T> sz) => Subtract(pt, sz);
 
     /// <summary>
-    /// 从点中减去元组。
+    /// Subtracts a tuple from a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="sz">表示大小的元组。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="sz">A tuple representing a size.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> operator -(Point<T> pt, (T width, T height) sz) => new(pt.X - sz.width, pt.Y - sz.height);
 
     /// <summary>
-    /// 从点中减去标量。
+    /// Subtracts a scalar from a point.
     /// </summary>
-    /// <param name="pt">点。</param>
-    /// <param name="scalar">标量值。</param>
-    /// <returns>结果点。</returns>
+    /// <param name="pt">The point.</param>
+    /// <param name="scalar">The scalar value.</param>
+    /// <returns>The resulting point.</returns>
     public static Point<T> operator -(Point<T> pt, T scalar) => new(pt.X - scalar, pt.Y - scalar);
 
     /// <summary>
-    /// 计算两个点之间的距离。
+    /// Computes the distance between two points.
     /// </summary>
-    /// <typeparam name="TFloatingPointNumber">浮点数类型。</typeparam>
-    /// <param name="a">第一个点。</param>
-    /// <param name="b">第二个点。</param>
-    /// <returns>两个点之间的距离。</returns>
+    /// <typeparam name="TFloatingPointNumber">The floating-point number type.</typeparam>
+    /// <param name="a">The first point.</param>
+    /// <param name="b">The second point.</param>
+    /// <returns>The distance between the two points.</returns>
     public static TFloatingPointNumber Distance<TFloatingPointNumber>(Point<TFloatingPointNumber> a, Point<TFloatingPointNumber> b)
         where TFloatingPointNumber : struct, IFloatingPointIeee754<TFloatingPointNumber>
     {
@@ -139,29 +139,29 @@ public struct Point<T> :
     }
 
     /// <summary>
-    /// 确定指定的点是否等于当前点。
+    /// Determines whether the specified point is equal to the current point.
     /// </summary>
-    /// <param name="other">要与当前点进行比较的点。</param>
-    /// <returns>如果指定的点等于当前点，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    /// <param name="other">The point to compare with the current point.</param>
+    /// <returns><c>true</c> if the specified point is equal to the current point; otherwise, <c>false</c>.</returns>
     public bool Equals(Point<T> other) => X.Equals(other.X) && Y.Equals(other.Y);
 
     /// <summary>
-    /// 确定指定对象是否等于当前点。
+    /// Determines whether the specified object is equal to the current point.
     /// </summary>
-    /// <param name="obj">要与当前点进行比较的对象。</param>
-    /// <returns>如果指定对象等于当前点，则为 <c>true</c>；否则为 <c>false</c>。</returns>
+    /// <param name="obj">The object to compare with the current point.</param>
+    /// <returns><c>true</c> if the specified object is equal to the current point; otherwise, <c>false</c>.</returns>
     public override bool Equals(object? obj) => obj is Point<T> other && Equals(other);
 
     /// <summary>
-    /// 返回当前点的哈希代码。
+    /// Returns the hash code for the current point.
     /// </summary>
-    /// <returns>当前点的哈希代码。</returns>
+    /// <returns>The hash code for the current point.</returns>
     public override int GetHashCode() => HashCode.Combine(X, Y);
 
     /// <summary>
-    /// 返回表示当前点的字符串。
+    /// Returns a string that represents the current point.
     /// </summary>
-    /// <returns>表示当前点的字符串。</returns>
+    /// <returns>A string that represents the current point.</returns>
     public override readonly string ToString() => $"{{X={X}, Y={Y}}}";
 }
 

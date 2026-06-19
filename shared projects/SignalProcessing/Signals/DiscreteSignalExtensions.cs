@@ -1,5 +1,4 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Signals;
-
+namespace Vorcyc.Mathematics.SignalProcessing.Signals;
 /// <summary>
 /// Provides extension methods for working with <see cref="DiscreteSignal"/> objects.
 /// </summary>
@@ -8,8 +7,6 @@ public static partial class DiscreteSignalExtensions
 {
     // Note.
     // Method implementations are LINQ-less and leverage FastCopy() for better performance.
-
-
 
     /// <summary>
     /// Creates the delayed copy of <paramref name="signal"/> 
@@ -21,27 +18,20 @@ public static partial class DiscreteSignalExtensions
     public static DiscreteSignal Delay(this DiscreteSignal signal, int delay)
     {
         var length = signal.SampleCount;
-
         if (delay <= 0)
         {
             delay = -delay;
-
             Guard.AgainstInvalidRange(delay, length, "Delay", "signal length");
-
             return new DiscreteSignal(
                             signal.SamplingRate,
                             signal.Samples.Values.FastCopyFragment(length - delay, delay),
                             false);
         }
-
         return new DiscreteSignal(
                         signal.SamplingRate,
                         signal.Samples.Values.FastCopyFragment(length, destinationOffset: delay),
                         false);
     }
-
-
-
 
     /// <summary>
     /// Superimposes signals <paramref name="signal1"/> and <paramref name="signal2"/>. 
@@ -53,13 +43,10 @@ public static partial class DiscreteSignalExtensions
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
-
         DiscreteSignal superimposed;
-
         if (signal1.SampleCount >= signal2.SampleCount)
         {
             superimposed = signal1.Clone();
-
             for (var i = 0; i < signal2.SampleCount; i++)
             {
                 superimposed[i] += signal2.Samples[i];
@@ -68,16 +55,13 @@ public static partial class DiscreteSignalExtensions
         else
         {
             superimposed = signal2.Clone();
-
             for (var i = 0; i < signal1.SampleCount; i++)
             {
                 superimposed[i] += signal1.Samples[i];
             }
         }
-
         return superimposed;
     }
-
     ///// <summary>
     ///// Superimposes <paramref name="signal2"/> and <paramref name="signal1"/> multiple times at given <paramref name="positions"/>.
     ///// </summary>
@@ -88,26 +72,19 @@ public static partial class DiscreteSignalExtensions
     //{
     //    Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
     //                                "Sampling rate of signal1", "sampling rate of signal2");
-
     //    var totalLength = Math.Max(signal1.Length, signal2.Length + positions.Max());
-
     //    DiscreteSignal superimposed = new DiscreteSignal(signal1.SamplingRate, totalLength);
     //    signal1.Samples.FastCopyTo(superimposed.Samples, signal1.Length);
-
     //    for (var p = 0; p < positions.Length; p++)
     //    {
     //        var offset = positions[p];
-
     //        for (var i = 0; i < signal2.Length; i++)
     //        {
     //            superimposed[offset + i] += signal2.Samples[i];
     //        }
     //    }
-
     //    return superimposed;
     //} 
-
-
     ///// <summary>
     ///// Superimposes <paramref name="signal2"/> and <paramref name="signal1"/> multiple times at given <paramref name="positions"/>.
     ///// </summary>
@@ -118,26 +95,19 @@ public static partial class DiscreteSignalExtensions
     //{
     //    Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
     //                                "Sampling rate of signal1", "sampling rate of signal2");
-
     //    var totalLength = Math.Max(signal1.Length, signal2.Length + positions.Max());
-
     //    DiscreteSignal superimposed = new DiscreteSignal(signal1.SamplingRate, totalLength);
     //    signal1.Samples.FastCopyTo(superimposed.Samples, signal1.Length);
-
     //    for (var p = 0; p < positions.Length; p++)
     //    {
     //        var offset = positions[p];
-
     //        for (var i = 0; i < signal2.Length; i++)
     //        {
     //            superimposed[offset + i] += signal2.Samples[i];
     //        }
     //    }
-
     //    return superimposed;
     //}   
-
-
 
     /// <summary>
     /// Superimposes <paramref name="signal2"/> and <paramref name="signal1"/> multiple times at given <paramref name="positions"/>.
@@ -149,25 +119,19 @@ public static partial class DiscreteSignalExtensions
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
-
         var totalLength = Math.Max(signal1.SampleCount, signal2.SampleCount + positions.Max());
-
         DiscreteSignal superimposed = new DiscreteSignal(signal1.SamplingRate, totalLength, false);
         signal1.Samples.Values.FastCopyTo(superimposed.Samples, signal1.SampleCount);
-
         for (var p = 0; p < positions.Length; p++)
         {
             var offset = positions[p];
-
             for (var i = 0; i < signal2.SampleCount; i++)
             {
                 superimposed[offset + i] += signal2.Samples[i];
             }
         }
-
         return superimposed;
     }
-
     ///// <summary>
     ///// Subtracts <paramref name="signal2"/> from <paramref name="signal1"/>. 
     ///// If sizes are different then the smaller signal is broadcast to fit the size of the larger signal.
@@ -178,13 +142,10 @@ public static partial class DiscreteSignalExtensions
     //{
     //    Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
     //                                "Sampling rate of signal1", "sampling rate of signal2");
-
     //    DiscreteSignal subtracted;
-
     //    if (signal1.Length >= signal2.Length)
     //    {
     //        subtracted = signal1.Copy();
-
     //        for (var i = 0; i < signal2.Length; i++)
     //        {
     //            subtracted[i] -= signal2.Samples[i];
@@ -193,7 +154,6 @@ public static partial class DiscreteSignalExtensions
     //    else
     //    {
     //        subtracted = new DiscreteSignal(signal2.SamplingRate, signal2.Length);
-
     //        for (var i = 0; i < signal1.Length; i++)
     //        {
     //            subtracted[i] = signal1.Samples[i] - signal2.Samples[i];
@@ -203,11 +163,8 @@ public static partial class DiscreteSignalExtensions
     //            subtracted[i] = -signal2.Samples[i];
     //        }
     //    }
-
     //    return subtracted;
     //}
-
-
     /// <summary>
     /// Subtracts <paramref name="signal2"/> from <paramref name="signal1"/>. 
     /// If sizes are different then the smaller signal is broadcast to fit the size of the larger signal.
@@ -218,13 +175,10 @@ public static partial class DiscreteSignalExtensions
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
-
         DiscreteSignal subtracted;
-
         if (signal1.SampleCount >= signal2.SampleCount)
         {
             subtracted = signal1.Clone();
-
             for (var i = 0; i < signal2.SampleCount; i++)
             {
                 subtracted[i] -= signal2.Samples[i];
@@ -233,7 +187,6 @@ public static partial class DiscreteSignalExtensions
         else
         {
             subtracted = new DiscreteSignal(signal2.SamplingRate, signal2.SampleCount, false);
-
             for (var i = 0; i < signal1.SampleCount; i++)
             {
                 subtracted[i] = signal1.Samples[i] - signal2.Samples[i];
@@ -243,10 +196,8 @@ public static partial class DiscreteSignalExtensions
                 subtracted[i] = -signal2.Samples[i];
             }
         }
-
         return subtracted;
     }
-
     /// <summary>
     /// Concatenates <paramref name="signal1"/> and <paramref name="signal2"/>.
     /// </summary>
@@ -256,12 +207,10 @@ public static partial class DiscreteSignalExtensions
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
-
         return new DiscreteSignal(
                         signal1.SamplingRate,
                         signal1.Samples.Values.Merge(signal2.Samples));
     }
-
     /// <summary>
     /// Creates the copy of <paramref name="signal"/> repeated <paramref name="n"/> times.
     /// </summary>
@@ -270,13 +219,10 @@ public static partial class DiscreteSignalExtensions
     public static DiscreteSignal Repeat(this DiscreteSignal signal, int n)
     {
         Guard.AgainstNonPositive(n, "Number of repeat times");
-
         return new DiscreteSignal(
                         signal.SamplingRate,
                         signal.Samples.Values.Repeat(n));
     }
-
-
 
     /// <summary>
     /// Amplifies <paramref name="signal"/> by <paramref name="coeff"/> in-place.
@@ -291,8 +237,6 @@ public static partial class DiscreteSignalExtensions
         }
     }
 
-
-
     /// <summary>
     /// Attenuates <paramref name="signal"/> by <paramref name="coeff"/> in-place.
     /// </summary>
@@ -301,17 +245,14 @@ public static partial class DiscreteSignalExtensions
     public static void Attenuate(this DiscreteSignal signal, float coeff)
     {
         Guard.AgainstNonPositive(coeff, "Attenuation coefficient");
-
         signal.Amplify(1 / coeff);
     }
-
     /// <summary>
     /// Reverses <paramref name="signal"/> in-place.
     /// </summary>
     public static void Reverse(this DiscreteSignal signal)
     {
         var samples = signal.Samples;
-
         for (int i = 0, j = samples.Length - 1; i < samples.Length / 2; i++, j--)
         {
             var tmp = samples[i];
@@ -319,7 +260,6 @@ public static partial class DiscreteSignalExtensions
             samples[j] = tmp;
         }
     }
-
     /// <summary>
     /// Creates new signal from first <paramref name="n"/> samples of <paramref name="signal"/>.
     /// </summary>
@@ -329,13 +269,11 @@ public static partial class DiscreteSignalExtensions
     {
         Guard.AgainstNonPositive(n, "Number of samples");
         Guard.AgainstExceedance(n, signal.SampleCount, "Number of samples", "signal length");
-
         return new DiscreteSignal(
                         signal.SamplingRate,
                         signal.Samples.Values.FastCopyFragment(n),
                         false);
     }
-
     /// <summary>
     /// Creates new signal from last <paramref name="n"/> samples of <paramref name="signal"/>.
     /// </summary>
@@ -345,13 +283,11 @@ public static partial class DiscreteSignalExtensions
     {
         Guard.AgainstNonPositive(n, "Number of samples");
         Guard.AgainstExceedance(n, signal.SampleCount, "Number of samples", "signal length");
-
         return new DiscreteSignal(
                         signal.SamplingRate,
                         signal.Samples.Values.FastCopyFragment(n, signal.SampleCount - n),
                         false);
     }
-
     /// <summary>
     /// Full-rectifies <paramref name="signal"/> in-place.
     /// </summary>
@@ -366,7 +302,6 @@ public static partial class DiscreteSignalExtensions
             }
         }
     }
-
     /// <summary>
     /// Half-rectifies <paramref name="signal"/> in-place.
     /// </summary>
@@ -381,7 +316,6 @@ public static partial class DiscreteSignalExtensions
             }
         }
     }
-
     /// <summary>
     /// Normalizes <paramref name="signal"/> by its max absolute value (to range [-1, 1]).
     /// </summary>
@@ -390,15 +324,12 @@ public static partial class DiscreteSignalExtensions
     public static void NormalizeMax(this DiscreteSignal signal, int bitsPerSample = 0)
     {
         var norm = 1 / signal.Samples.Max(s => Math.Abs(s));
-
         if (bitsPerSample > 0)
         {
             norm *= (float)(1 - 1 / Math.Pow(2, bitsPerSample));
         }
-
         signal.Amplify(norm);
     }
-
     /// <summary>
     /// Creates <see cref="ComplexDiscreteSignal"/> from <see cref="DiscreteSignal"/>. 
     /// Imaginary parts will be filled with zeros.
@@ -408,7 +339,6 @@ public static partial class DiscreteSignalExtensions
     {
         return new ComplexDiscreteSignal(signal.SamplingRate, signal.Samples);
     }
-
     /// <summary>
     /// Fades signal in and out linearly (in-place).
     /// </summary>
@@ -420,7 +350,6 @@ public static partial class DiscreteSignalExtensions
         signal.FadeIn(fadeInDuration);
         signal.FadeOut(fadeOutDuration);
     }
-
     /// <summary>
     /// Fades signal in and out linearly (in-place).
     /// </summary>
@@ -432,7 +361,6 @@ public static partial class DiscreteSignalExtensions
         signal.FadeIn(fadeInDuration);
         signal.FadeOut(fadeOutDuration);
     }
-
     /// <summary>
     /// Fades signal in linearly (in-place).
     /// </summary>
@@ -441,15 +369,12 @@ public static partial class DiscreteSignalExtensions
     public static void FadeIn(this DiscreteSignal signal, double duration)
     {
         Guard.AgainstNonPositive(duration, "Fade-in duration");
-
         var fadeSampleCount = Math.Min(signal.SampleCount, (int)(signal.SamplingRate * duration));
-
         for (var i = 0; i < fadeSampleCount; i++)
         {
             signal[i] *= (float)i / fadeSampleCount;
         }
     }
-
     /// <summary>
     /// Fades signal in linearly (in-place).
     /// </summary>
@@ -460,15 +385,12 @@ public static partial class DiscreteSignalExtensions
     {
         if (duration < TimeSpan.Zero)
             throw new ArgumentException("Fade-in duration must greater than zero.");
-
         var fadeSampleCount = Math.Min(signal.SampleCount, (int)(signal.SamplingRate * duration.TotalSeconds));
-
         for (var i = 0; i < fadeSampleCount; i++)
         {
             signal[i] *= (float)i / fadeSampleCount;
         }
     }
-
     /// <summary>
     /// Fades signal out linearly (in-place).
     /// </summary>
@@ -477,15 +399,12 @@ public static partial class DiscreteSignalExtensions
     public static void FadeOut(this DiscreteSignal signal, double duration)
     {
         Guard.AgainstNonPositive(duration, "Fade-out duration");
-
         var fadeSampleCount = Math.Min(signal.SampleCount, (int)(signal.SamplingRate * duration));
-
         for (int i = signal.SampleCount - fadeSampleCount, fadeIndex = fadeSampleCount - 1; i < signal.SampleCount; i++, fadeIndex--)
         {
             signal[i] *= (float)fadeIndex / fadeSampleCount;
         }
     }
-
     /// <summary>
     /// Fades signal out linearly (in-place).
     /// </summary>
@@ -496,15 +415,12 @@ public static partial class DiscreteSignalExtensions
     {
         if (duration < TimeSpan.Zero)
             throw new ArgumentException("Fade-out duration must greater than zero.");
-
         var fadeSampleCount = Math.Min(signal.SampleCount, (int)(signal.SamplingRate * duration.TotalSeconds));
-
         for (int i = signal.SampleCount - fadeSampleCount, fadeIndex = fadeSampleCount - 1; i < signal.SampleCount; i++, fadeIndex--)
         {
             signal[i] *= (float)fadeIndex / fadeSampleCount;
         }
     }
-
     /// <summary>
     /// <para>
     /// Crossfades linearly between signals and returns crossfaded signal of length 
@@ -521,27 +437,19 @@ public static partial class DiscreteSignalExtensions
     public static DiscreteSignal Crossfade(this DiscreteSignal signal1, DiscreteSignal signal2, double duration)
     {
         Guard.AgainstNonPositive(duration, "Crossfade duration");
-
         var minSignalLength = Math.Min(signal1.SampleCount, signal2.SampleCount);
         var crossfadeSampleCount = Math.Min((int)(signal1.SamplingRate * duration), minSignalLength);
-
         var crossfaded = new DiscreteSignal(signal1.SamplingRate, signal1.SampleCount + signal2.SampleCount - crossfadeSampleCount, false);
-
         Array.Copy(signal1.Samples, crossfaded.Samples, signal1.SampleCount - crossfadeSampleCount);
         Array.Copy(signal2.Samples, crossfadeSampleCount, crossfaded.Samples, signal1.SampleCount, signal2.SampleCount - crossfadeSampleCount);
-
         var startPos = signal1.SampleCount - crossfadeSampleCount;
-
         for (int i = startPos, fadeIndex = 0; fadeIndex < crossfadeSampleCount; fadeIndex++, i++)
         {
             var frac = (float)fadeIndex / crossfadeSampleCount;
-
             crossfaded[i] = (1 - frac) * signal1[i] + frac * signal2[fadeIndex];
         }
-
         return crossfaded;
     }
-
     /// <summary>
     /// <para>
     /// Crossfades linearly between signals and returns crossfaded signal of length 
@@ -560,24 +468,17 @@ public static partial class DiscreteSignalExtensions
     {
         if (duration < TimeSpan.Zero)
             throw new ArgumentException("Fade-out duration must greater than zero.");
-
         var minSignalLength = Math.Min(signal1.SampleCount, signal2.SampleCount);
         var crossfadeSampleCount = Math.Min((int)(signal1.SamplingRate * duration.TotalSeconds), minSignalLength);
-
         var crossfaded = new DiscreteSignal(signal1.SamplingRate, signal1.SampleCount + signal2.SampleCount - crossfadeSampleCount, false);
-
         Array.Copy(signal1.Samples, crossfaded.Samples, signal1.SampleCount - crossfadeSampleCount);
         Array.Copy(signal2.Samples, crossfadeSampleCount, crossfaded.Samples, signal1.SampleCount, signal2.SampleCount - crossfadeSampleCount);
-
         var startPos = signal1.SampleCount - crossfadeSampleCount;
-
         for (int i = startPos, fadeIndex = 0; fadeIndex < crossfadeSampleCount; fadeIndex++, i++)
         {
             var frac = (float)fadeIndex / crossfadeSampleCount;
-
             crossfaded[i] = (1 - frac) * signal1[i] + frac * signal2[fadeIndex];
         }
-
         return crossfaded;
     }
 }

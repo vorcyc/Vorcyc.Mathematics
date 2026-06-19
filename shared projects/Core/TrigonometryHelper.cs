@@ -1,9 +1,7 @@
-﻿namespace Vorcyc.Mathematics;
-
+namespace Vorcyc.Mathematics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using static MathF;
-
 /// <summary>
 /// Provides helper methods for trigonometric operations.
 /// </summary>
@@ -19,7 +17,6 @@ public static class TrigonometryHelper
     {
         return 180.0 * a / Math.PI;
     }
-
     /// <summary>
     /// Converts an angle from radians to degrees.
     /// </summary>
@@ -30,7 +27,6 @@ public static class TrigonometryHelper
     {
         return (radians * 57.29578f);
     }
-
     /// <summary>
     /// Converts an angle from degrees to radians.
     /// </summary>
@@ -41,7 +37,6 @@ public static class TrigonometryHelper
     {
         return a * Math.PI / 180.0;
     }
-
     /// <summary>
     /// Converts an angle from degrees to radians.
     /// </summary>
@@ -52,7 +47,6 @@ public static class TrigonometryHelper
     {
         return (degrees * 0.01745329f);
     }
-
     /// <summary>
     /// Gets the difference between two angles, measured in radians.
     /// </summary>
@@ -71,7 +65,6 @@ public static class TrigonometryHelper
         }
         return num;
     }
-
     /// <summary>
     /// Reduces an angle to its equivalent between -π and π.
     /// </summary>
@@ -98,8 +91,6 @@ public static class TrigonometryHelper
         }
         return radianAngle;
     }    
-    
-    
     /// <summary>
     /// Reduces an angle to its equivalent between -π and π.
     /// </summary>
@@ -127,9 +118,6 @@ public static class TrigonometryHelper
         return radianAngle;
     }
 
-
-
-
     /// <summary>
     /// Gets the angle formed by the vector [x,y].
     /// </summary>
@@ -152,7 +140,6 @@ public static class TrigonometryHelper
             return ConstantsFp32.PI + Atan(y / x);
         }
     }
-
     /// <summary>
     /// Gets the angle formed by the vector [x,y].
     /// </summary>
@@ -175,7 +162,6 @@ public static class TrigonometryHelper
             return Math.PI + Math.Atan(y / x);
         }
     }
-
     /// <summary>
     /// Returns the hyperbolic arc cosine of the specified value.
     /// </summary>
@@ -188,7 +174,6 @@ public static class TrigonometryHelper
             throw new ArgumentOutOfRangeException("x");
         return System.Math.Log(x + System.Math.Sqrt(x * x - 1));
     }
-
     /// <summary>
     /// Returns the hyperbolic arc cosine of the specified value.
     /// </summary>
@@ -202,8 +187,6 @@ public static class TrigonometryHelper
         return Log(x + Sqrt(x * x - 1));
     }
 
-   
-
     /// <summary>
     /// Returns the hyperbolic arc tangent of the specified value.
     /// </summary>
@@ -216,7 +199,6 @@ public static class TrigonometryHelper
             throw new ArgumentOutOfRangeException("d");
         return 0.5 * System.Math.Log((1.0 + d) / (1.0 - d));
     }
-
     /// <summary>
     /// Returns the hyperbolic arc tangent of the specified value.
     /// </summary>
@@ -229,10 +211,7 @@ public static class TrigonometryHelper
             throw new ArgumentOutOfRangeException("d");
         return 0.5f * Log((1.0f + d) / (1.0f - d));
     }
-
-
     #region Sinc
-
     /// <summary>
     /// Returns Sinc of <paramref name="x"/>.
     /// </summary>
@@ -241,8 +220,6 @@ public static class TrigonometryHelper
     {
         return Math.Abs(x) > 1e-20 ? Math.Sin(Math.PI * x) / (Math.PI * x) : 1.0;
     }
-
-
     /// <summary>
     /// Returns Sinc of <paramref name="x"/>.
     /// </summary>
@@ -251,8 +228,6 @@ public static class TrigonometryHelper
     {
         return MathF.Abs(x) > 1e-20 ? MathF.Sin(ConstantsFp32.PI * x) / (ConstantsFp32.PI * x) : 1.0f;
     }
-
-
     /// <summary>
     /// Returns Sinc of <paramref name="x"/>.
     /// </summary>
@@ -262,13 +237,8 @@ public static class TrigonometryHelper
     {
         return T.Abs(x) > T.CreateTruncating(1e-20) ? T.Sin(T.Pi * x) / (T.Pi * x) : T.One;
     }
-
     #endregion
-
-
     #region Asinh
-
-
     ///// <summary>
     ///// Computes Inverse Sinh of <paramref name="x"/>.
     ///// </summary>
@@ -277,8 +247,6 @@ public static class TrigonometryHelper
     //{
     //    return Math.Log(x + Math.Sqrt(x * x + 1));
     //}
-
-
     ///// <summary>
     ///// Computes Inverse Sinh of <paramref name="x"/>.
     ///// </summary>
@@ -287,7 +255,6 @@ public static class TrigonometryHelper
     //{
     //    return MathF.Log(x + MathF.Sqrt(x * x + 1));
     //}
-
     /// <summary>
     /// Returns the hyperbolic arc sine of the specified value.
     /// </summary>
@@ -298,10 +265,8 @@ public static class TrigonometryHelper
     {
         double x;
         int sign;
-
         if (d == 0.0)
             return d;
-
         if (d < 0.0)
         {
             sign = -1;
@@ -314,7 +279,6 @@ public static class TrigonometryHelper
         }
         return sign * System.Math.Log(x + System.Math.Sqrt(x * x + 1));
     }
-
     /// <summary>
     /// Returns the hyperbolic arc sine of the specified value.
     /// </summary>
@@ -325,10 +289,8 @@ public static class TrigonometryHelper
     {
         float x;
         int sign;
-
         if (d == 0.0f)
             return d;
-
         if (d < 0.0f)
         {
             sign = -1;
@@ -341,7 +303,6 @@ public static class TrigonometryHelper
         }
         return sign * Log(x + Sqrt(x * x + 1));
     }
-
     /// <summary>
     /// Computes Inverse Sinh of <paramref name="x"/>.
     /// </summary>
@@ -351,7 +312,5 @@ public static class TrigonometryHelper
     {
         return T.Log(x + T.Sqrt(x * x + T.One));
     }
-
     #endregion
-
 }

@@ -1,8 +1,6 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-
 namespace Vorcyc.Mathematics.MachineLearning.Distances;
-
 /// <summary>
 /// Angular distance, or the proper distance metric version of <see cref="Cosine{TSelf}" /> distance.
 /// </summary>
@@ -15,8 +13,6 @@ public class Angular
     : IDistance<float[]>
 #endif
 {
-
-
     /// <summary>
     ///   Computes the distance <c>d(x,y)</c> between points
     ///   <paramref name="x"/> and <paramref name="y"/>.
@@ -37,21 +33,16 @@ public class Angular
         TSelf num = TSelf.Zero;
         TSelf p = TSelf.Zero;
         TSelf q = TSelf.Zero;
-
         for (int i = 0; i < x.Length; i++)
         {
             num += x[i] * y[i];
             p += x[i] * x[i];
             q += y[i] * y[i];
         }
-
         TSelf den = TSelf.Sqrt(p) * TSelf.Sqrt(q);
         TSelf similarity = num == TSelf.Zero ? TSelf.One : TSelf.One - (num / den);
-
         return TSelf.Acos(similarity);
     }
-
-
 
     /// <summary>
     ///   Gets a similarity measure between two points.
@@ -68,17 +59,14 @@ public class Angular
         TSelf num = TSelf.Zero;
         TSelf p = TSelf.Zero;
         TSelf q = TSelf.Zero;
-
         for (int i = 0; i < x.Length; i++)
         {
             num += x[i] * y[i];
             p += x[i] * x[i];
             q += y[i] * y[i];
         }
-
         TSelf den = TSelf.Sqrt(p) * TSelf.Sqrt(q);
         TSelf similarity = num == TSelf.Zero ? TSelf.One : TSelf.One - (num / den);
-
         return TSelf.One - TSelf.Acos(similarity);
     }
 }

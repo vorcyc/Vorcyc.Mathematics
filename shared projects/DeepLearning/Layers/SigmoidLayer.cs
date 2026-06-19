@@ -1,25 +1,19 @@
 using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
-
 namespace Vorcyc.Mathematics.DeepLearning.Layers;
-
 public static partial class Layers
 {
-
     /// <summary>
-    /// 对输入张量执行 Sigmoid 激活函数操作。
-    /// </summary>
-    /// <typeparam name="T">张量元素的类型，必须实现 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 接口。</typeparam>
-    /// <param name="input">输入的张量。</param>
-    /// <returns>执行 Sigmoid 操作后的张量。</returns>
+    /// 瀵硅緭鍏ュ紶閲忔墽琛?Sigmoid 婵€娲诲嚱鏁版搷浣溿€?    /// </summary>
+    /// <typeparam name="T">寮犻噺鍏冪礌鐨勭被鍨嬶紝蹇呴』瀹炵幇 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 鎺ュ彛銆?/typeparam>
+    /// <param name="input">杈撳叆鐨勫紶閲忋€?/param>
+    /// <returns>鎵ц Sigmoid 鎿嶄綔鍚庣殑寮犻噺銆?/returns>
     public static Tensor<T> Sigmoid<T>(Tensor<T> input)
         where T : IBinaryFloatingPointIeee754<T>
     {
-
         var height = input.Height;
         var width = input.Width;
         var result = new Tensor<T>(input.Width, input.Height, input.Depth);
-
         long workPer = (long)height * width;
         ForEachDepth(input.Depth, workPer, d =>
         {
@@ -33,23 +27,17 @@ public static partial class Layers
                 }
             }
         });
-
         return result;
     }
-
-
     /// <summary>
-    /// 对输入张量执行 Sigmoid 激活函数操作。
-    /// </summary>
-    /// <param name="input">输入的张量。</param>
-    /// <returns>执行 Sigmoid 操作后的张量。</returns>
+    /// 瀵硅緭鍏ュ紶閲忔墽琛?Sigmoid 婵€娲诲嚱鏁版搷浣溿€?    /// </summary>
+    /// <param name="input">杈撳叆鐨勫紶閲忋€?/param>
+    /// <returns>鎵ц Sigmoid 鎿嶄綔鍚庣殑寮犻噺銆?/returns>
     public static Tensor Sigmoid(Tensor input)
     {
-
         var height = input.Height;
         var width = input.Width;
         var result = new Tensor(input.Width, input.Height, input.Depth);
-
         long workPer = (long)height * width;
         ForEachDepth(input.Depth, workPer, d =>
         {
@@ -62,11 +50,7 @@ public static partial class Layers
                 }
             }
         });
-
         return result;
     }
-
-
-
 
 }
