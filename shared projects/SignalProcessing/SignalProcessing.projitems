@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -88,6 +88,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Adaptive\RlsFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Adaptive\SignLmsFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Adaptive\VariableStepLmsFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\ExtendedKalmanFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\ExtendedKalmanFilter2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\InformationFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\ParticleFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\SquareRootKalmanFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\StandardKalmanFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\StandardKalmanFilter2D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\UnscentedKalmanFilter1D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Base\FilterChain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Base\FilteringMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Base\FirFilter.cs" />
@@ -268,5 +276,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_real_f.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_real_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Filters\Kalman\kalman.md" />
   </ItemGroup>
 </Project>

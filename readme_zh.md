@@ -4,7 +4,7 @@
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**版本：** 0.9.3 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
+**版本：** 0.10.0 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
 
 [English readme](readme.md)
 
@@ -45,10 +45,7 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 **深度学习（0.9）** — `BatchTensor`（NHWC）、`BatchSequential` / `Sequential`、20+ 批处理层、`Trainer.Fit*`、**ModelSerializer v3**。  
 → [wiki_hans/Module_DeepLearning_zh.md](wiki_hans/Module_DeepLearning_zh.md)
 
-**实验性模块** — 卡尔曼滤波、实验性信号类型、`CurveFitter<T>` 曲线拟合等。  
-→ [wiki_hans/Module_Experimental_zh.md](wiki_hans/Module_Experimental_zh.md)
-
-**线性代数** — 矩阵、向量、张量、四元数、分解与方程求解。  
+**线性代数**
 → [wiki_hans/Module_LinearAlgebra_zh.md](wiki_hans/Module_LinearAlgebra_zh.md)
 
 **机器学习（0.9）** — 分类/回归流水线、树与森林、提升、交叉验证、网格搜索、聚类与降维等。  

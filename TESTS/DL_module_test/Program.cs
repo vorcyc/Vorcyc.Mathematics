@@ -18,9 +18,7 @@ class Program
         RunTest("BatchTraining", BatchTraining_test.Run(), ref passed, ref failed);
         RunTest("BatchNorm", BatchNorm_test.Run(), ref passed, ref failed);
         RunTest("ModelSerializer", ModelSerializer_test.Run(), ref passed, ref failed);
-        RunTest("CurveFittingDl", CurveFittingDl_test.Run(), ref passed, ref failed);
         RunTest("BatchCnn", BatchCnn_test.Run(), ref passed, ref failed);
-        RunTest("CurveFitterScheduler", CurveFitterScheduler_test.Run(), ref passed, ref failed);
         RunTest("BatchConvBackward", BatchConvBackward_test.Run(), ref passed, ref failed);
         RunTest("CnnMlpTraining", CnnMlp_training_test.Run(), ref passed, ref failed);
         RunTest("CnnMlpModelSerializer", CnnMlpModelSerializer_test.Run(), ref passed, ref failed);
@@ -37,7 +35,6 @@ class Program
         RunTest("MfccMeanTraining", MfccMean_training_test.Run(), ref passed, ref failed);
         RunTest("AudioFrontendLayers", AudioFrontendLayers_test.Run(), ref passed, ref failed);
         RunTest("AudioFrontendTraining", AudioFrontend_training_test.Run(), ref passed, ref failed);
-        RunTest("CurveFitterSignalNeuralNetwork", CurveFitterSignalNeuralNetwork_test.Run(), ref passed, ref failed);
         RunTest("WaveformScalarRegression", WaveformScalarRegression_test.Run(), ref passed, ref failed);
         RunTest("ComputingContextEquivalence", ComputingContext_equivalence_test.Run(), ref passed, ref failed);
 

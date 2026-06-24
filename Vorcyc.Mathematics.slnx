@@ -18,7 +18,6 @@
     <File Path="wiki_en/Module_DeepLearning.md" />
     <File Path="wiki_en/Module_DeepLearning_Audio.md" />
     <File Path="wiki_en/Module_Examples.md" />
-    <File Path="wiki_en/Module_Experimental.md" />
     <File Path="wiki_en/Module_Extensions_FFTW.md" />
     <File Path="wiki_en/Module_GPU_Policy.md" />
     <File Path="wiki_en/Module_LinearAlgebra.md" />
@@ -53,7 +52,6 @@
     <File Path="wiki_hans/Module_DeepLearning_zh.md" />
     <File Path="wiki_hans/Module_DeepLearning_Audio_zh.md" />
     <File Path="wiki_hans/Module_Examples_zh.md" />
-    <File Path="wiki_hans/Module_Experimental_zh.md" />
     <File Path="wiki_hans/Module_Extensions_FFTW_zh.md" />
     <File Path="wiki_hans/Module_GPU_Policy_zh.md" />
     <File Path="wiki_hans/Module_LinearAlgebra_zh.md" />
@@ -95,10 +93,8 @@
   </Folder>
   <Folder Name="/shared projects/">
     <Project Path="shared projects/Calculus/Calculus.shproj" />
-    <Project Path="shared projects/ComputingContext/ComputingContext.shproj" />
     <Project Path="shared projects/Core/Core.shproj" />
     <Project Path="shared projects/DeepLearning/DeepLearning.shproj" />
-    <Project Path="shared projects/Experimental/Experimental.shproj" />
     <Project Path="shared projects/Framework/Framework.shproj" />
     <Project Path="shared projects/LinearAlgebra/LinearAlgebra.shproj" />
     <Project Path="shared projects/MachineLearning/MachineLearning.shproj" />

@@ -373,7 +373,6 @@ FodyWeavers.xsd
 /wiki_en/Module_DeepLearning.md
 /wiki_en/Module_DeepLearning_Audio.md
 /wiki_en/Module_Examples.md
-/wiki_en/Module_Experimental.md
 /wiki_en/Module_Extensions_FFTW.md
 /wiki_en/Module_GPU_Policy.md
 /wiki_en/Module_LinearAlgebra.md
@@ -408,7 +407,6 @@ FodyWeavers.xsd
 /wiki_hans/Module_DeepLearning_Audio_zh.md
 /wiki_hans/Module_DeepLearning_zh.md
 /wiki_hans/Module_Examples_zh.md
-/wiki_hans/Module_Experimental_zh.md
 /wiki_hans/Module_Extensions_FFTW_zh.md
 /wiki_hans/Module_GPU_Policy_zh.md
 /wiki_hans/Module_LinearAlgebra_zh.md

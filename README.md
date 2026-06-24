@@ -4,7 +4,7 @@ High-performance **.NET 10** math library: SIMD/parallel CPU numerics, signal pr
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**Version:** 0.9.3 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
+**Version:** 0.10.0 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
 
 [中文说明](readme_zh.md)
 
@@ -38,10 +38,7 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 **Deep learning (0.9)** — `BatchTensor` (NHWC), `BatchSequential` / `Sequential`, 20+ batch layers, `Trainer.Fit*`, `ModelSerializer` v3.  
 → [wiki_en/Module_DeepLearning.md](wiki_en/Module_DeepLearning.md)
 
-**Experimental** — Kalman filters, curve fitting (`CurveFitter<T>`), legacy signal types.  
-→ [wiki_en/Module_Experimental.md](wiki_en/Module_Experimental.md)
-
-**Linear algebra** — matrices, vectors, tensors, quaternions, decompositions.  
+**Linear algebra**
 → [wiki_en/Module_LinearAlgebra.md](wiki_en/Module_LinearAlgebra.md)
 
 **Machine learning (0.9)** — classifiers, regressors, pipelines, trees/forests, boosting, CV, grid search.  

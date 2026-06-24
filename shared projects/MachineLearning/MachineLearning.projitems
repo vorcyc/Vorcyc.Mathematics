@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -9,6 +9,21 @@
     <Import_RootNamespace>Vorcyc.Mathematics.MachineLearning</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\01_LinearRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\02_PolynomialRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\03_ExponentialRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\04_LogarithmicRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\05_PowerRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\06_SinusoidalRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\07_CubicSplineInterpolation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\08_LocallyWeighted.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\09_MovingAverageFitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\10_NonlinearRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\11_GaussianProcessRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\14_BayesianRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\CurveFitRow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\CurveFitter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\FitResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Decomposition\ICA.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\Array2DHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\CartThresholdSearch.cs" />

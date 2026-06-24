@@ -50,7 +50,6 @@ public static partial class Basic
     /// <returns>The sum of the elements in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Sum: Returns the sum of all elements in a set of data, used to represent the overall magnitude of the data.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Sum<T>(this Span<T> values)
         where T : INumber<T>
@@ -91,7 +90,6 @@ public static partial class Basic
     /// <returns>The sum of the elements in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Sum: Returns the sum of all elements in a set of data, used to represent the overall magnitude of the data.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Sum<T>(this Span<T> values, Func<T, T> selector)
         where T : INumber<T>
@@ -114,7 +112,6 @@ public static partial class Basic
     /// <returns>The average value of the elements in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Mean: Returns the average value of a set of data, used to represent the central tendency of the data.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Average<T>(this Span<T> values)
     where T : INumber<T>
@@ -133,7 +130,6 @@ public static partial class Basic
     /// <returns>The median of the elements in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Median: Returns the median of a set of data, used to represent the middle value of the data, which effectively reflects the distribution of the data.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Median<T>(this Span<T> values)
         where T : INumber<T>
@@ -163,7 +159,6 @@ public static partial class Basic
     /// <returns>The most frequently occurring element in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Mode: Returns the most frequently occurring value in a set of data, used to represent the most common value in the data.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Mode<T>(this Span<T> values)
         where T : INumber<T>
@@ -194,7 +189,6 @@ public static partial class Basic
     /// <returns>A tuple containing the average value and variance of the elements in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Variance: Returns the variance of a set of data, used to represent the dispersion of the data.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (T average, T variance) Variance<T>(this Span<T> values)
         where T : INumber<T>
@@ -238,7 +232,6 @@ public static partial class Basic
     /// <returns>The standard deviation of the elements in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Standard Deviation: Returns the standard deviation of a set of data, used to represent the dispersion of the data.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T StandardDeviation<T>(this Span<T> values)
         where T : IFloatingPointIeee754<T>
@@ -257,7 +250,6 @@ public static partial class Basic
     /// <returns>The coefficient of variation of the elements in the set of values.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Coefficient of Variation: Measures the dispersion of the data, representing the ratio of the standard deviation to the mean.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T CoefficientOfVariation<T>(this Span<T> values)
         where T : IFloatingPointIeee754<T>
@@ -277,7 +269,6 @@ public static partial class Basic
     /// <returns>A tuple containing the mean, median, mode, variance, standard deviation, and coefficient of variation.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="values"/> is empty.</exception>
     /// <remarks>Returns a tuple containing all statistics.</remarks>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (T Mean, T Median, T Mode, T Variance, T StandardDeviation, T CoefficientOfVariation)
         CalculateAllStatistics<T>(this Span<T> values)

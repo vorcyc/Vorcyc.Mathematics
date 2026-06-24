@@ -8,7 +8,6 @@ public static partial class Basic
     /// <summary>
     /// Computes mean and variance with explicit <see cref="DescriptiveStatisticsOptions"/>.
     /// </summary>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (T average, T variance) Variance<T>(
         this Span<T> values,
@@ -51,7 +50,6 @@ public static partial class Basic
     /// <summary>
     /// Computes standard deviation with explicit options.
     /// </summary>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T StandardDeviation<T>(
         this Span<T> values,
@@ -65,7 +63,6 @@ public static partial class Basic
     /// <summary>
     /// Computes all descriptive statistics with explicit options.
     /// </summary>
-    [DeviceDependency(DeviceDependency.CPU)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (T Mean, T Median, T Mode, T Variance, T StandardDeviation, T CoefficientOfVariation)
         CalculateAllStatistics<T>(
