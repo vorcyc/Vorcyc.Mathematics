@@ -5,6 +5,7 @@ using Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Multi;
 using Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Options;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 namespace Vorcyc.Mathematics.DeepLearning.Integration;
 

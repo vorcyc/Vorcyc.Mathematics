@@ -5,6 +5,7 @@ using Vorcyc.Mathematics.SignalProcessing.Operations;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 namespace DSP_module_test;
 

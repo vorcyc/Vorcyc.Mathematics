@@ -21,25 +21,18 @@ internal class Program
         Console.WriteLine(SignalPhase3_test.RunNamed(out failure)
             ? "SignalPhase3: PASS"
             : $"SignalPhase3: FAIL ({failure})");
-        //var input = new float[1024];
-        //input.Fill(0, 1f);
-        //var output = new ComplexFp32[500];//ArrayPool<ComplexFp32>.Shared.Rent(1024 / 2 + 1);
-        //Dft1D.Forward(input, output);
-        //output.PrintLine();
-        //Dft1D.Inverse(output, input);
-        //input.PrintLine();
-        //FFTW_ALL.Run();
-
-        var s = new Signal(TimeSpan.FromSeconds(1), 1000);
-        Console.WriteLine(s.Length);
-        Console.WriteLine(s.Duration);
-        var seg = s[0, 500];
-        Console.WriteLine(seg.Value.Length);
-        var freq = seg.Value.TransformToFrequencyDomain();
-        Console.WriteLine(freq.Offset);
-        Console.WriteLine(freq.ActualLength);
-        Console.WriteLine(freq.TransformLength);
-        Console.WriteLine("----------");
-        Console.WriteLine(500.NextPowerOf2());
+        Console.WriteLine(FftKernel_test.RunNamed(out failure)
+            ? "FftKernel: PASS"
+            : $"FftKernel: FAIL ({failure})");
+        Console.WriteLine(FftKernel_test.RunNamed64(out failure)
+            ? "FftKernel64: PASS"
+            : $"FftKernel64: FAIL ({failure})");
+        Console.WriteLine(FftKernel_test.RunNamedSpan(out failure)
+            ? "FftKernelSpan: PASS"
+            : $"FftKernelSpan: FAIL ({failure})");
+        Console.WriteLine(Stft_test.RunNamed(out failure)
+            ? "Stft: PASS"
+            : $"Stft: FAIL ({failure})");
+        FftKernel_bench.Run();
     }
 }

@@ -1,8 +1,6 @@
-﻿using Vorcyc.Mathematics;
-using Vorcyc.Mathematics.SignalProcessing.Signals;
-using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
+﻿using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
 
-namespace Vorcyc.Mathematics.SignalProcessing.Transforms;
+namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 /// <summary>
 /// <para>Represents Complex Fast Fourier Transform (for real-valued input):</para>
@@ -102,6 +100,32 @@ public class RealFft : IComplexTransform
     /// <param name="re">Output data (real parts)</param>
     /// <param name="im">Output data (imaginary parts)</param>
     public void Direct(float[] input, float[] re, float[] im)
+        => Direct(input, re, im, context: null);
+
+    /// <summary>
+    /// <para>
+    /// Does Fast Fourier Transform: real <paramref name="input"/> -> complex (<paramref name="re"/>, <paramref name="im"/>),
+    /// selecting a scalar / SIMD / parallel kernel for the inner half-size complex FFT according to <paramref name="context"/>.
+    /// </para>
+    /// </summary>
+    /// <param name="input">Input data (real)</param>
+    /// <param name="re">Output data (real parts)</param>
+    /// <param name="im">Output data (imaginary parts)</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Direct(float[] input, float[] re, float[] im, ComputingContext? context)
+        => Direct((ReadOnlySpan<float>)input, re, im, context);
+
+    /// <summary>
+    /// <para>
+    /// Does Fast Fourier Transform: real <paramref name="input"/> -> complex (<paramref name="re"/>, <paramref name="im"/>),
+    /// selecting a scalar / SIMD / parallel kernel for the inner half-size complex FFT according to <paramref name="context"/>.
+    /// </para>
+    /// </summary>
+    /// <param name="input">Input data (real)</param>
+    /// <param name="re">Output data (real parts)</param>
+    /// <param name="im">Output data (imaginary parts)</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Direct(ReadOnlySpan<float> input, Span<float> re, Span<float> im, ComputingContext? context = null)
     {
         // do half-size complex FFT:
 
@@ -111,57 +135,8 @@ public class RealFft : IComplexTransform
             _im[i] = input[k++];
         }
 
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0f;
-            var u2 = 0.0f;
-            var c = _cosTbl[ti];
-            var s = -_sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = _re[i] + _re[p];
-                    var t2 = _im[i] + _im[p];
-                    var t3 = _re[i] - _re[p];
-                    var t4 = _im[i] - _im[p];
-                    _re[p] = t3 * u1 - t4 * u2;
-                    _im[p] = t4 * u1 + t3 * u2;
-                    _re[i] = t1;
-                    _im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = _re[j];
-                var t2 = _im[j];
-                _re[j] = _re[i];
-                _im[j] = _im[i];
-                _re[i] = t1;
-                _im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(_fftSize);
+        HalfSizeButterfly(inverse: false, mode, context);
 
         // do the last step:
 
@@ -188,6 +163,32 @@ public class RealFft : IComplexTransform
     /// <param name="im">Input data (imaginary parts)</param>
     /// <param name="output">Output data (real)</param>
     public void Inverse(float[] re, float[] im, float[] output)
+        => Inverse(re, im, output, context: null);
+
+    /// <summary>
+    /// <para>
+    /// Does Inverse Fast Fourier Transform: complex (<paramref name="re"/>, <paramref name="im"/>) -> real <paramref name="output"/>,
+    /// selecting a scalar / SIMD / parallel kernel for the inner half-size complex FFT according to <paramref name="context"/>.
+    /// </para>
+    /// </summary>
+    /// <param name="re">Input data (real parts)</param>
+    /// <param name="im">Input data (imaginary parts)</param>
+    /// <param name="output">Output data (real)</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Inverse(float[] re, float[] im, float[] output, ComputingContext? context)
+        => Inverse((ReadOnlySpan<float>)re, im, output, context);
+
+    /// <summary>
+    /// <para>
+    /// Does Inverse Fast Fourier Transform: complex (<paramref name="re"/>, <paramref name="im"/>) -> real <paramref name="output"/>,
+    /// selecting a scalar / SIMD / parallel kernel for the inner half-size complex FFT according to <paramref name="context"/>.
+    /// </para>
+    /// </summary>
+    /// <param name="re">Input data (real parts)</param>
+    /// <param name="im">Input data (imaginary parts)</param>
+    /// <param name="output">Output data (real)</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Inverse(ReadOnlySpan<float> re, ReadOnlySpan<float> im, Span<float> output, ComputingContext? context = null)
     {
         // do the first step:
 
@@ -199,57 +200,8 @@ public class RealFft : IComplexTransform
 
         // do half-size complex FFT:
 
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0f;
-            var u2 = 0.0f;
-            var c = _cosTbl[ti];
-            var s = _sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = _re[i] + _re[p];
-                    var t2 = _im[i] + _im[p];
-                    var t3 = _re[i] - _re[p];
-                    var t4 = _im[i] - _im[p];
-                    _re[p] = t3 * u1 - t4 * u2;
-                    _im[p] = t4 * u1 + t3 * u2;
-                    _re[i] = t1;
-                    _im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = _re[j];
-                var t2 = _im[j];
-                _re[j] = _re[i];
-                _im[j] = _im[i];
-                _re[i] = t1;
-                _im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(_fftSize);
+        HalfSizeButterfly(inverse: true, mode, context);
 
         // fill output:
 
@@ -269,7 +221,33 @@ public class RealFft : IComplexTransform
     /// <param name="re">Input data (real parts)</param>
     /// <param name="im">Input data (imaginary parts)</param>
     /// <param name="output">Output data (real)</param>
-    public void InverseNorm( float[] re, float[] im, float[] output)
+    public void InverseNorm(float[] re, float[] im, float[] output)
+        => InverseNorm(re, im, output, context: null);
+
+    /// <summary>
+    /// <para>
+    /// Does normalized Inverse Fast Fourier Transform: complex (<paramref name="re"/>, <paramref name="im"/>) -> real <paramref name="output"/>,
+    /// selecting a scalar / SIMD / parallel kernel for the inner half-size complex FFT according to <paramref name="context"/>.
+    /// </para>
+    /// </summary>
+    /// <param name="re">Input data (real parts)</param>
+    /// <param name="im">Input data (imaginary parts)</param>
+    /// <param name="output">Output data (real)</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void InverseNorm(float[] re, float[] im, float[] output, ComputingContext? context)
+        => InverseNorm((ReadOnlySpan<float>)re, im, output, context);
+
+    /// <summary>
+    /// <para>
+    /// Does normalized Inverse Fast Fourier Transform: complex (<paramref name="re"/>, <paramref name="im"/>) -> real <paramref name="output"/>,
+    /// selecting a scalar / SIMD / parallel kernel for the inner half-size complex FFT according to <paramref name="context"/>.
+    /// </para>
+    /// </summary>
+    /// <param name="re">Input data (real parts)</param>
+    /// <param name="im">Input data (imaginary parts)</param>
+    /// <param name="output">Output data (real)</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void InverseNorm(ReadOnlySpan<float> re, ReadOnlySpan<float> im, Span<float> output, ComputingContext? context = null)
     {
         // do the first step:
 
@@ -281,6 +259,36 @@ public class RealFft : IComplexTransform
 
         // do half-size complex FFT:
 
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(_fftSize);
+        HalfSizeButterfly(inverse: true, mode, context);
+
+        // fill output with normalization:
+
+        for (int i = 0, k = 0; i < _fftSize; i++)
+        {
+            output[k++] = _re[i] / _fftSize;
+            output[k++] = _im[i] / _fftSize;
+        }
+    }
+
+    /// <summary>
+    /// Runs the inner half-size complex FFT over the internal <see cref="_re"/>/<see cref="_im"/> buffers,
+    /// dispatching to the shared SIMD/parallel <see cref="FftButterflyFp32"/> kernel when it is beneficial,
+    /// otherwise falling back to the original scalar butterfly that uses the precomputed twiddle tables.
+    /// </summary>
+    /// <param name="inverse">Direction of the transform (Direct uses s = -sin, Inverse uses s = +sin).</param>
+    /// <param name="mode">Resolved CPU execution mode.</param>
+    /// <param name="context">Optional execution policy (for parallel dispatch).</param>
+    private void HalfSizeButterfly(bool inverse, CpuExecutionMode mode, ComputingContext? context)
+    {
+        if (FftButterflyFp32.WillAccelerate(mode, _fftSize))
+        {
+            FftButterflyFp32.Transform(_re, _im, _fftSize, inverse, mode, context);
+            return;
+        }
+
+        // original scalar path using precomputed twiddle tables:
+
         var L = _fftSize;
         var M = _fftSize >> 1;
         var S = _fftSize - 1;
@@ -291,7 +299,7 @@ public class RealFft : IComplexTransform
             var u1 = 1.0f;
             var u2 = 0.0f;
             var c = _cosTbl[ti];
-            var s = _sinTbl[ti];
+            var s = inverse ? _sinTbl[ti] : -_sinTbl[ti];
             ti++;
             for (var j = 0; j < l; j++)
             {
@@ -331,14 +339,6 @@ public class RealFft : IComplexTransform
                 k >>= 1;
             }
             j += k;
-        }
-
-        // fill output with normalization:
-
-        for (int i = 0, k = 0; i < _fftSize; i++)
-        {
-            output[k++] = _re[i] / _fftSize;
-            output[k++] = _im[i] / _fftSize;
         }
     }
 
@@ -423,6 +423,12 @@ public class RealFft : IComplexTransform
     /// Computes magnitude spectrum from a sample span.
     /// </summary>
     public void MagnitudeSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = false)
+        => MagnitudeSpectrum(samples, spectrum.AsSpan(), normalize);
+
+    /// <summary>
+    /// Computes magnitude spectrum from a sample span into a destination span.
+    /// </summary>
+    public void MagnitudeSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = false)
     {
         DirectFromSpan(samples);
 
@@ -462,6 +468,12 @@ public class RealFft : IComplexTransform
     /// Computes power spectrum from a sample span.
     /// </summary>
     public void PowerSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = true)
+        => PowerSpectrum(samples, spectrum.AsSpan(), normalize);
+
+    /// <summary>
+    /// Computes power spectrum from a sample span into a destination span.
+    /// </summary>
+    public void PowerSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = true)
     {
         DirectFromSpan(samples);
 
@@ -534,7 +546,12 @@ public class RealFft : IComplexTransform
     /// <summary>
     /// FFT shift in-place. Throws <see cref="ArgumentException"/> if array of <paramref name="samples"/> has odd length.
     /// </summary>
-    public static void Shift(float[] samples)
+    public static void Shift(float[] samples) => Shift(samples.AsSpan());
+
+    /// <summary>
+    /// FFT shift in-place over a span. Throws <see cref="ArgumentException"/> if <paramref name="samples"/> has odd length.
+    /// </summary>
+    public static void Shift(Span<float> samples)
     {
         if ((samples.Length & 1) == 1)
         {
@@ -551,257 +568,4 @@ public class RealFft : IComplexTransform
             samples[shift] = tmp;
         }
     }
-
-
-#if NET50
-    /// <summary>
-    /// <para>
-    /// Does Fast Fourier Transform: 
-    /// real <paramref name="input"/> -> complex (<paramref name="re"/>, <paramref name="im"/>).
-    /// </para>
-    /// </summary>
-    /// <param name="input">Input data (real)</param>
-    /// <param name="re">Output data (real parts)</param>
-    /// <param name="im">Output data (imaginary parts)</param>
-    public void Direct(ReadOnlySpan<float> input, Span<float> re, Span<float> im)
-    {
-        // do half-size complex FFT:
-
-        for (int i = 0, k = 0; i < _fftSize; i++)
-        {
-            _re[i] = input[k++];
-            _im[i] = input[k++];
-        }
-
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0f;
-            var u2 = 0.0f;
-            var c = _cosTbl[ti];
-            var s = -_sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = _re[i] + _re[p];
-                    var t2 = _im[i] + _im[p];
-                    var t3 = _re[i] - _re[p];
-                    var t4 = _im[i] - _im[p];
-                    _re[p] = t3 * u1 - t4 * u2;
-                    _im[p] = t4 * u1 + t3 * u2;
-                    _re[i] = t1;
-                    _im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = _re[j];
-                var t2 = _im[j];
-                _re[j] = _re[i];
-                _im[j] = _im[i];
-                _re[i] = t1;
-                _im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
-
-        // do the last step:
-
-        re[0] = _re[0] * _ar[0] - _im[0] * _ai[0] + _re[0] * _br[0] + _im[0] * _bi[0];
-        im[0] = _im[0] * _ar[0] + _re[0] * _ai[0] + _re[0] * _bi[0] - _im[0] * _br[0];
-
-        for (var k = 1; k < _fftSize; k++)
-        {
-            re[k] = _re[k] * _ar[k] - _im[k] * _ai[k] + _re[_fftSize - k] * _br[k] + _im[_fftSize - k] * _bi[k];
-            im[k] = _im[k] * _ar[k] + _re[k] * _ai[k] + _re[_fftSize - k] * _bi[k] - _im[_fftSize - k] * _br[k];
-        }
-
-        re[_fftSize] = _re[0] - _im[0];
-        im[_fftSize] = 0;
-    }
-
-    /// <summary>
-    /// <para>
-    /// Does Inverse Fast Fourier Transform: 
-    /// complex (<paramref name="re"/>, <paramref name="im"/>) -> real <paramref name="output"/>.
-    /// </para>
-    /// </summary>
-    /// <param name="re">Input data (real parts)</param>
-    /// <param name="im">Input data (imaginary parts)</param>
-    /// <param name="output">Output data (real)</param>
-    public void Inverse(ReadOnlySpan<float> re, ReadOnlySpan<float> im, Span<float> output)
-    {
-        // do the first step:
-
-        for (var k = 0; k < _fftSize; k++)
-        {
-            _re[k] = re[k] * _ar[k] + im[k] * _ai[k] + re[_fftSize - k] * _br[k] - im[_fftSize - k] * _bi[k];
-            _im[k] = im[k] * _ar[k] - re[k] * _ai[k] - re[_fftSize - k] * _bi[k] - im[_fftSize - k] * _br[k];
-        }
-
-        // do half-size complex FFT:
-
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0f;
-            var u2 = 0.0f;
-            var c = _cosTbl[ti];
-            var s = _sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = _re[i] + _re[p];
-                    var t2 = _im[i] + _im[p];
-                    var t3 = _re[i] - _re[p];
-                    var t4 = _im[i] - _im[p];
-                    _re[p] = t3 * u1 - t4 * u2;
-                    _im[p] = t4 * u1 + t3 * u2;
-                    _re[i] = t1;
-                    _im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = _re[j];
-                var t2 = _im[j];
-                _re[j] = _re[i];
-                _im[j] = _im[i];
-                _re[i] = t1;
-                _im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
-
-        // fill output:
-
-        for (int i = 0, k = 0; i < _fftSize; i++)
-        {
-            output[k++] = _re[i] * 2;
-            output[k++] = _im[i] * 2;
-        }
-    }
-
-    /// <summary>
-    /// <para>
-    /// Does normalized Inverse Fast Fourier Transform: 
-    /// complex (<paramref name="re"/>, <paramref name="im"/>) -> real <paramref name="output"/>.
-    /// </para>
-    /// </summary>
-    /// <param name="re">Input data (real parts)</param>
-    /// <param name="im">Input data (imaginary parts)</param>
-    /// <param name="output">Output data (real)</param>
-    public void InverseNorm(ReadOnlySpan<float> re, ReadOnlySpan<float> im, Span<float> output)
-    {
-        // do the first step:
-
-        for (var k = 0; k < _fftSize; k++)
-        {
-            _re[k] = re[k] * _ar[k] + im[k] * _ai[k] + re[_fftSize - k] * _br[k] - im[_fftSize - k] * _bi[k];
-            _im[k] = im[k] * _ar[k] - re[k] * _ai[k] - re[_fftSize - k] * _bi[k] - im[_fftSize - k] * _br[k];
-        }
-
-        // do half-size complex FFT:
-
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0f;
-            var u2 = 0.0f;
-            var c = _cosTbl[ti];
-            var s = _sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = _re[i] + _re[p];
-                    var t2 = _im[i] + _im[p];
-                    var t3 = _re[i] - _re[p];
-                    var t4 = _im[i] - _im[p];
-                    _re[p] = t3 * u1 - t4 * u2;
-                    _im[p] = t4 * u1 + t3 * u2;
-                    _re[i] = t1;
-                    _im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = _re[j];
-                var t2 = _im[j];
-                _re[j] = _re[i];
-                _im[j] = _im[i];
-                _re[i] = t1;
-                _im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
-
-        // fill output with normalization:
-
-        for (int i = 0, k = 0; i < _fftSize; i++)
-        {
-            output[k++] = _re[i] / _fftSize;
-            output[k++] = _im[i] / _fftSize;
-        }
-    }
-#endif
 }

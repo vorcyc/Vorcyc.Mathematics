@@ -2,6 +2,7 @@
 using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Features;

@@ -1,5 +1,7 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
 
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
+
 namespace Vorcyc.Mathematics.SignalProcessing.Transforms;
 
 /// <summary>

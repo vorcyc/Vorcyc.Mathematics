@@ -4,6 +4,7 @@ using Vorcyc.Mathematics.SignalProcessing.FeatureExtractors.Options;
 using Vorcyc.Mathematics.SignalProcessing.Filters;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.FeatureExtractors

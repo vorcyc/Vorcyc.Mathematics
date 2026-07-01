@@ -6,6 +6,7 @@ using Vorcyc.Mathematics.DeepLearning.Optimizers;
 using Vorcyc.Mathematics.DeepLearning.Training;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 namespace DL_module_test;
 

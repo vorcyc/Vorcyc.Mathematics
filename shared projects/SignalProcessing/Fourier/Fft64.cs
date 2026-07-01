@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Transforms;
+﻿namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 /// <summary>
 /// <para>Represents Complex Fast Fourier Transform for 64-bit data:</para>
@@ -54,7 +54,19 @@ public class Fft64
     /// </summary>
     /// <param name="re">Array of real parts</param>
     /// <param name="im">Array of imaginary parts</param>
-    public void Direct(double[] re, double[] im)
+    public void Direct(double[] re, double[] im) => DirectInPlace(re, im);
+
+    /// <summary>
+    /// Does Fast Fourier Transform in-place over spans (real/imaginary parts).
+    /// </summary>
+    /// <param name="re">Span of real parts</param>
+    /// <param name="im">Span of imaginary parts</param>
+    public void Direct(Span<double> re, Span<double> im) => DirectInPlace(re, im);
+
+    /// <summary>
+    /// Scalar in-place decimation-in-frequency FFT (forward), shared by the array and span overloads.
+    /// </summary>
+    private void DirectInPlace(Span<double> re, Span<double> im)
     {
         var L = _fftSize;
         var M = _fftSize >> 1;
@@ -114,7 +126,19 @@ public class Fft64
     /// </summary>
     /// <param name="re">Array of real parts</param>
     /// <param name="im">Array of imaginary parts</param>
-    public void Inverse(double[] re, double[] im)
+    public void Inverse(double[] re, double[] im) => InverseInPlace(re, im);
+
+    /// <summary>
+    /// Does Inverse Fast Fourier Transform in-place over spans (real/imaginary parts).
+    /// </summary>
+    /// <param name="re">Span of real parts</param>
+    /// <param name="im">Span of imaginary parts</param>
+    public void Inverse(Span<double> re, Span<double> im) => InverseInPlace(re, im);
+
+    /// <summary>
+    /// Scalar in-place decimation-in-frequency FFT (inverse), shared by the array and span overloads.
+    /// </summary>
+    private void InverseInPlace(Span<double> re, Span<double> im)
     {
         var L = _fftSize;
         var M = _fftSize >> 1;
@@ -174,9 +198,16 @@ public class Fft64
     /// </summary>
     /// <param name="re">Array of real parts</param>
     /// <param name="im">Array of imaginary parts</param>
-    public void InverseNorm(double[] re, double[] im)
+    public void InverseNorm(double[] re, double[] im) => InverseNorm(re.AsSpan(), im.AsSpan());
+
+    /// <summary>
+    /// Does normalized Inverse Fast Fourier Transform in-place over spans.
+    /// </summary>
+    /// <param name="re">Span of real parts</param>
+    /// <param name="im">Span of imaginary parts</param>
+    public void InverseNorm(Span<double> re, Span<double> im)
     {
-        Inverse(re, im);
+        InverseInPlace(re, im);
 
         for (int i = 0; i < _fftSize; i++)
         {
@@ -184,6 +215,53 @@ public class Fft64
             im[i] /= _fftSize;
         }
     }
+
+    #region ComputingContext-aware overloads
+
+    /// <summary>
+    /// Does Fast Fourier Transform in-place, selecting a scalar / SIMD / parallel kernel according to <paramref name="context"/>.
+    /// </summary>
+    /// <param name="re">Array of real parts</param>
+    /// <param name="im">Array of imaginary parts</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Direct(double[] re, double[] im, ComputingContext? context)
+    {
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(_fftSize);
+        if (!FftButterflyFp64.WillAccelerate(mode, _fftSize)) { Direct(re, im); return; }
+        FftButterflyFp64.Transform(re, im, _fftSize, inverse: false, mode, context);
+    }
+
+    /// <summary>
+    /// Does Inverse Fast Fourier Transform in-place, selecting a scalar / SIMD / parallel kernel according to <paramref name="context"/>.
+    /// </summary>
+    /// <param name="re">Array of real parts</param>
+    /// <param name="im">Array of imaginary parts</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Inverse(double[] re, double[] im, ComputingContext? context)
+    {
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(_fftSize);
+        if (!FftButterflyFp64.WillAccelerate(mode, _fftSize)) { Inverse(re, im); return; }
+        FftButterflyFp64.Transform(re, im, _fftSize, inverse: true, mode, context);
+    }
+
+    /// <summary>
+    /// Does normalized Inverse Fast Fourier Transform in-place, selecting a scalar / SIMD / parallel kernel according to <paramref name="context"/>.
+    /// </summary>
+    /// <param name="re">Array of real parts</param>
+    /// <param name="im">Array of imaginary parts</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void InverseNorm(double[] re, double[] im, ComputingContext? context)
+    {
+        Inverse(re, im, context);
+
+        for (int i = 0; i < _fftSize; i++)
+        {
+            re[i] /= _fftSize;
+            im[i] /= _fftSize;
+        }
+    }
+
+    #endregion
 
     /// <summary>
     /// Does Fast Fourier Transform: 
@@ -202,6 +280,22 @@ public class Fft64
     }
 
     /// <summary>
+    /// Does Fast Fourier Transform:
+    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
+    /// </summary>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
+    public void Direct(ReadOnlySpan<double> inRe, ReadOnlySpan<double> inIm, Span<double> outRe, Span<double> outIm)
+    {
+        inRe.CopyTo(outRe);
+        inIm.CopyTo(outIm);
+
+        DirectInPlace(outRe, outIm);
+    }
+
+    /// <summary>
     /// Does normalized Fast Fourier Transform: 
     /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
     /// </summary>
@@ -210,6 +304,19 @@ public class Fft64
     /// <param name="outRe">Output data (real parts)</param>
     /// <param name="outIm">Output data (imaginary parts)</param>
     public void DirectNorm(double[] inRe, double[] inIm, double[] outRe, double[] outIm)
+    {
+        Direct(inRe, inIm, outRe, outIm);
+    }
+
+    /// <summary>
+    /// Does normalized Fast Fourier Transform:
+    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
+    /// </summary>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
+    public void DirectNorm(ReadOnlySpan<double> inRe, ReadOnlySpan<double> inIm, Span<double> outRe, Span<double> outIm)
     {
         Direct(inRe, inIm, outRe, outIm);
     }
@@ -231,6 +338,22 @@ public class Fft64
     }
 
     /// <summary>
+    /// Does Inverse Fast Fourier Transform:
+    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
+    /// </summary>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
+    public void Inverse(ReadOnlySpan<double> inRe, ReadOnlySpan<double> inIm, Span<double> outRe, Span<double> outIm)
+    {
+        inRe.CopyTo(outRe);
+        inIm.CopyTo(outIm);
+
+        InverseInPlace(outRe, outIm);
+    }
+
+    /// <summary>
     /// Does normalized Inverse Fast Fourier Transform: 
     /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
     /// </summary>
@@ -246,183 +369,14 @@ public class Fft64
         InverseNorm(outRe, outIm);
     }
 
-#if NET50
     /// <summary>
-    /// Does Fast Fourier Transform in-place.
-    /// </summary>
-    /// <param name="re">Array of real parts</param>
-    /// <param name="im">Array of imaginary parts</param>
-    public void Direct(Span<double> re, Span<double> im)
-    {
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0;
-            var u2 = 0.0;
-            var c = _cosTbl[ti];
-            var s = -_sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = re[i] + re[p];
-                    var t2 = im[i] + im[p];
-                    var t3 = re[i] - re[p];
-                    var t4 = im[i] - im[p];
-                    re[p] = t3 * u1 - t4 * u2;
-                    im[p] = t4 * u1 + t3 * u2;
-                    re[i] = t1;
-                    im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = re[j];
-                var t2 = im[j];
-                re[j] = re[i];
-                im[j] = im[i];
-                re[i] = t1;
-                im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
-    }
-
-    /// <summary>
-    /// Does Inverse Fast Fourier Transform in-place.
-    /// </summary>
-    /// <param name="re">Array of real parts</param>
-    /// <param name="im">Array of imaginary parts</param>
-    public void Inverse(Span<double> re, Span<double> im)
-    {
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0;
-            var u2 = 0.0;
-            var c = _cosTbl[ti];
-            var s = _sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = re[i] + re[p];
-                    var t2 = im[i] + im[p];
-                    var t3 = re[i] - re[p];
-                    var t4 = im[i] - im[p];
-                    re[p] = t3 * u1 - t4 * u2;
-                    im[p] = t4 * u1 + t3 * u2;
-                    re[i] = t1;
-                    im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = re[j];
-                var t2 = im[j];
-                re[j] = re[i];
-                im[j] = im[i];
-                re[i] = t1;
-                im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
-    }
-
-    /// <summary>
-    /// Does normalized Inverse Fast Fourier Transform in-place.
-    /// </summary>
-    /// <param name="re">Array of real parts</param>
-    /// <param name="im">Array of imaginary parts</param>
-    public void InverseNorm(Span<double> re, Span<double> im)
-    {
-        Inverse(re, im);
-
-        for (int i = 0; i < _fftSize; i++)
-        {
-            re[i] /= _fftSize;
-            im[i] /= _fftSize;
-        }
-    }
-
-    /// <summary>
-    /// Does Fast Fourier Transform: 
+    /// Does normalized Inverse Fast Fourier Transform:
     /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
     /// </summary>
-    /// <param name="inRe">Array of real parts (input)</param>
-    /// <param name="inIm">Array of imaginary parts (input)</param>
-    /// <param name="outRe">Array of real parts (output)</param>
-    /// <param name="outIm">Array of imaginary parts (output)</param>
-    public void Direct(ReadOnlySpan<double> inRe, ReadOnlySpan<double> inIm, Span<double> outRe, Span<double> outIm)
-    {
-        inRe.CopyTo(outRe);
-        inIm.CopyTo(outIm);
-
-        Direct(outRe, outIm);
-    }
-
-    /// <summary>
-    /// Does Inverse Fast Fourier Transform: 
-    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
-    /// </summary>
-    /// <param name="inRe">Array of real parts (input)</param>
-    /// <param name="inIm">Array of imaginary parts (input)</param>
-    /// <param name="outRe">Array of real parts (output)</param>
-    /// <param name="outIm">Array of imaginary parts (output)</param>
-    public void Inverse(ReadOnlySpan<double> inRe, ReadOnlySpan<double> inIm, Span<double> outRe, Span<double> outIm)
-    {
-        inRe.CopyTo(outRe);
-        inIm.CopyTo(outIm);
-
-        Inverse(outRe, outIm);
-    }
-
-    /// <summary>
-    /// Does normalized Inverse Fast Fourier Transform: 
-    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
-    /// </summary>
-    /// <param name="inRe">Array of real parts (input)</param>
-    /// <param name="inIm">Array of imaginary parts (input)</param>
-    /// <param name="outRe">Array of real parts (output)</param>
-    /// <param name="outIm">Array of imaginary parts (output)</param>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
     public void InverseNorm(ReadOnlySpan<double> inRe, ReadOnlySpan<double> inIm, Span<double> outRe, Span<double> outIm)
     {
         inRe.CopyTo(outRe);
@@ -430,5 +384,5 @@ public class Fft64
 
         InverseNorm(outRe, outIm);
     }
-#endif
+
 }

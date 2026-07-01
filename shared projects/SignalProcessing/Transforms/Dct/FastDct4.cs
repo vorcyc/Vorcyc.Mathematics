@@ -1,6 +1,8 @@
 ﻿using System;
 using Vorcyc.Mathematics;
 
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
+
 namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 {
     /// <summary>

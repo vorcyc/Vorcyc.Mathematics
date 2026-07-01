@@ -1,4 +1,5 @@
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 

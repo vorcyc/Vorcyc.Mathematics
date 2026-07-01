@@ -1,7 +1,7 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
 
-namespace Vorcyc.Mathematics.SignalProcessing.Transforms;
+namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 /// <summary>
 /// <para>Represents Complex Fast Fourier Transform:</para>
@@ -69,7 +69,19 @@ public class Fft : IComplexTransform
     /// </summary>
     /// <param name="re">Array of real parts</param>
     /// <param name="im">Array of imaginary parts</param>
-    public void Direct(float[] re, float[] im)
+    public void Direct(float[] re, float[] im) => DirectInPlace(re, im);
+
+    /// <summary>
+    /// Does Fast Fourier Transform in-place over spans (real/imaginary parts).
+    /// </summary>
+    /// <param name="re">Span of real parts</param>
+    /// <param name="im">Span of imaginary parts</param>
+    public void Direct(Span<float> re, Span<float> im) => DirectInPlace(re, im);
+
+    /// <summary>
+    /// Scalar in-place decimation-in-frequency FFT (forward), shared by the array and span overloads.
+    /// </summary>
+    private void DirectInPlace(Span<float> re, Span<float> im)
     {
         var L = _fftSize;
         var M = _fftSize >> 1;
@@ -129,7 +141,19 @@ public class Fft : IComplexTransform
     /// </summary>
     /// <param name="re">Array of real parts</param>
     /// <param name="im">Array of imaginary parts</param>
-    public void Inverse(float[] re, float[] im)
+    public void Inverse(float[] re, float[] im) => InverseInPlace(re, im);
+
+    /// <summary>
+    /// Does Inverse Fast Fourier Transform in-place over spans (real/imaginary parts).
+    /// </summary>
+    /// <param name="re">Span of real parts</param>
+    /// <param name="im">Span of imaginary parts</param>
+    public void Inverse(Span<float> re, Span<float> im) => InverseInPlace(re, im);
+
+    /// <summary>
+    /// Scalar in-place decimation-in-frequency FFT (inverse), shared by the array and span overloads.
+    /// </summary>
+    private void InverseInPlace(Span<float> re, Span<float> im)
     {
         var L = _fftSize;
         var M = _fftSize >> 1;
@@ -189,9 +213,16 @@ public class Fft : IComplexTransform
     /// </summary>
     /// <param name="re">Array of real parts</param>
     /// <param name="im">Array of imaginary parts</param>
-    public void InverseNorm(float[] re, float[] im)
+    public void InverseNorm(float[] re, float[] im) => InverseNorm(re.AsSpan(), im.AsSpan());
+
+    /// <summary>
+    /// Does normalized Inverse Fast Fourier Transform in-place over spans.
+    /// </summary>
+    /// <param name="re">Span of real parts</param>
+    /// <param name="im">Span of imaginary parts</param>
+    public void InverseNorm(Span<float> re, Span<float> im)
     {
-        Inverse(re, im);
+        InverseInPlace(re, im);
 
         for (int i = 0; i < _fftSize; i++)
         {
@@ -199,6 +230,65 @@ public class Fft : IComplexTransform
             im[i] /= _fftSize;
         }
     }
+
+    #region ComputingContext-aware overloads
+
+    /// <summary>
+    /// Does Fast Fourier Transform in-place, selecting a scalar / SIMD / parallel kernel
+    /// according to <paramref name="context"/> (falls back to <see cref="ComputingContext.Resolve"/> when null).
+    /// </summary>
+    /// <param name="re">Array of real parts</param>
+    /// <param name="im">Array of imaginary parts</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Direct(float[] re, float[] im, ComputingContext? context)
+    {
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(_fftSize);
+        if (!FftButterflyFp32.WillAccelerate(mode, _fftSize))
+        {
+            Direct(re, im);
+            return;
+        }
+
+        FftButterflyFp32.Transform(re, im, _fftSize, inverse: false, mode, context);
+    }
+
+    /// <summary>
+    /// Does Inverse Fast Fourier Transform in-place, selecting a scalar / SIMD / parallel kernel
+    /// according to <paramref name="context"/>.
+    /// </summary>
+    /// <param name="re">Array of real parts</param>
+    /// <param name="im">Array of imaginary parts</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void Inverse(float[] re, float[] im, ComputingContext? context)
+    {
+        var mode = ComputingContext.Resolve(context).ResolveCpuMode(_fftSize);
+        if (!FftButterflyFp32.WillAccelerate(mode, _fftSize))
+        {
+            Inverse(re, im);
+            return;
+        }
+
+        FftButterflyFp32.Transform(re, im, _fftSize, inverse: true, mode, context);
+    }
+
+    /// <summary>
+    /// Does normalized Inverse Fast Fourier Transform in-place, honoring <paramref name="context"/>.
+    /// </summary>
+    /// <param name="re">Array of real parts</param>
+    /// <param name="im">Array of imaginary parts</param>
+    /// <param name="context">Optional execution policy.</param>
+    public void InverseNorm(float[] re, float[] im, ComputingContext? context)
+    {
+        Inverse(re, im, context);
+
+        for (int i = 0; i < _fftSize; i++)
+        {
+            re[i] /= _fftSize;
+            im[i] /= _fftSize;
+        }
+    }
+
+    #endregion
 
     /// <summary>
     /// Does Fast Fourier Transform: 
@@ -217,6 +307,22 @@ public class Fft : IComplexTransform
     }
 
     /// <summary>
+    /// Does Fast Fourier Transform:
+    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
+    /// </summary>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
+    public void Direct(ReadOnlySpan<float> inRe, ReadOnlySpan<float> inIm, Span<float> outRe, Span<float> outIm)
+    {
+        inRe.CopyTo(outRe);
+        inIm.CopyTo(outIm);
+
+        DirectInPlace(outRe, outIm);
+    }
+
+    /// <summary>
     /// Does normalized Fast Fourier Transform: 
     /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
     /// </summary>
@@ -225,6 +331,19 @@ public class Fft : IComplexTransform
     /// <param name="outRe">Output data (real parts)</param>
     /// <param name="outIm">Output data (imaginary parts)</param>
     public void DirectNorm(float[] inRe, float[] inIm, float[] outRe, float[] outIm)
+    {
+        Direct(inRe, inIm, outRe, outIm);
+    }
+
+    /// <summary>
+    /// Does normalized Fast Fourier Transform:
+    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
+    /// </summary>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
+    public void DirectNorm(ReadOnlySpan<float> inRe, ReadOnlySpan<float> inIm, Span<float> outRe, Span<float> outIm)
     {
         Direct(inRe, inIm, outRe, outIm);
     }
@@ -246,6 +365,22 @@ public class Fft : IComplexTransform
     }
 
     /// <summary>
+    /// Does Inverse Fast Fourier Transform:
+    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
+    /// </summary>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
+    public void Inverse(ReadOnlySpan<float> inRe, ReadOnlySpan<float> inIm, Span<float> outRe, Span<float> outIm)
+    {
+        inRe.CopyTo(outRe);
+        inIm.CopyTo(outIm);
+
+        InverseInPlace(outRe, outIm);
+    }
+
+    /// <summary>
     /// Does normalized Inverse Fast Fourier Transform: 
     /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
     /// </summary>
@@ -257,6 +392,22 @@ public class Fft : IComplexTransform
     {
         inRe.FastCopyTo(outRe, inRe.Length);
         inIm.FastCopyTo(outIm, inIm.Length);
+
+        InverseNorm(outRe, outIm);
+    }
+
+    /// <summary>
+    /// Does normalized Inverse Fast Fourier Transform:
+    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
+    /// </summary>
+    /// <param name="inRe">Input data (real parts)</param>
+    /// <param name="inIm">Input data (imaginary parts)</param>
+    /// <param name="outRe">Output data (real parts)</param>
+    /// <param name="outIm">Output data (imaginary parts)</param>
+    public void InverseNorm(ReadOnlySpan<float> inRe, ReadOnlySpan<float> inIm, Span<float> outRe, Span<float> outIm)
+    {
+        inRe.CopyTo(outRe);
+        inIm.CopyTo(outIm);
 
         InverseNorm(outRe, outIm);
     }
@@ -278,6 +429,12 @@ public class Fft : IComplexTransform
     /// Computes magnitude spectrum from a sample span.
     /// </summary>
     public void MagnitudeSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = false)
+        => MagnitudeSpectrum(samples, spectrum.AsSpan(), normalize);
+
+    /// <summary>
+    /// Computes magnitude spectrum from a sample span into a destination span.
+    /// </summary>
+    public void MagnitudeSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = false)
     {
         Array.Clear(_realSpectrum, 0, _fftSize);
         Array.Clear(_imagSpectrum, 0, _fftSize);
@@ -327,6 +484,12 @@ public class Fft : IComplexTransform
     /// Computes power spectrum from a sample span.
     /// </summary>
     public void PowerSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = true)
+        => PowerSpectrum(samples, spectrum.AsSpan(), normalize);
+
+    /// <summary>
+    /// Computes power spectrum from a sample span into a destination span.
+    /// </summary>
+    public void PowerSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = true)
     {
         Array.Clear(_realSpectrum, 0, _fftSize);
         Array.Clear(_imagSpectrum, 0, _fftSize);
@@ -335,7 +498,7 @@ public class Fft : IComplexTransform
 
         Direct(_realSpectrum, _imagSpectrum);
 
-        var n = _fftSize / 2; 
+        var n = _fftSize / 2;
 
         if (normalize)
         {
@@ -392,7 +555,12 @@ public class Fft : IComplexTransform
     /// <summary>
     /// FFT shift in-place. Throws <see cref="ArgumentException"/> if array of <paramref name="samples"/> has odd length.
     /// </summary>
-    public static void Shift(float[] samples)
+    public static void Shift(float[] samples) => Shift(samples.AsSpan());
+
+    /// <summary>
+    /// FFT shift in-place over a span. Throws <see cref="ArgumentException"/> if <paramref name="samples"/> has odd length.
+    /// </summary>
+    public static void Shift(Span<float> samples)
     {
         if ((samples.Length & 1) == 1)
         {
@@ -409,191 +577,4 @@ public class Fft : IComplexTransform
             samples[shift] = tmp;
         }
     }
-
-
-#if NET50
-    /// <summary>
-    /// Does Fast Fourier Transform in-place.
-    /// </summary>
-    /// <param name="re">Array of real parts</param>
-    /// <param name="im">Array of imaginary parts</param>
-    public void Direct(Span<float> re, Span<float> im)
-    {
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0f;
-            var u2 = 0.0f;
-            var c = _cosTbl[ti];
-            var s = -_sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = re[i] + re[p];
-                    var t2 = im[i] + im[p];
-                    var t3 = re[i] - re[p];
-                    var t4 = im[i] - im[p];
-                    re[p] = t3 * u1 - t4 * u2;
-                    im[p] = t4 * u1 + t3 * u2;
-                    re[i] = t1;
-                    im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = re[j];
-                var t2 = im[j];
-                re[j] = re[i];
-                im[j] = im[i];
-                re[i] = t1;
-                im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
-    }
-
-    /// <summary>
-    /// Does Inverse Fast Fourier Transform in-place.
-    /// </summary>
-    /// <param name="re">Array of real parts</param>
-    /// <param name="im">Array of imaginary parts</param>
-    public void Inverse(Span<float> re, Span<float> im)
-    {
-        var L = _fftSize;
-        var M = _fftSize >> 1;
-        var S = _fftSize - 1;
-        var ti = 0;
-        while (L >= 2)
-        {
-            var l = L >> 1;
-            var u1 = 1.0f;
-            var u2 = 0.0f;
-            var c = _cosTbl[ti];
-            var s = _sinTbl[ti];
-            ti++;
-            for (var j = 0; j < l; j++)
-            {
-                for (var i = j; i < _fftSize; i += L)
-                {
-                    var p = i + l;
-                    var t1 = re[i] + re[p];
-                    var t2 = im[i] + im[p];
-                    var t3 = re[i] - re[p];
-                    var t4 = im[i] - im[p];
-                    re[p] = t3 * u1 - t4 * u2;
-                    im[p] = t4 * u1 + t3 * u2;
-                    re[i] = t1;
-                    im[i] = t2;
-                }
-                var u3 = u1 * c - u2 * s;
-                u2 = u2 * c + u1 * s;
-                u1 = u3;
-            }
-            L >>= 1;
-        }
-        for (int i = 0, j = 0; i < S; i++)
-        {
-            if (i > j)
-            {
-                var t1 = re[j];
-                var t2 = im[j];
-                re[j] = re[i];
-                im[j] = im[i];
-                re[i] = t1;
-                im[i] = t2;
-            }
-            var k = M;
-            while (j >= k)
-            {
-                j -= k;
-                k >>= 1;
-            }
-            j += k;
-        }
-    }
-
-    /// <summary>
-    /// Does normalized Inverse Fast Fourier Transform in-place.
-    /// </summary>
-    /// <param name="re">Array of real parts</param>
-    /// <param name="im">Array of imaginary parts</param>
-    public void InverseNorm(Span<float> re, Span<float> im)
-    {
-        Inverse(re, im);
-
-        for (int i = 0; i < _fftSize; i++)
-        {
-            re[i] /= _fftSize;
-            im[i] /= _fftSize;
-        }
-    }
-
-    /// <summary>
-    /// Does Fast Fourier Transform: 
-    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
-    /// </summary>
-    /// <param name="inRe">Array of real parts (input)</param>
-    /// <param name="inIm">Array of imaginary parts (input)</param>
-    /// <param name="outRe">Array of real parts (output)</param>
-    /// <param name="outIm">Array of imaginary parts (output)</param>
-    public void Direct(ReadOnlySpan<float> inRe, ReadOnlySpan<float> inIm, Span<float> outRe, Span<float> outIm)
-    {
-        inRe.CopyTo(outRe);
-        inIm.CopyTo(outIm);
-
-        Direct(outRe, outIm);
-    }
-
-    /// <summary>
-    /// Does Inverse Fast Fourier Transform: 
-    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
-    /// </summary>
-    /// <param name="inRe">Array of real parts (input)</param>
-    /// <param name="inIm">Array of imaginary parts (input)</param>
-    /// <param name="outRe">Array of real parts (output)</param>
-    /// <param name="outIm">Array of imaginary parts (output)</param>
-    public void Inverse(ReadOnlySpan<float> inRe, ReadOnlySpan<float> inIm, Span<float> outRe, Span<float> outIm)
-    {
-        inRe.CopyTo(outRe);
-        inIm.CopyTo(outIm);
-
-        Inverse(outRe, outIm);
-    }
-
-    /// <summary>
-    /// Does normalized Inverse Fast Fourier Transform: 
-    /// complex (<paramref name="inRe"/>, <paramref name="inIm"/>) -> complex(<paramref name="outRe"/>, <paramref name="outIm"/>).
-    /// </summary>
-    /// <param name="inRe">Array of real parts (input)</param>
-    /// <param name="inIm">Array of imaginary parts (input)</param>
-    /// <param name="outRe">Array of real parts (output)</param>
-    /// <param name="outIm">Array of imaginary parts (output)</param>
-    public void InverseNorm(ReadOnlySpan<float> inRe, ReadOnlySpan<float> inIm, Span<float> outRe, Span<float> outIm)
-    {
-        inRe.CopyTo(outRe);
-        inIm.CopyTo(outIm);
-
-        InverseNorm(outRe, outIm);
-    }
-#endif
 }

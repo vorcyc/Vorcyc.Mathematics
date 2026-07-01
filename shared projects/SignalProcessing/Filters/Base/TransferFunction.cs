@@ -3,6 +3,7 @@ using Vorcyc.Mathematics.LinearAlgebra;
 using Vorcyc.Mathematics.SignalProcessing.Operations;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 

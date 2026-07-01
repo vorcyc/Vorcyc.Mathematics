@@ -2,6 +2,7 @@ namespace Vorcyc.Mathematics.Calculus.Series;
 
 using System.Numerics;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 /// <summary>
 /// 从周期采样数据估计傅里叶级数系数（基于 FFT，要求采样数为 2 的幂）。

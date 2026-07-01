@@ -1,6 +1,7 @@
 using Vorcyc.Mathematics.DeepLearning.Integration;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 namespace DL_module_test;
 

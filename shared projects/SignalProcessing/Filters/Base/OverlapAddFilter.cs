@@ -1,5 +1,6 @@
 ﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
+using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Filters.Base;
