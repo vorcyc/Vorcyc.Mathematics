@@ -30,7 +30,7 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 
 ## 依赖项
 
-- `System.Numerics.Tensors` 10.0.5
+- `System.Numerics.Tensors` 10.0.9
 
 ---
 

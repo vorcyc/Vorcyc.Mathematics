@@ -23,7 +23,7 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 
 ## Dependencies
 
-- `System.Numerics.Tensors` 10.0.5
+- `System.Numerics.Tensors` 10.0.9
 
 ---
 
