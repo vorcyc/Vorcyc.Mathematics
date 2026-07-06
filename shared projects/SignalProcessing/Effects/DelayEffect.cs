@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
+using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects;
 
@@ -10,23 +10,36 @@ public class DelayEffect : AudioEffect
     /// <summary>
     /// Internal fractional delay line.
     /// </summary>
-    private readonly FractionalDelayLine _delayLine;
+    private FractionalDelayLine? _delayLine;
 
     /// <summary>
     /// Sampling rate.
     /// </summary>
-    private readonly int _fs;
+    private int _fs;
+
+    // Stored parameters for deferred initialization
+    private float _delaySeconds;
+    private float _reserveDelaySeconds;
+    private InterpolationMode _interpolationMode;
 
     /// <summary>
     /// Gets or sets delay (in seconds).
     /// </summary>
     public float Delay
     {
-        get => _delay / _fs;
+        get
+        {
+            if (_fs == 0)
+                throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+            return _delay / _fs;
+        }
         set
         {
-            _delayLine.Ensure(_fs, value);
+            if (_fs == 0)
+                throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+            _delayLine!.Ensure(_fs, value);
             _delay = _fs * value;
+            _delaySeconds = value;
         }
     }
     private float _delay;
@@ -37,7 +50,27 @@ public class DelayEffect : AudioEffect
     public float Feedback { get; set; }
 
     /// <summary>
-    /// Constructs <see cref="DelayEffect"/>.
+    /// Constructs <see cref="DelayEffect"/> with deferred sampling rate initialization.
+    /// Call <see cref="SetSamplingRate"/> before using.
+    /// </summary>
+    /// <param name="delay">Delay (in seconds)</param>
+    /// <param name="feedback">Feedback</param>
+    /// <param name="interpolationMode">Interpolation mode for fractional delay line</param>
+    /// <param name="reserveDelay">Max delay for reserving the size of delay line</param>
+    public DelayEffect(float delay,
+                       float feedback = 0.5f,
+                       InterpolationMode interpolationMode = InterpolationMode.Nearest,
+                       float reserveDelay = 0f)
+    {
+        _delaySeconds = delay;
+        _reserveDelaySeconds = reserveDelay;
+        _interpolationMode = interpolationMode;
+        Feedback = feedback;
+        _fs = 0;
+    }
+
+    /// <summary>
+    /// Constructs <see cref="DelayEffect"/> with immediate sampling rate.
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="delay">Delay (in seconds)</param>
@@ -49,20 +82,21 @@ public class DelayEffect : AudioEffect
                        float feedback = 0.5f,
                        InterpolationMode interpolationMode = InterpolationMode.Nearest,
                        float reserveDelay = 0f)
+        : this(delay, feedback, interpolationMode, reserveDelay)
+    {
+        SetSamplingRate(samplingRate);
+    }
+
+    /// <summary>
+    /// Sets sampling rate and initializes delay line.
+    /// </summary>
+    public override void SetSamplingRate(int samplingRate)
     {
         _fs = samplingRate;
 
-        if (reserveDelay < delay)
-        {
-            _delayLine = new FractionalDelayLine(samplingRate, delay, interpolationMode);
-        }
-        else
-        {
-            _delayLine = new FractionalDelayLine(samplingRate, reserveDelay, interpolationMode);
-        }
-
-        Delay = delay;
-        Feedback = feedback;
+        var effectiveReserve = _reserveDelaySeconds < _delaySeconds ? _delaySeconds : _reserveDelaySeconds;
+        _delayLine = new FractionalDelayLine(samplingRate, effectiveReserve, _interpolationMode);
+        _delay = samplingRate * _delaySeconds;
     }
 
     /// <summary>
@@ -71,6 +105,9 @@ public class DelayEffect : AudioEffect
     /// <param name="sample">Input sample</param>
     public override float Process(float sample)
     {
+        if (_delayLine == null)
+            throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+
         var delayed = _delayLine.Read(_delay);
 
         var output = sample + delayed * Feedback;
@@ -85,6 +122,6 @@ public class DelayEffect : AudioEffect
     /// </summary>
     public override void Reset()
     {
-        _delayLine.Reset();
+        _delayLine?.Reset();
     }
 }

@@ -29,4 +29,11 @@ public abstract class AudioEffect : WetDryMixer, IFilter, IOnlineFilter
     /// </summary>
     public virtual void Apply(Signal signal, FilteringMethod method = FilteringMethod.Auto)
         => this.FilterOnline_Inplace(signal);
+
+    /// <summary>
+    /// Sets sampling rate for this effect (deferred initialization).
+    /// Default implementation does nothing; override in effects that depend on sampling rate.
+    /// </summary>
+    /// <param name="samplingRate">Sampling rate in Hz</param>
+    public virtual void SetSamplingRate(int samplingRate) { }
 }

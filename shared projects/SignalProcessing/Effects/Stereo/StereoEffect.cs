@@ -182,5 +182,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects.Stereo
         /// Resets effect.
         /// </summary>
         public abstract void Reset();
+
+        /// <summary>
+        /// Sets sampling rate for this effect (deferred initialization).
+        /// Default implementation does nothing; override in effects that depend on sampling rate.
+        /// </summary>
+        /// <param name="samplingRate">Sampling rate in Hz</param>
+        public virtual void SetSamplingRate(int samplingRate) { }
     }
 }

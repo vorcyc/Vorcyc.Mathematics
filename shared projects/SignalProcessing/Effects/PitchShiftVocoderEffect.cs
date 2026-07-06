@@ -1,14 +1,21 @@
-﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects
 {
     /// <summary>
-    /// Represents pitch shift audio effect 
+    /// Represents pitch shift audio effect
     /// based on overlap-add filtering and pitch shifting in frequency domain.
     /// </summary>
     public class PitchShiftVocoderEffect : OverlapAddFilter
     {
+        // Stored parameters for deferred initialization
+        private int _samplingRate;
+        private float _shift;
+        private int _fftSize;
+        private int _hopSize;
+        private bool _initialized;
+
         /// <summary>
         /// Gets or sets pitch shift ratio.
         /// </summary>
@@ -17,38 +24,63 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         /// <summary>
         /// Frequency resolution.
         /// </summary>
-        private readonly float _freqResolution;
+        private float _freqResolution;
 
         /// <summary>
         /// Array of spectrum magnitudes (at the current step).
         /// </summary>
-        private readonly float[] _mag;
+        private float[]? _mag;
 
         /// <summary>
         /// Array of spectrum phases (at the current step).
         /// </summary>
-        private readonly float[] _phase;
+        private float[]? _phase;
 
         /// <summary>
         /// Array of phases computed at the previous step.
         /// </summary>
-        private readonly float[] _prevPhase;
+        private float[]? _prevPhase;
 
         /// <summary>
         /// Array of new synthesized phases (at the current step).
         /// </summary>
-        private readonly float[] _phaseTotal;
+        private float[]? _phaseTotal;
 
         /// <summary>
-        /// Constructs <see cref="PitchShiftVocoderEffect"/>.
+        /// Constructs <see cref="PitchShiftVocoderEffect"/> with deferred sampling rate initialization.
+        /// Call <see cref="SetSamplingRate"/> before using.
+        /// </summary>
+        /// <param name="shift">Pitch shift ratio</param>
+        /// <param name="fftSize">FFT size</param>
+        /// <param name="hopSize">Hop length</param>
+        public PitchShiftVocoderEffect(float shift, int fftSize = 1024, int hopSize = 64) : base(hopSize, fftSize)
+        {
+            _shift = shift;
+            _fftSize = fftSize;
+            _hopSize = hopSize;
+            Shift = shift;
+            _initialized = false;
+        }
+
+        /// <summary>
+        /// Constructs <see cref="PitchShiftVocoderEffect"/> with immediate sampling rate.
         /// </summary>
         /// <param name="samplingRate">Sampling rate</param>
         /// <param name="shift">Pitch shift ratio</param>
         /// <param name="fftSize">FFT size</param>
         /// <param name="hopSize">Hop length</param>
-        public PitchShiftVocoderEffect(int samplingRate, float shift, int fftSize = 1024, int hopSize = 64) : base(hopSize, fftSize)
+        public PitchShiftVocoderEffect(int samplingRate, float shift, int fftSize = 1024, int hopSize = 64)
+            : this(shift, fftSize, hopSize)
         {
-            Shift = (float)shift;
+            SetSamplingRate(samplingRate);
+        }
+
+        /// <summary>
+        /// Sets sampling rate and initializes arrays.
+        /// </summary>
+        public void SetSamplingRate(int samplingRate)
+        {
+            _samplingRate = samplingRate;
 
             _gain = 2 * ConstantsFp32.PI / (_fftSize * _window.Select(w => w * w).Sum() / _hopSize);
 
@@ -58,6 +90,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
             _phase = new float[_fftSize / 2 + 1];
             _prevPhase = new float[_fftSize / 2 + 1];
             _phaseTotal = new float[_fftSize / 2 + 1];
+
+            _initialized = true;
         }
 
         /// <summary>
@@ -69,6 +103,9 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         /// <param name="filteredIm">Imaginary parts of output spectrum</param>
         protected override void ProcessSpectrum(float[] re, float[] im, float[] filteredRe, float[] filteredIm)
         {
+            if (!_initialized || _mag == null || _phase == null || _prevPhase == null || _phaseTotal == null)
+                throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+
             var nextPhase = (2 * ConstantsFp32.PI * _hopSize / _fftSize);
 
             for (var j = 1; j <= _fftSize / 2; j++)
@@ -118,8 +155,11 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         public override void Reset()
         {
             base.Reset();
-            Array.Clear(_prevPhase, 0, _prevPhase.Length);
-            Array.Clear(_phaseTotal, 0, _phaseTotal.Length);
+            if (_prevPhase != null && _phaseTotal != null)
+            {
+                Array.Clear(_prevPhase, 0, _prevPhase.Length);
+                Array.Clear(_phaseTotal, 0, _phaseTotal.Length);
+            }
         }
     }
 }

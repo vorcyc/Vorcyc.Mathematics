@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics.Framework;
+using Vorcyc.Mathematics.Framework;
 using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
@@ -12,18 +12,28 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects;
 /// </summary>
 public class ChorusEffect : AudioEffect
 {
+    // Stored parameters for deferred initialization
+    private float[] _lfoFrequenciesHz;
+    private float[] _widthsSeconds;
+    private ISampleGenerator[]? _customLfos;
+    private bool _useCustomLfos;
+
     /// <summary>
     /// Gets or sets widths for each voice (max delays in seconds).
     /// </summary>
     public float[] Widths
     {
-        get => _voices.Select(v => v.Width).ToArray();
+        get => _voices?.Select(v => v.Width).ToArray() ?? _widthsSeconds;
         set
         {
+            if (_voices == null)
+                throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+
             for (var i = 0; i < _voices.Length; i++)
             {
                 _voices[i].Width = value[i];
             }
+            _widthsSeconds = value;
         }
     }
 
@@ -32,59 +42,103 @@ public class ChorusEffect : AudioEffect
     /// </summary>
     public float[] LfoFrequencies
     {
-        get => _lfoFrequencies;
+        get => _lfoFrequenciesHz;
         set
         {
-            _lfoFrequencies = value;
+            _lfoFrequenciesHz = value;
 
-            for (var i = 0; i < _voices.Length; i++)
+            if (_voices != null)
             {
-                _voices[i].LfoFrequency = value[i];
+                for (var i = 0; i < _voices.Length; i++)
+                {
+                    _voices[i].LfoFrequency = value[i];
+                }
             }
         }
     }
-    private float[] _lfoFrequencies;
 
     /// <summary>
     /// Chorus voices.
     /// </summary>
-    private readonly VibratoEffect[] _voices;
+    private VibratoEffect[]? _voices;
 
     /// <summary>
-    /// Constructs <see cref="ChorusEffect"/>.
+    /// Constructs <see cref="ChorusEffect"/> with deferred sampling rate initialization.
+    /// Call <see cref="SetSamplingRate"/> before using.
+    /// </summary>
+    /// <param name="lfoFrequencies">LFO frequencies for each voice</param>
+    /// <param name="widths">Widths (max delays, in seconds) for each voice</param>
+    public ChorusEffect(float[] lfoFrequencies, float[] widths)
+    {
+        Guard.AgainstInequality(lfoFrequencies.Length, widths.Length, "Size of frequency array", "size of widths array");
+
+        _lfoFrequenciesHz = lfoFrequencies;
+        _widthsSeconds = widths;
+        _useCustomLfos = false;
+    }
+
+    /// <summary>
+    /// Constructs <see cref="ChorusEffect"/> with deferred sampling rate initialization from custom LFOs.
+    /// Call <see cref="SetSamplingRate"/> before using.
+    /// </summary>
+    /// <param name="lfos">LFOs (in the form of signal generators)</param>
+    /// <param name="widths">Widths (max delays, in seconds) for each voice</param>
+    public ChorusEffect(ISampleGenerator[] lfos, float[] widths)
+    {
+        Guard.AgainstInequality(lfos.Length, widths.Length, "Number of LFOs", "size of widths array");
+
+        _customLfos = lfos;
+        _widthsSeconds = widths;
+        _lfoFrequenciesHz = new float[lfos.Length];
+        _useCustomLfos = true;
+    }
+
+    /// <summary>
+    /// Constructs <see cref="ChorusEffect"/> with immediate sampling rate.
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="lfoFrequencies">LFO frequencies for each voice</param>
     /// <param name="widths">Widths (max delays, in seconds) for each voice</param>
     public ChorusEffect(int samplingRate, float[] lfoFrequencies, float[] widths)
+        : this(lfoFrequencies, widths)
     {
-        Guard.AgainstInequality(lfoFrequencies.Length, widths.Length, "Size of frequency array", "size of widths array");
-
-        _lfoFrequencies = lfoFrequencies;
-
-        _voices = new VibratoEffect[widths.Length];
-
-        for (var i = 0; i < _voices.Length; i++)
-        {
-            _voices[i] = new VibratoEffect(samplingRate, lfoFrequencies[i], widths[i]);
-        }
+        SetSamplingRate(samplingRate);
     }
 
     /// <summary>
-    /// Constructs <see cref="ChorusEffect"/> from <paramref name="lfos"/>.
+    /// Constructs <see cref="ChorusEffect"/> with immediate sampling rate from custom LFOs.
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
-    /// <param name="lfos">LFOs (in the form of signal builders)</param>
+    /// <param name="lfos">LFOs (in the form of signal generators)</param>
     /// <param name="widths">Widths (max delays, in seconds) for each voice</param>
     public ChorusEffect(int samplingRate, ISampleGenerator[] lfos, float[] widths)
+        : this(lfos, widths)
     {
-        Guard.AgainstInequality(lfos.Length, widths.Length, "Size of frequency array", "number of LFOs");
+        SetSamplingRate(samplingRate);
+    }
 
-        _voices = new VibratoEffect[widths.Length];
+    /// <summary>
+    /// Sets sampling rate and initializes all chorus voices.
+    /// </summary>
+    public override void SetSamplingRate(int samplingRate)
+    {
+        _voices = new VibratoEffect[_widthsSeconds.Length];
 
-        for (var i = 0; i < _voices.Length; i++)
+        if (_useCustomLfos && _customLfos != null)
         {
-            _voices[i] = new VibratoEffect(samplingRate, lfos[i], widths[i]);
+            for (var i = 0; i < _voices.Length; i++)
+            {
+                _voices[i] = new VibratoEffect(_customLfos[i], _widthsSeconds[i]);
+                _voices[i].SetSamplingRate(samplingRate);
+            }
+        }
+        else
+        {
+            for (var i = 0; i < _voices.Length; i++)
+            {
+                _voices[i] = new VibratoEffect(_lfoFrequenciesHz[i], _widthsSeconds[i]);
+                _voices[i].SetSamplingRate(samplingRate);
+            }
         }
     }
 
@@ -94,6 +148,9 @@ public class ChorusEffect : AudioEffect
     /// <param name="sample">Input sample</param>
     public override float Process(float sample)
     {
+        if (_voices == null)
+            throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+
         var chorus = _voices.Sum(v => v.Process(sample)) / _voices.Length;
 
         return sample * Dry + chorus * Wet;
@@ -104,9 +161,12 @@ public class ChorusEffect : AudioEffect
     /// </summary>
     public override void Reset()
     {
-        foreach (var voice in _voices)
+        if (_voices != null)
         {
-            voice.Reset();
+            foreach (var voice in _voices)
+            {
+                voice.Reset();
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects.Stereo;
 
@@ -10,20 +10,33 @@ public class StereoDelayEffect : StereoEffect
     /// <summary>
     /// Left channel delay effect.
     /// </summary>
-    private readonly DelayEffect _delayEffectLeft;
+    private DelayEffect? _delayEffectLeft;
 
     /// <summary>
     /// Right channel delay effect.
     /// </summary>
-    private readonly DelayEffect _delayEffectRight;
+    private DelayEffect? _delayEffectRight;
+
+    // Stored parameters for deferred initialization
+    private float _delayLeftSeconds;
+    private float _delayRightSeconds;
+    private float _feedbackLeft;
+    private float _feedbackRight;
+    private InterpolationMode _interpolationMode;
+    private float _reserveDelaySeconds;
 
     /// <summary>
     /// Gets or sets left channel delay (in seconds).
     /// </summary>
     public float DelayLeft
     {
-        get => _delayEffectLeft.Delay;
-        set => _delayEffectLeft.Delay = value;
+        get => _delayEffectLeft?.Delay ?? _delayLeftSeconds;
+        set
+        {
+            _delayLeftSeconds = value;
+            if (_delayEffectLeft != null)
+                _delayEffectLeft.Delay = value;
+        }
     }
 
     /// <summary>
@@ -31,8 +44,13 @@ public class StereoDelayEffect : StereoEffect
     /// </summary>
     public float DelayRight
     {
-        get => _delayEffectRight.Delay;
-        set => _delayEffectRight.Delay = value;
+        get => _delayEffectRight?.Delay ?? _delayRightSeconds;
+        set
+        {
+            _delayRightSeconds = value;
+            if (_delayEffectRight != null)
+                _delayEffectRight.Delay = value;
+        }
     }
 
     /// <summary>
@@ -40,8 +58,13 @@ public class StereoDelayEffect : StereoEffect
     /// </summary>
     public float FeedbackLeft
     {
-        get => _delayEffectLeft.Feedback;
-        set => _delayEffectLeft.Feedback = value;
+        get => _delayEffectLeft?.Feedback ?? _feedbackLeft;
+        set
+        {
+            _feedbackLeft = value;
+            if (_delayEffectLeft != null)
+                _delayEffectLeft.Feedback = value;
+        }
     }
 
     /// <summary>
@@ -49,8 +72,13 @@ public class StereoDelayEffect : StereoEffect
     /// </summary>
     public float FeedbackRight
     {
-        get => _delayEffectRight.Feedback;
-        set => _delayEffectRight.Feedback = value;
+        get => _delayEffectRight?.Feedback ?? _feedbackRight;
+        set
+        {
+            _feedbackRight = value;
+            if (_delayEffectRight != null)
+                _delayEffectRight.Feedback = value;
+        }
     }
 
     /// <summary>
@@ -59,13 +87,41 @@ public class StereoDelayEffect : StereoEffect
     public float Pan { get; set; }
 
     /// <summary>
-    /// Constructs <see cref="StereoDelayEffect"/>.
+    /// Constructs <see cref="StereoDelayEffect"/> with deferred sampling rate initialization.
+    /// Call <see cref="SetSamplingRate"/> before using.
+    /// </summary>
+    /// <param name="pan">Pan</param>
+    /// <param name="delayLeft">Left channel delay (in seconds)</param>
+    /// <param name="delayRight">Right channel delay (in seconds)</param>
+    /// <param name="feedbackLeft">Left channel feedback</param>
+    /// <param name="feedbackRight">Right channel feedback</param>
+    /// <param name="interpolationMode">Interpolation mode for fractional delay line</param>
+    /// <param name="reserveDelay">Max delay for reserving the size of delay line</param>
+    public StereoDelayEffect(float pan,
+                             float delayLeft,
+                             float delayRight,
+                             float feedbackLeft = 0.5f,
+                             float feedbackRight = 0.5f,
+                             InterpolationMode interpolationMode = InterpolationMode.Nearest,
+                             float reserveDelay = 0/*sec*/)
+    {
+        _delayLeftSeconds = delayLeft;
+        _delayRightSeconds = delayRight;
+        _feedbackLeft = feedbackLeft;
+        _feedbackRight = feedbackRight;
+        _interpolationMode = interpolationMode;
+        _reserveDelaySeconds = reserveDelay;
+        Pan = pan;
+    }
+
+    /// <summary>
+    /// Constructs <see cref="StereoDelayEffect"/> with immediate sampling rate.
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="pan">Pan</param>
     /// <param name="delayLeft">Left channel delay (in seconds)</param>
-    /// <param name="feedbackLeft">Left channel feedback</param>
     /// <param name="delayRight">Right channel delay (in seconds)</param>
+    /// <param name="feedbackLeft">Left channel feedback</param>
     /// <param name="feedbackRight">Right channel feedback</param>
     /// <param name="interpolationMode">Interpolation mode for fractional delay line</param>
     /// <param name="reserveDelay">Max delay for reserving the size of delay line</param>
@@ -77,11 +133,21 @@ public class StereoDelayEffect : StereoEffect
                              float feedbackRight = 0.5f,
                              InterpolationMode interpolationMode = InterpolationMode.Nearest,
                              float reserveDelay = 0/*sec*/)
+        : this(pan, delayLeft, delayRight, feedbackLeft, feedbackRight, interpolationMode, reserveDelay)
     {
-        _delayEffectLeft = new DelayEffect(samplingRate, delayLeft, feedbackLeft, interpolationMode, reserveDelay);
-        _delayEffectRight = new DelayEffect(samplingRate, delayRight, feedbackRight, interpolationMode, reserveDelay);
-        
-        Pan = pan;
+        SetSamplingRate(samplingRate);
+    }
+
+    /// <summary>
+    /// Sets sampling rate and initializes delay effects.
+    /// </summary>
+    public override void SetSamplingRate(int samplingRate)
+    {
+        _delayEffectLeft = new DelayEffect(_delayLeftSeconds, _feedbackLeft, _interpolationMode, _reserveDelaySeconds);
+        _delayEffectLeft.SetSamplingRate(samplingRate);
+
+        _delayEffectRight = new DelayEffect(_delayRightSeconds, _feedbackRight, _interpolationMode, _reserveDelaySeconds);
+        _delayEffectRight.SetSamplingRate(samplingRate);
     }
 
     /// <summary>
@@ -91,6 +157,9 @@ public class StereoDelayEffect : StereoEffect
     /// <param name="right">Input sample in right channel</param>
     public override void Process(ref float left, ref float right)
     {
+        if (_delayEffectLeft == null || _delayEffectRight == null)
+            throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+
         var delayedLeft = _delayEffectLeft.Process(left);
         var delayedRight = _delayEffectRight.Process(right);
 
@@ -106,7 +175,7 @@ public class StereoDelayEffect : StereoEffect
     /// </summary>
     public override void Reset()
     {
-        _delayEffectLeft.Reset();
-        _delayEffectRight.Reset();
+        _delayEffectLeft?.Reset();
+        _delayEffectRight?.Reset();
     }
 }

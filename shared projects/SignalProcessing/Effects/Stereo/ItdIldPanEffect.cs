@@ -1,9 +1,9 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Filters.BiQuad;
+using Vorcyc.Mathematics.SignalProcessing.Filters.BiQuad;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Effects.Stereo;
 
 /// <summary>
-/// Represents stereo pan audio effect based on ITD-ILD 
+/// Represents stereo pan audio effect based on ITD-ILD
 /// (Interaural Time Difference - Interaural Level Difference).
 /// </summary>
 public class ItdIldPanEffect : StereoEffect
@@ -18,31 +18,32 @@ public class ItdIldPanEffect : StereoEffect
     /// </summary>
     const float Pi2 = ConstantsFp32.PI_2;
 
+    // Stored parameters for deferred initialization
+    private int _samplingRate;
+    private float _headRadius;
+    private float _panValue;
+    private InterpolationMode _interpolationMode;
+    private double _reserveDelaySeconds;
+
     /// <summary>
     /// Gets head radius.
     /// </summary>
     public float HeadRadius => _headRadius;
-    private readonly float _headRadius;
-
-    /// <summary>
-    /// Sampling rate.
-    /// </summary>
-    private readonly int _samplingRate;
 
     /// <summary>
     /// Head factor.
     /// </summary>
-    private readonly float _headFactor;
+    private float _headFactor;
 
     /// <summary>
     /// ITD delay lines.
     /// </summary>
-    private readonly FractionalDelayLine _itdDelayLeft, _itdDelayRight;
+    private FractionalDelayLine? _itdDelayLeft, _itdDelayRight;
 
     /// <summary>
     /// ILD filters.
     /// </summary>
-    private readonly BiQuadFilter _ildFilterLeft, _ildFilterRight;
+    private BiQuadFilter? _ildFilterLeft, _ildFilterRight;
 
     /// <summary>
     /// Time delays (in seconds).
@@ -54,14 +55,17 @@ public class ItdIldPanEffect : StereoEffect
     /// </summary>
     public float Pan
     {
-        get => _pan;
+        get => _panValue;
         set
         {
-            _pan = value;
+            _panValue = value;
+
+            if (_itdDelayLeft == null || _ildFilterLeft == null)
+                return;  // Not initialized yet
 
             // update ITD parameters
 
-            var phi = _pan * Pi2;
+            var phi = _panValue * Pi2;
 
             _delayLeft = Itd(phi + Pi2);
             _delayRight = Itd(phi - Pi2);
@@ -72,10 +76,9 @@ public class ItdIldPanEffect : StereoEffect
             var alphaR = 1 + MathF.Cos(phi - Pi2);
 
             _ildFilterLeft.Change(_headFactor + alphaL, _headFactor - alphaL, 0, _headFactor + 1, _headFactor - 1, 0);
-            _ildFilterRight.Change(_headFactor + alphaR, _headFactor - alphaR, 0, _headFactor + 1, _headFactor - 1, 0);
+            _ildFilterRight!.Change(_headFactor + alphaR, _headFactor - alphaR, 0, _headFactor + 1, _headFactor - 1, 0);
         }
     }
-    private float _pan;
 
     /// <summary>
     /// Interaural Time Difference.
@@ -94,7 +97,28 @@ public class ItdIldPanEffect : StereoEffect
     }
 
     /// <summary>
-    /// Constructs <see cref="ItdIldPanEffect"/>.
+    /// Constructs <see cref="ItdIldPanEffect"/> with deferred sampling rate initialization.
+    /// Call <see cref="SetSamplingRate"/> before using.
+    /// </summary>
+    /// <param name="pan">Pan</param>
+    /// <param name="interpolationMode">Interpolation mode for fractional delay line</param>
+    /// <param name="reserveDelay">Max delay (in seconds) for reserving the size of delay line</param>
+    /// <param name="headRadius">Head radius</param>
+    public ItdIldPanEffect(float pan,
+                           InterpolationMode interpolationMode = InterpolationMode.Linear,
+                           double reserveDelay = 0.005/*seconds*/,
+                           float headRadius = 8.5e-2f)
+    {
+        _headRadius = headRadius;
+        _headFactor = _headRadius / SpeedOfSound;
+        _panValue = pan;
+        _interpolationMode = interpolationMode;
+        _reserveDelaySeconds = reserveDelay;
+        _samplingRate = 0;
+    }
+
+    /// <summary>
+    /// Constructs <see cref="ItdIldPanEffect"/> with immediate sampling rate.
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="pan">Pan</param>
@@ -106,18 +130,25 @@ public class ItdIldPanEffect : StereoEffect
                            InterpolationMode interpolationMode = InterpolationMode.Linear,
                            double reserveDelay = 0.005/*seconds*/,
                            float headRadius = 8.5e-2f)
+        : this(pan, interpolationMode, reserveDelay, headRadius)
+    {
+        SetSamplingRate(samplingRate);
+    }
+
+    /// <summary>
+    /// Sets sampling rate and initializes delay lines and filters.
+    /// </summary>
+    public override void SetSamplingRate(int samplingRate)
     {
         _samplingRate = samplingRate;
-        _headRadius = headRadius;
-        _headFactor = _headRadius / SpeedOfSound;
 
-        _itdDelayLeft = new FractionalDelayLine(samplingRate, reserveDelay, interpolationMode);
-        _itdDelayRight = new FractionalDelayLine(samplingRate, reserveDelay, interpolationMode);
+        _itdDelayLeft = new FractionalDelayLine(samplingRate, _reserveDelaySeconds, _interpolationMode);
+        _itdDelayRight = new FractionalDelayLine(samplingRate, _reserveDelaySeconds, _interpolationMode);
 
         _ildFilterLeft = new BiQuadFilter(1, 0, 0, 0, 0, 0);
         _ildFilterRight = new BiQuadFilter(1, 0, 0, 0, 0, 0);
 
-        Pan = pan;
+        Pan = _panValue;  // Update filters with pan value
     }
 
     /// <summary>
@@ -127,6 +158,9 @@ public class ItdIldPanEffect : StereoEffect
     /// <param name="right">Input sample in right channel</param>
     public override void Process(ref float left, ref float right)
     {
+        if (_itdDelayLeft == null || _itdDelayRight == null || _ildFilterLeft == null || _ildFilterRight == null)
+            throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+
         var leftIn = left;
         var rightIn = right;
 
@@ -154,9 +188,9 @@ public class ItdIldPanEffect : StereoEffect
     /// </summary>
     public override void Reset()
     {
-        _itdDelayLeft.Reset();
-        _itdDelayRight.Reset();
-        _ildFilterLeft.Reset();
-        _ildFilterRight.Reset();
+        _itdDelayLeft?.Reset();
+        _itdDelayRight?.Reset();
+        _ildFilterLeft?.Reset();
+        _ildFilterRight?.Reset();
     }
 }

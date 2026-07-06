@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.SignalProcessing.Effects.Base;
 using Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
@@ -12,66 +12,121 @@ public class VibratoEffect : AudioEffect
     /// <summary>
     /// Internal fractional delay line.
     /// </summary>
-    private readonly FractionalDelayLine _delayLine;
+    private FractionalDelayLine? _delayLine;
 
     /// <summary>
     /// Sampling rate.
     /// </summary>
-    private readonly int _fs;
+    private int _fs;
+
+    // Stored parameters for deferred initialization
+    private float _widthSeconds;
+    private float _reserveWidthSeconds;
+    private InterpolationMode _interpolationMode;
+    private float _lfoFrequencyHz;
+    private bool _useCustomLfo;
+    private ISampleGenerator? _customLfo;
 
     /// <summary>
     /// Gets or sets width (in seconds).
     /// </summary>
     public float Width
     {
-        get => _width;
+        get => _widthSeconds;
         set
         {
-            _delayLine.Ensure(_fs, value);
-            _width = value;
+            if (_fs == 0)
+                throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+            _delayLine!.Ensure(_fs, value);
+            _widthSeconds = value;
         }
     }
-    private float _width;
 
     /// <summary>
     /// Gets or sets LFO frequency (in Hz).
     /// </summary>
     public float LfoFrequency
     {
-        get => _lfoFrequency;
+        get => _lfoFrequencyHz;
         set
         {
-            _lfoFrequency = value;
-            _lfo.SetLfoFrequency(value);
+            _lfoFrequencyHz = value;
+            _lfo?.SetLfoFrequency(value);
         }
     }
-    private float _lfoFrequency = 1;
 
     /// <summary>
     /// Gets or sets LFO signal generator.
     /// </summary>
     public ISampleGenerator Lfo
     {
-        get => _lfo;
+        get => _lfo ?? throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
         set
         {
             _lfo = value;
             _lfo.SetLfoRange(0f, 1f);
         }
     }
-    private ISampleGenerator _lfo;
+    private ISampleGenerator? _lfo;
 
     /// <summary>
     /// Gets or sets interpolation mode.
     /// </summary>
     public InterpolationMode InterpolationMode
     {
-        get => _delayLine.InterpolationMode;
-        set => _delayLine.InterpolationMode = value;
+        get => _delayLine?.InterpolationMode ?? _interpolationMode;
+        set
+        {
+            if (_delayLine != null)
+                _delayLine.InterpolationMode = value;
+            _interpolationMode = value;
+        }
     }
 
     /// <summary>
-    /// Constructs <see cref="VibratoEffect"/>.
+    /// Constructs <see cref="VibratoEffect"/> with deferred sampling rate initialization (using default sine LFO).
+    /// Call <see cref="SetSamplingRate"/> before using.
+    /// </summary>
+    /// <param name="lfoFrequency">LFO frequency (in Hz)</param>
+    /// <param name="width">Width (in seconds)</param>
+    /// <param name="interpolationMode">Interpolation mode for fractional delay line</param>
+    /// <param name="reserveWidth">Max width (in seconds) for reserving the size of delay line</param>
+    public VibratoEffect(float lfoFrequency = 1/*Hz*/,
+                         float width = 0.003f/*sec*/,
+                         InterpolationMode interpolationMode = InterpolationMode.Linear,
+                         float reserveWidth = 0/*sec*/)
+    {
+        _lfoFrequencyHz = lfoFrequency;
+        _widthSeconds = width;
+        _reserveWidthSeconds = reserveWidth;
+        _interpolationMode = interpolationMode;
+        _useCustomLfo = false;
+        _fs = 0;
+    }
+
+    /// <summary>
+    /// Constructs <see cref="VibratoEffect"/> with deferred sampling rate initialization (using custom LFO).
+    /// Call <see cref="SetSamplingRate"/> before using.
+    /// </summary>
+    /// <param name="lfo">LFO signal generator</param>
+    /// <param name="width">Width (in seconds)</param>
+    /// <param name="interpolationMode">Interpolation mode for fractional delay line</param>
+    /// <param name="reserveWidth">Max width (in seconds) for reserving the size of delay line</param>
+    public VibratoEffect(ISampleGenerator lfo,
+                         float width = 0.003f/*sec*/,
+                         InterpolationMode interpolationMode = InterpolationMode.Linear,
+                         float reserveWidth = 0/*sec*/)
+    {
+        _customLfo = lfo;
+        _widthSeconds = width;
+        _reserveWidthSeconds = reserveWidth;
+        _interpolationMode = interpolationMode;
+        _useCustomLfo = true;
+        _fs = 0;
+    }
+
+    /// <summary>
+    /// Constructs <see cref="VibratoEffect"/> with immediate sampling rate (default sine LFO).
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="lfoFrequency">LFO frequency (in Hz)</param>
@@ -83,14 +138,14 @@ public class VibratoEffect : AudioEffect
                          float width = 0.003f/*sec*/,
                          InterpolationMode interpolationMode = InterpolationMode.Linear,
                          float reserveWidth = 0/*sec*/)
-
-        : this(samplingRate, new SineOscillator { SamplingRate = samplingRate, Min = 0, Max = 1 }, width, interpolationMode, reserveWidth)
+        : this(lfoFrequency, width, interpolationMode, reserveWidth)
     {
+        SetSamplingRate(samplingRate);
         LfoFrequency = lfoFrequency;
     }
 
     /// <summary>
-    /// Constructs <see cref="VibratoEffect"/> from <paramref name="lfo"/>.
+    /// Constructs <see cref="VibratoEffect"/> with immediate sampling rate (custom LFO).
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="lfo">LFO signal generator</param>
@@ -102,20 +157,34 @@ public class VibratoEffect : AudioEffect
                          float width = 0.003f/*sec*/,
                          InterpolationMode interpolationMode = InterpolationMode.Linear,
                          float reserveWidth = 0/*sec*/)
+        : this(lfo, width, interpolationMode, reserveWidth)
+    {
+        SetSamplingRate(samplingRate);
+    }
+
+    /// <summary>
+    /// Sets sampling rate and initializes delay line and LFO.
+    /// </summary>
+    public override void SetSamplingRate(int samplingRate)
     {
         _fs = samplingRate;
-        _width = width;
 
-        Lfo = lfo;
+        var effectiveReserve = _reserveWidthSeconds < _widthSeconds ? _widthSeconds : _reserveWidthSeconds;
+        _delayLine = new FractionalDelayLine(samplingRate, effectiveReserve, _interpolationMode);
 
-        if (reserveWidth < width)
+        if (_useCustomLfo && _customLfo != null)
         {
-            _delayLine = new FractionalDelayLine(samplingRate, width, interpolationMode);
+            _lfo = _customLfo;
+            if (_lfo is SineOscillator sine)
+                sine.SamplingRate = samplingRate;
         }
         else
         {
-            _delayLine = new FractionalDelayLine(samplingRate, reserveWidth, interpolationMode);
+            _lfo = new SineOscillator { SamplingRate = samplingRate, Min = 0, Max = 1 };
+            _lfo.SetLfoFrequency(_lfoFrequencyHz);
         }
+
+        _lfo.SetLfoRange(0f, 1f);
     }
 
     /// <summary>
@@ -124,7 +193,10 @@ public class VibratoEffect : AudioEffect
     /// <param name="sample">Input sample</param>
     public override float Process(float sample)
     {
-        var delay = _lfo.NextSample() * _width * _fs;
+        if (_delayLine == null || _lfo == null)
+            throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
+
+        var delay = _lfo.NextSample() * _widthSeconds * _fs;
 
         var delayedSample = _delayLine.Read(delay);
 
@@ -138,7 +210,7 @@ public class VibratoEffect : AudioEffect
     /// </summary>
     public override void Reset()
     {
-        _delayLine.Reset();
-        _lfo.Reset();
+        _delayLine?.Reset();
+        _lfo?.Reset();
     }
 }

@@ -41,7 +41,7 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
-	  <None Include="..\..\wiki_en\HOME.md" Link="README.md">
+	  <None Include="..\..\wiki\wiki_en\HOME.md" Link="README.md">
 	    <PackagePath>\</PackagePath>
 	    <Pack>True</Pack>
 	  </None>
