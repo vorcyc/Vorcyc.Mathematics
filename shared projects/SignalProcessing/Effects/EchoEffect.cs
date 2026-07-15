@@ -27,19 +27,17 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         /// </summary>
         public float Delay
         {
-            get
-            {
-                if (_fs == 0)
-                    throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
-                return _delay / _fs;
-            }
+            // 未绑定采样率时返回已缓存的秒数（配置值），绑定后按当前 _fs 反算。
+            get => _fs == 0 ? _delaySeconds : _delay / _fs;
             set
             {
-                if (_fs == 0)
-                    throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
-                _delayLine!.Ensure(_fs, value);
-                _delay = _fs * value;
+                // 始终缓存配置值；仅在采样率已绑定后做依赖采样率的实时更新（延迟线/采样计数）。
                 _delaySeconds = value;
+                if (_fs != 0)
+                {
+                    _delayLine!.Ensure(_fs, value);
+                    _delay = _fs * value;
+                }
             }
         }
         private float _delay;

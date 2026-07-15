@@ -35,10 +35,10 @@ public class VibratoEffect : AudioEffect
         get => _widthSeconds;
         set
         {
-            if (_fs == 0)
-                throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
-            _delayLine!.Ensure(_fs, value);
+            // 始终缓存配置值；仅在采样率已绑定后重配延迟线。
             _widthSeconds = value;
+            if (_fs != 0)
+                _delayLine!.Ensure(_fs, value);
         }
     }
 

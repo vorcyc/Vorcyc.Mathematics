@@ -26,14 +26,15 @@ public class ChorusEffect : AudioEffect
         get => _voices?.Select(v => v.Width).ToArray() ?? _widthsSeconds;
         set
         {
-            if (_voices == null)
-                throw new InvalidOperationException("Sampling rate not set. Call SetSamplingRate first.");
-
-            for (var i = 0; i < _voices.Length; i++)
-            {
-                _voices[i].Width = value[i];
-            }
+            // 始终缓存配置值；仅在采样率已绑定（各 voice 已建）后转发到每个声部。
             _widthsSeconds = value;
+            if (_voices != null)
+            {
+                for (var i = 0; i < _voices.Length; i++)
+                {
+                    _voices[i].Width = value[i];
+                }
+            }
         }
     }
 

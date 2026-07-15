@@ -52,7 +52,8 @@ public class Fft : IComplexTransform
         _realSpectrum = new float[fftSize];
         _imagSpectrum = new float[fftSize];
 
-        var tblSize = (int)Math.Log(fftSize, 2);
+        // int.Log2：勿用 (int)Math.Log —— 部分 2 幂浮点 Log 会略小于整数，表短一格后写表越界。
+        var tblSize = int.Log2(fftSize);
 
         _cosTbl = new float[tblSize];
         _sinTbl = new float[tblSize];
