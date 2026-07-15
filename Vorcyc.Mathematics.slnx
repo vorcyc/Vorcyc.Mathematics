@@ -7,6 +7,8 @@
   <Folder Name="/docs/">
     <File Path="docs/License.txt" />
     <File Path="docs/tech.md" />
+    <File Path="README.md" />
+    <File Path="readme_zh.md" />
   </Folder>
   <Folder Name="/docs/logos/">
     <File Path="docs/logos/logo1.png" />
