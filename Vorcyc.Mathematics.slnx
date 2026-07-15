@@ -40,7 +40,11 @@
     <Project Path="TESTS/DSP_module_test/DSP_module_test.csproj" />
     <Project Path="TESTS/ML_module_test/ML_module_test.csproj" />
   </Folder>
-  <Folder Name="/docs/wiki/" />
+  <Folder Name="/docs/wiki/">
+    <File Path="wiki/upload.ps1" />
+    <File Path="wiki/upload.sh" />
+    <File Path="wiki/_Sidebar.md" />
+  </Folder>
   <Folder Name="/docs/wiki/wiki_en/">
     <File Path="wiki/wiki_en/changelog.txt" />
     <File Path="wiki/wiki_en/HOME.md" />
