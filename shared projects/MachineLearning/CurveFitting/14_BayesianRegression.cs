@@ -2,7 +2,8 @@
 namespace Vorcyc.Mathematics.MachineLearning.CurveFitting;
 public static class BayesianLinearRegression<T> where T : struct, IFloatingPointIeee754<T>
 {
-    public static BayesianFitResult<T> Fit(CurveFitRow<T>[] X, T[] y, T alpha, T beta)
+    public static BayesianFitResult<T> Fit(
+        CurveFitRow<T>[] X, T[] y, T alpha, T beta, ComputingContext? computingContext = null)
     {
         if (X == null || y == null) throw new ArgumentNullException("Input data cannot be null.");
         if (X.Length != y.Length) throw new ArgumentException("X and y must have the same length.");
@@ -11,13 +12,13 @@ public static class BayesianLinearRegression<T> where T : struct, IFloatingPoint
         int d = X[0].ColumnCount; // 特征数
         // 构造设计矩阵（添加偏置项）
         T[][] designMatrix = new T[n][];
-        for (int i = 0; i < n; i++)
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
             designMatrix[i] = new T[d + 1];
             for (int j = 0; j < d; j++)
                 designMatrix[i][j] = X[i][j];
             designMatrix[i][d] = T.One; // 偏置项
-        }
+        }, workPerItem: d + 1);
         // 计算后验分布
         T[][] XtX = MatrixMultiply(MatrixTranspose(designMatrix), designMatrix);
         T[][] A = MatrixAdd(ScalarMultiply(CreateIdentity(d + 1), alpha), ScalarMultiply(XtX, beta));

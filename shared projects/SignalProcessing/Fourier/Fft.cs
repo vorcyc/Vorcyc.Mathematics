@@ -1,4 +1,4 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Signals;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Fourier;

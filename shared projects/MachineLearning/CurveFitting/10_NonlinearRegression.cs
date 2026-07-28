@@ -26,7 +26,8 @@ internal static class NonlinearRegression
         T? lambdaIncreaseFactor = null,
         T? lambdaDecreaseFactor = null,
         T? stepSize = null,
-        T? residualTolerance = null)
+        T? residualTolerance = null,
+        ComputingContext? computingContext = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -55,17 +56,21 @@ internal static class NonlinearRegression
         T decreaseFactor = lambdaDecreaseFactor ?? defaultDecrease;
         T defaultStepSize = T.CreateChecked(1e-6);
         T h = stepSize ?? defaultStepSize;
+        long workPerItem = Math.Max(8, m * 4);
+        var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, workPerItem);
+        bool useSimd = dispatch == CurveFitDispatchKind.Simd;
+        T[] colI = new T[n];
+        T[] colJ = new T[n];
         for (int iter = 0; iter < maxIterations; iter++)
         {
-            // 计算残差
             T[] residuals = new T[n];
-            for (int i = 0; i < n; i++)
-                residuals[i] = model(xDataArray[i], parameters) - yDataArray[i];
-            // 计算雅可比矩阵（数值近似）
             T[][] jacobian = new T[n][];
             for (int i = 0; i < n; i++)
-            {
                 jacobian[i] = new T[m];
+
+            ComputingContextExecution.ForEach(computingContext, 0, n, i =>
+            {
+                residuals[i] = model(xDataArray[i], parameters) - yDataArray[i];
                 for (int j = 0; j < m; j++)
                 {
                     T[] tempParams = (T[])parameters.Clone();
@@ -75,27 +80,28 @@ internal static class NonlinearRegression
                     T f2 = model(xDataArray[i], tempParams);
                     jacobian[i][j] = (f1 - f2) / (h + h);
                 }
-            }
-            // 计算 J^T * J 和 J^T * r
+            }, workPerItem);
+
             T[][] jtJ = new T[m][];
             for (int i = 0; i < m; i++)
             {
                 jtJ[i] = new T[m];
+                for (int r = 0; r < n; r++)
+                    colI[r] = jacobian[r][i];
                 for (int j = 0; j < m; j++)
                 {
-                    T sum = T.Zero;
-                    for (int k = 0; k < n; k++)
-                        sum += jacobian[k][i] * jacobian[k][j];
-                    jtJ[i][j] = sum + (i == j ? currentLambda * sum : T.Zero); // 添加阻尼
+                    for (int r = 0; r < n; r++)
+                        colJ[r] = jacobian[r][j];
+                    T sum = CurveFittingExecution.Dot<T>(colI, colJ, useSimd);
+                    jtJ[i][j] = sum + (i == j ? currentLambda * sum : T.Zero);
                 }
             }
             T[] jtr = new T[m];
             for (int i = 0; i < m; i++)
             {
-                T sum = T.Zero;
-                for (int k = 0; k < n; k++)
-                    sum += jacobian[k][i] * residuals[k];
-                jtr[i] = -sum;
+                for (int r = 0; r < n; r++)
+                    colI[r] = jacobian[r][i];
+                jtr[i] = -CurveFittingExecution.Dot<T>(colI, residuals, useSimd);
             }
             // 求解更新步长
             T[] delta = SolveLinearSystem(jtJ, jtr);
@@ -202,7 +208,8 @@ internal static class NonlinearRegression
         T? lambdaIncreaseFactor = null,
         T? lambdaDecreaseFactor = null,
         T? stepSize = null,
-        T? residualTolerance = null)
+        T? residualTolerance = null,
+        ComputingContext? computingContext = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -235,17 +242,21 @@ internal static class NonlinearRegression
         T decreaseFactor = lambdaDecreaseFactor ?? defaultDecrease;
         T defaultStepSize = T.CreateChecked(1e-6);
         T h = stepSize ?? defaultStepSize;
+        long workPerItem = Math.Max(8, m * 4);
+        var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, workPerItem);
+        bool useSimd = dispatch == CurveFitDispatchKind.Simd;
+        T[] colI = new T[n];
+        T[] colJ = new T[n];
         for (int iter = 0; iter < maxIterations; iter++)
         {
-            // 计算残差
             T[] residuals = new T[n];
-            for (int i = 0; i < n; i++)
-                residuals[i] = model(xData[i], parameters) - yDataArray[i];
-            // 计算雅可比矩阵（数值近似）
             T[][] jacobian = new T[n][];
             for (int i = 0; i < n; i++)
-            {
                 jacobian[i] = new T[m];
+
+            ComputingContextExecution.ForEach(computingContext, 0, n, i =>
+            {
+                residuals[i] = model(xData[i], parameters) - yDataArray[i];
                 for (int j = 0; j < m; j++)
                 {
                     T[] tempParams = (T[])parameters.Clone();
@@ -255,27 +266,29 @@ internal static class NonlinearRegression
                     T f2 = model(xData[i], tempParams);
                     jacobian[i][j] = (f1 - f2) / (h + h);
                 }
-            }
+            }, workPerItem);
+
             // 计算 J^T * J 和 J^T * r
             T[][] jtJ = new T[m][];
             for (int i = 0; i < m; i++)
             {
                 jtJ[i] = new T[m];
+                for (int r = 0; r < n; r++)
+                    colI[r] = jacobian[r][i];
                 for (int j = 0; j < m; j++)
                 {
-                    T sum = T.Zero;
-                    for (int k = 0; k < n; k++)
-                        sum += jacobian[k][i] * jacobian[k][j];
+                    for (int r = 0; r < n; r++)
+                        colJ[r] = jacobian[r][j];
+                    T sum = CurveFittingExecution.Dot<T>(colI, colJ, useSimd);
                     jtJ[i][j] = sum + (i == j ? currentLambda * sum : T.Zero);
                 }
             }
             T[] jtr = new T[m];
             for (int i = 0; i < m; i++)
             {
-                T sum = T.Zero;
-                for (int k = 0; k < n; k++)
-                    sum += jacobian[k][i] * residuals[k];
-                jtr[i] = -sum;
+                for (int r = 0; r < n; r++)
+                    colI[r] = jacobian[r][i];
+                jtr[i] = -CurveFittingExecution.Dot<T>(colI, residuals, useSimd);
             }
             // 求解更新步长
             T[] delta = SolveLinearSystem(jtJ, jtr);

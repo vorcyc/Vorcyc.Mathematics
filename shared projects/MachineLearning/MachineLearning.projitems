@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\10_NonlinearRegression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\11_GaussianProcessRegression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\14_BayesianRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\CurveFittingExecution.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\CurveFitRow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\CurveFitter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CurveFitting\FitResult.cs" />

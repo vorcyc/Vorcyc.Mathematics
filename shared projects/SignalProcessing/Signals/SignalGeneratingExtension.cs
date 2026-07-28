@@ -57,7 +57,33 @@ public enum WaveShape
     /// <summary>
     /// 绮夌孩鍣０銆?
     /// </summary>
-    PinkNoise
+    PinkNoise,
+    /// <summary>
+    /// Linear frequency chirp (sweep). <c>frequency</c> is the start frequency;
+    /// end frequency defaults to <c>min(frequency×10, 0.45×Nyquist)</c>.
+    /// </summary>
+    Chirp,
+    /// <summary>
+    /// Periodic pulse train. <c>frequency</c> is the pulse rate (period = 1/f);
+    /// duty cycle defaults to 50%.
+    /// </summary>
+    Pulse,
+    /// <summary>
+    /// Linear ramp from -1 to +1 over the signal length. <c>frequency</c> is ignored.
+    /// </summary>
+    Ramp,
+    /// <summary>
+    /// Scaled sinc. <c>frequency</c> controls the sinc width (same as <see cref="Generators.SincGenerator.Frequency"/>).
+    /// </summary>
+    Sinc,
+    /// <summary>
+    /// Red (Brownian) noise. <c>frequency</c> is ignored.
+    /// </summary>
+    RedNoise,
+    /// <summary>
+    /// Additive white Gaussian noise (AWGN). <c>frequency</c> is ignored.
+    /// </summary>
+    Awgn,
 }
 /// <summary>
 /// Provides extension methods for generating and applying various waveforms and noise types to time-domain signals.
@@ -76,8 +102,8 @@ public static class SignalGeneratingExtension
     /// <remarks>The method modifies the samples of the provided signal in place according to the specified behavior.
     /// When using noise shapes, the frequency parameter may be ignored.</remarks>
     /// <param name="signal">The signal to which the generated waveform will be applied.</param>
-    /// <param name="shape">The shape of the waveform to generate. Supported shapes include sine, cosine, square, sawtooth, triangle, white
-    /// noise, and pink noise.</param>
+    /// <param name="shape">The shape of the waveform to generate (sine, cosine, square, sawtooth, triangle,
+    /// white/pink/red noise, AWGN, chirp, pulse, ramp, sinc).</param>
     /// <param name="frequency">The frequency of the waveform to generate, in hertz. The interpretation of this value depends on the waveform shape.</param>
     /// <param name="behaviour">The behavior that determines how the generated waveform is combined with the existing signal. Defaults to <see
     /// cref="Behaviour.Replace"/>.</param>
@@ -127,6 +153,24 @@ public static class SignalGeneratingExtension
                 break;
             case WaveShape.PinkNoise:
                 GeneratePinkNoise(signal, action);
+                break;
+            case WaveShape.Chirp:
+                GenerateChirp(signal, frequency, action);
+                break;
+            case WaveShape.Pulse:
+                GeneratePulse(signal, frequency, action);
+                break;
+            case WaveShape.Ramp:
+                GenerateRamp(signal, action);
+                break;
+            case WaveShape.Sinc:
+                GenerateSinc(signal, frequency, action);
+                break;
+            case WaveShape.RedNoise:
+                GenerateRedNoise(signal, action);
+                break;
+            case WaveShape.Awgn:
+                GenerateAwgn(signal, action);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(shape), shape, null);
@@ -592,5 +636,100 @@ public static class SignalGeneratingExtension
             action(i, noiseHistory[0]);
             Array.Copy(noiseHistory, 0, noiseHistory, 1, 6);
         }
+    }
+
+    /// <summary>
+    /// Applies samples from <paramref name="generator"/> via <paramref name="action"/>.
+    /// </summary>
+    private static void ApplyGenerator(ITimeDomainSignal signal, Generators.ISampleGenerator generator, Action<int, float> action)
+    {
+        generator.Reset();
+        for (int i = 0; i < signal.Length; i++)
+            action(i, generator.NextSample());
+    }
+
+    /// <summary>
+    /// Linear chirp: start = <paramref name="frequency"/>, end = min(frequency×10, 0.45×Nyquist).
+    /// </summary>
+    internal static void GenerateChirp(ITimeDomainSignal signal, float frequency, Action<int, float> action)
+    {
+        float start = MathF.Max(frequency, 0f);
+        float nyquist = signal.SamplingRate * 0.5f;
+        float end = MathF.Min(MathF.Max(start * 10f, start + 1f), nyquist * 0.45f);
+        var gen = new Generators.ChirpOscillator
+        {
+            SamplingRate = signal.SamplingRate,
+            Length = signal.Length,
+            StartFrequency = start,
+            EndFrequency = end,
+            Min = -1f,
+            Max = 1f,
+        };
+        ApplyGenerator(signal, gen, action);
+    }
+
+    /// <summary>
+    /// Pulse train at <paramref name="frequency"/> Hz with 50% duty cycle.
+    /// </summary>
+    internal static void GeneratePulse(ITimeDomainSignal signal, float frequency, Action<int, float> action)
+    {
+        float freq = MathF.Max(frequency, 1e-6f);
+        float period = 1f / freq;
+        var gen = new Generators.PulseWaveGenerator
+        {
+            SamplingRate = signal.SamplingRate,
+            Period = period,
+            PulseDuration = period * 0.5f,
+            Min = -1f,
+            Max = 1f,
+        };
+        ApplyGenerator(signal, gen, action);
+    }
+
+    /// <summary>
+    /// Linear ramp from -1 to +1 over the signal length.
+    /// </summary>
+    internal static void GenerateRamp(ITimeDomainSignal signal, Action<int, float> action)
+    {
+        int n = Math.Max(signal.Length - 1, 1);
+        var gen = new Generators.RampGenerator
+        {
+            Slope = 2f / n,
+            Intercept = -1f,
+        };
+        ApplyGenerator(signal, gen, action);
+    }
+
+    /// <summary>
+    /// Scaled sinc with the given frequency parameter.
+    /// </summary>
+    internal static void GenerateSinc(ITimeDomainSignal signal, float frequency, Action<int, float> action)
+    {
+        var gen = new Generators.SincGenerator
+        {
+            SamplingRate = signal.SamplingRate,
+            Frequency = MathF.Max(frequency, 0f),
+            Min = -1f,
+            Max = 1f,
+        };
+        ApplyGenerator(signal, gen, action);
+    }
+
+    /// <summary>
+    /// Red (Brownian) noise in approximately [-1, 1].
+    /// </summary>
+    internal static void GenerateRedNoise(ITimeDomainSignal signal, Action<int, float> action)
+    {
+        var gen = new Generators.RedNoiseGenerator { Min = -1f, Max = 1f };
+        ApplyGenerator(signal, gen, action);
+    }
+
+    /// <summary>
+    /// Additive white Gaussian noise (mean 0, σ ≈ 0.25).
+    /// </summary>
+    internal static void GenerateAwgn(ITimeDomainSignal signal, Action<int, float> action)
+    {
+        var gen = new Generators.AwgnGenerator { Mean = 0f, Sigma = 0.25f };
+        ApplyGenerator(signal, gen, action);
     }
 }

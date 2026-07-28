@@ -15,75 +15,58 @@ internal static class GaussianProcessRegression
     /// <param name="noiseVariance">噪声方差，默认0.01</param>
     /// <returns>拟合结果</returns>
     public static FitResult<T> Fit<T>(Span<T> xData, Span<T> yData,
-        T lengthScale = default, T signalVariance = default, T noiseVariance = default)
+        T lengthScale = default, T signalVariance = default, T noiseVariance = default,
+        ComputingContext? computingContext = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
             throw new ArgumentException("数据点数量必须相等且至少有1个点");
 
         int n = xData.Length;
-
-        // 默认参数
         T l = lengthScale == T.Zero ? T.One : lengthScale;
         T sigmaF = signalVariance == T.Zero ? T.One : signalVariance;
         T sigmaN = noiseVariance == T.Zero ? T.CreateChecked(0.01) : noiseVariance;
 
-        // 转换为数组以避免 Span 在 lambda 中的问题
         T[] xDataArray = xData.ToArray();
         T[] yDataArray = yData.ToArray();
 
-        // 计算训练数据的协方差矩阵 K(X, X)
+        // O(n²) 核：count=n, workPerItem=n → 总工作量 n²（与 UseParallelIndexed / Auto 一致）
+        var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, n);
+        bool useSimd = dispatch == CurveFitDispatchKind.Simd;
+
         T[][] K = new T[n][];
         for (int i = 0; i < n; i++)
-        {
             K[i] = new T[n];
-            for (int j = 0; j < n; j++)
-            {
-                K[i][j] = ComputeKernel(xDataArray[i], xDataArray[j], l, sigmaF);
-                if (i == j)
-                    K[i][j] += sigmaN; // 添加噪声方差
-            }
-        }
 
-        // 计算 K 的逆矩阵
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
+        {
+            CurveFittingExecution.FillRbfKernelRow(xDataArray, xDataArray[i], l, sigmaF, K[i], useSimd);
+            K[i][i] += sigmaN;
+        }, workPerItem: n);
+
         T[][] KInv = InvertMatrix(K);
 
-        // 计算 alpha = K^-1 * y
         T[] alpha = new T[n];
-        for (int i = 0; i < n; i++)
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
-            T sum = T.Zero;
-            for (int j = 0; j < n; j++)
-                sum += KInv[i][j] * yDataArray[j];
-            alpha[i] = sum;
-        }
+            alpha[i] = CurveFittingExecution.Dot<T>(KInv[i], yDataArray, useSimd);
+        }, workPerItem: n);
 
-        // 预测函数（仅返回均值）
         Func<T, T> predict = x =>
         {
             T[] k = new T[n];
-            for (int i = 0; i < n; i++)
-                k[i] = ComputeKernel(x, xDataArray[i], l, sigmaF);
-
-            T mu = T.Zero;
-            for (int i = 0; i < n; i++)
-                mu += k[i] * alpha[i];
-
-            return mu;
+            CurveFittingExecution.FillRbfKernelRow(xDataArray, x, l, sigmaF, k, useSimd);
+            return CurveFittingExecution.Dot<T>(k, alpha, useSimd);
         };
 
-        // 计算 MSE
-        T mse = T.Zero;
-        for (int i = 0; i < n; i++)
+        T[] fitted = new T[n];
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
-            T predicted = predict(xDataArray[i]);
-            T diff = predicted - yDataArray[i];
-            mse += diff * diff;
-        }
-        mse /= T.CreateChecked(n);
+            fitted[i] = predict(xDataArray[i]);
+        }, workPerItem: n);
 
-        T[] parameters = new T[] { l, sigmaF, sigmaN };
-        return new FitResult<T>(predict, parameters, mse);
+        T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yDataArray, useSimd);
+        return new FitResult<T>(predict, [l, sigmaF, sigmaN], mse);
     }
 
     /// <summary>
@@ -97,7 +80,8 @@ internal static class GaussianProcessRegression
     /// <param name="noiseVariance">噪声方差，默认0.01</param>
     /// <returns>拟合结果</returns>
     public static MultiColumnFitResult<T> Fit<T>(CurveFitRow<T>[] xData, Span<T> yData,
-        T lengthScale = default, T signalVariance = default, T noiseVariance = default)
+        T lengthScale = default, T signalVariance = default, T noiseVariance = default,
+        ComputingContext? computingContext = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -116,59 +100,48 @@ internal static class GaussianProcessRegression
         T sigmaN = noiseVariance == T.Zero ? T.CreateChecked(0.01) : noiseVariance;
 
         T[] yDataArray = yData.ToArray();
+        long kernelWork = (long)n * Math.Max(1, inputDim);
+        var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, kernelWork);
+        bool useSimd = dispatch == CurveFitDispatchKind.Simd;
 
-        // 计算训练数据的协方差矩阵 K(X, X)
         T[][] K = new T[n][];
         for (int i = 0; i < n; i++)
-        {
             K[i] = new T[n];
+
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
+        {
             for (int j = 0; j < n; j++)
             {
                 K[i][j] = ComputeKernel(xData[i], xData[j], l, sigmaF);
                 if (i == j)
                     K[i][j] += sigmaN;
             }
-        }
+        }, workPerItem: kernelWork);
 
-        // 计算 K 的逆矩阵
         T[][] KInv = InvertMatrix(K);
 
-        // 计算 alpha = K^-1 * y
         T[] alpha = new T[n];
-        for (int i = 0; i < n; i++)
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
-            T sum = T.Zero;
-            for (int j = 0; j < n; j++)
-                sum += KInv[i][j] * yDataArray[j];
-            alpha[i] = sum;
-        }
+            alpha[i] = CurveFittingExecution.Dot<T>(KInv[i], yDataArray, useSimd);
+        }, workPerItem: n);
 
-        // 预测函数（仅返回均值）
         Func<CurveFitRow<T>, T> predict = x =>
         {
             T[] k = new T[n];
             for (int i = 0; i < n; i++)
                 k[i] = ComputeKernel(x, xData[i], l, sigmaF);
-
-            T mu = T.Zero;
-            for (int i = 0; i < n; i++)
-                mu += k[i] * alpha[i];
-
-            return mu;
+            return CurveFittingExecution.Dot<T>(k, alpha, useSimd);
         };
 
-        // 计算 MSE
-        T mse = T.Zero;
-        for (int i = 0; i < n; i++)
+        T[] fitted = new T[n];
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
-            T predicted = predict(xData[i]);
-            T diff = predicted - yDataArray[i];
-            mse += diff * diff;
-        }
-        mse /= T.CreateChecked(n);
+            fitted[i] = predict(xData[i]);
+        }, workPerItem: n);
 
-        T[] parameters = new T[] { l, sigmaF, sigmaN };
-        return new MultiColumnFitResult<T>(predict, parameters, mse);
+        T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yDataArray, useSimd);
+        return new MultiColumnFitResult<T>(predict, [l, sigmaF, sigmaN], mse);
     }
 
     // 单变量核函数（RBF核）

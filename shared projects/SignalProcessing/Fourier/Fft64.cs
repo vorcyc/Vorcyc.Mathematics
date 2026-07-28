@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
+namespace Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 /// <summary>
 /// <para>Represents Complex Fast Fourier Transform for 64-bit data:</para>

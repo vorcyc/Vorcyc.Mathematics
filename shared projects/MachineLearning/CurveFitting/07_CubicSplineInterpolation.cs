@@ -129,27 +129,26 @@ internal class CubicSplineInterpolation<T>
     /// <param name="yData">The span of output values representing the dependent variable. Must have the same length as xData.</param>
     /// <returns>A <see cref="FitResult{T}"/> containing the prediction function, the coefficients of the fitted cubic spline, and the mean squared
     /// error of the fit.</returns>
-    public static FitResult<T> Fit_CubicSpline(Span<T> xData, Span<T> yData)
+    public static FitResult<T> Fit_CubicSpline(
+        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null)
     {
-        // 创建样条插值实例
         var spline = new CubicSplineInterpolation<T>(xData, yData);
-
-        // 获取预测函数
         Func<T, T> predict = spline.Predict;
-
-        // 获取参数
         T[] parameters = spline.GetCoefficients();
 
-        // 计算MSE
-        T mse = T.Zero;
-        for (int i = 0; i < xData.Length; i++)
-        {
-            T predicted = predict(xData[i]);
-            T diff = predicted - yData[i];
-            mse += diff * diff;
-        }
-        mse /= T.CreateChecked(xData.Length);
+        T[] xArr = xData.ToArray();
+        T[] yArr = yData.ToArray();
+        int n = xArr.Length;
+        var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, workPerItem: 1);
+        bool useSimd = dispatch == CurveFitDispatchKind.Simd;
 
+        T[] fitted = new T[n];
+        ComputingContextExecution.ForEach(computingContext, 0, n, i =>
+        {
+            fitted[i] = predict(xArr[i]);
+        });
+
+        T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yArr, useSimd);
         return new FitResult<T>(predict, parameters, mse);
     }
 

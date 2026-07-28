@@ -6,6 +6,8 @@ using Vorcyc.Mathematics.Framework.Utilities;
 //GMM_test.go();
 Regression_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
+CurveFitting_Sinusoidal_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
 KNN_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 LogisticRegression_test.Go();
