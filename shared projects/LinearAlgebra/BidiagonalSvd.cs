@@ -12,7 +12,9 @@ internal static class BidiagonalSvd
         Matrix<T> matrix,
         int m,
         int n,
-        T tolerance)
+        T tolerance,
+        ComputingContext? context = null,
+        CancellationToken cancellationToken = default)
         where T : struct, IFloatingPointIeee754<T>
     {
         int k = Math.Min(m, n);
@@ -20,19 +22,21 @@ internal static class BidiagonalSvd
         var v = Matrix<T>.Eye(n);
         var working = matrix.Clone();
 
-        Bidiagonalize(working, u, v, m, n);
+        Bidiagonalize(working, u, v, m, n, context, cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
         var diagonal = new T[k];
         var superdiagonal = new T[Math.Max(0, k - 1)];
         ExtractBidiagonal(working, diagonal, superdiagonal);
 
         var bMatrix = BuildUpperBidiagonal(diagonal, superdiagonal, k);
-        var bSvd = ImplicitQrBidiagonalSvd(diagonal, superdiagonal, k, tolerance)
-            ?? MatrixDecomposition.JacobiSvdSquare(bMatrix, tolerance);
+        var bSvd = ImplicitQrBidiagonalSvd(diagonal, superdiagonal, k, tolerance, cancellationToken)
+            ?? MatrixDecomposition.JacobiSvdSquare(bMatrix, tolerance, cancellationToken: cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
         var singularValues = bSvd.SingularValues;
-        var uThin = CombineLeftTransform(u, bSvd.U, m, k);
-        var vtThin = CombineRightTransform(bSvd.VT, v, k, n);
+        var uThin = CombineLeftTransform(u, bSvd.U, m, k, context);
+        var vtThin = CombineRightTransform(bSvd.VT, v, k, n, context);
         SortSingularValuesDescending(singularValues, uThin, vtThin, k);
         return new SingularValueDecompositionResult<T>(uThin, singularValues, vtThin);
     }
@@ -42,7 +46,9 @@ internal static class BidiagonalSvd
         Matrix<T> u,
         Matrix<T> v,
         int m,
-        int n)
+        int n,
+        ComputingContext? context,
+        CancellationToken cancellationToken)
         where T : struct, IFloatingPointIeee754<T>
     {
         int k = Math.Min(m, n);
@@ -50,6 +56,7 @@ internal static class BidiagonalSvd
 
         for (int j = 0; j < k; j++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int columnLength = m - j;
             for (int i = 0; i < columnLength; i++)
                 workspace[i] = a[j + i, j];
@@ -58,7 +65,7 @@ internal static class BidiagonalSvd
             if (tau != T.Zero)
             {
                 workspace[0] = T.One;
-                ApplyHouseholderLeft(a, u, workspace.AsSpan(0, length), tau, j, j, m, n);
+                ApplyHouseholderLeft(a, u, workspace.AsSpan(0, length), tau, j, j, m, n, context);
             }
 
             if (j >= k - 1)
@@ -72,7 +79,7 @@ internal static class BidiagonalSvd
             if (tau != T.Zero)
             {
                 workspace[0] = T.One;
-                ApplyHouseholderRight(a, v, workspace.AsSpan(0, length), tau, j, j + 1, m, n);
+                ApplyHouseholderRight(a, v, workspace.AsSpan(0, length), tau, j, j + 1, m, n, context);
             }
         }
     }
@@ -115,30 +122,35 @@ internal static class BidiagonalSvd
         int rowOffset,
         int colOffset,
         int m,
-        int n)
+        int n,
+        ComputingContext? context)
         where T : struct, IFloatingPointIeee754<T>
     {
-        for (int j = colOffset; j < n; j++)
+        // Copy reflector so parallel workers do not capture Span.
+        var reflector = v.ToArray();
+        int len = reflector.Length;
+
+        ComputingContextExecution.ForEach(context, colOffset, n, j =>
         {
             T dot = T.Zero;
-            for (int i = 0; i < v.Length; i++)
-                dot += v[i] * a[rowOffset + i, j];
+            for (int i = 0; i < len; i++)
+                dot += reflector[i] * a[rowOffset + i, j];
 
             dot *= tau;
-            for (int i = 0; i < v.Length; i++)
-                a[rowOffset + i, j] -= dot * v[i];
-        }
+            for (int i = 0; i < len; i++)
+                a[rowOffset + i, j] -= dot * reflector[i];
+        }, workPerItem: len * 2L);
 
-        for (int j = 0; j < m; j++)
+        ComputingContextExecution.ForEach(context, 0, m, j =>
         {
             T dot = T.Zero;
-            for (int i = 0; i < v.Length; i++)
-                dot += v[i] * u[j, rowOffset + i];
+            for (int i = 0; i < len; i++)
+                dot += reflector[i] * u[j, rowOffset + i];
 
             dot *= tau;
-            for (int i = 0; i < v.Length; i++)
-                u[j, rowOffset + i] -= dot * v[i];
-        }
+            for (int i = 0; i < len; i++)
+                u[j, rowOffset + i] -= dot * reflector[i];
+        }, workPerItem: len * 2L);
     }
 
     private static void ApplyHouseholderRight<T>(
@@ -149,30 +161,34 @@ internal static class BidiagonalSvd
         int rowOffset,
         int colOffset,
         int m,
-        int n)
+        int n,
+        ComputingContext? context)
         where T : struct, IFloatingPointIeee754<T>
     {
-        for (int i = rowOffset; i < m; i++)
+        var reflector = householder.ToArray();
+        int len = reflector.Length;
+
+        ComputingContextExecution.ForEach(context, rowOffset, m, i =>
         {
             T dot = T.Zero;
-            for (int j = 0; j < householder.Length; j++)
-                dot += a[i, colOffset + j] * householder[j];
+            for (int j = 0; j < len; j++)
+                dot += a[i, colOffset + j] * reflector[j];
 
             dot *= tau;
-            for (int j = 0; j < householder.Length; j++)
-                a[i, colOffset + j] -= dot * householder[j];
-        }
+            for (int j = 0; j < len; j++)
+                a[i, colOffset + j] -= dot * reflector[j];
+        }, workPerItem: len * 2L);
 
-        for (int i = 0; i < n; i++)
+        ComputingContextExecution.ForEach(context, 0, n, i =>
         {
             T dot = T.Zero;
-            for (int j = 0; j < householder.Length; j++)
-                dot += v[i, colOffset + j] * householder[j];
+            for (int j = 0; j < len; j++)
+                dot += v[i, colOffset + j] * reflector[j];
 
             dot *= tau;
-            for (int j = 0; j < householder.Length; j++)
-                v[i, colOffset + j] -= dot * householder[j];
-        }
+            for (int j = 0; j < len; j++)
+                v[i, colOffset + j] -= dot * reflector[j];
+        }, workPerItem: len * 2L);
     }
 
     private static void ExtractBidiagonal<T>(
@@ -210,7 +226,8 @@ internal static class BidiagonalSvd
         T[] diagonal,
         T[] superdiagonal,
         int k,
-        T tolerance)
+        T tolerance,
+        CancellationToken cancellationToken = default)
         where T : struct, IFloatingPointIeee754<T>
     {
         if (k <= 1)
@@ -224,6 +241,7 @@ internal static class BidiagonalSvd
 
         for (int iter = 0; iter < 75 * k; iter++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             int start = 0;
             while (start < k - 1 && IsNegligible(e[start], d[start], d[start + 1], eps))
                 e[start++] = T.Zero;
@@ -369,11 +387,12 @@ internal static class BidiagonalSvd
         }
     }
 
-    private static Matrix<T> CombineLeftTransform<T>(Matrix<T> left, Matrix<T> innerU, int m, int k)
+    private static Matrix<T> CombineLeftTransform<T>(
+        Matrix<T> left, Matrix<T> innerU, int m, int k, ComputingContext? context)
         where T : struct, IFloatingPointIeee754<T>
     {
         var result = new Matrix<T>(m, k);
-        for (int i = 0; i < m; i++)
+        ComputingContextExecution.ForEach(context, 0, m, i =>
         {
             for (int l = 0; l < k; l++)
             {
@@ -382,16 +401,16 @@ internal static class BidiagonalSvd
                     sum += left[i, p] * innerU[p, l];
                 result[i, l] = sum;
             }
-        }
-
+        }, workPerItem: (long)k * k);
         return result;
     }
 
-    private static Matrix<T> CombineRightTransform<T>(Matrix<T> innerVt, Matrix<T> rightV, int k, int n)
+    private static Matrix<T> CombineRightTransform<T>(
+        Matrix<T> innerVt, Matrix<T> rightV, int k, int n, ComputingContext? context)
         where T : struct, IFloatingPointIeee754<T>
     {
         var result = new Matrix<T>(k, n);
-        for (int l = 0; l < k; l++)
+        ComputingContextExecution.ForEach(context, 0, k, l =>
         {
             for (int j = 0; j < n; j++)
             {
@@ -400,8 +419,7 @@ internal static class BidiagonalSvd
                     sum += innerVt[l, p] * rightV[j, p];
                 result[l, j] = sum;
             }
-        }
-
+        }, workPerItem: (long)n * k);
         return result;
     }
 

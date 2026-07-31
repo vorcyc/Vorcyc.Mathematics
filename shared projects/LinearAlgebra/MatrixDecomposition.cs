@@ -154,6 +154,19 @@ public static class MatrixDecomposition
         Matrix<T> matrix,
         T? tolerance = null)
         where T : struct, IFloatingPointIeee754<T>
+        => SingularValueDecomposition(matrix, tolerance, context: null, cancellationToken: default);
+
+    /// <summary>
+    /// Computes a thin SVD with optional <see cref="ComputingContext"/> and cancellation.
+    /// Householder bidiagonalization and final factor combines honor the context;
+    /// the bidiagonal QR iteration remains sequential (cancel is polled each sweep).
+    /// </summary>
+    public static SingularValueDecompositionResult<T> SingularValueDecomposition<T>(
+        Matrix<T> matrix,
+        T? tolerance,
+        ComputingContext? context,
+        CancellationToken cancellationToken = default)
+        where T : struct, IFloatingPointIeee754<T>
     {
         int m = matrix.Rows;
         int n = matrix.Columns;
@@ -161,16 +174,18 @@ public static class MatrixDecomposition
             throw new ArgumentException("矩阵不能为空。", nameof(matrix));
 
         T tol = tolerance ?? T.CreateChecked(1e-12);
+        cancellationToken.ThrowIfCancellationRequested();
+
         if (ShouldUseBidiagonalSvd(m, n))
         {
             return m >= n
-                ? BidiagonalSvd.ComputeThin(matrix, m, n, tol)
-                : TransposeThinSvd(BidiagonalSvd.ComputeThin(matrix.Transpose(), n, m, tol));
+                ? BidiagonalSvd.ComputeThin(matrix, m, n, tol, context, cancellationToken)
+                : TransposeThinSvd(BidiagonalSvd.ComputeThin(matrix.Transpose(), n, m, tol, context, cancellationToken));
         }
 
         return m >= n
-            ? ComputeThinSvdTall(matrix, m, n, tol)
-            : ComputeThinSvdWide(matrix, m, n, tol);
+            ? ComputeThinSvdTall(matrix, m, n, tol, context, cancellationToken)
+            : TransposeThinSvd(ComputeThinSvdTall(matrix.Transpose(), n, m, tol, context, cancellationToken));
     }
 
     private static bool ShouldUseBidiagonalSvd(int m, int n)
@@ -244,24 +259,20 @@ public static class MatrixDecomposition
         Matrix<T> matrix,
         int m,
         int n,
-        T tolerance)
+        T tolerance,
+        ComputingContext? context,
+        CancellationToken cancellationToken)
         where T : struct, IFloatingPointIeee754<T>
     {
+        cancellationToken.ThrowIfCancellationRequested();
         matrix.QRDecomposition(out Matrix<T> qFull, out Matrix<T> rFull);
         ExtractThinQr(qFull, rFull, m, n, out Matrix<T> qThin, out Matrix<T> r);
 
-        var rSvd = JacobiSvdSquare(r, tolerance);
-        var u = qThin * rSvd.U;
+        cancellationToken.ThrowIfCancellationRequested();
+        var rSvd = JacobiSvdSquare(r, tolerance, cancellationToken: cancellationToken);
+        var u = Matrix<T>.Multiply(qThin, rSvd.U, context);
         return new SingularValueDecompositionResult<T>(u, rSvd.SingularValues, rSvd.VT);
     }
-
-    private static SingularValueDecompositionResult<T> ComputeThinSvdWide<T>(
-        Matrix<T> matrix,
-        int m,
-        int n,
-        T tolerance)
-        where T : struct, IFloatingPointIeee754<T>
-        => TransposeThinSvd(ComputeThinSvdTall(matrix.Transpose(), n, m, tolerance));
 
     private static void ExtractThinQr<T>(
         Matrix<T> qFull,
@@ -294,7 +305,8 @@ public static class MatrixDecomposition
     internal static SingularValueDecompositionResult<T> JacobiSvdSquare<T>(
         Matrix<T> matrix,
         T tolerance,
-        int maxSweeps = 32)
+        int maxSweeps = 32,
+        CancellationToken cancellationToken = default)
         where T : struct, IFloatingPointIeee754<T>
     {
         int n = matrix.Rows;
@@ -306,6 +318,7 @@ public static class MatrixDecomposition
 
         for (int sweep = 0; sweep < maxSweeps; sweep++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             bool changed = false;
             for (int p = 0; p < n; p++)
             {
@@ -324,6 +337,7 @@ public static class MatrixDecomposition
         var u = new Matrix<T>(n, n);
         for (int j = 0; j < n; j++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             T normSquared = ColumnNormSquared(working, j, n);
             T norm = T.Sqrt(normSquared);
             singularValues[j] = norm;

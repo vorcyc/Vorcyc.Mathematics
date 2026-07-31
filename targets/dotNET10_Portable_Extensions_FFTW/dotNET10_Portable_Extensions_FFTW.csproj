@@ -13,8 +13,8 @@
 		<Company>Vorcyc</Company>
 		<Description>.NET binding of FFTW library based-on Vorcyc.Mathematics. lib</Description>
 		<Copyright>Vorcyc® Mathematics</Copyright>
-		<Version>0.10.5</Version>
-		<AssemblyVersion>0.10.5</AssemblyVersion>
+		<Version>0.10.8</Version>
+		<AssemblyVersion>0.10.8</AssemblyVersion>
 		<Title>Vorcy.Mathematics.Extensions.FFTW</Title>
 		<PackageIcon>logo1.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>

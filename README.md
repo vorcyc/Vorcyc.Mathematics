@@ -4,11 +4,11 @@ High-performance **.NET 10** math library: SIMD/parallel CPU numerics, signal pr
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**Version:** 0.10.5 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
+**Version:** 0.10.8 � **TFM:** `net10.0` � **NuGet:** `Vorcyc.Mathematics`
 
-[中文说明](readme_zh.md)
+[????](readme_zh.md)
 
-Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU performance, accurate numerics, and modular APIs for DSP, deep learning, and classical ML.
+Vorcyc� Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU performance, accurate numerics, and modular APIs for DSP, deep learning, and classical ML.
 
 > **Minimum target: .NET 10.0**
 
@@ -19,7 +19,7 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 - SIMD-accelerated CPU execution
 - Parallel execution via `ComputingContext` (scalar / SIMD / parallel / auto)
 - Generic math (`INumber`, spans, tensors)
-- **No GPU in the main package** — CPU-only; ILGPU removed (see [GPU policy](wiki_en/Module_GPU_Policy.md))
+- **No GPU in the main package** ? CPU-only; ILGPU removed (see [GPU policy](wiki_en/Module_GPU_Policy.md))
 
 ## Dependencies
 
@@ -29,39 +29,39 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 
 ## Modules
 
-**Core** — arrays, constants, RNG, trigonometry, pinnable buffers.  
-→ [wiki_en/Module_Core.md](wiki_en/Module_Core.md)
+**Core** ? arrays, constants, RNG, trigonometry, pinnable buffers.  
+? [wiki_en/Module_Core.md](wiki_en/Module_Core.md)
 
-**ComputingContext** — execution policy, `ComputingScope`; integrated into FFT, statistics, linear algebra, batch DL, MFCC, Mel frontends, and `Trainer.Fit*`.  
-→ [wiki_en/Module_ComputingContext.md](wiki_en/Module_ComputingContext.md)
+**ComputingContext** ? execution policy, `ComputingScope`; integrated into FFT, statistics, linear algebra, batch DL, MFCC, Mel frontends, and `Trainer.Fit*`.  
+? [wiki_en/Module_ComputingContext.md](wiki_en/Module_ComputingContext.md)
 
-**Deep learning (0.9)** — `BatchTensor` (NHWC), `BatchSequential` / `Sequential`, 20+ batch layers, `Trainer.Fit*`, `ModelSerializer` v3.  
-→ [wiki_en/Module_DeepLearning.md](wiki_en/Module_DeepLearning.md)
+**Deep learning (0.9)** ? `BatchTensor` (NHWC), `BatchSequential` / `Sequential`, 20+ batch layers, `Trainer.Fit*`, `ModelSerializer` v3.  
+? [wiki_en/Module_DeepLearning.md](wiki_en/Module_DeepLearning.md)
 
 **Linear algebra**
-→ [wiki_en/Module_LinearAlgebra.md](wiki_en/Module_LinearAlgebra.md)
+? [wiki_en/Module_LinearAlgebra.md](wiki_en/Module_LinearAlgebra.md)
 
-**Machine learning (0.9)** — classifiers, regressors, pipelines, trees/forests, boosting, CV, grid search.  
-→ [wiki_en/Module_MachineLearning.md](wiki_en/Module_MachineLearning.md)
+**Machine learning (0.9)** ? classifiers, regressors, pipelines, trees/forests, boosting, CV, grid search.  
+? [wiki_en/Module_MachineLearning.md](wiki_en/Module_MachineLearning.md)
 
-**Signal processing** — **`Signal` / `SignalSegment`** as primary time-domain APIs; FFT, filters, MFCC, effects.  
-→ [wiki_en/Module_SignalProcessing.md](wiki_en/Module_SignalProcessing.md)
+**Signal processing** ? **`Signal` / `SignalSegment`** as primary time-domain APIs; FFT, filters, MFCC, effects.  
+? [wiki_en/Module_SignalProcessing.md](wiki_en/Module_SignalProcessing.md)
 
-**Numerics** — extended integer/float/complex/rational types.  
-→ [wiki_en/Module_Numerics.md](wiki_en/Module_Numerics.md)
+**Numerics** ? extended integer/float/complex/rational types.  
+? [wiki_en/Module_Numerics.md](wiki_en/Module_Numerics.md)
 
-**Statistics** — reductions, distributions, time series, extreme values.  
-→ [wiki_en/Module_Statistics.md](wiki_en/Module_Statistics.md)
+**Statistics** ? reductions, distributions, time series, extreme values.  
+? [wiki_en/Module_Statistics.md](wiki_en/Module_Statistics.md)
 
-**Calculus** — integration, derivatives, ODEs, root finding, series.  
-→ [wiki_en/Module_Calculus.md](wiki_en/Module_Calculus.md)
+**Calculus** ? integration, derivatives, ODEs, root finding, series.  
+? [wiki_en/Module_Calculus.md](wiki_en/Module_Calculus.md)
 
 ---
 
 ## Extension packages
 
-**FFTW** (`Vorcyc.Mathematics.Extensions.FFTW`) — native FFTW bindings for high-performance DFTs.  
-→ [wiki_en/Module_Extensions_FFTW.md](wiki_en/Module_Extensions_FFTW.md)
+**FFTW** (`Vorcyc.Mathematics.Extensions.FFTW`) ? native FFTW bindings for high-performance DFTs.  
+? [wiki_en/Module_Extensions_FFTW.md](wiki_en/Module_Extensions_FFTW.md)
 
 ---
 
@@ -113,7 +113,7 @@ Standalone projects under `Examples/` (not shipped on NuGet):
 | `Calculus_example` | Integration, ODE, root finding | `dotnet run --project Examples/Calculus_example` |
 | `Colorization_example` | ColorNet / ChromaGAN (Emgu.CV, Windows) | `dotnet run --project Examples/Colorization_example` |
 
-→ [wiki_en/Module_Examples.md](wiki_en/Module_Examples.md)
+? [wiki_en/Module_Examples.md](wiki_en/Module_Examples.md)
 
 ---
 
@@ -123,8 +123,8 @@ Standalone projects under `Examples/` (not shipped on NuGet):
 |----------|------|
 | **readme.md** (this file) | English solution overview |
 | **readme_zh.md** | Chinese solution overview |
-| **wiki_en/HOME.md** | English wiki home — full API manuals (NuGet README source) |
-| **wiki_hans/HOME_zh.md** | Chinese wiki home — full API manuals |
+| **wiki_en/HOME.md** | English wiki home ? full API manuals (NuGet README source) |
+| **wiki_hans/HOME_zh.md** | Chinese wiki home ? full API manuals |
 
 The two wikis are maintained independently. This solution README is a separate entry point and does not replace the wikis.
 

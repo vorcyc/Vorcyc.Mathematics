@@ -6,7 +6,7 @@
   </Folder>
   <Folder Name="/docs/">
     <File Path="docs/License.txt" />
-    <File Path="docs/tech.md" />
+    <File Path="docs/PROJECT_OVERVIEW.md" />
     <File Path="README.md" />
     <File Path="readme_zh.md" />
   </Folder>
