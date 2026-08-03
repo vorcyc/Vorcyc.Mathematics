@@ -4,7 +4,7 @@ High-performance **.NET 10** math library: SIMD/parallel CPU numerics, signal pr
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**Version:** 0.10.8 � **TFM:** `net10.0` � **NuGet:** `Vorcyc.Mathematics`
+**Version:** 0.10.9 � **TFM:** `net10.0` � **NuGet:** `Vorcyc.Mathematics`
 
 [????](readme_zh.md)
 

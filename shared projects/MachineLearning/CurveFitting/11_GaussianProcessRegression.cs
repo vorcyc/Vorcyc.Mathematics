@@ -7,16 +7,10 @@ internal static class GaussianProcessRegression
     /// <summary>
     /// 高斯过程回归 (GPR)：单列输入，平滑预测。
     /// </summary>
-    /// <typeparam name="T">浮点类型</typeparam>
-    /// <param name="xData">X 数据点，单列输入</param>
-    /// <param name="yData">Y 数据点</param>
-    /// <param name="lengthScale">核函数长度尺度，默认1.0</param>
-    /// <param name="signalVariance">信号方差，默认1.0</param>
-    /// <param name="noiseVariance">噪声方差，默认0.01</param>
-    /// <returns>拟合结果</returns>
     public static FitResult<T> Fit<T>(Span<T> xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -30,7 +24,7 @@ internal static class GaussianProcessRegression
         T[] xDataArray = xData.ToArray();
         T[] yDataArray = yData.ToArray();
 
-        // O(n²) 核：count=n, workPerItem=n → 总工作量 n²（与 UseParallelIndexed / Auto 一致）
+        // O(n²) 核：count=n, workPerItem=n → 总工作量 n²（交由 ComputingContextExecution 分发）
         var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, n);
         bool useSimd = dispatch == CurveFitDispatchKind.Simd;
 
@@ -42,15 +36,15 @@ internal static class GaussianProcessRegression
         {
             CurveFittingExecution.FillRbfKernelRow(xDataArray, xDataArray[i], l, sigmaF, K[i], useSimd);
             K[i][i] += sigmaN;
-        }, workPerItem: n);
+        }, workPerItem: n, cancellationToken: cancellationToken);
 
-        T[][] KInv = InvertMatrix(K);
+        T[][] KInv = InvertMatrix(K, computingContext, cancellationToken);
 
         T[] alpha = new T[n];
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
             alpha[i] = CurveFittingExecution.Dot<T>(KInv[i], yDataArray, useSimd);
-        }, workPerItem: n);
+        }, workPerItem: n, cancellationToken: cancellationToken);
 
         Func<T, T> predict = x =>
         {
@@ -63,7 +57,7 @@ internal static class GaussianProcessRegression
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
             fitted[i] = predict(xDataArray[i]);
-        }, workPerItem: n);
+        }, workPerItem: n, cancellationToken: cancellationToken);
 
         T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yDataArray, useSimd);
         return new FitResult<T>(predict, [l, sigmaF, sigmaN], mse);
@@ -72,16 +66,10 @@ internal static class GaussianProcessRegression
     /// <summary>
     /// 高斯过程回归 (GPR)：多列输入，平滑预测带置信区间。
     /// </summary>
-    /// <typeparam name="T">浮点类型</typeparam>
-    /// <param name="xData">X 数据点，每行是一个数据点的多变量输入</param>
-    /// <param name="yData">Y 数据点</param>
-    /// <param name="lengthScale">核函数长度尺度，默认1.0</param>
-    /// <param name="signalVariance">信号方差，默认1.0</param>
-    /// <param name="noiseVariance">噪声方差，默认0.01</param>
-    /// <returns>拟合结果</returns>
     public static MultiColumnFitResult<T> Fit<T>(CurveFitRow<T>[] xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -94,7 +82,6 @@ internal static class GaussianProcessRegression
         if (xData.Any(row => row.ColumnCount != inputDim))
             throw new ArgumentException("所有数据点的输入维度必须一致");
 
-        // 默认参数
         T l = lengthScale == T.Zero ? T.One : lengthScale;
         T sigmaF = signalVariance == T.Zero ? T.One : signalVariance;
         T sigmaN = noiseVariance == T.Zero ? T.CreateChecked(0.01) : noiseVariance;
@@ -116,15 +103,15 @@ internal static class GaussianProcessRegression
                 if (i == j)
                     K[i][j] += sigmaN;
             }
-        }, workPerItem: kernelWork);
+        }, workPerItem: kernelWork, cancellationToken: cancellationToken);
 
-        T[][] KInv = InvertMatrix(K);
+        T[][] KInv = InvertMatrix(K, computingContext, cancellationToken);
 
         T[] alpha = new T[n];
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
             alpha[i] = CurveFittingExecution.Dot<T>(KInv[i], yDataArray, useSimd);
-        }, workPerItem: n);
+        }, workPerItem: n, cancellationToken: cancellationToken);
 
         Func<CurveFitRow<T>, T> predict = x =>
         {
@@ -138,13 +125,12 @@ internal static class GaussianProcessRegression
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
             fitted[i] = predict(xData[i]);
-        }, workPerItem: n);
+        }, workPerItem: n, cancellationToken: cancellationToken);
 
         T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yDataArray, useSimd);
         return new MultiColumnFitResult<T>(predict, [l, sigmaF, sigmaN], mse);
     }
 
-    // 单变量核函数（RBF核）
     private static T ComputeKernel<T>(T x1, T x2, T lengthScale, T signalVariance)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
@@ -153,7 +139,6 @@ internal static class GaussianProcessRegression
         return signalVariance * T.Exp(exponent);
     }
 
-    // 多变量核函数（RBF核）
     private static T ComputeKernel<T>(CurveFitRow<T> x1, CurveFitRow<T> x2, T lengthScale, T signalVariance)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
@@ -167,20 +152,34 @@ internal static class GaussianProcessRegression
         return signalVariance * T.Exp(exponent);
     }
 
-    // 矩阵求逆（使用高斯-约当法）
-    private static T[][] InvertMatrix<T>(T[][] A) where T : unmanaged, IFloatingPointIeee754<T>
+    /// <summary>
+    /// 高斯-约当求逆。消元行更新经 <see cref="ComputingContextExecution.ForEach"/> 分发
+    ///（与 LinearAlgebra 矩阵乘同一套 ComputingContext 策略）；每主元步可取消。
+    /// </summary>
+    private static T[][] InvertMatrix<T>(
+        T[][] A,
+        ComputingContext? computingContext,
+        CancellationToken cancellationToken)
+        where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = A.Length;
         T[][] augmented = new T[n][];
         for (int i = 0; i < n; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             augmented[i] = new T[2 * n];
             Array.Copy(A[i], 0, augmented[i], 0, n);
             augmented[i][i + n] = T.One;
         }
 
+        // 每主元：对 n 行各做约 2n 次更新 → workPerItem=2n，总工作量 2n²
+        // 是否并行完全由 ComputingContextExecution（与 Matrix / 核装配同一套策略）
+        long eliminateWorkPerRow = 2L * n;
+
         for (int i = 0; i < n; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             T pivot = augmented[i][i];
             if (pivot == T.Zero)
                 throw new InvalidOperationException("矩阵奇异，无法求逆");
@@ -188,27 +187,31 @@ internal static class GaussianProcessRegression
             for (int j = 0; j < 2 * n; j++)
                 augmented[i][j] /= pivot;
 
-            for (int k = 0; k < n; k++)
+            int pivotIndex = i;
+            T[] pivotRow = augmented[i];
+            ComputingContextExecution.ForEach(computingContext, 0, n, k =>
             {
-                if (k != i)
-                {
-                    T factor = augmented[k][i];
-                    for (int j = 0; j < 2 * n; j++)
-                        augmented[k][j] -= factor * augmented[i][j];
-                }
-            }
+                if (k == pivotIndex)
+                    return;
+                T factor = augmented[k][pivotIndex];
+                if (factor == T.Zero)
+                    return;
+                T[] row = augmented[k];
+                for (int j = 0; j < 2 * n; j++)
+                    row[j] -= factor * pivotRow[j];
+            }, workPerItem: eliminateWorkPerRow, cancellationToken: cancellationToken);
         }
 
         T[][] inverse = new T[n][];
         for (int i = 0; i < n; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             inverse[i] = new T[n];
             Array.Copy(augmented[i], n, inverse[i], 0, n);
         }
         return inverse;
     }
 
-    // 测试方法
     public static void RunTests()
     {
         Console.WriteLine("Running Gaussian Process Regression Tests...");
@@ -272,7 +275,6 @@ internal static class GaussianProcessRegression
     {
         Console.WriteLine("\nTest 3: Invalid Input");
 
-        // 单列输入测试
         double[] emptyXSingle = Array.Empty<double>();
         double[] emptyYSingle = Array.Empty<double>();
         bool threwEmptySingle = false;
@@ -297,7 +299,6 @@ internal static class GaussianProcessRegression
             threwMismatchSingle = true;
         }
 
-        // 多列输入测试
         CurveFitRow<double>[] emptyXMulti = Array.Empty<CurveFitRow<double>>();
         double[] emptyYMulti = Array.Empty<double>();
         bool threwEmptyMulti = false;

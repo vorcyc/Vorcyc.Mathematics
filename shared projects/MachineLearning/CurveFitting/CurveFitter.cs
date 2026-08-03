@@ -232,15 +232,17 @@ public static class CurveFitter<T>
     /// <param name="lengthScale">核函数长度尺度，默认1.0</param>
     /// <param name="signalVariance">信号方差，默认1.0</param>
     /// <param name="noiseVariance">噪声方差，默认0.01</param>
-    /// <param name="computingContext">可选的计算执行策略。核矩阵装配等可按策略并行。</param>
+    /// <param name="computingContext">可选的计算执行策略。核矩阵装配与求逆消元可按策略并行。</param>
+    /// <param name="cancellationToken">协作式取消（核装配 / 求逆主元步 / 预测）。</param>
     /// <returns>拟合结果</returns>
     public static FitResult<T> GaussianProcess(Span<T> xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return GaussianProcessRegression.Fit(
-            xData, yData, lengthScale, signalVariance, noiseVariance, computingContext);
+            xData, yData, lengthScale, signalVariance, noiseVariance, computingContext, cancellationToken);
     }
     /// <summary>
     /// 高斯过程回归 (GPR)：多列输入，平滑预测带置信区间。
@@ -251,15 +253,17 @@ public static class CurveFitter<T>
     /// <param name="lengthScale">核函数长度尺度，默认1.0</param>
     /// <param name="signalVariance">信号方差，默认1.0</param>
     /// <param name="noiseVariance">噪声方差，默认0.01</param>
-    /// <param name="computingContext">可选的计算执行策略。核矩阵装配等可按策略并行。</param>
+    /// <param name="computingContext">可选的计算执行策略。核矩阵装配与求逆消元可按策略并行。</param>
+    /// <param name="cancellationToken">协作式取消（核装配 / 求逆主元步 / 预测）。</param>
     /// <returns>拟合结果</returns>
     public static MultiColumnFitResult<T> GaussianProcess(CurveFitRow<T>[] xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return GaussianProcessRegression.Fit(
-            xData, yData, lengthScale, signalVariance, noiseVariance, computingContext);
+            xData, yData, lengthScale, signalVariance, noiseVariance, computingContext, cancellationToken);
     }
     /// <summary>
     /// 贝叶斯回归：带参数不确定性估计。

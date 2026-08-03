@@ -34,7 +34,12 @@ public static class ComputingContextExecution
     /// <summary>
     /// Returns true when parallel execution should be used over indexed work items.
     /// </summary>
-    public static bool UseParallelIndexed(ComputingContext? context, int count, long workPerItem, int minCount = 2)
+    public static bool UseParallelIndexed(
+        ComputingContext? context,
+        int count,
+        long workPerItem,
+        int minCount = 2,
+        int threshold = ParallelReductionThreshold)
     {
         if (count < minCount)
         {
@@ -43,7 +48,7 @@ public static class ComputingContextExecution
 
         long totalWork = workPerItem * count;
         int problemSize = totalWork > int.MaxValue ? int.MaxValue : (int)totalWork;
-        return UseParallel(context, problemSize);
+        return UseParallel(context, problemSize, threshold);
     }
 
     /// <summary>
@@ -56,7 +61,9 @@ public static class ComputingContextExecution
         int toExclusive,
         Action<int> body,
         long workPerItem = 1,
-        int minParallelCount = 2)
+        int minParallelCount = 2,
+        int parallelThreshold = ParallelReductionThreshold,
+        CancellationToken cancellationToken = default)
     {
         int count = toExclusive - fromInclusive;
         if (count <= 0)
@@ -64,10 +71,13 @@ public static class ComputingContextExecution
             return;
         }
 
-        if (!UseParallelIndexed(context, count, workPerItem, minParallelCount))
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (!UseParallelIndexed(context, count, workPerItem, minParallelCount, parallelThreshold))
         {
             for (int i = fromInclusive; i < toExclusive; i++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 body(i);
             }
 
@@ -76,7 +86,8 @@ public static class ComputingContextExecution
 
         var options = new ParallelOptions
         {
-            MaxDegreeOfParallelism = ParallelWorkerCount(context)
+            MaxDegreeOfParallelism = ParallelWorkerCount(context),
+            CancellationToken = cancellationToken
         };
         Parallel.For(fromInclusive, toExclusive, options, body);
     }
