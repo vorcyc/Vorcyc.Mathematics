@@ -1,4 +1,4 @@
-﻿namespace Vorcyc.Mathematics.MachineLearning.CurveFitting;
+namespace Vorcyc.Mathematics.MachineLearning.CurveFitting;
 using System;
 using System.Numerics;
 /// <summary>
@@ -234,8 +234,8 @@ public static class CurveFitter<T>
     /// <param name="noiseVariance">噪声方差，默认0.01</param>
     /// <param name="computingContext">可选的计算执行策略。核矩阵装配与求逆消元可按策略并行。</param>
     /// <param name="cancellationToken">协作式取消（核装配 / 求逆主元步 / 预测）。</param>
-    /// <returns>拟合结果</returns>
-    public static FitResult<T> GaussianProcess(Span<T> xData, Span<T> yData,
+    /// <returns>拟合结果（含 <see cref="GaussianProcessFitResult{T}.PredictStd"/> / <see cref="GaussianProcessFitResult{T}.PredictVariance"/>）</returns>
+    public static GaussianProcessFitResult<T> GaussianProcess(Span<T> xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
         ComputingContext? computingContext = null,
         CancellationToken cancellationToken = default)
@@ -255,8 +255,8 @@ public static class CurveFitter<T>
     /// <param name="noiseVariance">噪声方差，默认0.01</param>
     /// <param name="computingContext">可选的计算执行策略。核矩阵装配与求逆消元可按策略并行。</param>
     /// <param name="cancellationToken">协作式取消（核装配 / 求逆主元步 / 预测）。</param>
-    /// <returns>拟合结果</returns>
-    public static MultiColumnFitResult<T> GaussianProcess(CurveFitRow<T>[] xData, Span<T> yData,
+    /// <returns>拟合结果（含 <see cref="MultiColumnGaussianProcessFitResult{T}.PredictStd"/>）</returns>
+    public static MultiColumnGaussianProcessFitResult<T> GaussianProcess(CurveFitRow<T>[] xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
         ComputingContext? computingContext = null,
         CancellationToken cancellationToken = default)

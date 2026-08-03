@@ -225,4 +225,68 @@ public class NumericDecisionTree<T> : IBatchClassifier<T>
         public static TreeNode Leaf(int predictedClass) =>
             new() { IsLeaf = true, PredictedClass = predictedClass };
     }
+
+    /// <summary>
+    /// Exports a tree structure snapshot (double precision thresholds).
+    /// </summary>
+    public Serialization.NumericDecisionTreeSnapshot CaptureSnapshot()
+    {
+        if (_root == null)
+            throw new InvalidOperationException("The model has not been fitted yet.");
+
+        return new Serialization.NumericDecisionTreeSnapshot
+        {
+            MaxDepth = MaxDepth,
+            MinSamplesSplit = MinSamplesSplit,
+            Root = CaptureNode(_root)
+        };
+    }
+
+    /// <summary>
+    /// Restores the tree from a snapshot (for inference).
+    /// </summary>
+    public void RestoreFromSnapshot(Serialization.NumericDecisionTreeSnapshot snapshot)
+    {
+        if (snapshot == null)
+            throw new ArgumentNullException(nameof(snapshot));
+        if (snapshot.Root == null)
+            throw new ArgumentException("Snapshot root cannot be null.");
+        _root = RestoreNode(snapshot.Root);
+    }
+
+    private static Serialization.DecisionTreeNodeSnapshot CaptureNode(TreeNode node)
+    {
+        if (node.IsLeaf)
+        {
+            return new Serialization.DecisionTreeNodeSnapshot
+            {
+                IsLeaf = true,
+                PredictedClass = node.PredictedClass
+            };
+        }
+
+        return new Serialization.DecisionTreeNodeSnapshot
+        {
+            IsLeaf = false,
+            FeatureIndex = node.FeatureIndex,
+            Threshold = double.CreateChecked(node.Threshold),
+            Left = CaptureNode(node.Left!),
+            Right = CaptureNode(node.Right!)
+        };
+    }
+
+    private static TreeNode RestoreNode(Serialization.DecisionTreeNodeSnapshot snapshot)
+    {
+        if (snapshot.IsLeaf)
+            return TreeNode.Leaf(snapshot.PredictedClass);
+
+        return new TreeNode
+        {
+            IsLeaf = false,
+            FeatureIndex = snapshot.FeatureIndex,
+            Threshold = T.CreateChecked(snapshot.Threshold),
+            Left = RestoreNode(snapshot.Left ?? throw new InvalidOperationException("Internal node missing Left.")),
+            Right = RestoreNode(snapshot.Right ?? throw new InvalidOperationException("Internal node missing Right."))
+        };
+    }
 }

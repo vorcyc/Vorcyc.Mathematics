@@ -187,4 +187,59 @@ public class SupportVectorMachine<TSelf> : IMachineLearning
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private TSelf SigmoidKernel(TSelf[] x, TSelf[] y) =>
         TSelf.Tanh(_sigmoidAlpha * DotProduct(x, y) + _sigmoidConstant);
+
+    /// <summary>
+    /// Exports trained parameters and support vectors (double precision).
+    /// </summary>
+    public Serialization.SupportVectorMachineSnapshot CaptureSnapshot()
+    {
+        var trainingInputs = new double[_trainingInputs.Length][];
+        for (int i = 0; i < _trainingInputs.Length; i++)
+            trainingInputs[i] = _trainingInputs[i].Select(v => double.CreateChecked(v)).ToArray();
+
+        return new Serialization.SupportVectorMachineSnapshot
+        {
+            FeatureCount = _weights.Length,
+            LearningRate = double.CreateChecked(_learningRate),
+            Epochs = _epochs,
+            KernelType = _kernelType,
+            Gamma = double.CreateChecked(_gamma),
+            PolynomialDegree = _polynomialDegree,
+            SigmoidAlpha = double.CreateChecked(_sigmoidAlpha),
+            SigmoidConstant = double.CreateChecked(_sigmoidConstant),
+            Weights = _weights.Select(v => double.CreateChecked(v)).ToArray(),
+            Bias = double.CreateChecked(_bias),
+            TrainingInputs = trainingInputs,
+            TrainingLabels = _trainingLabels.Length == 0 ? [] : (int[])_trainingLabels.Clone(),
+            Alphas = _alphas.Length == 0
+                ? []
+                : _alphas.Select(v => double.CreateChecked(v)).ToArray()
+        };
+    }
+
+    /// <summary>
+    /// Restores trained parameters from a snapshot (for inference).
+    /// </summary>
+    public void RestoreFromSnapshot(Serialization.SupportVectorMachineSnapshot snapshot)
+    {
+        if (snapshot == null)
+            throw new ArgumentNullException(nameof(snapshot));
+        if (snapshot.FeatureCount != _weights.Length)
+            throw new ArgumentException(
+                $"Snapshot feature count ({snapshot.FeatureCount}) does not match this model ({_weights.Length}).");
+        if (snapshot.KernelType != _kernelType)
+            throw new ArgumentException("Snapshot kernel type does not match this model.");
+
+        _weights = snapshot.Weights.Select(TSelf.CreateChecked).ToArray();
+        _bias = TSelf.CreateChecked(snapshot.Bias);
+        _trainingInputs = new TSelf[snapshot.TrainingInputs.Length][];
+        for (int i = 0; i < snapshot.TrainingInputs.Length; i++)
+            _trainingInputs[i] = snapshot.TrainingInputs[i].Select(TSelf.CreateChecked).ToArray();
+        _trainingLabels = snapshot.TrainingLabels.Length == 0
+            ? []
+            : (int[])snapshot.TrainingLabels.Clone();
+        _alphas = snapshot.Alphas.Length == 0
+            ? []
+            : snapshot.Alphas.Select(TSelf.CreateChecked).ToArray();
+    }
 }

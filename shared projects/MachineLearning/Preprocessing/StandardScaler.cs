@@ -141,4 +141,31 @@ public class StandardScaler<T> : IMatrixTransformInto<T>
         }
         _isFitted = true;
     }
+
+    /// <summary>
+    /// Exports a scaler snapshot (double precision).
+    /// </summary>
+    public Serialization.StandardScalerSnapshot CaptureSnapshot()
+    {
+        if (!_isFitted)
+            throw new InvalidOperationException("The scaler has not been fitted yet.");
+
+        return new Serialization.StandardScalerSnapshot
+        {
+            Mean = _mean.Select(v => double.CreateChecked(v)).ToArray(),
+            Std = _std.Select(v => double.CreateChecked(v)).ToArray()
+        };
+    }
+
+    /// <summary>
+    /// Restores scaler parameters from a snapshot.
+    /// </summary>
+    public void RestoreFromSnapshot(Serialization.StandardScalerSnapshot snapshot)
+    {
+        if (snapshot == null)
+            throw new ArgumentNullException(nameof(snapshot));
+        LoadState(
+            snapshot.Mean.Select(T.CreateChecked).ToArray(),
+            snapshot.Std.Select(T.CreateChecked).ToArray());
+    }
 }

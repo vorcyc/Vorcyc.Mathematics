@@ -107,4 +107,58 @@ public sealed class KnnClassifier<T> : IBatchClassifier<T>
         if (_labels.Length < _k)
             throw new InvalidOperationException($"The number of training samples ({_labels.Length}) is less than k ({_k}).");
     }
+
+    /// <summary>
+    /// Exports a prototype-set snapshot (double precision).
+    /// </summary>
+    public Serialization.KnnClassifierSnapshot CaptureSnapshot()
+    {
+        if (_features == null || _labels == null)
+            throw new InvalidOperationException("The model has not been fitted yet.");
+
+        int rows = _features.GetLength(0);
+        int cols = _features.GetLength(1);
+        var features = new double[rows][];
+        for (int i = 0; i < rows; i++)
+        {
+            features[i] = new double[cols];
+            for (int j = 0; j < cols; j++)
+                features[i][j] = double.CreateChecked(_features[i, j]);
+        }
+
+        return new Serialization.KnnClassifierSnapshot
+        {
+            K = _k,
+            Features = features,
+            Labels = (int[])_labels.Clone()
+        };
+    }
+
+    /// <summary>
+    /// Restores the prototype set from a snapshot (for inference).
+    /// </summary>
+    public void RestoreFromSnapshot(Serialization.KnnClassifierSnapshot snapshot)
+    {
+        if (snapshot == null)
+            throw new ArgumentNullException(nameof(snapshot));
+        if (snapshot.Features == null || snapshot.Features.Length == 0)
+            throw new ArgumentException("Snapshot features cannot be empty.");
+        if (snapshot.Labels == null || snapshot.Labels.Length != snapshot.Features.Length)
+            throw new ArgumentException("Snapshot labels must align with features.");
+        if (snapshot.K != _k)
+            throw new ArgumentException($"Snapshot k ({snapshot.K}) does not match this classifier's k ({_k}).");
+
+        int rows = snapshot.Features.Length;
+        int cols = snapshot.Features[0].Length;
+        var features = new T[rows, cols];
+        for (int i = 0; i < rows; i++)
+        {
+            if (snapshot.Features[i].Length != cols)
+                throw new ArgumentException("All feature rows must share the same dimension.");
+            for (int j = 0; j < cols; j++)
+                features[i, j] = T.CreateChecked(snapshot.Features[i][j]);
+        }
+        _features = features;
+        _labels = (int[])snapshot.Labels.Clone();
+    }
 }

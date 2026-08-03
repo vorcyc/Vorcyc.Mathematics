@@ -229,7 +229,9 @@ public class SoftmaxRegression<T> : IBatchClassifier<T>
             Biases = _biases!.Select(double.CreateChecked).ToArray(),
             LearningRate = double.CreateChecked(LearningRate),
             Epochs = Epochs,
-            Lambda = double.CreateChecked(Lambda)
+            Lambda = double.CreateChecked(Lambda),
+            BatchSize = BatchSize,
+            Seed = Seed
         };
     }
 

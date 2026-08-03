@@ -182,6 +182,10 @@ public class NumericRandomForest<T> : IBatchClassifier<T>
             _projected = new T[featureIndices.Length];
         }
 
+        public int[] FeatureIndices => _featureIndices;
+
+        public NumericDecisionTree<T> Tree => _tree;
+
         public int Predict(T[] sample)
         {
             for (int j = 0; j < _featureIndices.Length; j++)
@@ -196,6 +200,56 @@ public class NumericRandomForest<T> : IBatchClassifier<T>
             for (int j = 0; j < _featureIndices.Length; j++)
                 projected[j] = x[row, _featureIndices[j]];
             return _tree.Predict(projected);
+        }
+    }
+
+    /// <summary>
+    /// Exports a forest snapshot (trees + feature projections).
+    /// </summary>
+    public Serialization.NumericRandomForestSnapshot CaptureSnapshot()
+    {
+        if (_trees.Count == 0)
+            throw new InvalidOperationException("The model has not been fitted yet.");
+
+        var trees = new Serialization.ForestTreeSnapshot[_trees.Count];
+        for (int t = 0; t < _trees.Count; t++)
+        {
+            trees[t] = new Serialization.ForestTreeSnapshot
+            {
+                FeatureIndices = (int[])_trees[t].FeatureIndices.Clone(),
+                Tree = _trees[t].Tree.CaptureSnapshot()
+            };
+        }
+
+        return new Serialization.NumericRandomForestSnapshot
+        {
+            NumTrees = _numTrees,
+            MaxFeatures = _maxFeatures,
+            MaxDepth = _maxDepth,
+            MinSamplesSplit = _minSamplesSplit,
+            Seed = _seed,
+            Trees = trees
+        };
+    }
+
+    /// <summary>
+    /// Restores forest trees from a snapshot (for inference).
+    /// </summary>
+    public void RestoreFromSnapshot(Serialization.NumericRandomForestSnapshot snapshot)
+    {
+        if (snapshot == null)
+            throw new ArgumentNullException(nameof(snapshot));
+        if (snapshot.Trees == null || snapshot.Trees.Length == 0)
+            throw new ArgumentException("Snapshot must contain at least one tree.");
+
+        _trees.Clear();
+        foreach (var treeSnap in snapshot.Trees)
+        {
+            var tree = new NumericDecisionTree<T>(
+                snapshot.MaxDepth > 0 ? snapshot.MaxDepth : _maxDepth,
+                snapshot.MinSamplesSplit >= 2 ? snapshot.MinSamplesSplit : _minSamplesSplit);
+            tree.RestoreFromSnapshot(treeSnap.Tree);
+            _trees.Add(new ForestTree(tree, (int[])treeSnap.FeatureIndices.Clone()));
         }
     }
 }

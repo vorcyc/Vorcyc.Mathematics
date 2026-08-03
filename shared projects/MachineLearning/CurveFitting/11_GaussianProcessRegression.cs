@@ -1,13 +1,13 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 namespace Vorcyc.Mathematics.MachineLearning.CurveFitting;
 
 internal static class GaussianProcessRegression
 {
     /// <summary>
-    /// 高斯过程回归 (GPR)：单列输入，平滑预测。
+    /// 高斯过程回归 (GPR)：单列输入，平滑预测（含预测标准差 / 方差）。
     /// </summary>
-    public static FitResult<T> Fit<T>(Span<T> xData, Span<T> yData,
+    public static GaussianProcessFitResult<T> Fit<T>(Span<T> xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
         ComputingContext? computingContext = null,
         CancellationToken cancellationToken = default)
@@ -53,6 +53,18 @@ internal static class GaussianProcessRegression
             return CurveFittingExecution.Dot<T>(k, alpha, useSimd);
         };
 
+        // Var(f*) = k(x*,x*) − k*^T K⁻¹ k*；RBF 自核 k(x*,x*) = σ_f²
+        Func<T, T> predictVariance = x =>
+        {
+            T[] k = new T[n];
+            CurveFittingExecution.FillRbfKernelRow(xDataArray, x, l, sigmaF, k, useSimd);
+            T[] v = new T[n];
+            for (int i = 0; i < n; i++)
+                v[i] = CurveFittingExecution.Dot<T>(KInv[i], k, useSimd);
+            T variance = sigmaF - CurveFittingExecution.Dot<T>(k, v, useSimd);
+            return variance < T.Zero ? T.Zero : variance;
+        };
+
         T[] fitted = new T[n];
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
@@ -60,13 +72,13 @@ internal static class GaussianProcessRegression
         }, workPerItem: n, cancellationToken: cancellationToken);
 
         T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yDataArray, useSimd);
-        return new FitResult<T>(predict, [l, sigmaF, sigmaN], mse);
+        return new GaussianProcessFitResult<T>(predict, predictVariance, [l, sigmaF, sigmaN], mse);
     }
 
     /// <summary>
     /// 高斯过程回归 (GPR)：多列输入，平滑预测带置信区间。
     /// </summary>
-    public static MultiColumnFitResult<T> Fit<T>(CurveFitRow<T>[] xData, Span<T> yData,
+    public static MultiColumnGaussianProcessFitResult<T> Fit<T>(CurveFitRow<T>[] xData, Span<T> yData,
         T lengthScale = default, T signalVariance = default, T noiseVariance = default,
         ComputingContext? computingContext = null,
         CancellationToken cancellationToken = default)
@@ -121,6 +133,18 @@ internal static class GaussianProcessRegression
             return CurveFittingExecution.Dot<T>(k, alpha, useSimd);
         };
 
+        Func<CurveFitRow<T>, T> predictVariance = x =>
+        {
+            T[] k = new T[n];
+            for (int i = 0; i < n; i++)
+                k[i] = ComputeKernel(x, xData[i], l, sigmaF);
+            T[] v = new T[n];
+            for (int i = 0; i < n; i++)
+                v[i] = CurveFittingExecution.Dot<T>(KInv[i], k, useSimd);
+            T variance = sigmaF - CurveFittingExecution.Dot<T>(k, v, useSimd);
+            return variance < T.Zero ? T.Zero : variance;
+        };
+
         T[] fitted = new T[n];
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
@@ -128,7 +152,7 @@ internal static class GaussianProcessRegression
         }, workPerItem: n, cancellationToken: cancellationToken);
 
         T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yDataArray, useSimd);
-        return new MultiColumnFitResult<T>(predict, [l, sigmaF, sigmaN], mse);
+        return new MultiColumnGaussianProcessFitResult<T>(predict, predictVariance, [l, sigmaF, sigmaN], mse);
     }
 
     private static T ComputeKernel<T>(T x1, T x2, T lengthScale, T signalVariance)
@@ -241,6 +265,11 @@ internal static class GaussianProcessRegression
         double predicted = result.Predict(testInput);
         bool predictOk = Math.Abs(predicted - expected) < tolerance;
         Console.WriteLine($"Prediction at 1.5 = {predicted:F3} (Expected ~{expected:F3}): {(predictOk ? "PASS" : "FAIL")}");
+
+        double stdAtTrain = result.PredictStd(1.0);
+        double stdFar = result.PredictStd(10.0);
+        bool stdOk = stdAtTrain >= 0 && stdFar >= stdAtTrain;
+        Console.WriteLine($"PredictStd(1.0)={stdAtTrain:F4}, PredictStd(10.0)={stdFar:F4} (far ≥ near): {(stdOk ? "PASS" : "FAIL")}");
     }
 
     private static void TestMultiVariableModel()

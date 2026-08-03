@@ -99,6 +99,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\FactorAnalysis.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\HierarchicalClustering.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMachineLearning.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IsolationForest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KNN.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KnnClassifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KnnRegressor.cs" />

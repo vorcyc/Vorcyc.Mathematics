@@ -110,23 +110,69 @@ public static class InfrastructureSuite_test
         try
         {
             var scalerPath = Path.Combine(dir, "scaler.json");
+            var chainPath = Path.Combine(dir, "scaler_chain.json");
             var modelPath = Path.Combine(dir, "softmax.json");
+            var knnPath = Path.Combine(dir, "knn.json");
+            var rfPath = Path.Combine(dir, "rf.json");
+            var svmPath = Path.Combine(dir, "svm.json");
 
             var scaler = new StandardScaler<double>();
             scaler.Fit(x);
             ModelJsonPersistence.SaveStandardScaler(scaler, scalerPath);
             var loadedScaler = ModelJsonPersistence.LoadStandardScaler(scalerPath);
 
-            var xScaled = loadedScaler.Transform(x);
-            var model = new SoftmaxRegression<double>(learningRate: 0.1, epochs: 1500);
+            // Second scaler on already-scaled data forms a chain (identity-ish but validates pipeline).
+            var xScaledOnce = loadedScaler.Transform(x);
+            var scaler2 = new StandardScaler<double>();
+            scaler2.Fit(xScaledOnce);
+            ModelJsonPersistence.SaveStandardScalerChain([loadedScaler, scaler2], chainPath);
+            var loadedChain = ModelJsonPersistence.LoadStandardScalerChain(chainPath);
+            TestAssert.Equal(2, loadedChain.Length);
+
+            var xScaled = ModelJsonPersistence.TransformStandardScalerChain(loadedChain, x);
+            var model = new SoftmaxRegression<double>(learningRate: 0.1, epochs: 1500, batchSize: 8, seed: 3);
             model.Fit(xScaled, y);
             ModelJsonPersistence.SaveSoftmaxRegression(model, modelPath);
             var loadedModel = ModelJsonPersistence.LoadSoftmaxRegression(modelPath);
 
             int original = model.Predict(MLTestData.GetRow(xScaled, 0));
-            int restored = loadedModel.Predict(loadedScaler.Transform(MLTestData.GetRow(x, 0)));
+            int restored = loadedModel.Predict(
+                ModelJsonPersistence.TransformStandardScalerChain(loadedChain, MLTestData.GetRow(x, 0)));
             TestAssert.Equal(original, restored);
-            Console.WriteLine("JSON save/load roundtrip OK");
+
+            var knn = new KnnClassifier<double>(k: 3);
+            knn.Fit(xScaled, y);
+            ModelJsonPersistence.SaveKnnClassifier(knn, knnPath);
+            var loadedKnn = ModelJsonPersistence.LoadKnnClassifier(knnPath);
+            TestAssert.Equal(
+                knn.Predict(MLTestData.GetRow(xScaled, 0)),
+                loadedKnn.Predict(MLTestData.GetRow(xScaled, 0)));
+
+            var rf = new NumericRandomForest<double>(numTrees: 20, maxFeatures: 2, maxDepth: 8, seed: 9);
+            rf.Fit(xScaled, y);
+            ModelJsonPersistence.SaveNumericRandomForest(rf, rfPath);
+            var loadedRf = ModelJsonPersistence.LoadNumericRandomForest(rfPath);
+            TestAssert.Equal(
+                rf.Predict(MLTestData.GetRow(xScaled, 0)),
+                loadedRf.Predict(MLTestData.GetRow(xScaled, 0)));
+
+            // Linear SVM expects labels ±1
+            int rows = xScaled.GetLength(0);
+            int cols = xScaled.GetLength(1);
+            var svmInputs = new double[rows][];
+            var svmLabels = new int[rows];
+            for (int i = 0; i < rows; i++)
+            {
+                svmInputs[i] = MLTestData.GetRow(xScaled, i);
+                svmLabels[i] = y[i] == 0 ? -1 : 1;
+            }
+            var svm = new SupportVectorMachine<double>(cols, learningRate: 0.05, epochs: 400);
+            svm.Train(svmInputs, svmLabels);
+            ModelJsonPersistence.SaveSupportVectorMachine(svm, svmPath);
+            var loadedSvm = ModelJsonPersistence.LoadSupportVectorMachine(svmPath);
+            TestAssert.Equal(svm.Predict(svmInputs[0]), loadedSvm.Predict(svmInputs[0]));
+
+            Console.WriteLine("JSON save/load roundtrip OK (scaler/chain/softmax/knn/rf/svm)");
         }
         finally
         {

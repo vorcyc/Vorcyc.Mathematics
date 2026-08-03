@@ -89,6 +89,46 @@ public class FitResult<T>(Func<T, T> predict, T[] parameters, T mse) where T : s
 }
 
 /// <summary>
+/// 高斯过程回归拟合结果：均值预测 + 预测标准差 / 方差（复用训练核逆矩阵）。
+/// </summary>
+public class GaussianProcessFitResult<T> : FitResult<T>
+    where T : struct, IFloatingPointIeee754<T>
+{
+    /// <summary>
+    /// 预测均值（与 <see cref="FitResult{T}.Predict"/> 相同）。
+    /// </summary>
+    public Func<T, T> PredictMean => Predict;
+
+    /// <summary>
+    /// 预测标准差 σ(x*) = √max(0, Var(f*))。
+    /// </summary>
+    public Func<T, T> PredictStd { get; }
+
+    /// <summary>
+    /// 预测方差 Var(f*) = k(x*,x*) − k*^T K⁻¹ k*。
+    /// </summary>
+    public Func<T, T> PredictVariance { get; }
+
+    /// <summary>
+    /// 创建 GPR 拟合结果。
+    /// </summary>
+    public GaussianProcessFitResult(
+        Func<T, T> predictMean,
+        Func<T, T> predictVariance,
+        T[] parameters,
+        T mse)
+        : base(predictMean, parameters, mse)
+    {
+        PredictVariance = predictVariance ?? throw new ArgumentNullException(nameof(predictVariance));
+        PredictStd = x =>
+        {
+            T variance = PredictVariance(x);
+            return variance <= T.Zero ? T.Zero : T.Sqrt(variance);
+        };
+    }
+}
+
+/// <summary>
 /// 表示曲线拟合的结果，支持多列输入。
 /// </summary>
 public class MultiColumnFitResult<T>(Func<CurveFitRow<T>, T>? predict, T[] parameters, T mse)
@@ -108,6 +148,46 @@ public class MultiColumnFitResult<T>(Func<CurveFitRow<T>, T>? predict, T[] param
     /// 可选的多列输入预测函数。
     /// </summary>
     public Func<CurveFitRow<T>, T>? Predict { get; } = predict;
+}
+
+/// <summary>
+/// 多列输入高斯过程回归拟合结果：均值 + 预测标准差 / 方差。
+/// </summary>
+public class MultiColumnGaussianProcessFitResult<T> : MultiColumnFitResult<T>
+    where T : struct, IFloatingPointIeee754<T>
+{
+    /// <summary>
+    /// 预测均值（与 <see cref="MultiColumnFitResult{T}.Predict"/> 相同）。
+    /// </summary>
+    public Func<CurveFitRow<T>, T>? PredictMean => Predict;
+
+    /// <summary>
+    /// 预测标准差。
+    /// </summary>
+    public Func<CurveFitRow<T>, T> PredictStd { get; }
+
+    /// <summary>
+    /// 预测方差。
+    /// </summary>
+    public Func<CurveFitRow<T>, T> PredictVariance { get; }
+
+    /// <summary>
+    /// 创建多列 GPR 拟合结果。
+    /// </summary>
+    public MultiColumnGaussianProcessFitResult(
+        Func<CurveFitRow<T>, T> predictMean,
+        Func<CurveFitRow<T>, T> predictVariance,
+        T[] parameters,
+        T mse)
+        : base(predictMean, parameters, mse)
+    {
+        PredictVariance = predictVariance ?? throw new ArgumentNullException(nameof(predictVariance));
+        PredictStd = x =>
+        {
+            T variance = PredictVariance(x);
+            return variance <= T.Zero ? T.Zero : T.Sqrt(variance);
+        };
+    }
 }
 
 
