@@ -13,7 +13,7 @@
   * :bookmark: [ComputingContext / ComputingScope](Module_ComputingContext#core-types)
   * :bookmark: [Integrated APIs](Module_ComputingContext#integrated-apis)
   * :bookmark: [Verification and tests](Module_ComputingContext#verification-and-tests)
-  * :bookmark: [FftVersion migration](Module_ComputingContext#migration-fftversion-obsolete)
+  * :bookmark: [FftVersion (removed)](Module_ComputingContext#migration-fftversion)
   * :bookmark: [ComputingBackend / priority](Module_ComputingContext#future-hardware-taxonomy-reserved)
 
 * :ledger: [Core module](Module_Core)

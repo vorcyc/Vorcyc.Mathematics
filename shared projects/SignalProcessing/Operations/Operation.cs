@@ -447,8 +447,9 @@ public static class Operation
     }
 
     /// <summary>
-    /// Computes periodogram using Welch's method. 
-    /// If <paramref name="samplingRate"/>=0 then power spectrum is evaluated, otherwise power spectral density is evaluated. 
+    /// Computes periodogram using Welch's method.
+    /// If <paramref name="samplingRate"/>=0 then power spectrum is evaluated, otherwise power spectral density is evaluated.
+    /// Averages <b>complete</b> STFT windows only (trailing incomplete samples are discarded), matching SciPy / MATLAB <c>welch</c>.
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="windowSize">Window size (number of samples)</param>
@@ -456,21 +457,21 @@ public static class Operation
     /// <param name="window">Windowing function</param>
     /// <param name="fftSize">FFT size</param>
     /// <param name="samplingRate">If sampling rate=0 then power spectrum is evaluated, otherwise power spectral density is evaluated</param>
+    /// <param name="context">Optional execution policy (frame-level parallel when beneficial)</param>
     public static float[] Welch(Signal signal,
                                 int windowSize = 1024,
                                 int hopSize = 256,
                                 WindowType window = WindowType.Hann,
                                 int fftSize = 0,
-                                int samplingRate = 0)
+                                int samplingRate = 0,
+                                ComputingContext? context = null)
     {
         var stft = new Stft(windowSize, hopSize, window, fftSize);
 
-        var periodogram = stft.AveragePeriodogram(signal);
+        var periodogram = stft.AveragePeriodogram(signal, context);
 
-        // scaling is compliant with sciPy function welch():
-
+        // scaling aligned with SciPy signal.welch (onesided): ×2 on interior bins only
         float scale;
-
         if (samplingRate > 0)       // a.k.a. 'density'
         {
             var ws = WindowBuilder.OfType(window, windowSize).Select(w => w * w).Sum();
@@ -482,10 +483,15 @@ public static class Operation
             scale = 2 / (ws * ws);
         }
 
-        for (var j = 0; j < periodogram.Length; j++)
-        {
+        // DC and Nyquist (last bin when length == nfft/2+1) stay at scale/2 relative to onesided middle bins
+        float half = scale * 0.5f;
+        int last = periodogram.Length - 1;
+        if (periodogram.Length > 0)
+            periodogram[0] *= half;
+        for (var j = 1; j < last; j++)
             periodogram[j] *= scale;
-        }
+        if (last > 0)
+            periodogram[last] *= half;
 
         return periodogram;
     }

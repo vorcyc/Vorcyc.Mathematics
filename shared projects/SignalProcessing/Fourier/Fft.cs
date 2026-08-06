@@ -430,40 +430,47 @@ public class Fft : IComplexTransform
     /// Computes magnitude spectrum from a sample span.
     /// </summary>
     public void MagnitudeSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = false)
-        => MagnitudeSpectrum(samples, spectrum.AsSpan(), normalize);
+        => MagnitudeSpectrum(samples, spectrum.AsSpan(), normalize, context: null);
 
     /// <summary>
     /// Computes magnitude spectrum from a sample span into a destination span.
     /// </summary>
     public void MagnitudeSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = false)
+        => MagnitudeSpectrum(samples, spectrum, normalize, context: null);
+
+    /// <summary>
+    /// Computes magnitude spectrum, selecting a CPU kernel for the inner FFT according to <paramref name="context"/>.
+    /// </summary>
+    public void MagnitudeSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize, ComputingContext? context)
     {
         Array.Clear(_realSpectrum, 0, _fftSize);
         Array.Clear(_imagSpectrum, 0, _fftSize);
 
         samples.Slice(0, Math.Min(samples.Length, _fftSize)).CopyTo(_realSpectrum);
 
-        Direct(_realSpectrum, _imagSpectrum);
+        Direct(_realSpectrum, _imagSpectrum, context);
 
         var n = _fftSize / 2;
+        float inv = normalize ? 1f / _fftSize : 1f;
 
         if (normalize)
         {
-            spectrum[0] = Math.Abs(_realSpectrum[0]) / _fftSize;
-            spectrum[n] = Math.Abs(_realSpectrum[n]) / _fftSize;
+            spectrum[0] = MathF.Abs(_realSpectrum[0]) * inv;
+            spectrum[n] = MathF.Abs(_realSpectrum[n]) * inv;
 
             for (var i = 1; i < n; i++)
             {
-                spectrum[i] = (float)(Math.Sqrt(_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) / _fftSize);
+                spectrum[i] = MathF.Sqrt(_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) * inv;
             }
         }
         else
         {
-            spectrum[0] = Math.Abs(_realSpectrum[0]);
-            spectrum[n] = Math.Abs(_realSpectrum[n]);
+            spectrum[0] = MathF.Abs(_realSpectrum[0]);
+            spectrum[n] = MathF.Abs(_realSpectrum[n]);
 
             for (var i = 1; i < n; i++)
             {
-                spectrum[i] = (float)(Math.Sqrt(_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]));
+                spectrum[i] = MathF.Sqrt(_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]);
             }
         }
     }
@@ -485,30 +492,37 @@ public class Fft : IComplexTransform
     /// Computes power spectrum from a sample span.
     /// </summary>
     public void PowerSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = true)
-        => PowerSpectrum(samples, spectrum.AsSpan(), normalize);
+        => PowerSpectrum(samples, spectrum.AsSpan(), normalize, context: null);
 
     /// <summary>
     /// Computes power spectrum from a sample span into a destination span.
     /// </summary>
     public void PowerSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = true)
+        => PowerSpectrum(samples, spectrum, normalize, context: null);
+
+    /// <summary>
+    /// Computes power spectrum, selecting a CPU kernel for the inner FFT according to <paramref name="context"/>.
+    /// </summary>
+    public void PowerSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize, ComputingContext? context)
     {
         Array.Clear(_realSpectrum, 0, _fftSize);
         Array.Clear(_imagSpectrum, 0, _fftSize);
 
         samples.Slice(0, Math.Min(samples.Length, _fftSize)).CopyTo(_realSpectrum);
 
-        Direct(_realSpectrum, _imagSpectrum);
+        Direct(_realSpectrum, _imagSpectrum, context);
 
         var n = _fftSize / 2;
+        float inv = normalize ? 1f / _fftSize : 1f;
 
         if (normalize)
         {
-            spectrum[0] = _realSpectrum[0] * _realSpectrum[0] / _fftSize;
-            spectrum[n] = _realSpectrum[n] * _realSpectrum[n] / _fftSize;
+            spectrum[0] = _realSpectrum[0] * _realSpectrum[0] * inv;
+            spectrum[n] = _realSpectrum[n] * _realSpectrum[n] * inv;
 
             for (var i = 1; i < n; i++)
             {
-                spectrum[i] = (_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) / _fftSize;
+                spectrum[i] = (_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) * inv;
             }
         }
         else

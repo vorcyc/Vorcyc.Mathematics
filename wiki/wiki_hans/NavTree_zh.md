@@ -13,7 +13,7 @@
   * :bookmark: [ComputingContext / ComputingScope](Module_ComputingContext_zh#核心类型)
   * :bookmark: [已接入 API](Module_ComputingContext_zh#已接入-api)
   * :bookmark: [验证与测试](Module_ComputingContext_zh#验证与测试)
-  * :bookmark: [FftVersion 迁移](Module_ComputingContext_zh#迁移fftversion已过时)
+  * :bookmark: [FftVersion（已删除）](Module_ComputingContext_zh#迁移fftversion)
   * :bookmark: [ComputingBackend / 优先级](Module_ComputingContext_zh#未来硬件分类预留)
 
 * :ledger: [核心模块](Module_Core_zh)

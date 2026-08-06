@@ -86,6 +86,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="normalize">Normalize cepstrum by FFT size</param>
         /// <returns>Circular delay (number of samples) added to <paramref name="input"/></returns>
         public float ComplexCepstrum(float[] input, float[] cepstrum, bool normalize = true)
+            => ComplexCepstrum(input, cepstrum, normalize, context: null);
+
+        /// <summary>
+        /// Evaluates complex cepstrum with optional <paramref name="context"/> for the inner FFT.
+        /// </summary>
+        public float ComplexCepstrum(float[] input, float[] cepstrum, bool normalize, ComputingContext? context)
         {
             Array.Clear(_re, 0, _re.Length);
             Array.Clear(_im, 0, _im.Length);
@@ -94,7 +100,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             // complex fft
 
-            _fft.Direct(_re, _im);
+            _fft.Direct(_re, _im, context);
 
             // complex logarithm of magnitude spectrum
 
@@ -139,7 +145,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             // complex ifft
 
-            _fft.Inverse(_re, _im);
+            _fft.Inverse(_re, _im, context);
 
             // take truncated part
 
@@ -164,6 +170,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="normalize">Normalize result by FFT size</param>
         /// <param name="delay">Delay (usually, returned by function <see cref="ComplexCepstrum(float[], float[], bool)"/>)</param>
         public void InverseComplexCepstrum(float[] input, float[] cepstrum, bool normalize = true, float delay = 0)
+            => InverseComplexCepstrum(input, cepstrum, normalize, delay, context: null);
+
+        /// <summary>
+        /// Evaluates inverse complex cepstrum with optional <paramref name="context"/> for the inner FFT.
+        /// </summary>
+        public void InverseComplexCepstrum(float[] input, float[] cepstrum, bool normalize, float delay, ComputingContext? context)
         {
             Array.Clear(_re, 0, _re.Length);
             Array.Clear(_im, 0, _im.Length);
@@ -172,7 +184,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             // complex fft
 
-            _fft.Direct(_re, _im);
+            _fft.Direct(_re, _im, context);
 
             // complex exp() of spectrum
 
@@ -189,7 +201,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             // complex ifft
 
-            _fft.Inverse(_re, _im);
+            _fft.Inverse(_re, _im, context);
 
             // take truncated part
 
@@ -214,6 +226,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="cepstrum">Real cesptrum</param>
         /// <param name="normalize">Normalize cepstrum by FFT size</param>
         public void RealCepstrum(float[] input, float[] cepstrum, bool normalize = true)
+            => RealCepstrum(input, cepstrum, normalize, context: null);
+
+        /// <summary>
+        /// Evaluates real cepstrum with optional <paramref name="context"/> for the inner FFT.
+        /// </summary>
+        public void RealCepstrum(float[] input, float[] cepstrum, bool normalize, ComputingContext? context)
         {
             Array.Clear(_re, 0, _re.Length);
             Array.Clear(_im, 0, _im.Length);
@@ -222,7 +240,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             // complex fft
 
-            _fft.Direct(_re, _im);
+            _fft.Direct(_re, _im, context);
 
             // logarithm of magnitude spectrum
 
@@ -236,7 +254,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             // complex ifft
 
-            _fft.Inverse(_re, _im);
+            _fft.Inverse(_re, _im, context);
 
             // take truncated part
 
@@ -261,8 +279,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="cepstrum"></param>
         /// <param name="normalize"></param>
         public void PowerCepstrum(float[] input, float[] cepstrum, bool normalize = true)
+            => PowerCepstrum(input, cepstrum, normalize, context: null);
+
+        /// <summary>
+        /// Evaluates power cepstrum with optional <paramref name="context"/>.
+        /// </summary>
+        public void PowerCepstrum(float[] input, float[] cepstrum, bool normalize, ComputingContext? context)
         {
-            RealCepstrum(input, cepstrum, normalize);
+            RealCepstrum(input, cepstrum, normalize, context);
 
             for (var i = 0; i < cepstrum.Length; i++)
             {
@@ -282,8 +306,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="cepstrum">Phase cepstrum</param>
         /// <param name="normalize">Normalize cepstrum by FFT size</param>
         public void PhaseCepstrum(float[] input, float[] cepstrum, bool normalize = true)
+            => PhaseCepstrum(input, cepstrum, normalize, context: null);
+
+        /// <summary>
+        /// Evaluates phase cepstrum with optional <paramref name="context"/>.
+        /// </summary>
+        public void PhaseCepstrum(float[] input, float[] cepstrum, bool normalize, ComputingContext? context)
         {
-            ComplexCepstrum(input, cepstrum, normalize);
+            ComplexCepstrum(input, cepstrum, normalize, context);
 
             // use this free memory block for storing reversed cepstrum
             cepstrum.FastCopyTo(_re, cepstrum.Length);

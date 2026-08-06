@@ -223,24 +223,6 @@ public static class ZTransform
         return max;
     }
 
-    /// <summary>
-    /// Obsolete incorrect helper kept for binary compatibility — do not use.
-    /// Prefer <see cref="Filters.Base.TransferFunction.Poles"/> / <see cref="Filters.Base.TransferFunction.Zeros"/>.
-    /// </summary>
-    [Obsolete("Incorrect pole/zero extraction from DTFT samples. Use TransferFunction.Poles/Zeros.")]
-    public static (ComplexFp32[] poles, ComplexFp32[] zeros) GetPolesAndZeros(ComplexFp32[] zTransform)
-    {
-        int degree = Math.Max(0, zTransform.Length - 1);
-        var poles = new ComplexFp32[degree];
-        var zeros = new ComplexFp32[degree];
-        for (int i = 0; i < degree; i++)
-        {
-            poles[i] = zTransform[i] != ComplexFp32.Zero ? 1 / zTransform[i] : ComplexFp32.Zero;
-            zeros[i] = zTransform[i] == ComplexFp32.Zero ? ComplexFp32.One : ComplexFp32.Zero;
-        }
-        return (poles, zeros);
-    }
-
     // ── dispatch helpers ─────────────────────────────────────────────────────
 
     static int TotalWork(int count, long workPerItem)

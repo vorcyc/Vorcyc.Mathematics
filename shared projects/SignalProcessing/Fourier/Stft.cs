@@ -81,13 +81,16 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                 stft.Add((new float[_fftSize], new float[_fftSize]));
             }
 
+            bool frameParallel = ComputingContextExecution.UseParallelIndexed(context, len, _fftSize);
+            var frameFft = frameParallel ? NestedFrameFftContext(context) : context;
+
             // stft:
 
-            if (ComputingContextExecution.UseParallelIndexed(context, len, _fftSize))
+            if (frameParallel)
             {
                 // Frame-level parallelism: each frame writes its own pre-allocated (re, im)
                 // slot, so writes never overlap. One RealFft + scratch buffer per worker keeps
-                // the internal FFT buffers thread-safe.
+                // the internal FFT buffers thread-safe. Frame FFT uses SIMD when outer is Parallel.
                 var inputArray = input.ToArray();
                 using var fftLocal = new ThreadLocal<RealFft>(() => new RealFft(_fftSize));
                 using var bufLocal = new ThreadLocal<float[]>(() => new float[_fftSize]);
@@ -98,7 +101,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                     CopyFrame(inputArray, i * _hopSize, _windowSize, buf);
                     buf.ApplyWindow(_windowSamples);
                     var (re, im) = stft[i];
-                    fftLocal.Value!.Direct(buf, re, im);
+                    fftLocal.Value!.Direct(buf, re, im, frameFft);
                 }, workPerItem: _fftSize);
             }
             else
@@ -110,7 +113,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                     CopyFrame(input, pos, _windowSize, windowedBuffer);
                     windowedBuffer.ApplyWindow(_windowSamples);
                     var (re, im) = stft[i];
-                    _fft.Direct(windowedBuffer, re, im);
+                    _fft.Direct(windowedBuffer, re, im, frameFft);
                 }
             }
 
@@ -125,7 +128,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
 
             var (lre, lim) = stft.Last();
 
-            _fft.Direct(lastBuffer, lre, lim);
+            _fft.Direct(lastBuffer, lre, lim, context);
 
             return stft;
         }
@@ -169,12 +172,13 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
             {
                 var frameBufs = new float[spectraCount][];
                 using var fftLocal = new ThreadLocal<RealFft>(() => new RealFft(_fftSize));
+                var frameFft = NestedFrameFftContext(context);
 
                 ComputingContextExecution.ForEach(context, 0, spectraCount, i =>
                 {
                     var (re, im) = stft[i];
                     var b = new float[_fftSize];
-                    fftLocal.Value!.Inverse(re, im, b);
+                    fftLocal.Value!.Inverse(re, im, b, frameFft);
                     frameBufs[i] = b;
                 }, workPerItem: _fftSize);
 
@@ -204,7 +208,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
             {
                 var (re, im) = stft[i];
 
-                _fft.Inverse(re, im, buf);
+                _fft.Inverse(re, im, buf, context);
 
                 // windowing and reconstruction
 
@@ -312,7 +316,10 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
 
             // spectrogram:
 
-            if (ComputingContextExecution.UseParallelIndexed(context, len, _fftSize))
+            bool frameParallel = ComputingContextExecution.UseParallelIndexed(context, len, _fftSize);
+            var frameFft = frameParallel ? NestedFrameFftContext(context) : context;
+
+            if (frameParallel)
             {
                 var inputArray = input.ToArray();
                 using var fftLocal = new ThreadLocal<RealFft>(() => new RealFft(_fftSize));
@@ -326,7 +333,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                     {
                         buf.ApplyWindow(_windowSamples);
                     }
-                    fftLocal.Value!.PowerSpectrum(buf, spectrogram[i], normalize);
+                    fftLocal.Value!.PowerSpectrum(buf, spectrogram[i], normalize, frameFft);
                 }, workPerItem: _fftSize);
             }
             else
@@ -340,7 +347,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                     {
                         windowedBuffer.ApplyWindow(_windowSamples);
                     }
-                    _fft.PowerSpectrum(windowedBuffer, spectrogram[i], normalize);
+                    _fft.PowerSpectrum(windowedBuffer, spectrogram[i], normalize, frameFft);
                 }
             }
 
@@ -353,7 +360,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
 
             spectrogram.Add(new float[_fftSize / 2 + 1]);
 
-            _fft.PowerSpectrum(lastBuffer, spectrogram.Last(), normalize);
+            _fft.PowerSpectrum(lastBuffer, spectrogram.Last(), normalize, context);
 
             return spectrogram;
         }
@@ -365,15 +372,18 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
             => Spectrogram(signal.Samples, normalize, context);
 
         /// <summary>
-        /// Computes averaged periodogram (used, for example, in Welch method). 
-        /// This method is memory-efficient since it doesn't store all spectra in memory.
+        /// Computes averaged periodogram (Welch-style): mean of per-frame power spectra over
+        /// <b>complete</b> windows only (trailing samples that do not fill a window are discarded).
+        /// Memory-efficient — does not store all spectra. Honors <paramref name="context"/> for
+        /// frame-level parallel dispatch; when frames are parallelized, each frame FFT uses SIMD
+        /// (not nested Parallel) to avoid oversubscription.
         /// </summary>
         /// <param name="input">Input data</param>
         public float[] AveragePeriodogram(float[] input, ComputingContext? context = null)
             => AveragePeriodogram(input.AsSpan(), context);
 
         /// <summary>
-        /// Computes averaged periodogram from sample data.
+        /// Computes averaged periodogram from sample data (complete frames only; see overload remarks).
         /// </summary>
         public float[] AveragePeriodogram(ReadOnlySpan<float> input, ComputingContext? context = null)
         {
@@ -381,10 +391,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
 
             var binCount = _fftSize / 2 + 1;
             var periodogram = new float[binCount];
+            if (len < 1)
+                return periodogram;
 
-            // per-frame power spectrum accumulation is a cross-frame reduction, so parallel
-            // workers accumulate into thread-local buffers that are merged afterwards.
-            if (ComputingContextExecution.UseParallelIndexed(context, len, _fftSize))
+            // Frame-level parallelism; when active, downgrade inner FFT to SIMD to avoid nested Parallel.For.
+            bool frameParallel = ComputingContextExecution.UseParallelIndexed(context, len, _fftSize);
+            var frameFftContext = frameParallel ? NestedFrameFftContext(context) : context;
+
+            if (frameParallel)
             {
                 var inputArray = input.ToArray();
                 var locals = new System.Collections.Concurrent.ConcurrentBag<float[]>();
@@ -407,7 +421,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                         buf.ApplyWindow(_windowSamples);
                     }
                     var spectrum = specLocal.Value!;
-                    fftLocal.Value!.PowerSpectrum(buf, spectrum, false);
+                    fftLocal.Value!.PowerSpectrum(buf, spectrum, false, frameFftContext);
                     var acc = accLocal.Value!;
                     for (var j = 0; j < binCount; j++)
                     {
@@ -435,7 +449,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                     {
                         windowedBuffer.ApplyWindow(_windowSamples);
                     }
-                    _fft.PowerSpectrum(windowedBuffer, spectrum, false);
+                    _fft.PowerSpectrum(windowedBuffer, spectrum, false, frameFftContext);
                     for (var j = 0; j < binCount; j++)
                     {
                         periodogram[j] += spectrum[j];
@@ -443,23 +457,23 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                 }
             }
 
-            // last (incomplete) frame (always serial):
-
-            var lastSpectrum = new float[binCount];
-            var lastBuffer = new float[_fftSize];
-            var lastPos = len * _hopSize;
-            CopyFrame(input, lastPos, input.Length - lastPos, lastBuffer);
-            lastBuffer.ApplyWindow(_windowSamples);
-
-            _fft.PowerSpectrum(lastBuffer, lastSpectrum, false);
-
+            float inv = 1f / len;
             for (var j = 0; j < binCount; j++)
-            {
-                periodogram[j] += lastSpectrum[j];
-                periodogram[j] /= len + 1;
-            }
+                periodogram[j] *= inv;
 
             return periodogram;
+        }
+
+        /// <summary>
+        /// When the outer loop already uses <see cref="CpuExecutionMode.Parallel"/>, prefer SIMD
+        /// (or Normal) for per-frame FFTs so workers are not nested Parallel.For calls.
+        /// </summary>
+        static ComputingContext NestedFrameFftContext(ComputingContext? context)
+        {
+            var mode = ComputingContext.Resolve(context).CpuMode;
+            return mode == CpuExecutionMode.Normal
+                ? ComputingContext.Normal
+                : ComputingContext.Simd;
         }
 
         /// <summary>
@@ -495,7 +509,10 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
 
             // magnitude-phase spectrogram:
 
-            if (ComputingContextExecution.UseParallelIndexed(context, len, _fftSize))
+            bool frameParallel = ComputingContextExecution.UseParallelIndexed(context, len, _fftSize);
+            var frameFft = frameParallel ? NestedFrameFftContext(context) : context;
+
+            if (frameParallel)
             {
                 var inputArray = input.ToArray();
                 using var fftLocal = new ThreadLocal<RealFft>(() => new RealFft(_fftSize));
@@ -510,7 +527,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                     buf.ApplyWindow(_windowSamples);
                     var re = reLocal.Value!;
                     var im = imLocal.Value!;
-                    fftLocal.Value!.Direct(buf, re, im);
+                    fftLocal.Value!.Direct(buf, re, im, frameFft);
                     var mi = mag[i];
                     var pi = phase[i];
                     for (var j = 0; j < binCount; j++)
@@ -530,7 +547,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                 {
                     CopyFrame(input, pos, _windowSize, windowedBuffer);
                     windowedBuffer.ApplyWindow(_windowSamples);
-                    _fft.Direct(windowedBuffer, re, im);
+                    _fft.Direct(windowedBuffer, re, im, frameFft);
                     for (var j = 0; j < binCount; j++)
                     {
                         mag[i][j] = MathF.Sqrt(re[j] * re[j] + im[j] * im[j]);
@@ -551,7 +568,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
             mag.Add(new float[binCount]);
             phase.Add(new float[binCount]);
 
-            _fft.Direct(lastBuffer, lastRe, lastIm);
+            _fft.Direct(lastBuffer, lastRe, lastIm, context);
 
             var m = mag.Last();
             var p = phase.Last();
@@ -610,6 +627,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                 using var fftLocal = new ThreadLocal<RealFft>(() => new RealFft(_fftSize));
                 using var reLocal = new ThreadLocal<float[]>(() => new float[binCount]);
                 using var imLocal = new ThreadLocal<float[]>(() => new float[binCount]);
+                var frameFft = NestedFrameFftContext(context);
 
                 ComputingContextExecution.ForEach(context, 0, spectraCount, i =>
                 {
@@ -623,7 +641,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                         im[j] = mi[j] * MathF.Sin(pi[j]);
                     }
                     var b = new float[_fftSize];
-                    fftLocal.Value!.Inverse(re, im, b);
+                    fftLocal.Value!.Inverse(re, im, b, frameFft);
                     frameBufs[i] = b;
                 }, workPerItem: _fftSize);
 
@@ -659,7 +677,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Fourier
                     im0[j] = mag[i][j] * MathF.Sin(phase[i][j]);
                 }
 
-                _fft.Inverse(re0, im0, buf);
+                _fft.Inverse(re0, im0, buf, context);
 
                 // windowing and reconstruction
 

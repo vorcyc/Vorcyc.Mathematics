@@ -182,6 +182,43 @@ public sealed class IsolationForest<T> : IMachineLearning
         return labels;
     }
 
+    /// <summary>
+    /// Exports a fitted-tree snapshot (double precision thresholds).
+    /// </summary>
+    public Serialization.IsolationForestSnapshot CaptureSnapshot()
+    {
+        EnsureFitted();
+        return new Serialization.IsolationForestSnapshot
+        {
+            NumTrees = _numTrees,
+            SubsampleSize = _subsampleSize,
+            MaxDepth = _maxDepth,
+            Seed = _seed,
+            FeatureCount = _featureCount,
+            FitSampleCount = _fitSampleCount,
+            Trees = _trees.Select(t => t.Capture()).ToArray(),
+        };
+    }
+
+    /// <summary>
+    /// Restores fitted trees from a snapshot (for inference).
+    /// </summary>
+    public void RestoreFromSnapshot(Serialization.IsolationForestSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        if (snapshot.Trees is null || snapshot.Trees.Length == 0)
+            throw new ArgumentException("Snapshot trees cannot be empty.");
+        if (snapshot.NumTrees > 0 && snapshot.NumTrees != _numTrees)
+            throw new ArgumentException($"Snapshot NumTrees ({snapshot.NumTrees}) does not match this forest ({_numTrees}).");
+
+        _featureCount = snapshot.FeatureCount;
+        _fitSampleCount = snapshot.FitSampleCount;
+        _trees.Clear();
+        foreach (var node in snapshot.Trees)
+            _trees.Add(IsolationTree.FromSnapshot(node));
+        _isFitted = _trees.Count > 0;
+    }
+
     private T ScoreCore(ReadOnlySpan<T> sample)
     {
         double pathSum = 0;
@@ -237,6 +274,32 @@ public sealed class IsolationForest<T> : IMachineLearning
             new(BuildNode(x, indices, depth: 0, maxDepth, random));
 
         public double PathLength(ReadOnlySpan<T> sample) => PathLengthNode(_root, sample, depth: 0);
+
+        public Serialization.IsolationNodeSnapshot Capture() => CaptureNode(_root);
+
+        public static IsolationTree FromSnapshot(Serialization.IsolationNodeSnapshot snap)
+            => new(FromNode(snap));
+
+        private static Serialization.IsolationNodeSnapshot CaptureNode(IsolationNode n) => new()
+        {
+            IsExternal = n.IsExternal,
+            Size = n.Size,
+            FeatureIndex = n.FeatureIndex,
+            Threshold = double.CreateChecked(n.Threshold),
+            Left = n.Left is null ? null : CaptureNode(n.Left),
+            Right = n.Right is null ? null : CaptureNode(n.Right),
+        };
+
+        private static IsolationNode FromNode(Serialization.IsolationNodeSnapshot s)
+        {
+            if (s.IsExternal)
+                return IsolationNode.External(s.Size);
+            return IsolationNode.Internal(
+                s.FeatureIndex,
+                T.CreateChecked(s.Threshold),
+                FromNode(s.Left!),
+                FromNode(s.Right!));
+        }
 
         private static IsolationNode BuildNode(T[,] x, int[] indices, int depth, int maxDepth, Random random)
         {

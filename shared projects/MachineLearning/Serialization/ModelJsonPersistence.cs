@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Vorcyc.Mathematics.MachineLearning;
 using Vorcyc.Mathematics.MachineLearning.Classfication;
 using Vorcyc.Mathematics.MachineLearning.Preprocessing;
 
@@ -199,6 +200,30 @@ public static class ModelJsonPersistence
             polynomialDegree: snapshot.PolynomialDegree,
             sigmoidAlpha: snapshot.SigmoidAlpha,
             sigmoidConstant: snapshot.SigmoidConstant);
+        model.RestoreFromSnapshot(snapshot);
+        return model;
+    }
+
+    /// <summary>
+    /// Serializes a fitted <see cref="IsolationForest{T}"/>.
+    /// </summary>
+    public static void SaveIsolationForest(IsolationForest<double> model, string path)
+    {
+        File.WriteAllText(path, JsonSerializer.Serialize(model.CaptureSnapshot(), JsonOptions));
+    }
+
+    /// <summary>
+    /// Deserializes a fitted <see cref="IsolationForest{T}"/>.
+    /// </summary>
+    public static IsolationForest<double> LoadIsolationForest(string path)
+    {
+        var snapshot = JsonSerializer.Deserialize<IsolationForestSnapshot>(File.ReadAllText(path))
+            ?? throw new InvalidOperationException("Unable to deserialize IsolationForest.");
+        var model = new IsolationForest<double>(
+            numTrees: Math.Max(1, snapshot.NumTrees),
+            subsampleSize: snapshot.SubsampleSize,
+            maxDepth: snapshot.MaxDepth,
+            seed: snapshot.Seed);
         model.RestoreFromSnapshot(snapshot);
         return model;
     }

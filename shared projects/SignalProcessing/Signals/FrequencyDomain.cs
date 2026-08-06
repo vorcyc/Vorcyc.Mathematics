@@ -45,17 +45,18 @@ public readonly struct FrequencyDomain : IFrequencyDomain
 
     public ITimeDomainSignal Signal => _signal;
 
-    public float[] Magnitudes => IFrequencyDomainCharacteristics.GetMagnitudes(_fftResult, _transformLength >> 1);
+    public float[] Magnitudes => IFrequencyDomainCharacteristics.GetMagnitudes(_fftResult, (_transformLength >> 1) + 1);
 
-    public float Centroid => IFrequencyDomainCharacteristics.GetCentroid(Magnitudes, _signal.SamplingRate);
+    public float Centroid => IFrequencyDomainCharacteristics.GetCentroid(Magnitudes, _signal.SamplingRate, _transformLength);
 
     public float Frequency => IFrequencyDomainCharacteristics.GetFrequency(Magnitudes, _signal.SamplingRate, _resolution);
 
-    public float[] Phases => IFrequencyDomainCharacteristics.GetPhases(_fftResult, _transformLength >> 1);
+    public float[] Phases => IFrequencyDomainCharacteristics.GetPhases(_fftResult, (_transformLength >> 1) + 1);
 
     public float[] AngularVelocities => IFrequencyDomainCharacteristics.GetAngularVelocities(Phases, _signal.SamplingRate);
 
-    public float[] PowerSpectralDensity => IFrequencyDomainCharacteristics.GetPowerSpectralDensity(Magnitudes, _signal.SamplingRate);
+    public float[] PowerSpectralDensity =>
+        IFrequencyDomainCharacteristics.GetPowerSpectralDensity(Magnitudes, _signal.SamplingRate, _transformLength);
 
     public static float IndexToFrequency(int index, float samplingRate, int fftLen)
     {

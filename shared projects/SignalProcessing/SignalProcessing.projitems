@@ -167,11 +167,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Filters\ThiranFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\WienerFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransform.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransformAccelerated.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FftButterflyFp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FftButterflyFp64.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransformNormal.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransformParallel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Fourier\FastFourierTransformSIMD.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FractionalDelayLine.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InterpolationMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Lpc.cs" />

@@ -170,20 +170,6 @@ public readonly struct SignalSegment : ITimeDomainSignal, ISingleThreadTimeDomai
 
     #region To Frequency-domain    
 
-    /// <inheritdoc cref="ITimeDomainSignal.TransformToFrequencyDomain(WindowType?, FftVersion)"/>
-    [Obsolete("Use TransformToFrequencyDomain(ComputingContext?, WindowType?) instead.", false)]
-    public FrequencyDomain TransformToFrequencyDomain(WindowType? window, FftVersion fftVersion)
-    {
-        var context = fftVersion switch
-        {
-            FftVersion.SIMD => ComputingContext.Simd,
-            FftVersion.Parallel => ComputingContext.Parallel,
-            _ => ComputingContext.Normal
-        };
-
-        return TransformToFrequencyDomain(context, window);
-    }
-
     /// <inheritdoc/>
     public FrequencyDomain TransformToFrequencyDomain(ComputingContext? context = null, WindowType? window = null)
     {

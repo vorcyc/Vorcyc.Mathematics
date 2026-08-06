@@ -4,7 +4,7 @@
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**版本：** 0.10.10 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
+**版本：** 0.10.13 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
 
 [English readme](README.md)
 
@@ -48,10 +48,10 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 **线性代数**  
 → [wiki/wiki_hans/Module_LinearAlgebra_zh.md](wiki/wiki_hans/Module_LinearAlgebra_zh.md)
 
-**机器学习（0.9+）** — 分类/回归流水线、树与森林、提升、交叉验证、网格搜索、聚类与降维等；Isolation Forest 与 GPR `PredictStd`（0.10.10）。  
+**机器学习（0.9+）** — 分类/回归流水线、树与森林、提升、交叉验证、网格搜索、聚类与降维等；Isolation Forest + JSON 快照（0.10.11）与 GPR `PredictStd`（0.10.10）。  
 → [wiki/wiki_hans/Module_MachineLearning_zh.md](wiki/wiki_hans/Module_MachineLearning_zh.md)
 
-**信号处理** — **0.9 起以 `Signal` / `SignalSegment` 为时域主 API**；FFT、滤波、MFCC、音效等。  
+**信号处理** — **0.9 起以 `Signal` / `SignalSegment` 为时域主 API**；FFT（0.10.12 起 `TransformToFrequencyDomain` 走 SoA `FftButterflyFp32`）、Welch（0.10.13 完整窗 + `ComputingContext`）、滤波、MFCC、音效等。  
 → [wiki/wiki_hans/Module_SignalProcessing_zh.md](wiki/wiki_hans/Module_SignalProcessing_zh.md)
 
 **数值模块** — 扩展整数、浮点、复数、有理数等高精度类型。  

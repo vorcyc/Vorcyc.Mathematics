@@ -164,6 +164,57 @@ public sealed class NumericRandomForestSnapshot
 }
 
 /// <summary>
+/// Serializable node in an isolation tree.
+/// </summary>
+public sealed class IsolationNodeSnapshot
+{
+    /// <summary>Whether this node is an external (leaf) node.</summary>
+    public bool IsExternal { get; set; }
+
+    /// <summary>Subsample size represented at an external node.</summary>
+    public int Size { get; set; }
+
+    /// <summary>Split feature index for an internal node.</summary>
+    public int FeatureIndex { get; set; }
+
+    /// <summary>Split threshold for an internal node.</summary>
+    public double Threshold { get; set; }
+
+    /// <summary>Left child (values ≤ threshold).</summary>
+    public IsolationNodeSnapshot? Left { get; set; }
+
+    /// <summary>Right child (values &gt; threshold).</summary>
+    public IsolationNodeSnapshot? Right { get; set; }
+}
+
+/// <summary>
+/// Serializable snapshot of a fitted <c>IsolationForest</c>.
+/// </summary>
+public sealed class IsolationForestSnapshot
+{
+    /// <summary>Number of trees hyperparameter.</summary>
+    public int NumTrees { get; set; }
+
+    /// <summary>Bootstrap subsample size hyperparameter.</summary>
+    public int SubsampleSize { get; set; }
+
+    /// <summary>Maximum tree depth hyperparameter (0 = auto at fit time).</summary>
+    public int MaxDepth { get; set; }
+
+    /// <summary>Optional seed used at construction.</summary>
+    public int? Seed { get; set; }
+
+    /// <summary>Feature dimensionality at fit time.</summary>
+    public int FeatureCount { get; set; }
+
+    /// <summary>Training sample count used to normalize path lengths.</summary>
+    public int FitSampleCount { get; set; }
+
+    /// <summary>Fitted isolation trees (roots).</summary>
+    public IsolationNodeSnapshot[] Trees { get; set; } = [];
+}
+
+/// <summary>
 /// Serializable snapshot of a fitted support vector machine (weights / dual coefficients + support vectors).
 /// </summary>
 public sealed class SupportVectorMachineSnapshot

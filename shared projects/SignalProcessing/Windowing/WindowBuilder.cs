@@ -25,11 +25,20 @@ public static class WindowBuilder
             case WindowType.Hamming:
                 return Hamming(length);
 
+            case WindowType.HammingPeriodic:
+                return HammingPeriodic(length);
+
             case WindowType.Blackman:
                 return Blackman(length);
 
+            case WindowType.BlackmanPeriodic:
+                return BlackmanPeriodic(length);
+
             case WindowType.Hann:
                 return Hann(length);
+
+            case WindowType.HannPeriodic:
+                return HannPeriodic(length);
 
             case WindowType.Gaussian:
                 return Gaussian(length);
@@ -99,6 +108,15 @@ public static class WindowBuilder
                          .ToFloats();
     }
 
+    /// <summary>Periodic Hamming (denominator N), SciPy / MATLAB style for spectral analysis.</summary>
+    public static float[] HammingPeriodic(int length)
+    {
+        var n = 2 * Math.PI / length;
+        return Enumerable.Range(0, length)
+                         .Select(i => 0.54 - 0.46 * Math.Cos(i * n))
+                         .ToFloats();
+    }
+
     /// <summary>
     /// Generates Blackman window of given <paramref name="length"/>.
     /// </summary>
@@ -112,6 +130,15 @@ public static class WindowBuilder
                          .ToFloats();
     }
 
+    /// <summary>Periodic Blackman (denominator N).</summary>
+    public static float[] BlackmanPeriodic(int length)
+    {
+        var n = 2 * Math.PI / length;
+        return Enumerable.Range(0, length)
+                         .Select(i => 0.42 - 0.5 * Math.Cos(i * n) + 0.08 * Math.Cos(2 * i * n))
+                         .ToFloats();
+    }
+
     /// <summary>
     /// Generates Hann window of given <paramref name="length"/>.
     /// </summary>
@@ -120,6 +147,15 @@ public static class WindowBuilder
     public static float[] Hann(int length)
     {
         var n = 2 * Math.PI / (length - 1);
+        return Enumerable.Range(0, length)
+                         .Select(i => 0.5 * (1 - Math.Cos(i * n)))
+                         .ToFloats();
+    }
+
+    /// <summary>Periodic Hann (denominator N), SciPy welch default style.</summary>
+    public static float[] HannPeriodic(int length)
+    {
+        var n = 2 * Math.PI / length;
         return Enumerable.Range(0, length)
                          .Select(i => 0.5 * (1 - Math.Cos(i * n)))
                          .ToFloats();

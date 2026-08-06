@@ -11,4 +11,8 @@ ExtendedModeDecomposition_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 ZLaplace_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
+FFT_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Welch_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
 Console.WriteLine("SP_module_test done.");

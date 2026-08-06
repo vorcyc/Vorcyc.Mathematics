@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
+﻿using Vorcyc.Mathematics;
+using Vorcyc.Mathematics.SignalProcessing.Transforms.Base;
 
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
@@ -51,8 +52,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// Computes complex analytic signal (real and imaginary parts) from <paramref name="input"/>.
         /// </summary>
         public ComplexDiscreteSignal AnalyticSignal(ReadOnlySpan<float> input)
+            => AnalyticSignal(input, context: null);
+
+        /// <summary>
+        /// Computes complex analytic signal with optional <paramref name="context"/> for the inner FFT.
+        /// </summary>
+        public ComplexDiscreteSignal AnalyticSignal(ReadOnlySpan<float> input, ComputingContext? context)
         {
-            Direct(input, _im);
+            Direct(input, _im, context);
 
             for (int i = 0; i < Size; i++)
             {
@@ -67,8 +74,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// Computes magnitudes of the analytic signal without allocating a <see cref="ComplexDiscreteSignal"/>.
         /// </summary>
         public void AnalyticMagnitude(ReadOnlySpan<float> input, Span<float> magnitude)
+            => AnalyticMagnitude(input, magnitude, context: null);
+
+        /// <summary>
+        /// Computes magnitudes of the analytic signal with optional <paramref name="context"/> for the inner FFT.
+        /// </summary>
+        public void AnalyticMagnitude(ReadOnlySpan<float> input, Span<float> magnitude, ComputingContext? context)
         {
-            Direct(input, _im);
+            Direct(input, _im, context);
 
             var n = Math.Min(Size, magnitude.Length);
             for (var i = 0; i < n; i++)
@@ -85,12 +98,18 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="input">Input data</param>
         /// <param name="output">Output data</param>
         public void Direct(float[] input, float[] output)
-            => Direct(input.AsSpan(), output);
+            => Direct(input.AsSpan(), output, context: null);
 
         /// <summary>
         /// Does Fast Hilbert Transform from sample span.
         /// </summary>
         public void Direct(ReadOnlySpan<float> input, float[] output)
+            => Direct(input, output, context: null);
+
+        /// <summary>
+        /// Does Fast Hilbert Transform with optional <paramref name="context"/> for the inner FFT.
+        /// </summary>
+        public void Direct(ReadOnlySpan<float> input, float[] output, ComputingContext? context)
         {
             // just here, for code brevity, use alias _im for output (i.e. it's not internal _im)
             var _im = output;
@@ -100,7 +119,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
 
             input.Slice(0, Math.Min(input.Length, Size)).CopyTo(_re);
 
-            _fft.Direct(_re, _im);
+            _fft.Direct(_re, _im, context);
 
             for (var i = 1; i < _re.Length / 2; i++)
             {
@@ -114,7 +133,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
                 _im[i] = 0.0f;
             }
 
-            _fft.Inverse(_re, _im);
+            _fft.Inverse(_re, _im, context);
         }
 
         /// <summary>
@@ -123,8 +142,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="input">Input data</param>
         /// <param name="output">Output data</param>
         public void DirectNorm(float[] input, float[] output)
+            => DirectNorm(input, output, context: null);
+
+        /// <summary>
+        /// Does normalized Fast Hilbert Transform with optional <paramref name="context"/>.
+        /// </summary>
+        public void DirectNorm(float[] input, float[] output, ComputingContext? context)
         {
-            Direct(input, output);
+            Direct(input.AsSpan(), output, context);
 
             for (int i = 0; i < Size; i++)
             {
@@ -138,8 +163,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="input">Input data</param>
         /// <param name="output">Output data</param>
         public void Inverse(float[] input, float[] output)
+            => Inverse(input, output, context: null);
+
+        /// <summary>
+        /// Does Inverse Fast Hilbert Transform with optional <paramref name="context"/>.
+        /// </summary>
+        public void Inverse(float[] input, float[] output, ComputingContext? context)
         {
-            Direct(input, output);
+            Direct(input.AsSpan(), output, context);
 
             for (var i = 0; i < output.Length; i++)
             {
@@ -153,8 +184,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// <param name="input">Input data</param>
         /// <param name="output">Output data</param>
         public void InverseNorm(float[] input, float[] output)
+            => InverseNorm(input, output, context: null);
+
+        /// <summary>
+        /// Does normalized Inverse Fast Hilbert Transform with optional <paramref name="context"/>.
+        /// </summary>
+        public void InverseNorm(float[] input, float[] output, ComputingContext? context)
         {
-            DirectNorm(input, output);
+            DirectNorm(input, output, context);
 
             for (var i = 0; i < output.Length; i++)
             {

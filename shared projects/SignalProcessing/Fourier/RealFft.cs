@@ -429,17 +429,22 @@ public class RealFft : IComplexTransform
     /// Computes magnitude spectrum from a sample span into a destination span.
     /// </summary>
     public void MagnitudeSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = false)
+        => MagnitudeSpectrum(samples, spectrum, normalize, context: null);
+
+    /// <summary>Magnitude spectrum with optional <paramref name="context"/> for the inner FFT.</summary>
+    public void MagnitudeSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize, ComputingContext? context)
     {
-        DirectFromSpan(samples);
+        DirectFromSpan(samples, context);
 
         // Since for realFFT: im[0] = im[fftSize/2] = 0
         // we don't process separately these elements (like in case of FFT)
 
+        float inv = normalize ? 1f / Size : 1f;
         if (normalize)
         {
             for (var i = 0; i < spectrum.Length; i++)
             {
-                spectrum[i] = MathF.Sqrt(_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) / _fftSize;
+                spectrum[i] = MathF.Sqrt(_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) * inv;
             }
         }
         else
@@ -462,29 +467,49 @@ public class RealFft : IComplexTransform
     /// <param name="spectrum">Magnitude spectrum</param>
     /// <param name="normalize">Normalize by FFT size or not</param>
     public void PowerSpectrum(float[] samples, float[] spectrum, bool normalize = true)
-        => PowerSpectrum(samples.AsSpan(), spectrum, normalize);
+        => PowerSpectrum(samples.AsSpan(), spectrum.AsSpan(), normalize, context: null);
+
+    /// <summary>
+    /// Computes power spectrum from a sample array, honoring <paramref name="context"/> for the inner FFT.
+    /// </summary>
+    public void PowerSpectrum(float[] samples, float[] spectrum, bool normalize, ComputingContext? context)
+        => PowerSpectrum(samples.AsSpan(), spectrum.AsSpan(), normalize, context);
 
     /// <summary>
     /// Computes power spectrum from a sample span.
     /// </summary>
     public void PowerSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize = true)
-        => PowerSpectrum(samples, spectrum.AsSpan(), normalize);
+        => PowerSpectrum(samples, spectrum.AsSpan(), normalize, context: null);
+
+    /// <summary>
+    /// Computes power spectrum from a sample span, honoring <paramref name="context"/> for the inner FFT.
+    /// </summary>
+    public void PowerSpectrum(ReadOnlySpan<float> samples, float[] spectrum, bool normalize, ComputingContext? context)
+        => PowerSpectrum(samples, spectrum.AsSpan(), normalize, context);
 
     /// <summary>
     /// Computes power spectrum from a sample span into a destination span.
     /// </summary>
     public void PowerSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize = true)
+        => PowerSpectrum(samples, spectrum, normalize, context: null);
+
+    /// <summary>
+    /// Computes power spectrum from a sample span into a destination span,
+    /// selecting a scalar / SIMD / parallel kernel for the inner half-size complex FFT according to <paramref name="context"/>.
+    /// </summary>
+    public void PowerSpectrum(ReadOnlySpan<float> samples, Span<float> spectrum, bool normalize, ComputingContext? context)
     {
-        DirectFromSpan(samples);
+        DirectFromSpan(samples, context);
 
         // Since for realFFT: im[0] = im[fftSize/2] = 0
         // we don't process separately these elements (like in case of FFT)
 
         if (normalize)
         {
+            float inv = 1f / Size;
             for (var i = 0; i < spectrum.Length; i++)
             {
-                spectrum[i] = (_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) / _fftSize;
+                spectrum[i] = (_realSpectrum[i] * _realSpectrum[i] + _imagSpectrum[i] * _imagSpectrum[i]) * inv;
             }
         }
         else
@@ -536,11 +561,11 @@ public class RealFft : IComplexTransform
         return spectrum;
     }
 
-    private void DirectFromSpan(ReadOnlySpan<float> samples)
+    private void DirectFromSpan(ReadOnlySpan<float> samples, ComputingContext? context = null)
     {
         var buffer = new float[Size];
         samples.Slice(0, Math.Min(samples.Length, Size)).CopyTo(buffer);
-        Direct(buffer, _realSpectrum, _imagSpectrum);
+        Direct(buffer, _realSpectrum, _imagSpectrum, context);
     }
 
     /// <summary>

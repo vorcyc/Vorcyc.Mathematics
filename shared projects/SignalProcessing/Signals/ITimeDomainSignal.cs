@@ -1,5 +1,4 @@
 using Vorcyc.Mathematics;
-using Vorcyc.Mathematics.SignalProcessing.Fourier;
 using Vorcyc.Mathematics.SignalProcessing.Windowing;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Signals;
@@ -16,9 +15,6 @@ public interface ITimeDomainSignal : ITimeDomainCharacteristics
     int Length { get; }
 
     void NotifySamplesModified();
-
-    [Obsolete("Use TransformToFrequencyDomain(ComputingContext?, WindowType?) instead.", false)]
-    FrequencyDomain TransformToFrequencyDomain(WindowType? window, FftVersion fftVersion);
 
     /// <summary>
     /// Transforms the signal to the frequency domain using an optional <see cref="ComputingContext"/>.
