@@ -8,13 +8,14 @@ using Vorcyc.Mathematics.SignalProcessing.Windowing;
 namespace SP_module_test;
 
 /// <summary>
-/// 0.10.13: AveragePeriodogram / Operation.Welch use complete frames only and honor ComputingContext.
+/// 0.10.13+: AveragePeriodogram / Operation.Welch use complete frames only and honor ComputingContext.
+/// 0.10.14: onesided DC/Nyquist scaling; HannPeriodic OfType.
 /// </summary>
 internal static class Welch_test
 {
     public static void Go()
     {
-        "=== Welch / AveragePeriodogram (0.10.13) ===".PrintLine(ConsoleColor.Cyan);
+        "=== Welch / AveragePeriodogram (0.10.13+) ===".PrintLine(ConsoleColor.Cyan);
 
         CompleteFramesOnly();
         ParallelAgreesWithNormal();

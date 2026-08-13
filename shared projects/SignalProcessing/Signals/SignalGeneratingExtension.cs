@@ -614,28 +614,12 @@ public static class SignalGeneratingExtension
         }
     }
     /// <summary>
-    /// 鐢熸垚绮夌孩鍣０锛屽苟瀵规瘡涓敓鎴愮殑鍊兼墽琛屾寚瀹氭搷浣溿€?
+    /// Pink (1/f) noise via Paul Kellet's refined filter, approximately in [-1, 1].
     /// </summary>
-    /// <param name="signal">琛ㄧず淇″彿鐨勫璞°€?/param>
-    /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GeneratePinkNoise(ITimeDomainSignal signal, Action<int, float> action)
     {
-        float[] whiteNoise = new float[signal.Length];
-        // 鐢熸垚鐧藉櫔澹?
-        for (int i = 0; i < signal.Length; i++)
-        {
-            whiteNoise[i] = 2 * Random.Shared.NextSingle() - 1; // 鐢熸垚鑼冨洿鍦?-1 鍒?1 涔嬮棿鐨勯殢鏈烘暟
-        }
-        // 浣跨敤绠€鍗曠殑涓€鏋佹护娉㈠櫒鐢熸垚绮夌孩鍣０
-        float b0 = 0.99765f, b1 = 0.96300f, b2 = 0.57000f;
-        float a0 = 0.96400f, a1 = 0.76700f, a2 = 0.53500f;
-        float[] noiseHistory = new float[7];
-        for (int i = 0; i < signal.Length; i++)
-        {
-            noiseHistory[0] = b0 * whiteNoise[i] + b1 * noiseHistory[1] + b2 * noiseHistory[2] - a0 * noiseHistory[3] - a1 * noiseHistory[4] - a2 * noiseHistory[5];
-            action(i, noiseHistory[0]);
-            Array.Copy(noiseHistory, 0, noiseHistory, 1, 6);
-        }
+        var gen = new Generators.PinkNoiseGenerator { Min = -1f, Max = 1f };
+        ApplyGenerator(signal, gen, action);
     }
 
     /// <summary>

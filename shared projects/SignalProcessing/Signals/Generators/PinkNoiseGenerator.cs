@@ -1,12 +1,12 @@
 namespace Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
 /// <summary>
-/// Pink noise generator (Paul Kellet's algorithm).
+/// Pink (1/f) noise via Paul Kellet's refined multi-pole filter.
+/// Output stays roughly in <see cref="Min"/>…<see cref="Max"/> (default ±1).
 /// </summary>
 public sealed class PinkNoiseGenerator : ISampleGenerator
 {
     private float _b0, _b1, _b2, _b3, _b4, _b5, _b6;
-    private readonly Random _rand = new();
 
     /// <summary>
     /// Lower output level.
@@ -25,7 +25,7 @@ public sealed class PinkNoiseGenerator : ISampleGenerator
         var low = Min - mean;
         var high = Max - mean;
 
-        var white = (float)(_rand.NextDouble() * (high - low) + low);
+        var white = Random.Shared.NextSingle() * (high - low) + low;
 
         _b0 = 0.99886f * _b0 + white * 0.0555179f;
         _b1 = 0.99332f * _b1 + white * 0.0750759f;
