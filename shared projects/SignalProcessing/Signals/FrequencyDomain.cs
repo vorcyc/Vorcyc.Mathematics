@@ -58,9 +58,14 @@ public readonly struct FrequencyDomain : IFrequencyDomain
     public float[] PowerSpectralDensity =>
         IFrequencyDomainCharacteristics.GetPowerSpectralDensity(Magnitudes, _signal.SamplingRate, _transformLength);
 
+    /// <summary>
+    /// Maps a full-length FFT bin index to frequency (Hz).
+    /// Indices <c>0…N/2</c> are non-negative; <c>N/2+1…N</c> map to the negative side
+    /// (<c>N = <paramref name="fftLen"/></c>). Onesided spectra only use <c>0…N/2</c>.
+    /// </summary>
     public static float IndexToFrequency(int index, float samplingRate, int fftLen)
     {
-        if (index > fftLen)
+        if (index < 0 || index > fftLen)
         {
             return 0.0f;
         }
@@ -73,19 +78,18 @@ public readonly struct FrequencyDomain : IFrequencyDomain
         return -(fftLen - index) / (float)fftLen * samplingRate;
     }
 
+    /// <summary>
+    /// Maps a bin index on this spectrum to frequency (Hz).
+    /// Uses <see cref="TransformLength"/> (FFT size), not <see cref="ActualLength"/> (unpadded samples).
+    /// </summary>
     public float IndexToFrequency(int index)
     {
-        if (index > ActualLength)
+        if (index < 0 || index > TransformLength)
         {
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        if (index <= ActualLength / 2)
-        {
-            return index * _resolution;
-        }
-
-        return -(ActualLength - index) / (float)ActualLength * _signal.SamplingRate;
+        return IndexToFrequency(index, (float)_signal.SamplingRate, TransformLength);
     }
 
     public int FrequencyToIndex(float frequency) => (int)(frequency / _resolution);
