@@ -18,28 +18,28 @@ internal static class LinearRegession
     /// <param name="yData">因变量数据。</param>
     /// <returns>拟合结果，包括预测函数和参数。</returns>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static FitResult<T> Fit_Normal<T>(Span<T> xData, Span<T> yData)
+    internal static FitResult<T> Fit_Normal<T>(
+        Span<T> xData, Span<T> yData, CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = xData.Length;
         T xMean = xData.Average();
         T yMean = yData.Average();
-        // 计算斜率 a 和截距 b
         T numerator = T.Zero, denominator = T.Zero;
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             T dx = xData[i] - xMean;
             numerator += dx * (yData[i] - yMean);
             denominator += dx * dx;
         }
-        T a = numerator / denominator; // 斜率
-        T b = yMean - a * xMean;       // 截距
-        // 预测函数
+        T a = numerator / denominator;
+        T b = yMean - a * xMean;
         Func<T, T> predict = x => a * x + b;
-        // 计算均方误差
         T mse = T.Zero;
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             T error = yData[i] - predict(xData[i]);
             mse += error * error;
         }
@@ -61,32 +61,30 @@ internal static class LinearRegession
     /// <param name="yData">因变量数据。</param>
     /// <returns>拟合结果，包括预测函数和参数。</returns>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static FitResult<T> Fit_SIMD<T>(Span<T> xData, Span<T> yData)
+    internal static FitResult<T> Fit_SIMD<T>(
+        Span<T> xData, Span<T> yData, CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = xData.Length;
         if (n < 2) throw new ArgumentException("At least two data points are required.");
-        // Step 1: 计算均值
         int vectorSize = Vector<T>.Count;
         T nT = T.CreateChecked(n);
         T xMean = xData.Average();
         T yMean = yData.Average();
-        // Step 2: 计算斜率 a 和截距 b
         T numerator = T.Zero, denominator = T.Zero;
-        // 创建均值的向量
         var xMeanVec = new Vector<T>(xMean);
         var yMeanVec = new Vector<T>(yMean);
         int i = 0;
         for (; i <= n - vectorSize; i += vectorSize)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             var xVec = new Vector<T>(xData.Slice(i, vectorSize));
             var yVec = new Vector<T>(yData.Slice(i, vectorSize));
-            var dxVec = xVec - xMeanVec; // x_i - xMean
-            var dyVec = yVec - yMeanVec; // y_i - yMean
-            numerator += Vector.Sum(Vector.Multiply(dxVec, dyVec));   // \(\sum (x_i - \bar{x})(y_i - \bar{y})\)
-            denominator += Vector.Sum(Vector.Multiply(dxVec, dxVec)); // \(\sum (x_i - \bar{x})^2\)
+            var dxVec = xVec - xMeanVec;
+            var dyVec = yVec - yMeanVec;
+            numerator += Vector.Sum(Vector.Multiply(dxVec, dyVec));
+            denominator += Vector.Sum(Vector.Multiply(dxVec, dxVec));
         }
-        // 处理剩余元素
         for (; i < n; i++)
         {
             T dx = xData[i] - xMean;
@@ -96,20 +94,19 @@ internal static class LinearRegession
         }
         if (denominator == T.Zero)
             throw new InvalidOperationException("Cannot fit a line: all x values are identical.");
-        T a = numerator / denominator; // 斜率
-        T b = yMean - a * xMean;       // 截距
-        // Step 3: 预测函数
+        T a = numerator / denominator;
+        T b = yMean - a * xMean;
         Func<T, T> predict = x => a * x + b;
-        // Step 4: 计算均方误差 (MSE)
         T mse = T.Zero;
         i = 0;
         var aVec = new Vector<T>(a);
         var bVec = new Vector<T>(b);
         for (; i <= n - vectorSize; i += vectorSize)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             var xVec = new Vector<T>(xData.Slice(i, vectorSize));
             var yVec = new Vector<T>(yData.Slice(i, vectorSize));
-            var predVec = Vector.Multiply(aVec, xVec) + bVec; // ax + b
+            var predVec = Vector.Multiply(aVec, xVec) + bVec;
             var errorVec = yVec - predVec;
             mse += Vector.Sum(Vector.Multiply(errorVec, errorVec));
         }

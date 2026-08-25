@@ -42,63 +42,74 @@ public static class CurveFitter<T>
     /// 线性回归：拟合直线 y = ax + b。
     /// </summary>
     /// <param name="computingContext">可选计算策略。解析顺序与库内 Statistics / VectorSpan 相同：Normal 标量；Parallel 达阈值时本方法暂回退 SIMD；否则 SIMD（仅 float/double）。</param>
-    public static FitResult<T> Linear(Span<T> xData, Span<T> yData, ComputingContext? computingContext = null)
+    public static FitResult<T> Linear(
+        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return ResolveDispatch(computingContext, xData.Length) == CurveFitDispatchKind.Normal
-            ? LinearRegession.Fit_Normal(xData, yData)
-            : LinearRegession.Fit_SIMD(xData, yData);
+            ? LinearRegession.Fit_Normal(xData, yData, cancellationToken)
+            : LinearRegession.Fit_SIMD(xData, yData, cancellationToken);
     }
 
     /// <summary>
     /// 多项式回归：拟合 y = a0 + a1*x + a2*x^2 + ... + an*x^n。
     /// </summary>
-    public static FitResult<T> Polynomial(Span<T> xData, Span<T> yData, int degree, ComputingContext? computingContext = null)
+    public static FitResult<T> Polynomial(
+        Span<T> xData, Span<T> yData, int degree, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return ResolveDispatch(computingContext, xData.Length) == CurveFitDispatchKind.Normal
-            ? PolynomialRegression.Fit_Normal(xData, yData, degree)
-            : PolynomialRegression.Fit_SIMD(xData, yData, degree);
+            ? PolynomialRegression.Fit_Normal(xData, yData, degree, cancellationToken)
+            : PolynomialRegression.Fit_SIMD(xData, yData, degree, cancellationToken);
     }
     /// <summary>
     /// 指数回归：拟合 y = a * e^(bx)。
     /// </summary>
-    public static FitResult<T> Exponential(Span<T> xData, Span<T> yData, ComputingContext? computingContext = null)
+    public static FitResult<T> Exponential(
+        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return ResolveDispatch(computingContext, xData.Length) == CurveFitDispatchKind.Normal
-            ? ExponentialRegression.Fit_Normal(xData, yData)
-            : ExponentialRegression.Fit_SIMD(xData, yData);
+            ? ExponentialRegression.Fit_Normal(xData, yData, cancellationToken)
+            : ExponentialRegression.Fit_SIMD(xData, yData, cancellationToken);
     }
     /// <summary>
     /// 对数回归：拟合 y = a + b * ln(x)。
     /// </summary>
-    public static FitResult<T> Logarithmic(Span<T> xData, Span<T> yData, ComputingContext? computingContext = null)
+    public static FitResult<T> Logarithmic(
+        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return ResolveDispatch(computingContext, xData.Length) == CurveFitDispatchKind.Normal
-            ? LogarithmicRegression.Fit_Normal(xData, yData)
-            : LogarithmicRegression.Fit_SIMD(xData, yData);
+            ? LogarithmicRegression.Fit_Normal(xData, yData, cancellationToken)
+            : LogarithmicRegression.Fit_SIMD(xData, yData, cancellationToken);
     }
     /// <summary>
     ///  幂回归：拟合 y = a * x^b。
     /// </summary>
-    public static FitResult<T> Power(Span<T> xData, Span<T> yData, ComputingContext? computingContext = null)
+    public static FitResult<T> Power(
+        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return ResolveDispatch(computingContext, xData.Length) == CurveFitDispatchKind.Normal
-            ? PowerRegression.Fit_Normal(xData, yData)
-            : PowerRegression.Fit_SIMD(xData, yData);
+            ? PowerRegression.Fit_Normal(xData, yData, cancellationToken)
+            : PowerRegression.Fit_SIMD(xData, yData, cancellationToken);
     }
     /// <summary>
     /// 正弦回归：拟合 y = A * sin(Bx + C) + D。
     /// </summary>
     public static FitResult<T> Sinusoidal(
-        Span<T> xData, Span<T> yData, int maxIterations = 100, ComputingContext? computingContext = null)
+        Span<T> xData, Span<T> yData, int maxIterations = 100, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         ValidateType();
-        return SinusoidalRegression.Fit(xData, yData, maxIterations, computingContext);
+        return SinusoidalRegression.Fit(xData, yData, maxIterations, computingContext, cancellationToken);
     }
     /// <summary>
     /// 三次样条插值拟合：通过给定的点生成平滑曲线。
@@ -108,11 +119,12 @@ public static class CurveFitter<T>
     /// <param name="computingContext">可选的计算执行策略。样条系数求解串行；MSE 可按策略并行。</param>
     /// <returns>拟合结果</returns>
     public static FitResult<T> CubicSpline(
-        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null)
+        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         ValidateType();
-        return CubicSplineInterpolation<T>.Fit_CubicSpline(xData, yData, computingContext);
+        return CubicSplineInterpolation<T>.Fit_CubicSpline(xData, yData, computingContext, cancellationToken);
     }
     /// <summary>
     /// 局部加权回归 (LOWESS)：局部趋势拟合。
@@ -124,11 +136,12 @@ public static class CurveFitter<T>
     /// <param name="computingContext">可选的计算执行策略。拟合点评估可按策略并行。</param>
     /// <returns>拟合结果</returns>
     public static FitResult<T> LocallyWeighted(
-        Span<T> xData, Span<T> yData, T? bandwidth = null, ComputingContext? computingContext = null)
+        Span<T> xData, Span<T> yData, T? bandwidth = null, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         if (xData.Length != yData.Length || xData.Length < 2)
             throw new ArgumentException("数据点数量必须相等且至少有2个点");
-        return new LocallyWeightedRegression<T>(xData, yData, bandwidth).Fit(computingContext);
+        return new LocallyWeightedRegression<T>(xData, yData, bandwidth).Fit(computingContext, cancellationToken);
     }
 
     /// <summary>
@@ -137,10 +150,11 @@ public static class CurveFitter<T>
     /// <param name="windowSize">移动窗口大小</param>
     /// <param name="computingContext">可选的计算执行策略。各窗口平滑可按策略并行。</param>
     public static FitResult<T> MovingAverage(
-        T[] xData, T[] yData, int windowSize, ComputingContext? computingContext = null)
+        T[] xData, T[] yData, int windowSize, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
-        return MovingAverageFitter.Fit(xData, yData, windowSize, computingContext);
+        return MovingAverageFitter.Fit(xData, yData, windowSize, computingContext, cancellationToken);
     }
     /// <summary>
     /// 非线性回归：拟合复杂非线性模型。
@@ -153,11 +167,13 @@ public static class CurveFitter<T>
     /// <param name="computingContext">可选的计算执行策略。</param>
     /// <returns>拟合结果</returns>
     public static FitResult<T> Fit_Normal(Span<T> xData, Span<T> yData,
-        Func<T, T[], T> model, T[] initialParams, ComputingContext? computingContext = null)
+        Func<T, T[], T> model, T[] initialParams, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         ValidateInput(xData, yData);
         return NonlinearRegression.Fit_Normal(
-            xData, yData, model, initialParams, computingContext: computingContext);
+            xData, yData, model, initialParams, computingContext: computingContext,
+            cancellationToken: cancellationToken);
     }
     /// <summary>
     /// 非线性回归：拟合复杂非线性模型。
@@ -185,11 +201,13 @@ public static class CurveFitter<T>
         T? lambdaDecreaseFactor = null,
         T? stepSize = null,
         T? residualTolerance = null,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         return NonlinearRegression.Fit_Normal(
             xData, yData, model, initialParams, maxIterations, tolerance, initialLambda,
-            lambdaIncreaseFactor, lambdaDecreaseFactor, stepSize, residualTolerance, computingContext);
+            lambdaIncreaseFactor, lambdaDecreaseFactor, stepSize, residualTolerance, computingContext,
+            cancellationToken);
     }
     /// <summary>
     /// 非线性回归：拟合复杂非线性模型，支持多变量输入。
@@ -217,11 +235,13 @@ public static class CurveFitter<T>
         T? lambdaDecreaseFactor = null,
         T? stepSize = null,
         T? residualTolerance = null,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         return NonlinearRegression.Fit_MultiColumn_Normal(
             xData, yData, model, initialParams, maxIterations, tolerance, initialLambda,
-            lambdaIncreaseFactor, lambdaDecreaseFactor, stepSize, residualTolerance, computingContext);
+            lambdaIncreaseFactor, lambdaDecreaseFactor, stepSize, residualTolerance, computingContext,
+            cancellationToken);
     }
     /// <summary>
     /// 高斯过程回归 (GPR)：单列输入，平滑预测。
@@ -270,8 +290,9 @@ public static class CurveFitter<T>
     /// </summary>
     /// <param name="computingContext">可选的计算执行策略。</param>
     public static BayesianFitResult<T> BayesianLinear(
-        CurveFitRow<T>[] xData, T[] yData, T alpha, T beta, ComputingContext? computingContext = null)
+        CurveFitRow<T>[] xData, T[] yData, T alpha, T beta, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
-        return BayesianLinearRegression<T>.Fit(xData, yData, alpha, beta, computingContext);
+        return BayesianLinearRegression<T>.Fit(xData, yData, alpha, beta, computingContext, cancellationToken);
     }
 }

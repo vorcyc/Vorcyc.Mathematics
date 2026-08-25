@@ -8,26 +8,26 @@ internal static class SinusoidalRegression
     /// <summary>
     /// 正弦回归：拟合 y = A * sin(Bx + C) + D（标量路径）。
     /// </summary>
-    public static FitResult<T> Fit_Normal<T>(Span<T> xData, Span<T> yData, int maxIterations = 100)
+    public static FitResult<T> Fit_Normal<T>(
+        Span<T> xData, Span<T> yData, int maxIterations = 100, CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
-        => Fit(xData, yData, maxIterations, ComputingContext.Normal);
+        => Fit(xData, yData, maxIterations, ComputingContext.Normal, cancellationToken);
 
-    /// <summary>
-    /// 正弦回归：按 <see cref="ComputingContext"/> 分发（与 Statistics / VectorSpan 相同语义）。
-    /// </summary>
     public static FitResult<T> Fit<T>(
-        Span<T> xData, Span<T> yData, int maxIterations = 100, ComputingContext? computingContext = null)
+        Span<T> xData, Span<T> yData, int maxIterations = 100, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
-        => FitCore(xData, yData, maxIterations, computingContext);
+        => FitCore(xData, yData, maxIterations, computingContext, cancellationToken);
 
-    /// <summary>兼容旧名：等价于 <see cref="Fit{T}"/>。</summary>
     public static FitResult<T> Fit_SIMD<T>(
-        Span<T> xData, Span<T> yData, int maxIterations = 100, ComputingContext? computingContext = null)
+        Span<T> xData, Span<T> yData, int maxIterations = 100, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
-        => Fit(xData, yData, maxIterations, computingContext);
+        => Fit(xData, yData, maxIterations, computingContext, cancellationToken);
 
     private static FitResult<T> FitCore<T>(
-        Span<T> xData, Span<T> yData, int maxIterations, ComputingContext? computingContext)
+        Span<T> xData, Span<T> yData, int maxIterations, ComputingContext? computingContext,
+        CancellationToken cancellationToken)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 4)
@@ -44,6 +44,7 @@ internal static class SinusoidalRegression
         T ySum = T.Zero;
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             T x = xArr[i], y = yArr[i];
             if (x < xMin) xMin = x;
             if (x > xMax) xMax = x;
@@ -62,16 +63,19 @@ internal static class SinusoidalRegression
         // 将 x 缩放到 [0,1]，改善 B 的条件数；拟合后再还原。
         T[] xScaled = new T[n];
         for (int i = 0; i < n; i++)
+        {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             xScaled[i] = (xArr[i] - xMin) / xRange;
+        }
 
         T initA = yRange / T.CreateChecked(2);
         if (initA <= T.Zero)
             initA = T.One;
         T initD = yMean;
-        T initB = EstimateAngularFrequency(xScaled, yArr, yMean);
-        T[] seed = RefinePhaseGrid(xScaled, yArr, initA, initB, initD);
+        T initB = EstimateAngularFrequency(xScaled, yArr, yMean, cancellationToken);
+        T[] seed = RefinePhaseGrid(xScaled, yArr, initA, initB, initD, cancellationToken);
 
-        T[] parameters = LevenbergMarquardt(xScaled, yArr, seed, maxIterations, computingContext);
+        T[] parameters = LevenbergMarquardt(xScaled, yArr, seed, maxIterations, computingContext, cancellationToken);
 
         // B_scaled = B_original * xRange  =>  B_original = B_scaled / xRange
         parameters[1] /= xRange;
@@ -87,6 +91,7 @@ internal static class SinusoidalRegression
         T mse = T.Zero;
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             T diff = predict(xArr[i]) - yArr[i];
             mse += diff * diff;
         }
@@ -100,15 +105,15 @@ internal static class SinusoidalRegression
     /// <summary>
     /// 对去均值后的 y 用过零点估计角频率（在已缩放到单位区间的 x 上）。
     /// </summary>
-    private static T EstimateAngularFrequency<T>(T[] xScaled, T[] y, T yMean)
+    private static T EstimateAngularFrequency<T>(T[] xScaled, T[] y, T yMean, CancellationToken cancellationToken)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = y.Length;
-        // 收集过零点的 x 位置（线性插值）
         Span<T> crossings = n <= 256 ? stackalloc T[n] : new T[n];
         int count = 0;
         for (int i = 0; i < n - 1; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             T y0 = y[i] - yMean;
             T y1 = y[i + 1] - yMean;
             if (y0 == T.Zero)
@@ -153,7 +158,8 @@ internal static class SinusoidalRegression
     /// <summary>
     /// 在固定 B 下网格搜索相位，并用线性最小二乘估计 A、D。
     /// </summary>
-    private static T[] RefinePhaseGrid<T>(T[] x, T[] y, T initA, T initB, T initD)
+    private static T[] RefinePhaseGrid<T>(
+        T[] x, T[] y, T initA, T initB, T initD, CancellationToken cancellationToken)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = x.Length;
@@ -163,11 +169,12 @@ internal static class SinusoidalRegression
 
         for (int g = 0; g < grid; g++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             T c = T.Tau * T.CreateChecked(g) / T.CreateChecked(grid);
-            // y ≈ A * s + D，其中 s = sin(Bx+C)
             T sumS = T.Zero, sumS2 = T.Zero, sumY = T.Zero, sumSY = T.Zero;
             for (int i = 0; i < n; i++)
             {
+                CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
                 T s = T.Sin(initB * x[i] + c);
                 sumS += s;
                 sumS2 += s * s;
@@ -192,6 +199,7 @@ internal static class SinusoidalRegression
             T ssr = T.Zero;
             for (int i = 0; i < n; i++)
             {
+                CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
                 T r = y[i] - (a * T.Sin(initB * x[i] + c) + d);
                 ssr += r * r;
             }
@@ -214,7 +222,8 @@ internal static class SinusoidalRegression
     }
 
     private static T[] LevenbergMarquardt<T>(
-        T[] xData, T[] yData, T[] initialParams, int maxIterations, ComputingContext? context)
+        T[] xData, T[] yData, T[] initialParams, int maxIterations, ComputingContext? context,
+        CancellationToken cancellationToken)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = xData.Length;
@@ -232,7 +241,10 @@ internal static class SinusoidalRegression
         T[] residuals = new T[n];
         T[][] jacobian = new T[n][];
         for (int i = 0; i < n; i++)
+        {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             jacobian[i] = new T[m];
+        }
         T[] colI = new T[n];
         T[] colJ = new T[n];
 
@@ -252,19 +264,25 @@ internal static class SinusoidalRegression
 
         for (int iter = 0; iter < maxIterations; iter++)
         {
-            // 始终传入真实 context；是否并行由 ForEach / UseParallelIndexed 决定（同 Matrix / KMeans）
-            ComputingContextExecution.ForEach(context, 0, n, FillRow, workPerItem);
+            cancellationToken.ThrowIfCancellationRequested();
+            ComputingContextExecution.ForEach(context, 0, n, FillRow, workPerItem, cancellationToken: cancellationToken);
 
             T[][] jtJ = new T[m][];
             for (int i = 0; i < m; i++)
             {
                 jtJ[i] = new T[m];
                 for (int r = 0; r < n; r++)
+                {
+                    CurveFittingExecution.ThrowIfCancelled(cancellationToken, r);
                     colI[r] = jacobian[r][i];
+                }
                 for (int j = 0; j < m; j++)
                 {
                     for (int r = 0; r < n; r++)
+                    {
+                        CurveFittingExecution.ThrowIfCancelled(cancellationToken, r);
                         colJ[r] = jacobian[r][j];
+                    }
                     T sum = CurveFittingExecution.Dot<T>(colI, colJ, useSimd);
                     jtJ[i][j] = sum + (i == j ? currentLambda * sum : T.Zero);
                 }
@@ -274,7 +292,10 @@ internal static class SinusoidalRegression
             for (int i = 0; i < m; i++)
             {
                 for (int r = 0; r < n; r++)
+                {
+                    CurveFittingExecution.ThrowIfCancelled(cancellationToken, r);
                     colI[r] = jacobian[r][i];
+                }
                 jtr[i] = -CurveFittingExecution.Dot<T>(colI, residuals, useSimd);
             }
 
@@ -301,6 +322,7 @@ internal static class SinusoidalRegression
             T newSsr = T.Zero;
             for (int i = 0; i < n; i++)
             {
+                CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
                 T A = newParams[0], B = newParams[1], C = newParams[2], D = newParams[3];
                 T r = A * T.Sin(B * xData[i] + C) + D - yData[i];
                 newSsr += r * r;

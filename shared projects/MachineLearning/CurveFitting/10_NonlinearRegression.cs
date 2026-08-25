@@ -27,7 +27,8 @@ internal static class NonlinearRegression
         T? lambdaDecreaseFactor = null,
         T? stepSize = null,
         T? residualTolerance = null,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -63,10 +64,14 @@ internal static class NonlinearRegression
         T[] colJ = new T[n];
         for (int iter = 0; iter < maxIterations; iter++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             T[] residuals = new T[n];
             T[][] jacobian = new T[n][];
             for (int i = 0; i < n; i++)
+            {
+                CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
                 jacobian[i] = new T[m];
+            }
 
             ComputingContextExecution.ForEach(computingContext, 0, n, i =>
             {
@@ -80,7 +85,7 @@ internal static class NonlinearRegression
                     T f2 = model(xDataArray[i], tempParams);
                     jacobian[i][j] = (f1 - f2) / (h + h);
                 }
-            }, workPerItem);
+            }, workPerItem, cancellationToken: cancellationToken);
 
             T[][] jtJ = new T[m][];
             for (int i = 0; i < m; i++)
@@ -117,6 +122,7 @@ internal static class NonlinearRegression
             T newSsr = T.Zero;
             for (int i = 0; i < n; i++)
             {
+                CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
                 T r = model(xDataArray[i], newParams) - yDataArray[i];
                 newSsr += r * r;
             }
@@ -209,7 +215,8 @@ internal static class NonlinearRegression
         T? lambdaDecreaseFactor = null,
         T? stepSize = null,
         T? residualTolerance = null,
-        ComputingContext? computingContext = null)
+        ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -249,10 +256,14 @@ internal static class NonlinearRegression
         T[] colJ = new T[n];
         for (int iter = 0; iter < maxIterations; iter++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             T[] residuals = new T[n];
             T[][] jacobian = new T[n][];
             for (int i = 0; i < n; i++)
+            {
+                CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
                 jacobian[i] = new T[m];
+            }
 
             ComputingContextExecution.ForEach(computingContext, 0, n, i =>
             {
@@ -266,7 +277,7 @@ internal static class NonlinearRegression
                     T f2 = model(xData[i], tempParams);
                     jacobian[i][j] = (f1 - f2) / (h + h);
                 }
-            }, workPerItem);
+            }, workPerItem, cancellationToken: cancellationToken);
 
             // 计算 J^T * J 和 J^T * r
             T[][] jtJ = new T[m][];
@@ -304,6 +315,7 @@ internal static class NonlinearRegression
             T newSsr = T.Zero;
             for (int i = 0; i < n; i++)
             {
+                CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
                 T r = model(xData[i], newParams) - yDataArray[i];
                 newSsr += r * r;
             }

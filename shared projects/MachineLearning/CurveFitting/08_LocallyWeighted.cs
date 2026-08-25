@@ -21,30 +21,29 @@ internal class LocallyWeightedRegression<T> where T : unmanaged, IFloatingPointI
             throw new ArgumentException("带宽必须大于0");
     }
 
-    public FitResult<T> Fit(ComputingContext? computingContext = null)
+    public FitResult<T> Fit(ComputingContext? computingContext = null, CancellationToken cancellationToken = default)
     {
         int n = _xData.Length;
-        // 每查询点扫描 n 个样本 → workPerItem = n（与 UseParallelIndexed / Auto 总工作量一致）
         var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, n);
         bool useSimd = dispatch == CurveFitDispatchKind.Simd;
 
         T[] fittedValues = new T[n];
-        Func<T, T> predict = x => PredictAt(x, useSimd);
+        Func<T, T> predict = x => PredictAt(x, useSimd, cancellationToken);
 
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
-            fittedValues[i] = PredictAt(_xData[i], useSimd);
-        }, workPerItem: n);
+            fittedValues[i] = PredictAt(_xData[i], useSimd, cancellationToken);
+        }, workPerItem: n, cancellationToken: cancellationToken);
 
         T mse = CurveFittingExecution.MeanSquaredError<T>(fittedValues, _yData, useSimd);
         return new FitResult<T>(predict, Array.Empty<T>(), mse);
     }
 
-    private T PredictAt(T x, bool useSimd)
+    private T PredictAt(T x, bool useSimd, CancellationToken cancellationToken = default)
     {
         CurveFittingExecution.AccumWeightedLinearSums(
             _xData, _yData, x, _bandwidth,
-            out T wSum, out T wxSum, out T wySum, out T wxxSum, out T wxySum, useSimd);
+            out T wSum, out T wxSum, out T wySum, out T wxxSum, out T wxySum, useSimd, cancellationToken);
 
         T denominator = wSum * wxxSum - wxSum * wxSum;
         if (denominator == T.Zero)
@@ -55,6 +54,7 @@ internal class LocallyWeightedRegression<T> where T : unmanaged, IFloatingPointI
     }
 
     internal static FitResult<T> Fit_Normal(
-        Span<T> xData, Span<T> yData, T? bandwidth = null, ComputingContext? computingContext = null)
-        => new LocallyWeightedRegression<T>(xData, yData, bandwidth).Fit(computingContext);
+        Span<T> xData, Span<T> yData, T? bandwidth = null, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
+        => new LocallyWeightedRegression<T>(xData, yData, bandwidth).Fit(computingContext, cancellationToken);
 }

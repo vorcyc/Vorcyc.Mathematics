@@ -3,29 +3,27 @@ namespace Vorcyc.Mathematics.MachineLearning.CurveFitting;
 public static class BayesianLinearRegression<T> where T : struct, IFloatingPointIeee754<T>
 {
     public static BayesianFitResult<T> Fit(
-        CurveFitRow<T>[] X, T[] y, T alpha, T beta, ComputingContext? computingContext = null)
+        CurveFitRow<T>[] X, T[] y, T alpha, T beta, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
         if (X == null || y == null) throw new ArgumentNullException("Input data cannot be null.");
         if (X.Length != y.Length) throw new ArgumentException("X and y must have the same length.");
         if (X.Length == 0) throw new ArgumentException("Input data cannot be empty.");
-        int n = X.Length;         // 样本数
-        int d = X[0].ColumnCount; // 特征数
-        // 构造设计矩阵（添加偏置项）
+        int n = X.Length;
+        int d = X[0].ColumnCount;
         T[][] designMatrix = new T[n][];
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
             designMatrix[i] = new T[d + 1];
             for (int j = 0; j < d; j++)
                 designMatrix[i][j] = X[i][j];
-            designMatrix[i][d] = T.One; // 偏置项
-        }, workPerItem: d + 1);
-        // 计算后验分布
-        T[][] XtX = MatrixMultiply(MatrixTranspose(designMatrix), designMatrix);
+            designMatrix[i][d] = T.One;
+        }, workPerItem: d + 1, cancellationToken: cancellationToken);
+        T[][] XtX = MatrixMultiply(MatrixTranspose(designMatrix), designMatrix, cancellationToken);
         T[][] A = MatrixAdd(ScalarMultiply(CreateIdentity(d + 1), alpha), ScalarMultiply(XtX, beta));
-        T[][] S_N = MatrixInverse(A); // 后验协方差矩阵
+        T[][] S_N = MatrixInverse(A);
         T[] Xty = VectorMultiply(MatrixTranspose(designMatrix), y);
-        T[] m_N = VectorMultiply(ScalarMultiply(S_N, beta), Xty); // 后验均值
-        // 计算均方误差
+        T[] m_N = VectorMultiply(ScalarMultiply(S_N, beta), Xty);
         T mse = ComputeMSE(designMatrix, y, m_N);
         // 预测函数
         Func<T[], T> predictMean = (x) =>
@@ -46,12 +44,13 @@ public static class BayesianLinearRegression<T> where T : struct, IFloatingPoint
         return new BayesianFitResult<T>(predictMean, predictVariance, m_N, S_N, mse);
     }
     // 矩阵运算辅助方法（与之前相同）
-    private static T[][] MatrixMultiply(T[][] A, T[][] B)
+    private static T[][] MatrixMultiply(T[][] A, T[][] B, CancellationToken cancellationToken = default)
     {
         int rowsA = A.Length, colsA = A[0].Length, colsB = B[0].Length;
         T[][] result = new T[rowsA][];
         for (int i = 0; i < rowsA; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             result[i] = new T[colsB];
             for (int j = 0; j < colsB; j++)
                 for (int k = 0; k < colsA; k++)

@@ -35,9 +35,17 @@ internal class CubicSplineInterpolation<T>
         if (x < _xData[0] || x > _xData[_n])
             throw new ArgumentOutOfRangeException(nameof(x), "Prediction point out of data range.");
 
-        int i = 0;
-        while (i < _n && x > _xData[i + 1]) i++;
-        if (i == _n) i--;
+        int i = Array.BinarySearch(_xData, x);
+        if (i >= 0)
+        {
+            if (i >= _n) i = _n - 1;
+        }
+        else
+        {
+            i = ~i - 1;
+            if (i < 0) i = 0;
+            if (i >= _n) i = _n - 1;
+        }
 
         T dx = x - _xData[i];
         return _a[i] + _b[i] * dx + _c[i] * dx * dx + _d[i] * dx * dx * dx;
@@ -130,8 +138,10 @@ internal class CubicSplineInterpolation<T>
     /// <returns>A <see cref="FitResult{T}"/> containing the prediction function, the coefficients of the fitted cubic spline, and the mean squared
     /// error of the fit.</returns>
     public static FitResult<T> Fit_CubicSpline(
-        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null)
+        Span<T> xData, Span<T> yData, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var spline = new CubicSplineInterpolation<T>(xData, yData);
         Func<T, T> predict = spline.Predict;
         T[] parameters = spline.GetCoefficients();
@@ -146,7 +156,7 @@ internal class CubicSplineInterpolation<T>
         ComputingContextExecution.ForEach(computingContext, 0, n, i =>
         {
             fitted[i] = predict(xArr[i]);
-        });
+        }, cancellationToken: cancellationToken);
 
         T mse = CurveFittingExecution.MeanSquaredError<T>(fitted, yArr, useSimd);
         return new FitResult<T>(predict, parameters, mse);

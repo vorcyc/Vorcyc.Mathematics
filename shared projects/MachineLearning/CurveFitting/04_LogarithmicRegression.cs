@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,14 +14,14 @@ internal static class LogarithmicRegression
     /// <returns>返回拟合结果，包括预测函数、拟合参数和均方误差。</returns>
     /// <exception cref="ArgumentException">当 xData 和 yData 的长度不同时抛出。</exception>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static FitResult<T> Fit_Normal<T>(Span<T> xData, Span<T> yData)
+    public static FitResult<T> Fit_Normal<T>(
+        Span<T> xData, Span<T> yData, CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length)
             throw new ArgumentException("The length of xData and yData must be the same.");
         int n = xData.Length;
         T tn = T.CreateChecked(n);
-        // 计算各种和
         T sumX = T.Zero;
         T sumY = T.Zero;
         T sumLnX = T.Zero;
@@ -29,6 +29,7 @@ internal static class LogarithmicRegression
         T sumYLnX = T.Zero;
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             if (xData[i] <= T.Zero)
                 throw new ArgumentException("xData must be positive for logarithm transformation.");
             T lnX = T.Log(xData[i]);
@@ -38,37 +39,35 @@ internal static class LogarithmicRegression
             sumLnX2 += lnX * lnX;
             sumYLnX += yData[i] * lnX;
         }
-        // 计算系数 a 和 b
         T b = (tn * sumYLnX - sumY * sumLnX) / (tn * sumLnX2 - sumLnX * sumLnX);
         T a = (sumY - b * sumLnX) / tn;
-        // 定义预测函数
         Func<T, T> predict = x => a + b * T.Log(x);
-        // 计算均方误差
         T mse = T.Zero;
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             T error = yData[i] - predict(xData[i]);
             mse += error * error;
         }
         mse /= tn;
-        // 返回拟合结果
         return new FitResult<T>(predict, new T[] { a, b }, mse);
     }
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static FitResult<T> Fit_SIMD<T>(Span<T> xData, Span<T> yData)
+    internal static FitResult<T> Fit_SIMD<T>(
+        Span<T> xData, Span<T> yData, CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (typeof(T) == typeof(float))
         {
             var xDataFloat = MemoryMarshal.Cast<T, float>(xData);
             var yDataFloat = MemoryMarshal.Cast<T, float>(yData);
-            return Fit_SIMD_Single(xDataFloat, yDataFloat).ToGeneric<T>();
+            return Fit_SIMD_Single(xDataFloat, yDataFloat, cancellationToken).ToGeneric<T>();
         }
         else if (typeof(T) == typeof(double))
         {
             var xDataDouble = MemoryMarshal.Cast<T, double>(xData);
             var yDataDouble = MemoryMarshal.Cast<T, double>(yData);
-            return Fit_SIMD_Double(xDataDouble, yDataDouble).ToGeneric<T>();
+            return Fit_SIMD_Double(xDataDouble, yDataDouble, cancellationToken).ToGeneric<T>();
         }
         else
         {
@@ -85,12 +84,12 @@ internal static class LogarithmicRegression
     /// <returns>返回拟合结果，包括预测函数、拟合参数和均方误差。</returns>
     /// <exception cref="ArgumentException">当 xData 和 yData 的长度不同时抛出。</exception>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static FitResultOfSingle Fit_SIMD_Single(Span<float> xData, Span<float> yData)
+    internal static FitResultOfSingle Fit_SIMD_Single(
+        Span<float> xData, Span<float> yData, CancellationToken cancellationToken = default)
     {
         int n = xData.Length;
         int vectorSize = Vector<float>.Count;
         float tn = n;
-        // 计算各种和
         var sumX = 0f;
         var sumY = 0f;
         var sumLnX = 0f;
@@ -99,6 +98,7 @@ internal static class LogarithmicRegression
         int i = 0;
         for (; i <= n - vectorSize; i += vectorSize)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             var xVec = new Vector<float>(xData.Slice(i, vectorSize));
             var yVec = new Vector<float>(yData.Slice(i, vectorSize));
             var lnXVec = Vector.Log(xVec);
@@ -125,12 +125,13 @@ internal static class LogarithmicRegression
         var a = (sumY - b * sumLnX) / tn;
         // 定义预测函数
         Func<float, float> predict = x => a + b * float.Log(x);
-        // 计算均方误差
+        // 计算均方误差（stackalloc 在循环外复用，避免大 N StackOverflow）
         var mse = 0f;
         i = 0;
+        Span<float> predSpan = stackalloc float[vectorSize];
         for (; i <= n - vectorSize; i += vectorSize)
         {
-            Span<float> predSpan = stackalloc float[vectorSize];
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             for (int j = 0; j < vectorSize; j++)
             {
                 predSpan[j] = predict(xData[i + j]);
@@ -159,12 +160,12 @@ internal static class LogarithmicRegression
     /// <returns>返回拟合结果，包括预测函数、拟合参数和均方误差。</returns>
     /// <exception cref="ArgumentException">当 xData 和 yData 的长度不同时抛出。</exception>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static FitResultOfDouble Fit_SIMD_Double(Span<double> xData, Span<double> yData)
+    internal static FitResultOfDouble Fit_SIMD_Double(
+        Span<double> xData, Span<double> yData, CancellationToken cancellationToken = default)
     {
         int n = xData.Length;
         int vectorSize = Vector<double>.Count;
         double tn = n;
-        // 计算各种和
         var sumX = 0.0;
         var sumY = 0.0;
         var sumLnX = 0.0;
@@ -173,6 +174,7 @@ internal static class LogarithmicRegression
         int i = 0;
         for (; i <= n - vectorSize; i += vectorSize)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             var xVec = new Vector<double>(xData.Slice(i, vectorSize));
             var yVec = new Vector<double>(yData.Slice(i, vectorSize));
             var lnXVec = Vector.Log(xVec);
@@ -199,16 +201,15 @@ internal static class LogarithmicRegression
         var a = (sumY - b * sumLnX) / tn;
         // 定义预测函数
         Func<double, double> predict = x => a + b * double.Log(x);
-        // 计算均方误差
+        // 计算均方误差（stackalloc 在循环外复用，避免大 N StackOverflow）
         var mse = 0.0;
         i = 0;
+        Span<double> predSpan = stackalloc double[vectorSize];
         for (; i <= n - vectorSize; i += vectorSize)
         {
-            Span<double> predSpan = stackalloc double[vectorSize];
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             for (int j = 0; j < vectorSize; j++)
-            {
                 predSpan[j] = predict(xData[i + j]);
-            }
             var predVec = new Vector<double>(predSpan);
             var yVec = new Vector<double>(yData.Slice(i, vectorSize));
             var errorVec = yVec - predVec;

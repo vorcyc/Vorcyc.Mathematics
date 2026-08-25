@@ -4,7 +4,7 @@ High-performance **.NET 10** math library: SIMD/parallel CPU numerics, signal pr
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**Version:** 0.10.15 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
+**Version:** 0.10.17 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
 
 [中文](readme_zh.md)
 
@@ -41,7 +41,7 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 **Linear algebra**  
 → [wiki/wiki_en/Module_LinearAlgebra.md](wiki/wiki_en/Module_LinearAlgebra.md)
 
-**Machine learning (0.9+)** — classifiers, regressors, pipelines, trees/forests, boosting, CV, grid search; Isolation Forest + JSON snapshots (0.10.11) & GPR `PredictStd` (0.10.10).  
+**Machine learning (0.9+)** — classifiers, regressors, pipelines, trees/forests, boosting, CV, grid search; Isolation Forest + JSON snapshots (0.10.11) & GPR `PredictStd` (0.10.10); CurveFitting SIMD large-N `StackOverflow` fix (0.10.16); classic `CurveFitter` methods take `CancellationToken` (0.10.17).  
 → [wiki/wiki_en/Module_MachineLearning.md](wiki/wiki_en/Module_MachineLearning.md)
 
 **Signal processing** — **`Signal` / `SignalSegment`** as primary time-domain APIs; FFT (`TransformToFrequencyDomain` uses SoA `FftButterflyFp32` from 0.10.12), Welch (`AveragePeriodogram` complete windows + `ComputingContext` from 0.10.13; SciPy onesided scale / periodic windows / spectrum helpers from 0.10.14), `FrequencyDomain.IndexToFrequency` uses FFT `TransformLength` (0.10.15), pink noise via Paul Kellet (`PinkNoiseGenerator`, 0.10.14), filters, MFCC, effects.  

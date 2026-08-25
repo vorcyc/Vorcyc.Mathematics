@@ -60,6 +60,16 @@ internal static class CurveFittingExecution
         where T : unmanaged
         => typeof(T) == typeof(float) || typeof(T) == typeof(double);
 
+    /// <summary>热循环取消步长（与 VSS 重构扫点相同：每 1024 项）。</summary>
+    public const int CancelCheckStride = 1024;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ThrowIfCancelled(CancellationToken cancellationToken, int index = 0)
+    {
+        if ((index & (CancelCheckStride - 1)) == 0)
+            cancellationToken.ThrowIfCancellationRequested();
+    }
+
     // ── kernels (no parallel policy) ─────────────────────────────────────────
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -222,7 +232,8 @@ internal static class CurveFittingExecution
 
     public static void AccumWeightedLinearSums<T>(
         ReadOnlySpan<T> xData, ReadOnlySpan<T> yData, T xQuery, T bandwidth,
-        out T wSum, out T wxSum, out T wySum, out T wxxSum, out T wxySum, bool useSimd)
+        out T wSum, out T wxSum, out T wySum, out T wxxSum, out T wxySum, bool useSimd,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = xData.Length;
@@ -233,6 +244,7 @@ internal static class CurveFittingExecution
             Span<T> w = n <= 256 ? stackalloc T[n] : new T[n];
             for (int i = 0; i < n; i++)
             {
+                ThrowIfCancelled(cancellationToken, i);
                 T u = T.Abs((xQuery - xData[i]) / bandwidth);
                 if (u >= T.One)
                     w[i] = T.Zero;
@@ -282,6 +294,7 @@ internal static class CurveFittingExecution
 
         for (int i = 0; i < n; i++)
         {
+            ThrowIfCancelled(cancellationToken, i);
             T u = T.Abs((xQuery - xData[i]) / bandwidth);
             T wi;
             if (u >= T.One)

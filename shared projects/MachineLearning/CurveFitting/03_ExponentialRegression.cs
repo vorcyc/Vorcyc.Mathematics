@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 namespace Vorcyc.Mathematics.MachineLearning.CurveFitting;
 internal static class ExponentialRegression
@@ -9,29 +9,28 @@ internal static class ExponentialRegression
     /// <param name="xData">自变量数据。</param>
     /// <param name="yData">因变量数据。</param>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static FitResult<T> Fit_Normal<T>(Span<T> xData, Span<T> yData)
+    internal static FitResult<T> Fit_Normal<T>(
+        Span<T> xData, Span<T> yData, CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = xData.Length;
-        // Step 1: 对 yData 取对数
         T[] logYData = new T[n];
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             if (yData[i] <= T.Zero)
                 throw new ArgumentException("yData must be positive for logarithm transformation.");
             logYData[i] = T.Log(yData[i]);
         }
-        // Step 2: 使用线性回归拟合 log(y) = log(a) + b * x
-        var linearResult = PolynomialRegression.Fit_Normal(xData, logYData, 1);
+        var linearResult = PolynomialRegression.Fit_Normal(xData, logYData, 1, cancellationToken);
         T logA = linearResult.Parameters[0];
         T b = linearResult.Parameters[1];
         T a = T.Exp(logA);
-        // Step 3: 定义预测函数
         Func<T, T> predict = x => a * T.Exp(b * x);
-        // Step 4: 计算均方误差 (MSE)
         T mse = T.Zero;
         for (int i = 0; i < n; i++)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             T error = yData[i] - predict(xData[i]);
             mse += error * error;
         }
@@ -44,20 +43,21 @@ internal static class ExponentialRegression
     /// <param name="xData">自变量数据。</param>
     /// <param name="yData">因变量数据。</param>
     [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static FitResult<T> Fit_SIMD<T>(Span<T> xData, Span<T> yData)
+    internal static FitResult<T> Fit_SIMD<T>(
+        Span<T> xData, Span<T> yData, CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = xData.Length;
-        int vectorSize = Vector<T>.Count; // half 就不行，还是只能支持 float 或 double
+        int vectorSize = Vector<T>.Count;
         if (n < 2)
             throw new ArgumentException("At least two data points are required.");
         if (xData.Length != yData.Length)
             throw new ArgumentException("xData and yData must have the same length.");
-        // Step 1: 对 yData 取对数（使用 SIMD）
         T[] logYData = new T[n];
         int i = 0;
         for (; i <= n - vectorSize; i += vectorSize)
         {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             var yVec = new Vector<T>(yData.Slice(i, vectorSize));
             for (int j = 0; j < vectorSize; j++)
             {
@@ -66,26 +66,23 @@ internal static class ExponentialRegression
                 logYData[i + j] = T.Log(yVec[j]);
             }
         }
-        // 处理剩余元素
         for (; i < n; i++)
         {
             if (yData[i] <= T.Zero)
                 throw new ArgumentException("yData must be positive for logarithm transformation.");
             logYData[i] = T.Log(yData[i]);
         }
-        // Step 2: 使用线性回归拟合 log(y) = log(a) + b * x
-        var linearResult = PolynomialRegression.Fit_SIMD(xData, logYData, 1);
+        var linearResult = PolynomialRegression.Fit_SIMD(xData, logYData, 1, cancellationToken);
         T logA = linearResult.Parameters[0];
         T b = linearResult.Parameters[1];
         T a = T.Exp(logA);
-        // Step 3: 定义预测函数
         Func<T, T> predict = x => a * T.Exp(b * x);
-        // Step 4: 计算均方误差 (MSE) 使用 SIMD
         T mse = T.Zero;
         i = 0;
+        Span<T> predSpan = stackalloc T[vectorSize];
         for (; i <= n - vectorSize; i += vectorSize)
         {
-            Span<T> predSpan = stackalloc T[vectorSize];
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             for (int j = 0; j < vectorSize; j++)
             {
                 predSpan[j] = predict(xData[i + j]);
@@ -95,7 +92,6 @@ internal static class ExponentialRegression
             var errorVec = yVec - predVec;
             mse += Vector.Sum(Vector.Multiply(errorVec, errorVec));
         }
-        // 处理剩余元素
         for (; i < n; i++)
         {
             T error = yData[i] - predict(xData[i]);

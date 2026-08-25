@@ -9,7 +9,8 @@ internal static class MovingAverageFitter
     /// <see cref="ComputingContextExecution.ForEach"/> 始终传入调用方 context（同 KMeans / Matrix / Standardization）。
     /// </summary>
     public static FitResult<T> Fit<T>(
-        T[] xData, T[] yData, int windowSize, ComputingContext? computingContext = null)
+        T[] xData, T[] yData, int windowSize, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
@@ -23,8 +24,11 @@ internal static class MovingAverageFitter
         int halfWindow = (windowSize - 1) / 2;
 
         for (int i = 1; i < n; i++)
+        {
+            CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             if (xData[i] <= xData[i - 1])
                 throw new ArgumentException("X 数据点必须单调递增");
+        }
 
         var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, windowSize);
         bool useSimd = dispatch == CurveFitDispatchKind.Simd;
@@ -36,7 +40,7 @@ internal static class MovingAverageFitter
             int end = Math.Min(n - 1, i + halfWindow);
             int count = end - start + 1;
             smoothed[i] = CurveFittingExecution.SumRange(yData.AsSpan(), start, end, useSimd) / T.CreateChecked(count);
-        }, workPerItem: windowSize);
+        }, workPerItem: windowSize, cancellationToken: cancellationToken);
 
         Func<T, T> predict = x =>
         {
@@ -63,7 +67,8 @@ internal static class MovingAverageFitter
 
     /// <summary>兼容旧名。</summary>
     public static FitResult<T> Fit_Normal<T>(
-        T[] xData, T[] yData, int windowSize, ComputingContext? computingContext = null)
+        T[] xData, T[] yData, int windowSize, ComputingContext? computingContext = null,
+        CancellationToken cancellationToken = default)
         where T : unmanaged, IFloatingPointIeee754<T>
-        => Fit(xData, yData, windowSize, computingContext);
+        => Fit(xData, yData, windowSize, computingContext, cancellationToken);
 }
