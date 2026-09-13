@@ -15,4 +15,8 @@ FFT_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 Welch_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
+IIR_018_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Filter_018_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
 Console.WriteLine("SP_module_test done.");

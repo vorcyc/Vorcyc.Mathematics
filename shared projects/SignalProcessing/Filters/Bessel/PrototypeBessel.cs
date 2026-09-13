@@ -1,3 +1,6 @@
+using System.Numerics;
+using Vorcyc.Mathematics.Numerics;
+
 namespace Vorcyc.Mathematics.SignalProcessing.Filters.Bessel;
 /// <summary>
 /// Bessel filter prototype.
@@ -42,6 +45,35 @@ public static class PrototypeBessel
         {
             poles[i] *= norm;
         }
+        return poles;
+    }
+
+    /// <summary>
+    /// <paramref name="k"/>-th reverse Bessel polynomial coefficient of order <paramref name="n"/>, in <typeparamref name="T"/>.
+    /// </summary>
+    public static T Reverse<T>(int k, int n)
+        where T : IFloatingPointIeee754<T>
+    {
+        return VMath.Factorial(T.CreateChecked(2 * n - k)) /
+               (T.Pow(T.CreateChecked(2), T.CreateChecked(n - k)) *
+                VMath.Factorial(T.CreateChecked(k)) *
+                VMath.Factorial(T.CreateChecked(n - k)));
+    }
+
+    /// <summary>
+    /// Analog Bessel poles in <typeparamref name="T"/>.
+    /// </summary>
+    public static Complex<T>[] Poles<T>(int order)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        var a = new T[order + 1];
+        for (var i = 0; i <= order; i++)
+            a[i] = Reverse<T>(order - i, order);
+        var poles = VMath.PolynomialRoots(a)
+                    ?? throw new InvalidOperationException("Bessel polynomial root finder returned no roots.");
+        var norm = T.Pow(T.CreateChecked(10), -T.Log10(a[order - 1]) / T.CreateChecked(order));
+        for (var i = 0; i < poles.Length; i++)
+            poles[i] *= norm;
         return poles;
     }
 }

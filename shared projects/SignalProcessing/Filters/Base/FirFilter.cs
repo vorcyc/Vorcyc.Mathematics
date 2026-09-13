@@ -76,7 +76,7 @@ public class FirFilter : LtiFilter
     /// <para>
     /// NOTE. 
     /// It will simply cast values to floats. 
-    /// If you need to preserve precision for filter design and analysis, use constructor <see cref="FirFilter(TransferFunction)"/>.
+    /// To filter in double precision, use <see cref="FirFilter{T}"/> / <see cref="FirFilter64"/>.
     /// </para>
     /// </summary>
     /// <param name="kernel"></param>

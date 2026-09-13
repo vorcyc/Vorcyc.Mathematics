@@ -18,8 +18,7 @@ public static class EnsembleEmpiricalModeDecomposition
         IProgress<ModeDecompositionProgress>? progress = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
-            throw new NotSupportedException("Only float and double are supported.");
+        ModeDecompositionSupport.EnsureFloatOrDouble<T>();
 
         options ??= new EemdOptions();
 
@@ -70,7 +69,7 @@ public static class EnsembleEmpiricalModeDecomposition
             for (int i = 0; i < n; i++)
             {
                 double noise = NextGaussian(rng) * noiseScale;
-                noisy[i] = T.CreateChecked(Convert.ToDouble(signalCopy[i]) + noise);
+                noisy[i] = signalCopy[i] + T.CreateChecked(noise);
             }
 
             var trialResult = EmpiricalModeDecomposition.Decompose(

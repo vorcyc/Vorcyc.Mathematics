@@ -37,3 +37,5 @@ new string('-', 30).PrintLine(ConsoleColor.Green);
 InfrastructureSuite_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 GprAndIsolationForest_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+HoltPca_018_test.Go();

@@ -1,4 +1,7 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Filters.Butterworth;
+﻿using System.Numerics;
+using Vorcyc.Mathematics.Numerics;
+
+namespace Vorcyc.Mathematics.SignalProcessing.Filters.Butterworth;
 
 /// <summary>
 /// Butterworth filter prototype.
@@ -20,6 +23,22 @@ public static class PrototypeButterworth
             poles[k] = new ComplexFp32(-MathF.Sin(theta), MathF.Cos(theta));
         }
 
+        return poles;
+    }
+
+    /// <summary>
+    /// Analog Butterworth poles in <typeparamref name="T"/>.
+    /// </summary>
+    public static Complex<T>[] Poles<T>(int order)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        var poles = new Complex<T>[order];
+        var two = T.CreateChecked(2);
+        for (var k = 0; k < order; k++)
+        {
+            var theta = T.Pi * T.CreateChecked(2 * k + 1) / (two * T.CreateChecked(order));
+            poles[k] = new Complex<T>(-T.Sin(theta), T.Cos(theta));
+        }
         return poles;
     }
 }

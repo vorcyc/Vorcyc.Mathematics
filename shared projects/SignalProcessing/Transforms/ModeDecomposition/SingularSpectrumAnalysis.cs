@@ -19,8 +19,7 @@ public static class SingularSpectrumAnalysis
         IProgress<ModeDecompositionProgress>? progress = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
-            throw new NotSupportedException("Only float and double are supported.");
+        ModeDecompositionSupport.EnsureFloatOrDouble<T>();
 
         options ??= new SsaOptions();
         int N = signal.Length;
@@ -39,10 +38,7 @@ public static class SingularSpectrumAnalysis
         int groupSize = Math.Max(1, options.GroupSize);
         var ctx = options.ComputingContext;
 
-        // Copy once so parallel workers can index without capturing Span.
-        var samples = new double[N];
-        for (int i = 0; i < N; i++)
-            samples[i] = Convert.ToDouble(signal[i]);
+        var samples = signal.ToArray();
 
         progress?.Report(new ModeDecompositionProgress
         {
@@ -54,7 +50,7 @@ public static class SingularSpectrumAnalysis
             Message = "Embed",
         });
 
-        var x = new double[L, K];
+        var x = new T[L, K];
         ComputingContextExecution.ForEach(ctx, 0, K, j =>
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -73,7 +69,7 @@ public static class SingularSpectrumAnalysis
             Message = "SVD",
         });
 
-        var trajectory = new Matrix<double>(x);
+        var trajectory = new Matrix<T>(x);
         var svd = MatrixDecomposition.SingularValueDecomposition(
             trajectory,
             tolerance: null,
@@ -83,7 +79,7 @@ public static class SingularSpectrumAnalysis
 
         int groupCount = (componentCount + groupSize - 1) / groupSize;
         var components = new List<T[]>(groupCount);
-        var recon = new double[N];
+        var recon = new T[N];
 
         for (int g = 0; g < groupCount; g++)
         {
@@ -101,42 +97,34 @@ public static class SingularSpectrumAnalysis
                 Message = $"Group {g + 1}",
             });
 
-            var elem = new double[L, K];
+            var elem = new T[L, K];
             for (int t = start; t < end; t++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                double sigma = svd.SingularValues[t];
+                T sigma = svd.SingularValues[t];
                 ComputingContextExecution.ForEach(ctx, 0, L, i =>
                 {
-                    double ui = svd.U[i, t];
+                    T ui = svd.U[i, t];
                     for (int j = 0; j < K; j++)
                         elem[i, j] += sigma * ui * svd.VT[t, j];
                 }, workPerItem: K);
             }
 
             var series = DiagonalAverage(elem, L, K, ctx, cancellationToken);
-            var comp = new T[N];
-            ComputingContextExecution.ForEach(ctx, 0, N, i =>
-            {
-                comp[i] = T.CreateChecked(series[i]);
-                // recon is accumulated sequentially after the parallel fill of comp
-            }, workPerItem: 1);
-
+            components.Add(series);
             for (int i = 0; i < N; i++)
                 recon[i] += series[i];
-
-            components.Add(comp);
         }
 
         var residual = new T[N];
         ComputingContextExecution.ForEach(ctx, 0, N, i =>
         {
-            residual[i] = T.CreateChecked(samples[i] - recon[i]);
+            residual[i] = samples[i] - recon[i];
         }, workPerItem: 1);
 
         var singularValues = new double[svd.SingularValues.Length];
         for (int i = 0; i < singularValues.Length; i++)
-            singularValues[i] = svd.SingularValues[i];
+            singularValues[i] = Convert.ToDouble(svd.SingularValues[i]);
 
         return new SsaResult<T>
         {
@@ -147,15 +135,14 @@ public static class SingularSpectrumAnalysis
         };
     }
 
-    private static double[] DiagonalAverage(
-        double[,] m, int L, int K, ComputingContext? ctx, CancellationToken ct)
+    private static T[] DiagonalAverage<T>(
+        T[,] m, int L, int K, ComputingContext? ctx, CancellationToken ct)
+        where T : unmanaged, IFloatingPointIeee754<T>
     {
         int N = L + K - 1;
-        var result = new double[N];
+        var result = new T[N];
         var counts = new int[N];
 
-        // Diagonal averaging has races if parallelized over (i,j); keep sequential
-        // but honor cancel and optionally parallelize the final divide.
         for (int i = 0; i < L; i++)
         {
             ct.ThrowIfCancellationRequested();
@@ -169,7 +156,7 @@ public static class SingularSpectrumAnalysis
 
         ComputingContextExecution.ForEach(ctx, 0, N, n =>
         {
-            result[n] /= counts[n];
+            result[n] /= T.CreateChecked(counts[n]);
         }, workPerItem: 1);
 
         return result;

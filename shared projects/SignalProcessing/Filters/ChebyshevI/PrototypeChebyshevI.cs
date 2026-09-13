@@ -1,4 +1,7 @@
-﻿namespace Vorcyc.Mathematics.SignalProcessing.Filters.ChebyshevI;
+﻿using System.Numerics;
+using Vorcyc.Mathematics.Numerics;
+
+namespace Vorcyc.Mathematics.SignalProcessing.Filters.ChebyshevI;
 
 /// <summary>
 /// Chebyshev-I filter prototype.
@@ -27,6 +30,28 @@ public static class PrototypeChebyshevI
             poles[k] = new ComplexFp32(re, im);
         }
 
+        return poles;
+    }
+
+    /// <summary>
+    /// Analog Chebyshev-I poles in <typeparamref name="T"/>.
+    /// </summary>
+    public static Complex<T>[] Poles<T>(int order, T? ripple = null)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        var rip = ripple ?? T.CreateChecked(0.1);
+        var ten = T.CreateChecked(10);
+        var eps = T.Sqrt(T.Pow(ten, rip / ten) - T.One);
+        var s = TrigonometryHelper.Asinh(T.One / eps) / T.CreateChecked(order);
+        var sinh = T.Sinh(s);
+        var cosh = T.Cosh(s);
+        var two = T.CreateChecked(2);
+        var poles = new Complex<T>[order];
+        for (var k = 0; k < order; k++)
+        {
+            var theta = T.Pi * T.CreateChecked(2 * k + 1) / (two * T.CreateChecked(order));
+            poles[k] = new Complex<T>(-sinh * T.Sin(theta), cosh * T.Cos(theta));
+        }
         return poles;
     }
 }

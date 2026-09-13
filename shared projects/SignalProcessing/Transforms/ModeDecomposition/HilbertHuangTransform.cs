@@ -1,5 +1,5 @@
 using System.Numerics;
-using Vorcyc.Mathematics.SignalProcessing.Fourier;
+using Vorcyc.Mathematics.SignalProcessing.Transforms;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Transforms.ModeDecomposition;
 
@@ -77,13 +77,11 @@ public static class HilbertHuangTransform
         IProgress<ModeDecompositionProgress>? progress)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
-            throw new NotSupportedException("Only float and double are supported.");
+        ModeDecompositionSupport.EnsureFloatOrDouble<T>();
         ArgumentNullException.ThrowIfNull(modes);
         if (!(samplingRate > 0))
             throw new ArgumentOutOfRangeException(nameof(samplingRate));
 
-        // Materialize so AnalyzeResidual can append without mutating caller-owned lists.
         var modeList = new List<T[]>(modes.Count + 1);
         for (int i = 0; i < modes.Count; i++)
             modeList.Add(modes[i] ?? throw new ArgumentException("Mode array is null.", nameof(modes)));
@@ -143,18 +141,24 @@ public static class HilbertHuangTransform
             cancellationToken.ThrowIfCancellationRequested();
             var a = amps[m];
             var f = freqs[m];
-            double peak = 0;
+            T peak = T.Zero;
             for (int i = 0; i < a.Length; i++)
-                peak = Math.Max(peak, Math.Abs(Convert.ToDouble(a[i])));
-            double thr = peak * minRel;
+            {
+                T abs = T.Abs(a[i]);
+                if (abs > peak) peak = abs;
+            }
+            T thr = peak * T.CreateChecked(minRel);
 
             for (int i = 0; i < a.Length; i += stride)
             {
-                double amp = Math.Abs(Convert.ToDouble(a[i]));
+                T amp = T.Abs(a[i]);
                 if (amp < thr) continue;
-                double freq = Convert.ToDouble(f[i]);
-                if (!(freq > 0) || double.IsNaN(freq) || double.IsInfinity(freq)) continue;
-                list.Add(new HilbertSpectrumSample(i / (double)samplingRate, freq, amp));
+                T freq = f[i];
+                if (!(freq > T.Zero)) continue;
+                list.Add(new HilbertSpectrumSample(
+                    i / (double)samplingRate,
+                    Convert.ToDouble(freq),
+                    Convert.ToDouble(amp)));
             }
         }
 
@@ -170,87 +174,44 @@ public static class HilbertHuangTransform
         frequencyHz = new T[n];
         if (n == 0) return;
 
-        var re = new double[n];
-        var im = new double[n];
-        for (int i = 0; i < n; i++)
-            re[i] = Convert.ToDouble(mode[i]);
+        var re = (T[])mode.Clone();
+        var im = new T[n];
+        HilbertTransform<T>.AnalyticSignalInPlace(re, im, ctx);
 
-        AnalyticSignalInPlace(re, im, ctx);
-
-        var phase = new double[n];
+        var phase = new T[n];
         for (int i = 0; i < n; i++)
         {
-            amplitude[i] = T.CreateChecked(Math.Sqrt(re[i] * re[i] + im[i] * im[i]));
-            phase[i] = Math.Atan2(im[i], re[i]);
+            amplitude[i] = T.Sqrt(re[i] * re[i] + im[i] * im[i]);
+            phase[i] = T.Atan2(im[i], re[i]);
         }
 
-        double offset = 0;
+        T pi = T.Pi;
+        T twoPi = pi + pi;
+        T offset = T.Zero;
         for (int i = 1; i < n; i++)
         {
-            double d = phase[i] - phase[i - 1] + offset;
-            if (d > Math.PI)
+            T d = phase[i] - phase[i - 1] + offset;
+            if (d > pi)
             {
-                offset -= 2 * Math.PI;
-                d -= 2 * Math.PI;
+                offset -= twoPi;
+                d -= twoPi;
             }
-            else if (d < -Math.PI)
+            else if (d < -pi)
             {
-                offset += 2 * Math.PI;
-                d += 2 * Math.PI;
+                offset += twoPi;
+                d += twoPi;
             }
             phase[i] = phase[i - 1] + d;
         }
 
-        double dt = 1.0 / samplingRate;
+        T dt = T.One / T.CreateChecked(samplingRate);
+        T twoPiDt = twoPi * dt;
         for (int i = 0; i < n - 1; i++)
         {
-            double fq = (phase[i + 1] - phase[i]) / (2 * Math.PI * dt);
-            if (fq < 0) fq = 0;
-            frequencyHz[i] = T.CreateChecked(fq);
+            T fq = (phase[i + 1] - phase[i]) / twoPiDt;
+            if (fq < T.Zero) fq = T.Zero;
+            frequencyHz[i] = fq;
         }
         frequencyHz[n - 1] = n >= 2 ? frequencyHz[n - 2] : T.Zero;
-    }
-
-    /// <summary>
-    /// In-place analytic signal: real stays signal, imag ← Hilbert(real).
-    /// Pads to next power of two for FFT. Honors <paramref name="context"/> (including <see cref="ComputingScope"/>).
-    /// </summary>
-    internal static void AnalyticSignalInPlace(double[] re, double[] im, ComputingContext? context = null)
-    {
-        int n = re.Length;
-        Array.Clear(im);
-        int fftSize = NextPow2(n);
-        var pr = new double[fftSize];
-        var pi = new double[fftSize];
-        re.AsSpan().CopyTo(pr);
-
-        var fft = new Fft64(fftSize);
-        fft.Direct(pr, pi, context);
-
-        for (int i = 1; i < fftSize / 2; i++)
-        {
-            pr[i] *= 2;
-            pi[i] *= 2;
-        }
-        for (int i = fftSize / 2 + 1; i < fftSize; i++)
-        {
-            pr[i] = 0;
-            pi[i] = 0;
-        }
-
-        fft.InverseNorm(pr, pi, context);
-        for (int i = 0; i < n; i++)
-        {
-            re[i] = pr[i];
-            im[i] = pi[i];
-        }
-    }
-
-    private static int NextPow2(int n)
-    {
-        if (n <= 1) return 1;
-        int p = 1;
-        while (p < n) p <<= 1;
-        return p;
     }
 }

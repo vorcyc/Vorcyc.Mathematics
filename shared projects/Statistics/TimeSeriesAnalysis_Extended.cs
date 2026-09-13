@@ -49,6 +49,13 @@ public static partial class TimeSeriesAnalysis
     /// </summary>
     public static T[] Holt<T>(this ReadOnlySpan<T> series, T alpha, T beta)
         where T : IFloatingPointIeee754<T>
+        => series.HoltWithState(alpha, beta).Fitted;
+
+    /// <summary>
+    /// Holt recurrence plus the terminal level and trend (not the last two fitted values).
+    /// </summary>
+    public static (T[] Fitted, HoltState<T> State) HoltWithState<T>(this ReadOnlySpan<T> series, T alpha, T beta)
+        where T : IFloatingPointIeee754<T>
     {
         if (series.IsEmpty)
             throw new ArgumentException("Series cannot be empty.", nameof(series));
@@ -67,13 +74,30 @@ public static partial class TimeSeriesAnalysis
             fitted[i] = level + trend;
         }
 
-        return fitted;
+        return (fitted, new HoltState<T>(level, trend));
     }
 
     /// <summary>
     /// Holt-Winters additive seasonal forecasting.
     /// </summary>
     public static (T[] Fitted, T[] Forecast) HoltWinters<T>(
+        this ReadOnlySpan<T> series,
+        int seasonLength,
+        int forecastPeriod,
+        T alpha,
+        T beta,
+        T gamma)
+        where T : IFloatingPointIeee754<T>
+    {
+        var (fitted, forecast, _) = series.HoltWintersWithState(seasonLength, forecastPeriod, alpha, beta, gamma);
+        return (fitted, forecast);
+    }
+
+    /// <summary>
+    /// Holt-Winters additive recurrence plus the last level, trend, and one season of seasonal state.
+    /// Forecast uses that terminal seasonal vector: <c>L + h·T + S[(h-1) mod m]</c>.
+    /// </summary>
+    public static (T[] Fitted, T[] Forecast, HoltWintersState<T> State) HoltWintersWithState<T>(
         this ReadOnlySpan<T> series,
         int seasonLength,
         int forecastPeriod,
@@ -98,7 +122,6 @@ public static partial class TimeSeriesAnalysis
 
         for (int i = 1; i < n; i++)
         {
-            int seasonIndex = i % seasonLength;
             T prevLevel = i == 1 ? series[0] : level[i - 1];
             T prevTrend = i == 1 ? T.Zero : trend[i - 1];
             T prevSeasonal = seasonal[Math.Max(0, i - seasonLength)];
@@ -109,35 +132,53 @@ public static partial class TimeSeriesAnalysis
             fitted[i] = level[i] + trend[i] + seasonal[i];
         }
 
-        var forecast = new T[forecastPeriod];
-        for (int h = 1; h <= forecastPeriod; h++)
+        fitted[0] = level[0] + trend[0] + seasonal[0];
+
+        var seasonState = new T[seasonLength];
+        if (n >= seasonLength)
         {
-            int seasonIndex = (n - seasonLength + h) % seasonLength;
-            if (seasonIndex < 0) seasonIndex += seasonLength;
-            T s = seasonal[n - seasonLength + seasonIndex];
-            forecast[h - 1] = level[n - 1] + T.CreateChecked(h) * trend[n - 1] + s;
+            for (int i = 0; i < seasonLength; i++)
+                seasonState[i] = seasonal[n - seasonLength + i];
+        }
+        else
+        {
+            seasonal.AsSpan(0, n).CopyTo(seasonState);
         }
 
-        return (fitted, forecast);
+        var forecast = new T[forecastPeriod];
+        T lastLevel = level[n - 1];
+        T lastTrend = trend[n - 1];
+        for (int h = 1; h <= forecastPeriod; h++)
+        {
+            int seasonIndex = (h - 1) % seasonLength;
+            forecast[h - 1] = lastLevel + T.CreateChecked(h) * lastTrend + seasonState[seasonIndex];
+        }
+
+        return (fitted, forecast, new HoltWintersState<T>(lastLevel, lastTrend, seasonState));
     }
 
     /// <summary>
-    /// Forecast using Holt linear trend extrapolation.
+    /// Forecast using Holt linear trend extrapolation from the recurrence's last level and trend.
     /// </summary>
     public static T[] ForecastHolt<T>(this ReadOnlySpan<T> series, int forecastPeriod, T alpha, T beta)
         where T : IFloatingPointIeee754<T>
     {
-        if (series.IsEmpty)
-            throw new ArgumentException("Series cannot be empty.", nameof(series));
+        if (forecastPeriod < 0)
+            throw new ArgumentOutOfRangeException(nameof(forecastPeriod));
 
-        var fitted = series.Holt(alpha, beta);
-        T level = fitted[^1];
-        T trend = fitted.Length > 1 ? fitted[^1] - fitted[^2] : T.Zero;
-
+        var (_, state) = series.HoltWithState(alpha, beta);
         var forecast = new T[forecastPeriod];
         for (int h = 1; h <= forecastPeriod; h++)
-            forecast[h - 1] = level + T.CreateChecked(h) * trend;
+            forecast[h - 1] = state.LastLevel + T.CreateChecked(h) * state.LastTrend;
 
         return forecast;
     }
 }
+
+/// <summary>Terminal Holt level and trend after the last in-sample update.</summary>
+public readonly record struct HoltState<T>(T LastLevel, T LastTrend)
+    where T : IFloatingPointIeee754<T>;
+
+/// <summary>Terminal Holt-Winters level, trend, and last-season seasonal vector.</summary>
+public readonly record struct HoltWintersState<T>(T LastLevel, T LastTrend, T[] LastSeasonal)
+    where T : IFloatingPointIeee754<T>;

@@ -80,7 +80,7 @@ public class ZiFilter : LtiFilter
     /// <para>
     /// NOTE. 
     /// It will simply cast values to floats. 
-    /// If you need to preserve precision for filter design and analysis, use constructor <see cref="ZiFilter(TransferFunction)"/>.
+    /// To filter in double precision, use <see cref="ZiFilter{T}"/> / <see cref="ZiFilter64"/>.
     /// </para>
     /// </summary>
     /// <param name="b">Numerator of transfer function</param>

@@ -23,6 +23,7 @@ internal static class FFT_test
         Roundtrip(16384, ComputingContext.Parallel);
         RoundtripInPlace(16384, ComputingContext.Simd);
         DetectSine();
+        GenericFacadeAgrees();
 
         "FFT_test OK".PrintLine(ConsoleColor.Green);
     }
@@ -139,5 +140,49 @@ internal static class FFT_test
             throw new Exception($"Normal FFT peak {normal} Hz, expected ~{targetHz}");
         if (MathF.Abs(simd - normal) > 0.5f || MathF.Abs(parallel - normal) > 0.5f)
             throw new Exception($"peak mismatch Normal={normal} Simd={simd} Parallel={parallel}");
+    }
+
+    static void GenericFacadeAgrees()
+    {
+        const int n = 256;
+        var rng = new Random(18);
+
+        var re32 = new float[n];
+        var im32 = new float[n];
+        var re32b = new float[n];
+        var im32b = new float[n];
+        var re64 = new double[n];
+        var im64 = new double[n];
+        var re64b = new double[n];
+        var im64b = new double[n];
+        for (int i = 0; i < n; i++)
+        {
+            re32[i] = re32b[i] = (float)(rng.NextDouble() * 2 - 1);
+            im32[i] = im32b[i] = (float)(rng.NextDouble() * 2 - 1);
+            re64[i] = re64b[i] = rng.NextDouble() * 2 - 1;
+            im64[i] = im64b[i] = rng.NextDouble() * 2 - 1;
+        }
+
+        new Fft(n).Direct(re32, im32);
+        new Fft<float>(n).Direct(re32b, im32b);
+        float max32 = 0;
+        for (int i = 0; i < n; i++)
+        {
+            max32 = Math.Max(max32, Math.Abs(re32[i] - re32b[i]));
+            max32 = Math.Max(max32, Math.Abs(im32[i] - im32b[i]));
+        }
+        if (max32 > 0)
+            throw new Exception($"Fft<float> vs Fft: max |Δ|={max32}");
+
+        new Fft64(n).Direct(re64, im64);
+        new Fft<double>(n).Direct(re64b, im64b);
+        double max64 = 0;
+        for (int i = 0; i < n; i++)
+        {
+            max64 = Math.Max(max64, Math.Abs(re64[i] - re64b[i]));
+            max64 = Math.Max(max64, Math.Abs(im64[i] - im64b[i]));
+        }
+        if (max64 > 0)
+            throw new Exception($"Fft<double> vs Fft64: max |Δ|={max64}");
     }
 }

@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Signals;
+﻿using System.Numerics;
+using Vorcyc.Mathematics.SignalProcessing.Signals;
 using Vorcyc.Mathematics.SignalProcessing.Transforms;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
@@ -103,6 +104,28 @@ public static class IFilterExtensions
     /// </summary>
     public static float Process(this IOnlineFilter filter, float sample, float gain)
         => gain * filter.Process(sample);
+
+    /// <summary>Filters a frame through a generic online filter.</summary>
+    public static void Process<T>(this IOnlineFilter<T> filter,
+                                  ReadOnlySpan<T> input,
+                                  Span<T> output)
+        where T : unmanaged, IFloatingPointIeee754<T>
+    {
+        if (output.Length < input.Length)
+            throw new ArgumentException("Output is shorter than input.", nameof(output));
+        for (int i = 0; i < input.Length; i++)
+            output[i] = filter.Process(input[i]);
+    }
+
+    /// <summary>Filters an entire buffer and returns a new array.</summary>
+    public static T[] FilterOnline<T>(this IOnlineFilter<T> filter, ReadOnlySpan<T> samples)
+        where T : unmanaged, IFloatingPointIeee754<T>
+    {
+        var output = new T[samples.Length];
+        for (int i = 0; i < samples.Length; i++)
+            output[i] = filter.Process(samples[i]);
+        return output;
+    }
 
 #if DEBUG
     /// <summary>

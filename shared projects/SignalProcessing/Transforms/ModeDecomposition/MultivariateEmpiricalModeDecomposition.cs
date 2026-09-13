@@ -18,8 +18,7 @@ public static class MultivariateEmpiricalModeDecomposition
         IProgress<ModeDecompositionProgress>? progress = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
-            throw new NotSupportedException("Only float and double are supported.");
+        ModeDecompositionSupport.EnsureFloatOrDouble<T>();
 
         if (channels is null || channels.Count < 2)
             throw new ArgumentException("At least two channels are required.", nameof(channels));
@@ -316,36 +315,37 @@ public static class MultivariateEmpiricalModeDecomposition
         int rightIdx = 2 * (n - 1) - e1;
 
         int m = extrema.Count + 2;
-        var xs = new double[m];
-        var ys = new double[m];
+        var xs = new T[m];
+        var ys = new T[m];
 
-        xs[0] = leftIdx;
-        ys[0] = Convert.ToDouble(signal[e0]);
+        xs[0] = T.CreateChecked(leftIdx);
+        ys[0] = signal[e0];
         for (int k = 0; k < extrema.Count; k++)
         {
-            xs[k + 1] = extrema[k];
-            ys[k + 1] = Convert.ToDouble(signal[extrema[k]]);
+            xs[k + 1] = T.CreateChecked(extrema[k]);
+            ys[k + 1] = signal[extrema[k]];
         }
-        xs[^1] = rightIdx;
-        ys[^1] = Convert.ToDouble(signal[e1]);
+        xs[^1] = T.CreateChecked(rightIdx);
+        ys[^1] = signal[e1];
 
+        T bump = T.CreateChecked(1e-6);
         for (int k = 1; k < m; k++)
         {
             if (!(xs[k] > xs[k - 1]))
-                xs[k] = xs[k - 1] + 1e-6;
+                xs[k] = xs[k - 1] + bump;
         }
 
-        if (!NaturalCubicSpline.TryCreate(xs, ys, out var spline))
+        if (!NaturalCubicSpline<T>.TryCreate(xs, ys, out var spline))
         {
-            double mean = 0;
+            T mean = T.Zero;
             for (int k = 0; k < ys.Length; k++) mean += ys[k];
-            mean /= ys.Length;
-            envelope.Fill(T.CreateChecked(mean));
+            mean /= T.CreateChecked(ys.Length);
+            envelope.Fill(mean);
             return true;
         }
 
         for (int i = 0; i < n; i++)
-            envelope[i] = T.CreateChecked(spline.Evaluate(i));
+            envelope[i] = spline.Evaluate(i);
         return true;
     }
 
@@ -365,7 +365,7 @@ public static class MultivariateEmpiricalModeDecomposition
         int n = x.Length;
         ComputingContextExecution.ForEach(ctx, 0, n, i =>
         {
-            x[i] = T.CreateChecked(Convert.ToDouble(x[i]) * scale);
+            x[i] *= T.CreateChecked(scale);
         }, workPerItem: 2);
     }
 
@@ -434,84 +434,7 @@ public static class MultivariateEmpiricalModeDecomposition
             ComputingContextExecution.ForEach(ctx, 0, n, i =>
             {
                 r[i] -= m[i];
-            }, workPerItem: 2);
-        }
-    }
-
-    private readonly struct NaturalCubicSpline
-    {
-        private readonly double[] _x;
-        private readonly double[] _a;
-        private readonly double[] _b;
-        private readonly double[] _c;
-        private readonly double[] _d;
-        private readonly int _seg;
-
-        private NaturalCubicSpline(double[] x, double[] a, double[] b, double[] c, double[] d, int seg)
-        {
-            _x = x;
-            _a = a;
-            _b = b;
-            _c = c;
-            _d = d;
-            _seg = seg;
-        }
-
-        public static bool TryCreate(double[] x, double[] y, out NaturalCubicSpline spline)
-        {
-            spline = default;
-            int n = x.Length - 1;
-            if (n < 1 || x.Length != y.Length) return false;
-
-            var h = new double[n];
-            for (int i = 0; i < n; i++)
-            {
-                h[i] = x[i + 1] - x[i];
-                if (!(h[i] > 0)) return false;
-            }
-
-            var alpha = new double[n];
-            for (int i = 1; i < n; i++)
-                alpha[i] = 3.0 * ((y[i + 1] - y[i]) / h[i] - (y[i] - y[i - 1]) / h[i - 1]);
-
-            var l = new double[n + 1];
-            var mu = new double[n];
-            var z = new double[n + 1];
-            var c = new double[n + 1];
-            var b = new double[n];
-            var d = new double[n];
-
-            l[0] = 1;
-            for (int i = 1; i < n; i++)
-            {
-                l[i] = 2.0 * (x[i + 1] - x[i - 1]) - h[i - 1] * mu[i - 1];
-                if (Math.Abs(l[i]) < 1e-30) return false;
-                mu[i] = h[i] / l[i];
-                z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
-            }
-
-            l[n] = 1;
-            for (int j = n - 1; j >= 0; j--)
-            {
-                c[j] = z[j] - mu[j] * c[j + 1];
-                b[j] = (y[j + 1] - y[j]) / h[j] - h[j] * (c[j + 1] + 2.0 * c[j]) / 3.0;
-                d[j] = (c[j + 1] - c[j]) / (3.0 * h[j]);
-            }
-
-            spline = new NaturalCubicSpline(x, y, b, c, d, n);
-            return true;
-        }
-
-        public double Evaluate(double xi)
-        {
-            if (xi <= _x[0]) return _a[0];
-            if (xi >= _x[_seg]) return _a[_seg];
-
-            int i = 0;
-            while (i < _seg && xi > _x[i + 1]) i++;
-            if (i == _seg) i--;
-            double dx = xi - _x[i];
-            return _a[i] + _b[i] * dx + _c[i] * dx * dx + _d[i] * dx * dx * dx;
+            },             workPerItem: 2);
         }
     }
 }

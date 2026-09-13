@@ -109,7 +109,8 @@ public class IirFilter : LtiFilter
     /// <para>
     /// NOTE. 
     /// It will simply cast values to floats. 
-    /// If you need to preserve precision for filter design and analysis, use constructor <see cref="IirFilter(TransferFunction)"/>.
+    /// To filter in double precision, use <see cref="IirFilter{T}"/> / <see cref="IirFilter64"/>.
+    /// The float <see cref="TransferFunction"/> constructor still stores analysis coefficients as float.
     /// </para>
     /// </summary>
     /// <param name="b">Numerator of transfer function</param>

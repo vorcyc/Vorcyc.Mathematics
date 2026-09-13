@@ -19,8 +19,7 @@ public static class EmpiricalWaveletTransform
         IProgress<ModeDecompositionProgress>? progress = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
-            throw new NotSupportedException("Only float and double are supported.");
+        ModeDecompositionSupport.EnsureFloatOrDouble<T>();
 
         options ??= new EwtOptions();
         int n0 = signal.Length;
@@ -34,22 +33,22 @@ public static class EmpiricalWaveletTransform
         double minPeak = Math.Clamp(options.MinPeakHeight, 0, 1);
         var ctx = options.ComputingContext;
 
-        var f0 = new double[n0];
-        for (int i = 0; i < n0; i++)
-            f0[i] = Convert.ToDouble(signal[i]);
+        int fftSize = ModeDecompositionSupport.NextPow2(n0);
+        var re = new T[fftSize];
+        var im = new T[fftSize];
+        signal.CopyTo(re.AsSpan(0, n0));
 
-        int fftSize = NextPow2(n0);
-        var re = new double[fftSize];
-        var im = new double[fftSize];
-        f0.AsSpan().CopyTo(re);
-
-        var fft = new Fft64(fftSize);
+        var fft = new Fft<T>(fftSize);
         fft.Direct(re, im, ctx);
 
         int halfBins = fftSize / 2 + 1;
         var mag = new double[halfBins];
         for (int i = 0; i < halfBins; i++)
-            mag[i] = Math.Sqrt(re[i] * re[i] + im[i] * im[i]);
+        {
+            double r = Convert.ToDouble(re[i]);
+            double ii = Convert.ToDouble(im[i]);
+            mag[i] = Math.Sqrt(r * r + ii * ii);
+        }
 
         double maxMag = 0;
         for (int i = 1; i < halfBins - 1; i++)
@@ -106,15 +105,14 @@ public static class EmpiricalWaveletTransform
                 Message = $"Band {b + 1}",
             });
 
-            var br = (double[])re.Clone();
-            var bi = (double[])im.Clone();
+            var br = (T[])re.Clone();
+            var bi = (T[])im.Clone();
             ApplyBandpass(br, bi, fftSize, bandEdges[b], bandEdges[b + 1], gamma, ctx);
 
             fft.InverseNorm(br, bi, ctx);
 
             bands[b] = new T[n0];
-            for (int i = 0; i < n0; i++)
-                bands[b][i] = T.CreateChecked(br[i]);
+            br.AsSpan(0, n0).CopyTo(bands[b]);
         }
 
         var residual = (T[])bands[0].Clone();
@@ -145,17 +143,18 @@ public static class EmpiricalWaveletTransform
         return peaks;
     }
 
-    private static void ApplyBandpass(
-        double[] re, double[] im, int fftSize,
+    private static void ApplyBandpass<T>(
+        T[] re, T[] im, int fftSize,
         double fLow, double fHigh, double gamma,
         ComputingContext? ctx)
+        where T : unmanaged, IFloatingPointIeee754<T>
     {
         int n = fftSize;
         int half = n / 2;
         ComputingContextExecution.ForEach(ctx, 0, n, i =>
         {
             double f = i <= half ? (double)i / n : (double)(n - i) / n;
-            double w = RaisedCosineBand(f, fLow, fHigh, gamma);
+            T w = T.CreateChecked(RaisedCosineBand(f, fLow, fHigh, gamma));
             re[i] *= w;
             im[i] *= w;
         }, workPerItem: 8);
@@ -177,13 +176,5 @@ public static class EmpiricalWaveletTransform
 
         double tu = (f - fHigh) / (2.0 * gamma);
         return 0.5 * (1.0 + Math.Cos(Math.PI * tu));
-    }
-
-    private static int NextPow2(int n)
-    {
-        if (n <= 1) return 1;
-        int p = 1;
-        while (p < n) p <<= 1;
-        return p;
     }
 }

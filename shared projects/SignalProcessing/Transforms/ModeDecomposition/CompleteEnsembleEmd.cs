@@ -22,8 +22,7 @@ public static class CompleteEnsembleEmd
         IProgress<ModeDecompositionProgress>? progress = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        if (typeof(T) != typeof(float) && typeof(T) != typeof(double))
-            throw new NotSupportedException("Only float and double are supported.");
+        ModeDecompositionSupport.EnsureFloatOrDouble<T>();
 
         options ??= new CeemdanOptions();
 
@@ -120,8 +119,7 @@ public static class CompleteEnsembleEmd
                 var stageInput = new T[n];
                 for (int i = 0; i < n; i++)
                 {
-                    stageInput[i] = T.CreateChecked(
-                        Convert.ToDouble(residual[i]) + epsilon * Convert.ToDouble(noiseComp[i]));
+                    stageInput[i] = residual[i] + T.CreateChecked(epsilon) * noiseComp[i];
                 }
 
                 var stageResult = EmpiricalModeDecomposition.Decompose(

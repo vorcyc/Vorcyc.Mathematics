@@ -108,7 +108,22 @@ public class PCA<TSelf> : IMachineLearning
     }
 
     /// <summary>
-    /// Transforms the original data into principal components.
+    /// Per-feature means used to center the training data (and out-of-sample rows).
+    /// </summary>
+    public TSelf[] Means => _means;
+
+    /// <summary>
+    /// Eigenvalues of the sample covariance, already sorted descending.
+    /// </summary>
+    public TSelf[] Eigenvalues => _eigenValues;
+
+    /// <summary>
+    /// Principal axes as columns of the eigendecomposition; index <c>j</c> is component <c>j</c>.
+    /// </summary>
+    public TSelf[][] Eigenvectors => _eigenVectors;
+
+    /// <summary>
+    /// Transforms the (already centered) training data into principal components.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TSelf[,] Transform()
@@ -130,6 +145,39 @@ public class PCA<TSelf> : IMachineLearning
             },
             workPerItem: (long)numFeatures * numFeatures);
         return components;
+    }
+
+    /// <summary>
+    /// Centers <paramref name="x"/> with the fitted means and projects onto the first
+    /// <paramref name="components"/> principal axes (all of them when null).
+    /// </summary>
+    public TSelf[,] Transform(TSelf[,] x, int? components = null)
+    {
+        ArgumentNullException.ThrowIfNull(x);
+        int numSamples = x.GetLength(0);
+        int numFeatures = x.GetLength(1);
+        if (numFeatures != _means.Length)
+            throw new ArgumentException($"Expected {_means.Length} features, got {numFeatures}.", nameof(x));
+
+        int k = components ?? _eigenValues.Length;
+        if (k <= 0 || k > _eigenValues.Length)
+            throw new ArgumentOutOfRangeException(nameof(components), "Component count must be in 1..rank.");
+
+        TSelf[,] result = new TSelf[numSamples, k];
+        ComputingContextExecution.ForEach(
+            Context,
+            0,
+            numSamples,
+            i =>
+            {
+                var row = new TSelf[numFeatures];
+                for (int j = 0; j < numFeatures; j++)
+                    row[j] = x[i, j] - _means[j];
+                for (int c = 0; c < k; c++)
+                    result[i, c] = VectorSpan.Dot(_eigenVectors[c], row);
+            },
+            workPerItem: (long)numFeatures * k);
+        return result;
     }
 
     /// <summary>

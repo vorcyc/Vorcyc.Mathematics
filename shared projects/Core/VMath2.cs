@@ -126,6 +126,24 @@ public static partial class VMath
         //}
     }
     /// <summary>
+    /// Does bilinear transform (in-place) for IEEE-754 <typeparamref name="T"/>.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void BilinearTransform<T>(T[] re, T[] im)
+        where T : IFloatingPointIeee754<T>
+    {
+        var one = T.One;
+        var two = T.CreateChecked(2);
+        for (var k = 0; k < re.Length; k++)
+        {
+            var den = (one - re[k]) * (one - re[k]) + im[k] * im[k];
+            var newRe = (one - re[k] * re[k] - im[k] * im[k]) / den;
+            var newIm = two * im[k] / den;
+            re[k] = newRe;
+            im[k] = newIm;
+        }
+    }
+    /// <summary>
     /// Unwraps phase.
     /// </summary>
     /// <param name="phase">Phase array</param>
@@ -672,6 +690,88 @@ public static partial class VMath
         Array.Copy(output, 0, q, 0, separator);
         Array.Copy(output, separator, r, 0, output.Length - separator);
         return new[] { q, r };
+    }
+
+    /// <summary>
+    /// Evaluates complex roots of polynomials using Durand-Kerner (order up to ~50).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Complex<T>[]? PolynomialRoots<T>(T[] a, int maxIterations = PolyRootsIterations)
+        where T : struct, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        if (a.Length <= 1)
+            return null;
+
+        var c1 = Complex<T>.One;
+        var rootsPrev = new Complex<T>[a.Length - 1];
+        var roots = new Complex<T>[a.Length - 1];
+        var result = new Complex<T>(T.CreateChecked(0.4), T.CreateChecked(0.9));
+        rootsPrev[0] = c1;
+        for (var i = 1; i < rootsPrev.Length; i++)
+            rootsPrev[i] = rootsPrev[i - 1] * result;
+
+        var iter = 0;
+        var tol = T.CreateChecked(1e-16);
+        while (true)
+        {
+            for (int i = 0; i < rootsPrev.Length; i++)
+            {
+                result = c1;
+                for (int j = 0; j < rootsPrev.Length; j++)
+                {
+                    if (i != j)
+                        result = (rootsPrev[i] - rootsPrev[j]) * result;
+                }
+                roots[i] = rootsPrev[i] - (EvaluatePolynomial(a, rootsPrev[i]) / result);
+            }
+            if (++iter > maxIterations || ArraysAreEqual(rootsPrev, roots, tol))
+                break;
+            Array.Copy(roots, rootsPrev, roots.Length);
+        }
+        return roots;
+    }
+
+    private static bool ArraysAreEqual<T>(Complex<T>[] a, Complex<T>[] b, T tolerance)
+        where T : struct, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        for (var i = 0; i < a.Length; i++)
+        {
+            if (Complex<T>.Abs(a[i] - b[i]) > tolerance)
+                return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Evaluates a polynomial (Horner; <paramref name="a"/>[0] is the highest-degree coefficient).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Complex<T> EvaluatePolynomial<T>(T[] a, Complex<T> x)
+        where T : struct, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        var res = new Complex<T>(a[0], T.Zero);
+        for (var i = 1; i < a.Length; i++)
+        {
+            res *= x;
+            res += a[i];
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// Multiplies two polynomials with <see cref="Complex{T}"/> coefficients.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Complex<T>[] MultiplyPolynomials<T>(Complex<T>[] poly1, Complex<T>[] poly2)
+        where T : struct, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        var result = new Complex<T>[poly1.Length + poly2.Length - 1];
+        for (var i = 0; i < poly1.Length; i++)
+        {
+            for (var j = 0; j < poly2.Length; j++)
+                result[i + j] += poly1[i] * poly2[j];
+        }
+        return result;
     }
     #endregion
 
