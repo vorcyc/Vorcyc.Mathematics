@@ -773,6 +773,35 @@ public static partial class VMath
         }
         return result;
     }
+
+    /// <summary>
+    /// Divides polynomials with <see cref="Complex{T}"/> coefficients.
+    /// Returns <c>[quotient, remainder]</c>.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Complex<T>[][] DividePolynomial<T>(Complex<T>[] dividend, Complex<T>[] divisor)
+        where T : struct, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        var output = (Complex<T>[])dividend.Clone();
+        var normalizer = divisor[0];
+        var tol = T.CreateChecked(1e-10);
+        for (var i = 0; i < dividend.Length - divisor.Length + 1; i++)
+        {
+            output[i] /= normalizer;
+            var coeff = output[i];
+            if (T.Abs(coeff.Real) > tol || T.Abs(coeff.Imaginary) > tol)
+            {
+                for (var j = 1; j < divisor.Length; j++)
+                    output[i + j] -= divisor[j] * coeff;
+            }
+        }
+        var separator = output.Length - divisor.Length + 1;
+        var q = new Complex<T>[separator];
+        var r = new Complex<T>[output.Length - separator];
+        Array.Copy(output, 0, q, 0, separator);
+        Array.Copy(output, separator, r, 0, output.Length - separator);
+        return [q, r];
+    }
     #endregion
 
 }

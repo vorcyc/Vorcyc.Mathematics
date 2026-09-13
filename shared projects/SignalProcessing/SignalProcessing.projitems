@@ -192,9 +192,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)InterpolationMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Lpc.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\ComplexConvolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\ComplexConvolverGeneric.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\Convolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\ConvolverGeneric.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\OlaBlockConvolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\OlaBlockConvolverGeneric.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\OlsBlockConvolver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\Convolution\OlsBlockConvolverGeneric.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\DynamicsMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\DynamicsProcessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\EnvelopeFollower.cs" />

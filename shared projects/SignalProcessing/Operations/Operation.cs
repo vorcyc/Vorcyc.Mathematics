@@ -1,4 +1,5 @@
-﻿using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
+﻿using System.Numerics;
+using Vorcyc.Mathematics.SignalProcessing.Filters.Base;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Tsm;
 using Vorcyc.Mathematics.SignalProcessing.Signals;
@@ -46,12 +47,15 @@ public static class Operation
     /// Does fast convolution of <paramref name="signal"/> with <paramref name="kernel"/> via FFT.
     /// </summary>
     public static float[] Convolve(float[] signal, float[] kernel)
-    {
-        var length = signal.Length + kernel.Length - 1;
-        var output = new float[length];
-        new Convolver().Convolve(signal, kernel, output);
-        return output;
-    }
+        => Convolve<float>(signal, kernel);
+
+    /// <summary>
+    /// Fast convolution via FFT in <typeparamref name="T"/> (<see cref="float"/> or <see cref="double"/>).
+    /// Result length is <c>signal.Length + kernel.Length - 1</c>.
+    /// </summary>
+    public static T[] Convolve<T>(T[] signal, T[] kernel, ComputingContext? context = null)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => new Convolver<T>().Convolve(signal, kernel, context);
 
     /// <summary>
     /// Does fast cross-correlation between <paramref name="signal1"/> and <paramref name="signal2"/> via FFT.
@@ -68,6 +72,20 @@ public static class Operation
     {
         return new ComplexConvolver().CrossCorrelate(signal1, signal2);
     }
+
+    /// <summary>
+    /// Fast cross-correlation of float arrays via FFT.
+    /// </summary>
+    public static float[] CrossCorrelate(float[] signal1, float[] signal2)
+        => CrossCorrelate<float>(signal1, signal2);
+
+    /// <summary>
+    /// Fast cross-correlation via FFT in <typeparamref name="T"/> (<see cref="float"/> or <see cref="double"/>).
+    /// Result length is <c>signal1.Length + signal2.Length - 1</c>.
+    /// </summary>
+    public static T[] CrossCorrelate<T>(T[] signal1, T[] signal2, ComputingContext? context = null)
+        where T : unmanaged, IFloatingPointIeee754<T>
+        => new Convolver<T>().CrossCorrelate(signal1, signal2, context);
 
     /// <summary>
     /// Does block convolution of <paramref name="signal"/> with <paramref name="kernel"/> 
@@ -97,6 +115,43 @@ public static class Operation
     }
 
     /// <summary>
+    /// Block convolution in <typeparamref name="T"/> (overlap-add or overlap-save).
+    /// Result length is <c>signal.Length + kernel.Length - 1</c>.
+    /// </summary>
+    public static T[] BlockConvolve<T>(T[] signal,
+                                       T[] kernel,
+                                       int fftSize,
+                                       FilteringMethod method = FilteringMethod.OverlapSave)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        if (method == FilteringMethod.OverlapAdd)
+            return new OlaBlockConvolver<T>(kernel, fftSize).ApplyTo(signal);
+        return new OlsBlockConvolver<T>(kernel, fftSize).ApplyTo(signal);
+    }
+
+    /// <summary>
+    /// Fast convolution of complex signals in <typeparamref name="T"/>.
+    /// </summary>
+    public static ComplexDiscreteSignal<T> Convolve<T>(
+        ComplexDiscreteSignal<T> signal,
+        ComplexDiscreteSignal<T> kernel,
+        int fftSize = 0,
+        ComputingContext? context = null)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+        => new ComplexConvolver<T>().Convolve(signal, kernel, fftSize, context);
+
+    /// <summary>
+    /// Fast cross-correlation of complex signals in <typeparamref name="T"/>.
+    /// </summary>
+    public static ComplexDiscreteSignal<T> CrossCorrelate<T>(
+        ComplexDiscreteSignal<T> signal1,
+        ComplexDiscreteSignal<T> signal2,
+        int fftSize = 0,
+        ComputingContext? context = null)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+        => new ComplexConvolver<T>().CrossCorrelate(signal1, signal2, fftSize, context);
+
+    /// <summary>
     /// Deconvolves <paramref name="signal"/> and <paramref name="kernel"/>.
     /// </summary>
     /// <param name="signal">Signal</param>
@@ -105,6 +160,17 @@ public static class Operation
     {
         return new ComplexConvolver().Deconvolve(signal, kernel);
     }
+
+    /// <summary>
+    /// Deconvolution of complex signals in <typeparamref name="T"/>.
+    /// </summary>
+    public static ComplexDiscreteSignal<T> Deconvolve<T>(
+        ComplexDiscreteSignal<T> signal,
+        ComplexDiscreteSignal<T> kernel,
+        int fftSize = 0,
+        ComputingContext? context = null)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+        => new ComplexConvolver<T>().Deconvolve(signal, kernel, fftSize, context);
 
     /// <summary>
     /// Does interpolation of <paramref name="signal"/> followed by lowpass filtering.
