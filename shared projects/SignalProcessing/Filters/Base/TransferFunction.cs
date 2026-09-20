@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Vorcyc.Mathematics.LinearAlgebra;
 using Vorcyc.Mathematics.SignalProcessing.Operations;
 using Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
@@ -74,8 +74,8 @@ public class TransferFunction
         _zeros = zeros;
         _poles = poles;
 
-        Denominator = poles != null ? ZpToTf(poles) : new[] { 1.0f };
-        Numerator = zeros != null ? ZpToTf(zeros) : new[] { 1.0f };
+        Denominator = poles is { Length: > 0 } ? ZpToTf(poles) : new[] { 1.0f };
+        Numerator = zeros is { Length: > 0 } ? ZpToTf(zeros) : new[] { 1.0f };
 
         for (var i = 0; i < Numerator.Length; i++)
         {
@@ -411,10 +411,15 @@ public class TransferFunction
 
     /// <summary>
     /// Converts zeros (or poles) to numerator (or denominator) of transfer function.
+    /// Empty or null <paramref name="zp"/> yields the identity polynomial <c>[1]</c>
+    /// (all-pole / no-zero transfer function).
     /// </summary>
     /// <param name="zp">Zeros (or poles)</param>
     public static float[] ZpToTf(ComplexFp32[] zp)
     {
+        if (zp is not { Length: > 0 })
+            return [1f];
+
         var poly = new ComplexFp32[] { 1, -zp[0] };
 
         for (var k = 1; k < zp.Length; k++)
@@ -443,6 +448,9 @@ public class TransferFunction
     /// <param name="im">Imaginary parts of complex zeros (poles)</param>
     public static float[] ZpToTf(float[] re, float[] im = null)
     {
+        if (re is not { Length: > 0 })
+            return [1f];
+
         if (im is null)
         {
             im = new float[re.Length];

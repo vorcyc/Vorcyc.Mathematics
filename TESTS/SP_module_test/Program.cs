@@ -21,4 +21,6 @@ Filter_018_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 Conv_019_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
+Tf_020_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
 Console.WriteLine("SP_module_test done.");

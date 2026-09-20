@@ -308,9 +308,15 @@ public class TransferFunction<T>
             Numerator[i] /= a0;
     }
 
-    /// <summary>Converts zeros (or poles) to numerator (or denominator) coefficients.</summary>
+    /// <summary>
+    /// Converts zeros (or poles) to numerator (or denominator) coefficients.
+    /// Empty or null <paramref name="zp"/> yields the identity polynomial <c>[1]</c>.
+    /// </summary>
     public static T[] ZpToTf(Complex<T>[] zp)
     {
+        if (zp is not { Length: > 0 })
+            return [T.One];
+
         var poly = new[] { Complex<T>.One, -zp[0] };
         for (var k = 1; k < zp.Length; k++)
         {
@@ -326,6 +332,8 @@ public class TransferFunction<T>
     /// <summary>Converts zeros/poles given as separate real/imaginary parts.</summary>
     public static T[] ZpToTf(T[] re, T[]? im = null)
     {
+        if (re is not { Length: > 0 })
+            return [T.One];
         im ??= new T[re.Length];
         var zp = new Complex<T>[re.Length];
         for (var i = 0; i < re.Length; i++)
