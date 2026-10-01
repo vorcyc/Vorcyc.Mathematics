@@ -31,8 +31,6 @@ public class FFT_new_old_benchmark
     private float[] _outReal;
     private float[] _outImg;
 
-    private RealOnlyFFT_Fp32 _realOnly;
-
     [GlobalSetup]
     public void Setup()
     {
@@ -52,8 +50,6 @@ public class FFT_new_old_benchmark
         _fft = new RealFft(N);
         _outReal = new float[N];
         _outImg = new float[N];
-
-        _realOnly = new RealOnlyFFT_Fp32(N);
     }
 
 
@@ -63,10 +59,6 @@ public class FFT_new_old_benchmark
 
     [Benchmark]
     public void realFFT() => _fft.Direct(_realArray, _outReal, _outImg);
-
-
-    [Benchmark]
-    public void realFFT_new() => _realOnly.Forward(_realArray, _complexArray);
 
 
     [Benchmark]

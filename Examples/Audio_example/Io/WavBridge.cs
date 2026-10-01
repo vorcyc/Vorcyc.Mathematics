@@ -69,7 +69,7 @@ internal static class WavBridge
         var list = new List<float>(capacity: 16_384);
         var buffer = new float[8192];
         int read;
-        while ((read = provider.Read(buffer, 0, buffer.Length)) > 0)
+        while ((read = provider.Read(buffer)) > 0)
         {
             list.AddRange(buffer.AsSpan(0, read).ToArray());
         }
