@@ -69,8 +69,8 @@ internal static class ComputingContext_test
                 $"Large Sum equivalence failed: base={baseline}, normal={normal}, simd={simd}, parallel={parallel}");
         }
 
-        var a = new Matrix(64, 64);
-        var b = new Matrix(64, 64);
+        var a = new MatrixFp32(64, 64);
+        var b = new MatrixFp32(64, 64);
         for (var i = 0; i < 64; i++)
         {
             for (var j = 0; j < 64; j++)
@@ -81,14 +81,14 @@ internal static class ComputingContext_test
         }
 
         var baseMul = a * b;
-        var parMul = Matrix.Multiply(a, b, ComputingContext.Parallel);
+        var parMul = MatrixFp32.Multiply(a, b, ComputingContext.Parallel);
         for (var i = 0; i < 64; i++)
         {
             for (var j = 0; j < 64; j++)
             {
                 if (MathF.Abs(baseMul[i, j] - parMul[i, j]) > 1e-2f)
                 {
-                    throw new InvalidOperationException("Large Matrix Multiply Parallel mismatch.");
+                    throw new InvalidOperationException("Large MatrixFp32 Multiply Parallel mismatch.");
                 }
             }
         }
@@ -151,8 +151,8 @@ internal static class ComputingContext_test
 
     private static void TestMatrixContext()
     {
-        var a = new Matrix(4, 4);
-        var b = new Matrix(4, 4);
+        var a = new MatrixFp32(4, 4);
+        var b = new MatrixFp32(4, 4);
         for (var i = 0; i < 4; i++)
         {
             for (var j = 0; j < 4; j++)
@@ -163,7 +163,7 @@ internal static class ComputingContext_test
         }
 
         var baseline = a * b;
-        var explicitResult = Matrix.Multiply(a, b, ComputingContext.Simd);
+        var explicitResult = MatrixFp32.Multiply(a, b, ComputingContext.Simd);
 
         for (var i = 0; i < 4; i++)
         {
@@ -171,12 +171,12 @@ internal static class ComputingContext_test
             {
                 if (MathF.Abs(baseline[i, j] - explicitResult[i, j]) > 1e-4f)
                 {
-                    throw new InvalidOperationException("Matrix Multiply context dispatch mismatch.");
+                    throw new InvalidOperationException("MatrixFp32 Multiply context dispatch mismatch.");
                 }
             }
         }
 
-        Console.WriteLine("Matrix Multiply context OK");
+        Console.WriteLine("MatrixFp32 Multiply context OK");
     }
 
     private static void TestSignalContext()
@@ -361,7 +361,7 @@ internal static class ComputingContext_test
 
     private static void TestMatrixVectorMultiply()
     {
-        var matrix = new Matrix(32, 32);
+        var matrix = new MatrixFp32(32, 32);
         var vector = new float[32];
         for (var i = 0; i < 32; i++)
         {
@@ -380,11 +380,11 @@ internal static class ComputingContext_test
         {
             if (MathF.Abs(baseline[i] - result[i]) > 1e-3f)
             {
-                throw new InvalidOperationException("Matrix vector multiply parallel mismatch.");
+                throw new InvalidOperationException("MatrixFp32 vector multiply parallel mismatch.");
             }
         }
 
-        Console.WriteLine("Matrix vector multiply parallel OK");
+        Console.WriteLine("MatrixFp32 vector multiply parallel OK");
     }
 
     private static void TestSignalFftPeakModes()

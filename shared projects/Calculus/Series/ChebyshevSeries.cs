@@ -72,7 +72,7 @@ public sealed class ChebyshevSeries<T> where T : struct, IFloatingPointIeee754<T
     /// <summary>用 Chebyshev 系数初始化。</summary>
     public ChebyshevSeries(ReadOnlySpan<T> coefficients)
     {
-        if (coefficients.IsEmpty) throw new ArgumentException("系数不能为空", nameof(coefficients));
+        if (coefficients.IsEmpty) throw new ArgumentException("Coefficients cannot be empty.", nameof(coefficients));
         _coefficients = coefficients.ToArray();
         _two = T.CreateChecked(2);
     }
@@ -99,8 +99,8 @@ public sealed class ChebyshevSeries<T> where T : struct, IFloatingPointIeee754<T
         int sampleCount,
         ChebyshevFitWorkspace<T>? workspace)
     {
-        if (order < 0) throw new ArgumentException("阶数必须非负", nameof(order));
-        if (sampleCount < order + 1) throw new ArgumentException("采样数不足", nameof(sampleCount));
+        if (order < 0) throw new ArgumentException("Order must be non-negative.", nameof(order));
+        if (sampleCount < order + 1) throw new ArgumentException("Insufficient sample count.", nameof(sampleCount));
 
         var coeffs = new T[order + 1];
         T half = (a + b) * T.CreateChecked(0.5);

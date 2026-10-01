@@ -33,7 +33,7 @@ public sealed class TaylorSeries<T> where T : struct, IFloatingPointIeee754<T>
     /// </summary>
     public T Calculate(T x, int order = 5)
     {
-        if (order < 0) throw new ArgumentException("阶数必须大于等于 0", nameof(order));
+        if (order < 0) throw new ArgumentException("Order must be greater than or equal to 0.", nameof(order));
 
         EnsureCoefficients(order);
         T dx = x - _center;
@@ -48,7 +48,7 @@ public sealed class TaylorSeries<T> where T : struct, IFloatingPointIeee754<T>
     /// </summary>
     public T GetTaylorCoefficient(int order)
     {
-        if (order < 0) throw new ArgumentException("阶数必须大于等于 0", nameof(order));
+        if (order < 0) throw new ArgumentException("Order must be greater than or equal to 0.", nameof(order));
         EnsureCoefficients(order);
         return _coefficients[order];
     }

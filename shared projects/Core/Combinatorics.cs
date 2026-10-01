@@ -512,19 +512,19 @@ public static class Combinatorics
     }
 
     /// <summary>
-    /// 计算从 n 个元素中选取 k 个元素的组合数。
+    /// Computes the number of ways to choose k elements from n elements (the binomial coefficient).
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="n">总元素数。</param>
-    /// <param name="k">选取的元素数。</param>
-    /// <returns>组合数，即从 n 个元素中选取 k 个元素的方式数。</returns>
+    /// <typeparam name="T">The generic type, must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
+    /// <param name="n">The total number of elements.</param>
+    /// <param name="k">The number of elements to choose.</param>
+    /// <returns>The number of ways to choose k elements from n elements.</returns>
     /// <remarks>
-    /// 组合数的公式为：
+    /// The formula for the binomial coefficient is:
     /// <code>
     /// C(n, k) = n! / (k! * (n - k)!)
     /// </code>
-    /// 其中，n! 表示 n 的阶乘。
-    /// 组合数在概率论和统计学中有广泛的应用，特别是在计算概率分布时。
+    /// where n! denotes the factorial of n.
+    /// The binomial coefficient is widely used in probability theory and statistics, especially when computing probability distributions.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Combinations<T>(int n, int k) where T : IFloatingPointIeee754<T>

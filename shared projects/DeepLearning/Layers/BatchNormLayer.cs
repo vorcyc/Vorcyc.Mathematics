@@ -138,10 +138,10 @@ public static partial class Layers
     /// <param name="shift">鍋忕Щ閲忓紶閲忋€?/param>
     /// <param name="scale">缂╂斁鍥犲瓙寮犻噺銆?/param>
     /// <returns>褰掍竴鍖栧悗鐨勫紶閲忋€?/returns>
-    public static Tensor BatchNorm(Tensor input, Tensor mean, Tensor variance, Tensor shift, Tensor scale)
+    public static TensorFp32 BatchNorm(TensorFp32 input, TensorFp32 mean, TensorFp32 variance, TensorFp32 shift, TensorFp32 scale)
     {
         var v = 1e-5f;//甯告暟
-        var normalized = new Tensor(input.Width, input.Height, input.Depth);
+        var normalized = new TensorFp32(input.Width, input.Height, input.Depth);
         long workPer = (long)input.Height * input.Width;
         ForEachDepth(input.Depth, workPer, d =>
         {

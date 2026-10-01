@@ -14,11 +14,11 @@ internal static class MovingAverageFitter
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
-            throw new ArgumentException("数据点数量必须相等且至少有1个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 1 point.");
         if (windowSize <= 0 || windowSize % 2 == 0)
-            throw new ArgumentException("窗口大小必须为正奇数");
+            throw new ArgumentException("Window size must be a positive odd number.");
         if (windowSize > xData.Length)
-            throw new ArgumentException("窗口大小不能大于数据点数量");
+            throw new ArgumentException("Window size cannot be greater than the number of data points.");
 
         int n = xData.Length;
         int halfWindow = (windowSize - 1) / 2;
@@ -27,7 +27,7 @@ internal static class MovingAverageFitter
         {
             CurveFittingExecution.ThrowIfCancelled(cancellationToken, i);
             if (xData[i] <= xData[i - 1])
-                throw new ArgumentException("X 数据点必须单调递增");
+                throw new ArgumentException("X data points must be strictly increasing.");
         }
 
         var dispatch = CurveFittingExecution.ResolveDispatch<T>(computingContext, n, windowSize);
@@ -45,7 +45,7 @@ internal static class MovingAverageFitter
         Func<T, T> predict = x =>
         {
             if (x < xData[0] || x > xData[n - 1])
-                throw new ArgumentOutOfRangeException(nameof(x), "预测点超出数据范围");
+                throw new ArgumentOutOfRangeException(nameof(x), "The prediction point is out of the data range.");
 
             int i = 0;
             while (i < n - 1 && x > xData[i]) i++;

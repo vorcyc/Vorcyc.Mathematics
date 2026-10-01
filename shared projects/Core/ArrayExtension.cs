@@ -5,11 +5,11 @@ public static partial class ArrayExtension
 {
     #region Generic
     /// <summary>
-    /// 复制数组。
+    /// Copies the array.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="source">源数组。</param>
-    /// <returns>返回复制后的新数组。</returns>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="source">The source array.</param>
+    /// <returns>The newly copied array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Copy<T>(this T[] source)
     {
@@ -18,12 +18,12 @@ public static partial class ArrayExtension
         return result;
     }
     /// <summary>
-    /// 复制数组的指定长度。
+    /// Copies the specified length of the array.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="source">源数组。</param>
-    /// <param name="length">要复制的长度。</param>
-    /// <returns>返回复制后的新数组。</returns>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="source">The source array.</param>
+    /// <param name="length">The length to copy.</param>
+    /// <returns>The newly copied array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Copy<T>(this T[] source, int length)
     {
@@ -32,12 +32,12 @@ public static partial class ArrayExtension
         return result;
     }
     /// <summary>
-    /// 初始化一个指定长度的数组，并用初始值填充。
+    /// Initializes an array of the specified length and fills it with an initial value.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="length">数组的长度。</param>
-    /// <param name="initialValue">初始值。</param>
-    /// <returns>返回初始化后的数组。</returns>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="length">The length of the array.</param>
+    /// <param name="initialValue">The initial value.</param>
+    /// <returns>The initialized array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[]? InitializeArray<T>(int length, T initialValue = default!)
     {
@@ -53,11 +53,11 @@ public static partial class ArrayExtension
         return array;
     }
     /// <summary>
-    /// 用指定值填充整个数组。
+    /// Fills the entire array with the specified value.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="value">填充的值。</param>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="value">The value to fill with.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] array, T value)
     {
@@ -67,15 +67,15 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 用指定值填充数组的指定范围。
+    /// Fills the specified range of the array with the specified value.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="start">起始索引。</param>
-    /// <param name="end">结束索引。</param>
-    /// <param name="value">填充的值。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当起始或结束索引超出范围时抛出。</exception>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="start">The start index.</param>
+    /// <param name="end">The end index.</param>
+    /// <param name="value">The value to fill with.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the start or end index is out of range.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] array, int start, int end, T value)
     {
@@ -91,14 +91,14 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 用指定值填充数组的指定范围。
+    /// Fills the specified range of the array with the specified value.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="range">要填充的范围。</param>
-    /// <param name="value">填充的值。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当范围超出数组边界时抛出。</exception>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="range">The range to fill.</param>
+    /// <param name="value">The value to fill with.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the range is out of the array bounds.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] array, Range range, T value)
     {
@@ -110,11 +110,11 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 用指定值填充数组的指定范围。
+    /// Fills the specified <see cref="Span{T}"/> with the specified value.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="values">指定的<see cref="Span{T}"/></param>
-    /// <param name="value">填充的值。</param>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="values">The specified <see cref="Span{T}"/>.</param>
+    /// <param name="value">The value to fill with.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this Span<T> values, T value)
     {
@@ -124,10 +124,10 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 用随机浮点数填充数组。
+    /// Fills the array with random floating-point numbers.
     /// </summary>
-    /// <param name="span">要填充的数组。</param>
-    /// <exception cref="ArgumentOutOfRangeException">当数组长度小于1时抛出。</exception>
+    /// <param name="span">The array to fill.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the array length is less than 1.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this Span<float> span)
     {
@@ -139,11 +139,11 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 用随机数填充数组。
+    /// Fills the array with random numbers.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型，必须实现 IFloatingPointIeee754 接口。</typeparam>
-    /// <param name="array">要填充的数组。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    /// <typeparam name="T">The array element type, must implement the IFloatingPointIeee754 interface.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber<T>(this T[] array)
         where T : IFloatingPointIeee754<T>
@@ -153,13 +153,13 @@ public static partial class ArrayExtension
             array[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
     /// <summary>
-    /// 用随机数填充数组的指定范围。
+    /// Fills the specified range of the array with random numbers.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型，必须实现 IFloatingPointIeee754 接口。</typeparam>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="range">要填充的范围。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当范围超出数组边界时抛出。</exception>
+    /// <typeparam name="T">The array element type, must implement the IFloatingPointIeee754 interface.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="range">The range to fill.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the range is out of the array bounds.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber<T>(this T[] array, Range range)
         where T : IFloatingPointIeee754<T>
@@ -170,11 +170,11 @@ public static partial class ArrayExtension
             array[i] = T.CreateTruncating(Random.Shared.NextDouble());
     }
     /// <summary>
-    /// 用随机数填充数组。
+    /// Fills the array with random numbers.
     /// </summary>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="limit">随机数的范围。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="limit">The range of the random numbers.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this int[] array, (int max, int min)? limit = null)
     {
@@ -187,11 +187,11 @@ public static partial class ArrayExtension
                 array[i] = Random.Shared.Next(limit.Value.min, limit.Value.max);
     }
     /// <summary>
-    /// 用随机数填充数组的指定范围。
+    /// Fills the specified range of the array with random numbers.
     /// </summary>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="range">要填充的范围。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="range">The range to fill.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this int[] array, Range range)
     {
@@ -201,10 +201,10 @@ public static partial class ArrayExtension
             array[i] = Random.Shared.Next();
     }
     /// <summary>
-    /// 用随机数填充数组。
+    /// Fills the array with random numbers.
     /// </summary>
-    /// <param name="array">要填充的数组。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    /// <param name="array">The array to fill.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this long[] array)
     {
@@ -213,11 +213,11 @@ public static partial class ArrayExtension
             array[i] = Random.Shared.NextInt64();
     }
     /// <summary>
-    /// 用随机数填充数组的指定范围。
+    /// Fills the specified range of the array with random numbers.
     /// </summary>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="range">要填充的范围。</param>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="range">The range to fill.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FillWithRandomNumber(this long[] array, Range range)
     {
@@ -227,12 +227,12 @@ public static partial class ArrayExtension
             array[i] = Random.Shared.NextInt64();
     }
     /// <summary>
-    /// 用指定的起始值和步长填充数组。
+    /// Fills the array with the specified starting value and step.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型，必须实现 INumber 接口。</typeparam>
-    /// <param name="array">要填充的数组。</param>
-    /// <param name="startValue">起始值。</param>
-    /// <param name="step">步长。</param>
+    /// <typeparam name="T">The array element type, must implement the INumber interface.</typeparam>
+    /// <param name="array">The array to fill.</param>
+    /// <param name="startValue">The starting value.</param>
+    /// <param name="step">The step.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this T[] array, T startValue, T step)
         where T : INumber<T>
@@ -245,12 +245,12 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 用指定的起始值和步长填充数组。
+    /// Fills the array with the specified starting value and step.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型，必须实现 INumber 接口。</typeparam>
-    /// <param name="span">要填充的数组。</param>
-    /// <param name="startValue">起始值。</param>
-    /// <param name="step">步长。</param>
+    /// <typeparam name="T">The array element type, must implement the INumber interface.</typeparam>
+    /// <param name="span">The array to fill.</param>
+    /// <param name="startValue">The starting value.</param>
+    /// <param name="step">The step.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Fill<T>(this Span<T> span, T startValue, T step)
         where T : INumber<T>
@@ -263,19 +263,19 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 取内部一段，并返回迭代集。
+    /// Gets an inner segment and returns it as an enumerable sequence.
     /// </summary>
     /// <remarks>
-    /// 可以使用LINQ提供的扩展方法 System.Linq.Enumerable.Skip(start).Take(length)）实现同样功能。
-    /// 但本版本性能更高。
+    /// The same effect can be achieved using the LINQ extension method System.Linq.Enumerable.Skip(start).Take(length).
+    /// However, this version has better performance.
     /// </remarks>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="array">源数组。</param>
-    /// <param name="start">起始索引。</param>
-    /// <param name="length">长度。</param>
-    /// <returns>返回内部片段的迭代集。</returns>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当起始索引或长度超出范围时抛出。</exception>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="array">The source array.</param>
+    /// <param name="start">The start index.</param>
+    /// <param name="length">The length.</param>
+    /// <returns>An enumerable sequence of the inner segment.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the start index or length is out of range.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<T> GetInner<T>(this T[] array, int start, int length)
     {
@@ -292,15 +292,15 @@ public static partial class ArrayExtension
         }
     }
     /// <summary>
-    /// 取一个数组的内部片段，并返回片段。
+    /// Gets an inner segment of an array and returns it as a new array.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="array">源数组。</param>
-    /// <param name="start">起始索引。</param>
-    /// <param name="length">长度。</param>
-    /// <returns>返回内部片段的数组。</returns>
-    /// <exception cref="ArgumentNullException">当数组为空时抛出。</exception>
-    /// <exception cref="ArgumentOutOfRangeException">当起始索引或长度超出范围时抛出。</exception>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="array">The source array.</param>
+    /// <param name="start">The start index.</param>
+    /// <param name="length">The length.</param>
+    /// <returns>A new array containing the inner segment.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the array is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the start index or length is out of range.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] GetInnerArray<T>(this T[] array, int start, int length)
     {
@@ -316,13 +316,13 @@ public static partial class ArrayExtension
         return result;
     }
     /// <summary>
-    /// 移出数组中的一部分，并返回移出后的新数组。
+    /// Removes a segment from the array and returns the resulting new array.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="array">源数组。</param>
-    /// <param name="start">待移出部分的起始索引。</param>
-    /// <param name="length">待移出部分的长度。</param>
-    /// <returns>返回移出指定段后的数组。</returns>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="array">The source array.</param>
+    /// <param name="start">The start index of the segment to remove.</param>
+    /// <param name="length">The length of the segment to remove.</param>
+    /// <returns>The array with the specified segment removed.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] RemoveSegment<T>(this T[] array, int start, int length)
     {
@@ -347,13 +347,13 @@ public static partial class ArrayExtension
     //    return result;
     //}
     /// <summary>
-    /// 联接两个数组。
+    /// Merges two arrays.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="leading">前置数组，不能为 null。</param>
-    /// <param name="following">后置数组，不能为 null。</param>
-    /// <returns>返回联接后的新数组。如果任一输入为 null，则抛出 <see cref="ArgumentNullException"/>。</returns>
-    /// <exception cref="ArgumentNullException">当 <paramref name="leading"/> 或 <paramref name="following"/> 为 null 时抛出。</exception>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="leading">The leading array, cannot be null.</param>
+    /// <param name="following">The following array, cannot be null.</param>
+    /// <returns>The merged new array. Throws <see cref="ArgumentNullException"/> if either input is null.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="leading"/> or <paramref name="following"/> is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Merge<T>(this T[] leading, T[] following)
     {
@@ -369,25 +369,25 @@ public static partial class ArrayExtension
         return result;
     }
     /// <summary>
-    /// 将集合转换为字符串。
+    /// Converts a collection to a string.
     /// </summary>
-    /// <typeparam name="T">集合元素的类型。</typeparam>
-    /// <param name="collection">要转换的集合。</param>
-    /// <returns>返回表示集合的字符串。</returns>
+    /// <typeparam name="T">The collection element type.</typeparam>
+    /// <param name="collection">The collection to convert.</param>
+    /// <returns>A string representing the collection.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ToString<T>(this IEnumerable<T> collection)
     {
         return "[" + string.Join(",", collection) + "]";
     }
     /// <summary>
-    /// 快速复制数组的片段。
+    /// Quickly copies a fragment of the array.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型，必须是非托管类型。</typeparam>
-    /// <param name="source">源数组。</param>
-    /// <param name="size">要复制的大小。</param>
-    /// <param name="sourceOffset">源数组的偏移量。</param>
-    /// <param name="destinationOffset">目标数组的偏移量。</param>
-    /// <returns>返回复制后的新数组。</returns>
+    /// <typeparam name="T">The array element type, must be an unmanaged type.</typeparam>
+    /// <param name="source">The source array.</param>
+    /// <param name="size">The size to copy.</param>
+    /// <param name="sourceOffset">The offset in the source array.</param>
+    /// <param name="destinationOffset">The offset in the destination array.</param>
+    /// <returns>The newly copied array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] FastCopyFragment<T>(this T[] source, int size, int sourceOffset = 0, int destinationOffset = 0)
         where T : unmanaged
@@ -398,26 +398,26 @@ public static partial class ArrayExtension
         return destination;
     }
     /// <summary>
-    /// 快速复制数组到目标数组。
+    /// Quickly copies the array to a destination array.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="source">源数组。</param>
-    /// <param name="destination">目标数组。</param>
-    /// <param name="size">要复制的大小。</param>
-    /// <param name="sourceOffset">源数组的偏移量。</param>
-    /// <param name="destinationOffset">目标数组的偏移量。</param>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="source">The source array.</param>
+    /// <param name="destination">The destination array.</param>
+    /// <param name="size">The size to copy.</param>
+    /// <param name="sourceOffset">The offset in the source array.</param>
+    /// <param name="destinationOffset">The offset in the destination array.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void FastCopyTo<T>(this T[] source, T[] destination, int size, int sourceOffset = 0, int destinationOffset = 0)
     {
         Array.Copy(source, sourceOffset, destination, destinationOffset, size);
     }
     /// <summary>
-    /// 创建一个包含给定数组重复 <paramref name="n"/> 次的新数组。
+    /// Creates a new array containing the given array repeated <paramref name="n"/> times.
     /// </summary>
-    /// <typeparam name="T">数组元素的类型。</typeparam>
-    /// <param name="source">源数组。</param>
-    /// <param name="n">重复次数。</param>
-    /// <returns>返回重复后的新数组。</returns>
+    /// <typeparam name="T">The array element type.</typeparam>
+    /// <param name="source">The source array.</param>
+    /// <param name="n">The number of repetitions.</param>
+    /// <returns>The newly repeated array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Repeat<T>(this T[] source, int n)
     {

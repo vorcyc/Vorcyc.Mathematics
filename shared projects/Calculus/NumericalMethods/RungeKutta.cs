@@ -24,7 +24,7 @@ public sealed class RungeKutta<T> where T : struct, IFloatingPointIeee754<T>
 
     public T Solve(T x0, T y0, T xEnd, int steps = 100, T? h = null)
     {
-        if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
+        if (steps < 1) throw new ArgumentException("Step count must be greater than or equal to 1.", nameof(steps));
         if (x0 == xEnd) return y0;
 
         T step = h ?? (xEnd - x0) / T.CreateChecked(steps);
@@ -49,7 +49,7 @@ public sealed class RungeKutta<T> where T : struct, IFloatingPointIeee754<T>
         OdeEvent<T>? odeEvent = null,
         int maxPoints = 10_000)
     {
-        if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
+        if (steps < 1) throw new ArgumentException("Step count must be greater than or equal to 1.", nameof(steps));
 
         int cap = Math.Min(maxPoints, steps + 1);
         var xs = new T[cap];

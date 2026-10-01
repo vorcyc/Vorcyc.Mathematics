@@ -8,7 +8,7 @@ using static Vorcyc.Mathematics.VMath;
 /// Finite complex DT signal is stored as two arrays of data (real parts and imaginary parts) sampled at certain sampling rate. 
 /// See also <see cref="ComplexDiscreteSignalExtensions"/> for extra functionality of complex DT signals.
 /// </summary>
-public class ComplexDiscreteSignal
+public class ComplexDiscreteSignalFp32
 {
     /// <summary>
     /// Gets sampling rate (number of samples per one second).
@@ -32,7 +32,7 @@ public class ComplexDiscreteSignal
 
     /// <summary>
     /// The most efficient constructor for initializing complex discrete signals. 
-    /// By default, it just wraps <see cref="ComplexDiscreteSignal"/> 
+    /// By default, it just wraps <see cref="ComplexDiscreteSignalFp32"/> 
     /// around arrays <paramref name="real"/> and <paramref name="imag"/> (without copying).
     /// If a new memory should be allocated for signal data, set <paramref name="allocateNew"/> to true.
     /// </summary>
@@ -40,7 +40,7 @@ public class ComplexDiscreteSignal
     /// <param name="real">Array of real parts of the complex-valued signal</param>
     /// <param name="imag">Array of imaginary parts of the complex-valued signal</param>
     /// <param name="allocateNew">Set to true if new memory should be allocated for data</param>
-    public ComplexDiscreteSignal(int samplingRate, float[] real, float[] imag = null, bool allocateNew = false)
+    public ComplexDiscreteSignalFp32(int samplingRate, float[] real, float[] imag = null, bool allocateNew = false)
     {
         Guard.AgainstNonPositive(samplingRate, "Sampling rate");
 
@@ -67,7 +67,7 @@ public class ComplexDiscreteSignal
     /// <param name="samplingRate">Sampling rate of the signal</param>
     /// <param name="real">Array of real parts of the complex-valued signal</param>
     /// <param name="imag">Array of imaginary parts of the complex-valued signal</param>
-    public ComplexDiscreteSignal(int samplingRate, IEnumerable<float> real, IEnumerable<float> imag = null)
+    public ComplexDiscreteSignalFp32(int samplingRate, IEnumerable<float> real, IEnumerable<float> imag = null)
         : this(samplingRate, real.ToArray(), imag?.ToArray())
     {
     }
@@ -77,7 +77,7 @@ public class ComplexDiscreteSignal
     /// </summary>
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="samples">Collection of complex-valued samples</param>
-    public ComplexDiscreteSignal(int samplingRate, IEnumerable<ComplexFp32> samples)
+    public ComplexDiscreteSignalFp32(int samplingRate, IEnumerable<ComplexFp32> samples)
         : this(samplingRate, samples.Select(s => s.Real), samples.Select(s => s.Imaginary))
     {
     }
@@ -89,7 +89,7 @@ public class ComplexDiscreteSignal
     /// <param name="length">Number of samples</param>
     /// <param name="real">Value of each sample</param>
     /// <param name="imag">Value of each sample</param>
-    public ComplexDiscreteSignal(int samplingRate, int length, float real = 0.0f, float imag = 0.0f)
+    public ComplexDiscreteSignalFp32(int samplingRate, int length, float real = 0.0f, float imag = 0.0f)
     {
         Guard.AgainstNonPositive(samplingRate, "Sampling rate");
 
@@ -112,7 +112,7 @@ public class ComplexDiscreteSignal
     /// <param name="samplingRate">Sampling rate</param>
     /// <param name="samples">Collection of integer samples</param>
     /// <param name="normalizeFactor">Each sample will be divided by this value</param>
-    public ComplexDiscreteSignal(int samplingRate, IEnumerable<int> samples, float normalizeFactor = 1.0f)
+    public ComplexDiscreteSignalFp32(int samplingRate, IEnumerable<int> samples, float normalizeFactor = 1.0f)
     {
         Guard.AgainstNonPositive(samplingRate, "Sampling rate");
 
@@ -133,9 +133,9 @@ public class ComplexDiscreteSignal
     /// <summary>
     /// Creates deep copy of the signal.
     /// </summary>
-    public ComplexDiscreteSignal Copy()
+    public ComplexDiscreteSignalFp32 Copy()
     {
-        return new ComplexDiscreteSignal(SamplingRate, Real, Imag, allocateNew: true);
+        return new ComplexDiscreteSignalFp32(SamplingRate, Real, Imag, allocateNew: true);
     }
 
     /// <summary>
@@ -155,7 +155,7 @@ public class ComplexDiscreteSignal
     /// </summary>
     /// <param name="startPos">Index of the first sample (inclusive)</param>
     /// <param name="endPos">Index of the last sample (exclusive)</param>
-    public ComplexDiscreteSignal this[int startPos, int endPos]
+    public ComplexDiscreteSignalFp32 this[int startPos, int endPos]
     {
         get
         {
@@ -163,7 +163,7 @@ public class ComplexDiscreteSignal
 
             var rangeLength = endPos - startPos;
 
-            return new ComplexDiscreteSignal(SamplingRate,
+            return new ComplexDiscreteSignalFp32(SamplingRate,
                                 Real.FastCopyFragment(rangeLength, startPos),
                                 Imag.FastCopyFragment(rangeLength, startPos));
         }
@@ -243,7 +243,7 @@ public class ComplexDiscreteSignal
     /// </summary>
     /// <param name="s1">First signal</param>
     /// <param name="s2">Second signal</param>
-    public static ComplexDiscreteSignal operator +(ComplexDiscreteSignal s1, ComplexDiscreteSignal s2)
+    public static ComplexDiscreteSignalFp32 operator +(ComplexDiscreteSignalFp32 s1, ComplexDiscreteSignalFp32 s2)
     {
         return s1.Superimpose(s2);
     }
@@ -253,9 +253,9 @@ public class ComplexDiscreteSignal
     /// </summary>
     /// <param name="s">Signal</param>
     /// <param name="constant">Constant to add to each sample</param>
-    public static ComplexDiscreteSignal operator +(ComplexDiscreteSignal s, float constant)
+    public static ComplexDiscreteSignalFp32 operator +(ComplexDiscreteSignalFp32 s, float constant)
     {
-        return new ComplexDiscreteSignal(s.SamplingRate, s.Real.Select(x => x + constant));
+        return new ComplexDiscreteSignalFp32(s.SamplingRate, s.Real.Select(x => x + constant));
     }
 
     /// <summary>
@@ -263,9 +263,9 @@ public class ComplexDiscreteSignal
     /// </summary>
     /// <param name="s">Signal</param>
     /// <param name="constant">Constant to subtract from each sample</param>
-    public static ComplexDiscreteSignal operator -(ComplexDiscreteSignal s, float constant)
+    public static ComplexDiscreteSignalFp32 operator -(ComplexDiscreteSignalFp32 s, float constant)
     {
-        return new ComplexDiscreteSignal(s.SamplingRate, s.Real.Select(x => x - constant));
+        return new ComplexDiscreteSignalFp32(s.SamplingRate, s.Real.Select(x => x - constant));
     }
 
     /// <summary>
@@ -273,7 +273,7 @@ public class ComplexDiscreteSignal
     /// </summary>
     /// <param name="s">Signal</param>
     /// <param name="coeff">Amplification/attenuation coefficient</param>
-    public static ComplexDiscreteSignal operator *(ComplexDiscreteSignal s, float coeff)
+    public static ComplexDiscreteSignalFp32 operator *(ComplexDiscreteSignalFp32 s, float coeff)
     {
         var signal = s.Copy();
         signal.Amplify(coeff);

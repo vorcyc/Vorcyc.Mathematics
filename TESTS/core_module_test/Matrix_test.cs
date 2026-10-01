@@ -14,7 +14,7 @@ internal class Matrix_test
         TestVectorSpanAndMatrixMultiply();
         TestMatrixSolveWrappers();
         TestBidiagonalSvdLarge();
-        var m1 = new Matrix(4, 3);
+        var m1 = new MatrixFp32(4, 3);
         for (int i = 0; i < m1.Rows; i++)
         {
             for (int j = 0; j < m1.Columns; j++)
@@ -233,7 +233,7 @@ internal class Matrix_test
                     throw new InvalidOperationException("Bidiagonal SVD reconstruction failed for large matrix.");
             }
         }
-        var legacy = new Matrix(rows, cols);
+        var legacy = new MatrixFp32(rows, cols);
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)

@@ -31,7 +31,7 @@ public sealed class LBfgsOptimizer<T> where T : struct, IFloatingPointIeee754<T>
     public LBfgsOptimizer(MultiVariableFunction<T> func, T defaultH, int historySize = 10)
     {
         _func = func ?? throw new ArgumentNullException(nameof(func));
-        if (historySize < 1) throw new ArgumentException("历史长度必须大于等于 1", nameof(historySize));
+        if (historySize < 1) throw new ArgumentException("History length must be greater than or equal to 1.", nameof(historySize));
         _derivative = new Derivative<T>(func, defaultH);
         _historySize = historySize;
     }
@@ -39,7 +39,7 @@ public sealed class LBfgsOptimizer<T> where T : struct, IFloatingPointIeee754<T>
     /// <summary>求解无约束极小点。</summary>
     public T[] Minimize(T[] initial, int maxIterations = 200, T? tolerance = null)
     {
-        if (initial.Length == 0) throw new ArgumentException("初始点不能为空", nameof(initial));
+        if (initial.Length == 0) throw new ArgumentException("Initial point cannot be empty.", nameof(initial));
         EnsureCapacity(initial.Length);
 
         T tol = tolerance ?? T.CreateChecked(1e-8);

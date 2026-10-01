@@ -1,7 +1,7 @@
 using System.Numerics;
-using System.Numerics.Tensors;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace Vorcyc.Mathematics.MachineLearning.Internal;
 
@@ -19,21 +19,8 @@ internal static class NumericKernels
         if (a.Length != b.Length)
             throw new ArgumentException("The vector lengths do not match.");
 
-        if (typeof(T) == typeof(double))
-        {
-            double sum = TensorPrimitives.Dot(
-                MemoryMarshal.Cast<T, double>(a),
-                MemoryMarshal.Cast<T, double>(b));
-            return T.CreateTruncating(sum);
-        }
-
-        if (typeof(T) == typeof(float))
-        {
-            float sum = TensorPrimitives.Dot(
-                MemoryMarshal.Cast<T, float>(a),
-                MemoryMarshal.Cast<T, float>(b));
-            return T.CreateTruncating(sum);
-        }
+        if (typeof(T) == typeof(double) || typeof(T) == typeof(float))
+            return VectorSpan.Dot(a, b);
 
         T scalar = T.Zero;
         for (int i = 0; i < a.Length; i++)
@@ -165,7 +152,7 @@ internal static class NumericKernels
             Span<double> rowScratch = cols <= MaxStackScratch ? stackalloc double[cols] : new double[cols];
             for (int j = 0; j < cols; j++)
                 rowScratch[j] = md[row, j];
-            double sum = TensorPrimitives.Dot(rowScratch, MemoryMarshal.Cast<T, double>(weights));
+            double sum = VectorSpan.Dot(rowScratch, MemoryMarshal.Cast<T, double>(weights));
             return T.CreateTruncating(sum);
         }
 
@@ -175,7 +162,7 @@ internal static class NumericKernels
             Span<float> rowScratch = cols <= MaxStackScratch ? stackalloc float[cols] : new float[cols];
             for (int j = 0; j < cols; j++)
                 rowScratch[j] = mf[row, j];
-            float sum = TensorPrimitives.Dot(rowScratch, MemoryMarshal.Cast<T, float>(weights));
+            float sum = VectorSpan.Dot(rowScratch, MemoryMarshal.Cast<T, float>(weights));
             return T.CreateTruncating(sum);
         }
 
@@ -200,15 +187,15 @@ internal static class NumericKernels
     {
         int n = a.Length;
         Span<double> diff = n <= MaxStackScratch ? stackalloc double[n] : new double[n];
-        TensorPrimitives.Subtract(a, b, diff);
-        return TensorPrimitives.Dot(diff, diff);
+        VectorSpan.Subtract(a, b, diff);
+        return VectorSpan.Dot(diff, diff);
     }
 
     private static float SquaredDistanceFloat(ReadOnlySpan<float> a, ReadOnlySpan<float> b)
     {
         int n = a.Length;
         Span<float> diff = n <= MaxStackScratch ? stackalloc float[n] : new float[n];
-        TensorPrimitives.Subtract(a, b, diff);
-        return TensorPrimitives.Dot(diff, diff);
+        VectorSpan.Subtract(a, b, diff);
+        return VectorSpan.Dot(diff, diff);
     }
 }

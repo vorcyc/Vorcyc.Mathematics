@@ -45,19 +45,19 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
         /// Computes complex analytic signal (real and imaginary parts) from <paramref name="input"/>.
         /// </summary>
         /// <param name="input">Input data</param>
-        public ComplexDiscreteSignal AnalyticSignal(float[] input)
+        public ComplexDiscreteSignalFp32 AnalyticSignal(float[] input)
             => AnalyticSignal(input.AsSpan());
 
         /// <summary>
         /// Computes complex analytic signal (real and imaginary parts) from <paramref name="input"/>.
         /// </summary>
-        public ComplexDiscreteSignal AnalyticSignal(ReadOnlySpan<float> input)
+        public ComplexDiscreteSignalFp32 AnalyticSignal(ReadOnlySpan<float> input)
             => AnalyticSignal(input, context: null);
 
         /// <summary>
         /// Computes complex analytic signal with optional <paramref name="context"/> for the inner FFT.
         /// </summary>
-        public ComplexDiscreteSignal AnalyticSignal(ReadOnlySpan<float> input, ComputingContext? context)
+        public ComplexDiscreteSignalFp32 AnalyticSignal(ReadOnlySpan<float> input, ComputingContext? context)
         {
             Direct(input, _im, context);
 
@@ -67,11 +67,11 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
                 _im[i] /= Size;
             }
 
-            return new ComplexDiscreteSignal(1, _re, _im, allocateNew: true);
+            return new ComplexDiscreteSignalFp32(1, _re, _im, allocateNew: true);
         }
 
         /// <summary>
-        /// Computes magnitudes of the analytic signal without allocating a <see cref="ComplexDiscreteSignal"/>.
+        /// Computes magnitudes of the analytic signal without allocating a <see cref="ComplexDiscreteSignalFp32"/>.
         /// </summary>
         public void AnalyticMagnitude(ReadOnlySpan<float> input, Span<float> magnitude)
             => AnalyticMagnitude(input, magnitude, context: null);

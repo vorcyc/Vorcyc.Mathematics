@@ -147,13 +147,13 @@ public static class SignalExtensions
     }
 
     /// <summary>
-    /// Creates <see cref="ComplexDiscreteSignal"/> with zero imaginary parts.
+    /// Creates <see cref="ComplexDiscreteSignalFp32"/> with zero imaginary parts.
     /// </summary>
-    public static ComplexDiscreteSignal ToComplex(this Signal signal)
+    public static ComplexDiscreteSignalFp32 ToComplex(this Signal signal)
     {
         var real = new float[signal.Length];
         signal.Samples.CopyTo(real);
-        return new ComplexDiscreteSignal((int)signal.SamplingRate, real);
+        return new ComplexDiscreteSignalFp32((int)signal.SamplingRate, real);
     }
 
     /// <summary>

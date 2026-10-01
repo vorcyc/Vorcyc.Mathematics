@@ -140,7 +140,7 @@ public static class CurveFitter<T>
         CancellationToken cancellationToken = default)
     {
         if (xData.Length != yData.Length || xData.Length < 2)
-            throw new ArgumentException("数据点数量必须相等且至少有2个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 2 points.");
         return new LocallyWeightedRegression<T>(xData, yData, bandwidth).Fit(computingContext, cancellationToken);
     }
 

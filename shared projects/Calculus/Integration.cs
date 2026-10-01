@@ -101,9 +101,9 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
     public T Integrate(T a, T b, int n, SingleVariableFunction<T> func, T? h = null, Method method = Method.Trapezoidal)
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
-        if (n < 1) throw new ArgumentException("分段数必须大于等于 1", nameof(n));
+        if (n < 1) throw new ArgumentException("Segment count must be greater than or equal to 1.", nameof(n));
         T step = h ?? _defaultH;
-        if (step <= _minH) throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+        if (step <= _minH) throw new ArgumentException($"Step size must be greater than {_minH}.", nameof(h));
 
         return method switch
         {
@@ -112,7 +112,7 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
             Method.Romberg => IntegrateRomberg(a, b, n, func),
             Method.GaussLegendre => IntegrateGaussLegendre(a, b, n, func),
             Method.AdaptiveSimpson => IntegrateAdaptiveSimpson(a, b, n, func, step),
-            _ => throw new ArgumentException("不支持的积分方法")
+            _ => throw new ArgumentException("Unsupported integration method.")
         };
     }
 
@@ -122,7 +122,7 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
     public T Integrate(T a, T b, int n = 1000, Method method = Method.Trapezoidal, T? h = null)
     {
         if (_boundFunc == null)
-            throw new InvalidOperationException("此实例未绑定被积函数，请使用带 func 参数的 Integrate 重载或绑定函数的构造函数。");
+            throw new InvalidOperationException("This instance is not bound to an integrand function; use the Integrate overload with a func parameter, or the constructor that binds a function.");
         return Integrate(a, b, n, _boundFunc, h, method);
     }
 
@@ -155,7 +155,7 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
 
     private T IntegrateSimpson(T a, T b, int n, SingleVariableFunction<T> func)
     {
-        if (n % 2 != 0) throw new ArgumentException("辛普森法则要求分段数为偶数", nameof(n));
+        if (n % 2 != 0) throw new ArgumentException("Simpson's rule requires an even segment count.", nameof(n));
 
         T h = (b - a) / T.CreateChecked(n);
         T sum = func(a) + func(b);
@@ -170,7 +170,7 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
 
     private T IntegrateRomberg(T a, T b, int maxLevel, SingleVariableFunction<T> func)
     {
-        if (maxLevel < 1) throw new ArgumentException("Romberg 外推层数必须大于等于 1", nameof(maxLevel));
+        if (maxLevel < 1) throw new ArgumentException("Romberg extrapolation level count must be greater than or equal to 1.", nameof(maxLevel));
 
         EnsureRomberg(maxLevel);
         T[,] r = _romberg!;
@@ -209,7 +209,7 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
     private T IntegrateGaussLegendre(T a, T b, int order, SingleVariableFunction<T> func)
     {
         if (order is not (4 or 8 or 16))
-            throw new ArgumentException("Gauss-Legendre 阶数须为 4、8 或 16", nameof(order));
+            throw new ArgumentException("Gauss-Legendre order must be 4, 8, or 16.", nameof(order));
 
         EnsureGaussLegendreTable(order);
         T[] nodesT = _glNodesT!;
@@ -234,8 +234,8 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
     /// </summary>
     private T IntegrateAdaptiveSimpson(T a, T b, int maxDepth, SingleVariableFunction<T> func, T tolerance)
     {
-        if (maxDepth < 0) throw new ArgumentException("最大递归深度必须大于等于 0", nameof(maxDepth));
-        if (tolerance <= T.Zero) throw new ArgumentException("容差必须为正", nameof(tolerance));
+        if (maxDepth < 0) throw new ArgumentException("Maximum recursion depth must be greater than or equal to 0.", nameof(maxDepth));
+        if (tolerance <= T.Zero) throw new ArgumentException("Tolerance must be positive.", nameof(tolerance));
 
         T fa = func(a);
         T fb = func(b);
@@ -350,7 +350,7 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
     {
         if (func == null) throw new ArgumentNullException(nameof(func));
         if (nodesPerDim is not (4 or 8 or 16))
-            throw new ArgumentException("每维节点数须为 4、8 或 16", nameof(nodesPerDim));
+            throw new ArgumentException("Node count per dimension must be 4, 8, or 16.", nameof(nodesPerDim));
 
         EnsureGaussLegendreTable(nodesPerDim);
         T[] nodesT = _glNodesT!;
@@ -387,7 +387,7 @@ public class Integration<T> where T : struct, IFloatingPointIeee754<T>
     private T IntegrateImproperBySubstitution(T a, SingleVariableFunction<T> func, int maxDepth, T tolerance)
     {
         if (a <= T.Zero)
-            throw new ArgumentException("反常积分下限须为正", nameof(a));
+            throw new ArgumentException("The improper integral's lower bound must be positive.", nameof(a));
 
         _improperA = a;
         _improperScale = T.One / a;

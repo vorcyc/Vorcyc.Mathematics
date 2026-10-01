@@ -38,7 +38,7 @@ public static class Operation
     /// <summary>
     /// Does fast convolution of <paramref name="signal"/> with <paramref name="kernel"/> via FFT.
     /// </summary>
-    public static ComplexDiscreteSignal Convolve(ComplexDiscreteSignal signal, ComplexDiscreteSignal kernel)
+    public static ComplexDiscreteSignalFp32 Convolve(ComplexDiscreteSignalFp32 signal, ComplexDiscreteSignalFp32 kernel)
     {
         return new ComplexConvolver().Convolve(signal, kernel);
     }
@@ -68,7 +68,7 @@ public static class Operation
     /// <summary>
     /// Does fast cross-correlation between <paramref name="signal1"/> and <paramref name="signal2"/> via FFT.
     /// </summary>
-    public static ComplexDiscreteSignal CrossCorrelate(ComplexDiscreteSignal signal1, ComplexDiscreteSignal signal2)
+    public static ComplexDiscreteSignalFp32 CrossCorrelate(ComplexDiscreteSignalFp32 signal1, ComplexDiscreteSignalFp32 signal2)
     {
         return new ComplexConvolver().CrossCorrelate(signal1, signal2);
     }
@@ -156,7 +156,7 @@ public static class Operation
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="kernel">Kernel</param>
-    public static ComplexDiscreteSignal Deconvolve(ComplexDiscreteSignal signal, ComplexDiscreteSignal kernel)
+    public static ComplexDiscreteSignalFp32 Deconvolve(ComplexDiscreteSignalFp32 signal, ComplexDiscreteSignalFp32 kernel)
     {
         return new ComplexConvolver().Deconvolve(signal, kernel);
     }

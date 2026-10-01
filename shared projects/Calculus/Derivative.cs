@@ -129,8 +129,8 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     public T Calculate(T x, int order = 1, T? h = null, Method method = Method.Central)
     {
         if (_isMultiVariable || _singleADFunc != null || _multiADFunc != null)
-            throw new InvalidOperationException("此实例不支持数值单变量导数计算");
-        if (order < 1) throw new ArgumentException("导数阶数必须大于等于 1", nameof(order));
+            throw new InvalidOperationException("This instance does not support numeric single-variable derivative calculation.");
+        if (order < 1) throw new ArgumentException("Derivative order must be greater than or equal to 1.", nameof(order));
         T floor = NumericalStep.Optimal(x, order);
         T step = h ?? floor;
         if (step < floor)
@@ -138,7 +138,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         if (step <= _minH)
             step = T.Max(_defaultH, floor);
         if (step <= _minH)
-            throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+            throw new ArgumentException($"Step size must be greater than {_minH}.", nameof(h));
 
         if (order == 1 && method == Method.Central && h is null)
             return NumericalStep.RichardsonFirstOrder(x, _singleFunc!, step);
@@ -170,7 +170,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
                      / (two * h2 * h),
                 4 => (func(x + two * h) - T.CreateChecked(4) * func(x + h) + T.CreateChecked(6) * func(x)
                      - T.CreateChecked(4) * func(x - h) + func(x - two * h)) / (h2 * h2),
-                _ => throw new ArgumentException("不支持的导数阶数")
+                _ => throw new ArgumentException("Unsupported derivative order.")
             };
         }
 
@@ -193,7 +193,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
             Method.Backward => (func(x) - func(x - h)) / h,
             Method.Central => (func(x + h) - func(x - h)) / (two * h),
             Method.CentralFourthOrder => (-func(x + two * h) + eight * func(x + h) - eight * func(x - h) + func(x - two * h)) / (twelve * h),
-            _ => throw new ArgumentException("不支持的数值方法")
+            _ => throw new ArgumentException("Unsupported numerical method.")
         };
     }
 
@@ -209,10 +209,10 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     public T CalculatePartial(Span<T> point, int variableIndex, int order = 1, T? h = null, Method method = Method.Central)
     {
         if (!_isMultiVariable || _singleADFunc != null || _multiADFunc != null)
-            throw new InvalidOperationException("此实例不支持数值偏导数计算");
+            throw new InvalidOperationException("This instance does not support numeric partial derivative calculation.");
         if (point.IsEmpty) throw new ArgumentNullException(nameof(point));
-        if (variableIndex < 0 || variableIndex >= point.Length) throw new ArgumentException("变量索引超出范围", nameof(variableIndex));
-        if (order < 1) throw new ArgumentException("偏导数阶数必须大于等于 1", nameof(order));
+        if (variableIndex < 0 || variableIndex >= point.Length) throw new ArgumentException("Variable index is out of range.", nameof(variableIndex));
+        if (order < 1) throw new ArgumentException("Partial derivative order must be greater than or equal to 1.", nameof(order));
         T floor = NumericalStep.Optimal(point[variableIndex], order);
         T step = h ?? floor;
         if (step < floor)
@@ -220,7 +220,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         if (step <= _minH)
             step = T.Max(_defaultH, floor);
         if (step <= _minH)
-            throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+            throw new ArgumentException($"Step size must be greater than {_minH}.", nameof(h));
         return CalculatePartialDerivative(point, variableIndex, order, step, method);
     }
 
@@ -257,7 +257,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
                 Method.Forward => (Eval(_ptPlus) - Eval(point)) / h,
                 Method.Backward => (Eval(point) - Eval(_ptMinus)) / h,
                 Method.Central => (Eval(_ptPlus) - Eval(_ptMinus)) / (two * h),
-                _ => throw new ArgumentException("不支持的数值方法")
+                _ => throw new ArgumentException("Unsupported numerical method.")
             };
         }
 
@@ -282,7 +282,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
                 3 => (Eval(_ptPlus2) - two * Eval(_ptPlus) + two * Eval(_ptMinus) - Eval(_ptMinus2)) / (two * h2 * h),
                 4 => (Eval(_ptPlus2) - T.CreateChecked(4) * Eval(_ptPlus) + T.CreateChecked(6) * Eval(_pt)
                      - T.CreateChecked(4) * Eval(_ptMinus) + Eval(_ptMinus2)) / (h2 * h2),
-                _ => throw new ArgumentException("不支持的导数阶数")
+                _ => throw new ArgumentException("Unsupported derivative order.")
             };
         }
 
@@ -315,7 +315,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     /// <returns>导数值。</returns>
     public T CalculateAD(T x)
     {
-        if (_singleADFunc == null) throw new InvalidOperationException("此实例不支持单变量自动微分");
+        if (_singleADFunc == null) throw new InvalidOperationException("This instance does not support single-variable automatic differentiation.");
         DualNumber<T> input = new DualNumber<T>(x, T.One);
         return _singleADFunc(input).Deriv;
     }
@@ -337,9 +337,9 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     /// <returns>偏导数值。</returns>
     public T CalculatePartialAD(Span<T> point, int variableIndex)
     {
-        if (_multiADFunc == null) throw new InvalidOperationException("此实例不支持多变量自动微分");
+        if (_multiADFunc == null) throw new InvalidOperationException("This instance does not support multivariable automatic differentiation.");
         if (point.IsEmpty) throw new ArgumentNullException(nameof(point));
-        if (variableIndex < 0 || variableIndex >= point.Length) throw new ArgumentException("变量索引超出范围", nameof(variableIndex));
+        if (variableIndex < 0 || variableIndex >= point.Length) throw new ArgumentException("Variable index is out of range.", nameof(variableIndex));
 
         DualNumber<T>[] inputs = new DualNumber<T>[point.Length];
         for (int i = 0; i < point.Length; i++)
@@ -358,7 +358,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     /// <returns>梯度向量。</returns>
     public T[] Gradient(Span<T> point, T? h = null, Method method = Method.Central)
     {
-        if (point.IsEmpty) throw new ArgumentException("输入点不能为空", nameof(point));
+        if (point.IsEmpty) throw new ArgumentException("Input point cannot be empty.", nameof(point));
         T[] gradient = new T[point.Length];
         Gradient(point, gradient, h, method);
         return gradient;
@@ -370,10 +370,10 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     public void Gradient(Span<T> point, Span<T> destination, T? h = null, Method method = Method.Central)
     {
         if (!_isMultiVariable || _multiFunc == null || _singleADFunc != null || _multiADFunc != null)
-            throw new InvalidOperationException("此实例不支持数值梯度计算");
-        if (point.IsEmpty) throw new ArgumentException("输入点不能为空", nameof(point));
+            throw new InvalidOperationException("This instance does not support numeric gradient calculation.");
+        if (point.IsEmpty) throw new ArgumentException("Input point cannot be empty.", nameof(point));
         if (destination.Length < point.Length)
-            throw new ArgumentException("目标缓冲区长度不足", nameof(destination));
+            throw new ArgumentException("Destination buffer length is insufficient.", nameof(destination));
 
         if (method == Method.Central)
         {
@@ -396,7 +396,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
         {
             step = h.GetValueOrDefault();
             if (step <= _minH)
-                throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+                throw new ArgumentException($"Step size must be greater than {_minH}.", nameof(h));
         }
         else
         {
@@ -433,7 +433,7 @@ public class Derivative<T> where T : struct, IFloatingPointIeee754<T>
     /// <returns>梯度向量。</returns>
     public T[] GradientAD(Span<T> point)
     {
-        if (_multiADFunc == null) throw new InvalidOperationException("此实例不支持多变量自动微分");
+        if (_multiADFunc == null) throw new InvalidOperationException("This instance does not support multivariable automatic differentiation.");
         T[] gradient = new T[point.Length];
         for (int i = 0; i < point.Length; i++)
         {

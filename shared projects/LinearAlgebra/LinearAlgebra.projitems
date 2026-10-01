@@ -15,7 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Matrix.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixOperations.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Matrix_f.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MatrixFp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Matrix_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BidiagonalSvd.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixDecomposition.cs" />
@@ -23,7 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TensorOps.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MatrixMultiply.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Quaternion.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tensor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TensorFp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tensor_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tensor4D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VectorSpan.cs" />

@@ -45,7 +45,7 @@ public sealed class AdaptiveRungeKuttaSystem<T> where T : struct, IFloatingPoint
     /// </summary>
     public T[] Solve(T x0, ReadOnlySpan<T> y0, T xEnd, T relativeTolerance, T absoluteTolerance, T? initialStep = null)
     {
-        if (y0.IsEmpty) throw new ArgumentException("初始状态不能为空", nameof(y0));
+        if (y0.IsEmpty) throw new ArgumentException("Initial state cannot be empty.", nameof(y0));
         if (x0 == xEnd) return y0.ToArray();
 
         EnsureBuffers(y0.Length);
@@ -64,8 +64,8 @@ public sealed class AdaptiveRungeKuttaSystem<T> where T : struct, IFloatingPoint
         OdeSystemEvent<T>? odeEvent = null,
         int maxPoints = 10_000)
     {
-        if (y0.IsEmpty) throw new ArgumentException("初始状态不能为空", nameof(y0));
-        if (maxPoints < 1) throw new ArgumentException("maxPoints 必须大于等于 1", nameof(maxPoints));
+        if (y0.IsEmpty) throw new ArgumentException("Initial state cannot be empty.", nameof(y0));
+        if (maxPoints < 1) throw new ArgumentException("maxPoints must be greater than or equal to 1.", nameof(maxPoints));
 
         int dim = y0.Length;
         EnsureBuffers(dim);
@@ -112,7 +112,7 @@ public sealed class AdaptiveRungeKuttaSystem<T> where T : struct, IFloatingPoint
         while (forward ? x < xEnd - _endTol : x > xEnd + _endTol)
         {
             if (++totalSteps > 5_000)
-                throw new InvalidOperationException("自适应积分超过最大步数");
+                throw new InvalidOperationException("Adaptive integration exceeded the maximum number of steps.");
 
             T remaining = xEnd - x;
             if (T.Abs(h) > T.Abs(remaining))

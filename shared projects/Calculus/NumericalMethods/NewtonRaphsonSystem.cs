@@ -26,7 +26,7 @@ public sealed class NewtonRaphsonSystem<T> where T : struct, IFloatingPointIeee7
     public NewtonRaphsonSystem(VectorFieldFunction<T> func, int dimension, T defaultH)
     {
         _func = func ?? throw new ArgumentNullException(nameof(func));
-        if (dimension < 1) throw new ArgumentException("维数必须大于等于 1", nameof(dimension));
+        if (dimension < 1) throw new ArgumentException("Dimension must be greater than or equal to 1.", nameof(dimension));
         _dimension = dimension;
         _jacobian = new Jacobian<T>(func, dimension, defaultH);
         _half = T.CreateChecked(0.5);
@@ -39,7 +39,7 @@ public sealed class NewtonRaphsonSystem<T> where T : struct, IFloatingPointIeee7
     public T[] Solve(T[] initialGuess, int maxIterations = 50, T? tolerance = null, bool useLineSearch = false)
     {
         if (initialGuess.Length != _dimension)
-            throw new ArgumentException("初始猜测维数与系统维数不匹配", nameof(initialGuess));
+            throw new ArgumentException("The initial guess dimension does not match the system dimension.", nameof(initialGuess));
 
         EnsureBuffers();
         initialGuess.AsSpan().CopyTo(_x!);
@@ -85,7 +85,7 @@ public sealed class NewtonRaphsonSystem<T> where T : struct, IFloatingPointIeee7
             }
         }
 
-        throw new InvalidOperationException("多元牛顿法未在指定迭代次数内收敛");
+        throw new InvalidOperationException("Multivariate Newton's method did not converge within the specified number of iterations.");
     }
 
     private void EnsureBuffers()

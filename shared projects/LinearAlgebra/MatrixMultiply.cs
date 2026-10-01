@@ -42,7 +42,7 @@ internal static class MatrixMultiply
         int n = bCols;
 
         if (k != bRows)
-            throw new ArgumentException("矩阵维度不匹配，无法相乘。");
+            throw new ArgumentException("Matrix dimensions do not match; cannot multiply.");
 
         int problemSize = m * n * k;
         if (ComputingContextExecution.UseParallel(context, problemSize, ComputingContextExecution.ParallelMatrixMultiplyThreshold))
@@ -93,7 +93,7 @@ internal static class MatrixMultiply
         int n = bCols;
 
         if (k != bRows)
-            throw new ArgumentException("矩阵维度不匹配，无法相乘。");
+            throw new ArgumentException("Matrix dimensions do not match; cannot multiply.");
 
         int problemSize = m * n * k;
         if (problemSize > BlockedMultiplyThreshold)

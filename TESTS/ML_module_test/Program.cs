@@ -15,6 +15,12 @@ if (args is ["cancel"])
     return;
 }
 
+if (args is ["exp-check"])
+{
+    VectorSpanExp_test.Go();
+    return;
+}
+
 //SVM_test.text_go();
 
 //GMM_test.go();

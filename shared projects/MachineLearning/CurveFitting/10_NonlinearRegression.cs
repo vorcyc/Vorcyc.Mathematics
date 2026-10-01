@@ -32,13 +32,13 @@ internal static class NonlinearRegression
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
-            throw new ArgumentException("数据点数量必须相等且至少有1个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 1 point.");
         if (model == null)
             throw new ArgumentNullException(nameof(model));
         if (initialParams == null || initialParams.Length == 0)
-            throw new ArgumentNullException(nameof(initialParams), "初始参数不能为空");
+            throw new ArgumentNullException(nameof(initialParams), "Initial parameters cannot be empty.");
         if (maxIterations <= 0)
-            throw new ArgumentException("最大迭代次数必须大于0");
+            throw new ArgumentException("Maximum iterations must be greater than 0.");
         // 转换为数组以避免 Span 在 lambda 中的问题
         T[] xDataArray = xData.ToArray();
         T[] yDataArray = yData.ToArray();
@@ -173,7 +173,7 @@ internal static class NonlinearRegression
         {
             T pivot = augmented[i][i];
             if (pivot == T.Zero)
-                throw new InvalidOperationException("矩阵奇异，无法求解");
+                throw new InvalidOperationException("The matrix is singular; cannot solve.");
             for (int j = i + 1; j < n; j++)
             {
                 T factor = augmented[j][i] / pivot;
@@ -220,20 +220,20 @@ internal static class NonlinearRegression
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
-            throw new ArgumentException("数据点数量必须相等且至少有1个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 1 point.");
         if (model == null)
             throw new ArgumentNullException(nameof(model));
         if (initialParams == null || initialParams.Length == 0)
-            throw new ArgumentNullException(nameof(initialParams), "初始参数不能为空");
+            throw new ArgumentNullException(nameof(initialParams), "Initial parameters cannot be empty.");
         if (maxIterations <= 0)
-            throw new ArgumentException("最大迭代次数必须大于0");
+            throw new ArgumentException("Maximum iterations must be greater than 0.");
         if (xData.Any(row => row.ColumnCount == 0))
-            throw new ArgumentException("X 数据中不能包含空行");
+            throw new ArgumentException("X data cannot contain empty rows.");
         int n = xData.Length; // 数据点数
         int m = initialParams.Length; // 参数数
         int inputDim = xData[0].ColumnCount; // 输入变量维度
         if (xData.Any(row => row.ColumnCount != inputDim))
-            throw new ArgumentException("所有数据点的输入维度必须一致");
+            throw new ArgumentException("All data points must have a consistent input dimension.");
         // 转换为数组以避免 Span 在 lambda 中的问题
         T[] yDataArray = yData.ToArray();
         // 参数优化

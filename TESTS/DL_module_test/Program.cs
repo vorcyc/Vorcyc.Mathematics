@@ -56,7 +56,7 @@ class Program
             { { 1 }, { 2 } },
             { { 3 }, { 4 } }
         };
-        var inputTensor = new Tensor(inputArray);
+        var inputTensor = new TensorFp32(inputArray);
 
         var expectedArray = new float[,,]
         {
@@ -65,7 +65,7 @@ class Program
             { { 3 }, { 3 }, { 4 }, { 4 } },
             { { 3 }, { 3 }, { 4 }, { 4 } }
         };
-        var expectedTensor = new Tensor(expectedArray);
+        var expectedTensor = new TensorFp32(expectedArray);
         var resultTensor = Layers.Upsample2D(inputTensor);
         return TensorsEqual(expectedTensor, resultTensor);
     }
@@ -91,7 +91,7 @@ class Program
         return TensorsEqual(expectedTensor, resultTensor);
     }
 
-    static bool TensorsEqual(Tensor expected, Tensor actual)
+    static bool TensorsEqual(TensorFp32 expected, TensorFp32 actual)
     {
         if (expected.Width != actual.Width || expected.Height != actual.Height || expected.Depth != actual.Depth)
         {

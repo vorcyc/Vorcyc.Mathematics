@@ -89,7 +89,7 @@ public class TransferFunction
     /// <param name="zeros">Zeros</param>
     /// <param name="poles">Poles</param>
     /// <param name="gain">Gain</param>
-    public TransferFunction(ComplexDiscreteSignal zeros, ComplexDiscreteSignal poles, float gain = 1)
+    public TransferFunction(ComplexDiscreteSignalFp32 zeros, ComplexDiscreteSignalFp32 poles, float gain = 1)
         : this(zeros.ToComplexNumbers().ToArray(), poles.ToComplexNumbers().ToArray(), gain)
     {
     }
@@ -165,7 +165,7 @@ public class TransferFunction
             {
                 return new StateSpace
                 {
-                    A = new Matrix(1),
+                    A = new MatrixFp32(1),
                     B = new float[M],
                     C = new float[M],
                     D = new float[1] { Numerator[0] / a0 }
@@ -180,7 +180,7 @@ public class TransferFunction
                 Numerator.FastCopyTo(num, M, 0, K - M);
             }
 
-            var a = new Matrix(K - 1);
+            var a = new MatrixFp32(K - 1);
             for (var i = 0; i < K - 1; i++)
             {
                 a.GetRow(0)[i] = -Denominator[i + 1] / a0;
@@ -235,7 +235,7 @@ public class TransferFunction
                 B[i - 1] = b[i] - a[i] * b[0];
             }
 
-            Matrix m = Matrix.Eye(size - 1) - Matrix.Companion(a).Transpose();
+            MatrixFp32 m = MatrixFp32.Eye(size - 1) - MatrixFp32.Companion(a).Transpose();
 
             var sum = 0.0f;
 
@@ -295,7 +295,7 @@ public class TransferFunction
     /// Evaluates frequency response of given <paramref name="length"/>.
     /// </summary>
     /// <param name="length">Length of the frequency response</param>
-    public ComplexDiscreteSignal FrequencyResponse(int length = 512)
+    public ComplexDiscreteSignalFp32 FrequencyResponse(int length = 512)
     {
         var ir = ImpulseResponse(length);
 
@@ -307,7 +307,7 @@ public class TransferFunction
         var fft = new Fft(length);
         fft.Direct(real, imag);
 
-        return new ComplexDiscreteSignal(1, real.Take(length / 2 + 1),
+        return new ComplexDiscreteSignalFp32(1, real.Take(length / 2 + 1),
                                             imag.Take(length / 2 + 1));
     }
 
@@ -318,8 +318,8 @@ public class TransferFunction
     public float[] GroupDelay(int length = 512)
     {
         var cc = new ComplexConvolver()
-                        .CrossCorrelate(new ComplexDiscreteSignal(1, Numerator),
-                                        new ComplexDiscreteSignal(1, Denominator)).Real;
+                        .CrossCorrelate(new ComplexDiscreteSignalFp32(1, Numerator),
+                                        new ComplexDiscreteSignalFp32(1, Denominator)).Real;
 
         var cr = Enumerable.Range(0, cc.Length)
                            .Zip(cc, (r, c) => r * c)
@@ -435,7 +435,7 @@ public class TransferFunction
     /// Converts zeros (or poles) to numerator (or denominator) of transfer function.
     /// </summary>
     /// <param name="zp">Zeros (or poles)</param>
-    public static float[] ZpToTf(ComplexDiscreteSignal zp)
+    public static float[] ZpToTf(ComplexDiscreteSignalFp32 zp)
     {
         return ZpToTf(zp.ToComplexNumbers().ToArray());
     }

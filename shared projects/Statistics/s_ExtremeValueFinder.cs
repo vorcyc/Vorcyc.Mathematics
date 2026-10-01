@@ -194,17 +194,17 @@ public static class ExtremeValueFinder
         return (max, min);
     }
     /// <summary>
-    /// 获取一段数据中的最大值和最小值，使用 SSE2 指令集进行优化。
+    /// Gets the maximum and minimum values in a span of data, optimized using the SSE2 instruction set.
     /// </summary>
-    /// <param name="segment">包含浮点数的 Span。</param>
-    /// <returns>包含最大值和最小值的元组。</returns>
-    /// <exception cref="ArgumentException">当数组为空时抛出。</exception>
-    /// <exception cref="PlatformNotSupportedException">当平台不支持 SSE2 时抛出。</exception>
+    /// <param name="segment">The span of floating-point numbers.</param>
+    /// <returns>A tuple containing the maximum and minimum values.</returns>
+    /// <exception cref="ArgumentException">Thrown when the array is empty.</exception>
+    /// <exception cref="PlatformNotSupportedException">Thrown when the platform does not support SSE2.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static (float max, float min) FindExtremeValue_Vector128(this Span<float> span)
     {
         if (span.IsEmpty)
-            throw new ArgumentException("Span 不能为空", nameof(span));
+            throw new ArgumentException("Span cannot be empty.", nameof(span));
         if (!Sse.IsSupported)
             throw new PlatformNotSupportedException("SSE is not supported on this platform.");
         var vectorSize = Vector128<float>.Count;

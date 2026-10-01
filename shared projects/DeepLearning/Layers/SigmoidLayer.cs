@@ -1,13 +1,14 @@
-using System.Numerics;
+﻿using System.Numerics;
 using Vorcyc.Mathematics.LinearAlgebra;
 namespace Vorcyc.Mathematics.DeepLearning.Layers;
 public static partial class Layers
 {
     /// <summary>
-    /// 瀵硅緭鍏ュ紶閲忔墽琛?Sigmoid 婵€娲诲嚱鏁版搷浣溿€?    /// </summary>
-    /// <typeparam name="T">寮犻噺鍏冪礌鐨勭被鍨嬶紝蹇呴』瀹炵幇 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 鎺ュ彛銆?/typeparam>
-    /// <param name="input">杈撳叆鐨勫紶閲忋€?/param>
-    /// <returns>鎵ц Sigmoid 鎿嶄綔鍚庣殑寮犻噺銆?/returns>
+    /// Performs a Sigmoid activation function operation on the input tensor.
+    /// </summary>
+    /// <typeparam name="T">The tensor element type, must implement <see cref="IBinaryFloatingPointIeee754{TSelf}"/>.</typeparam>
+    /// <param name="input">The input tensor.</param>
+    /// <returns>The resulting tensor after the Sigmoid operation.</returns>
     public static Tensor<T> Sigmoid<T>(Tensor<T> input)
         where T : IBinaryFloatingPointIeee754<T>
     {
@@ -30,14 +31,15 @@ public static partial class Layers
         return result;
     }
     /// <summary>
-    /// 瀵硅緭鍏ュ紶閲忔墽琛?Sigmoid 婵€娲诲嚱鏁版搷浣溿€?    /// </summary>
-    /// <param name="input">杈撳叆鐨勫紶閲忋€?/param>
-    /// <returns>鎵ц Sigmoid 鎿嶄綔鍚庣殑寮犻噺銆?/returns>
-    public static Tensor Sigmoid(Tensor input)
+    /// Performs a Sigmoid activation function operation on the input tensor.
+    /// </summary>
+    /// <param name="input">The input tensor.</param>
+    /// <returns>The resulting tensor after the Sigmoid operation.</returns>
+    public static TensorFp32 Sigmoid(TensorFp32 input)
     {
         var height = input.Height;
         var width = input.Width;
-        var result = new Tensor(input.Width, input.Height, input.Depth);
+        var result = new TensorFp32(input.Width, input.Height, input.Depth);
         long workPer = (long)height * width;
         ForEachDepth(input.Depth, workPer, d =>
         {

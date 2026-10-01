@@ -7,11 +7,11 @@ public static partial class Layers
 {
 
     /// <summary>
-    /// 对输入张量执行 ReLU 激活函数操作。
+    /// Performs a ReLU activation function operation on the input tensor.
     /// </summary>
-    /// <typeparam name="T">张量元素的类型，必须实现 <see cref="IBinaryFloatingPointIeee754{TSelf}"/>接口。</typeparam>
-    /// <param name="input">输入的张量。</param>
-    /// <returns>执行 ReLU 操作后的张量。</returns>
+    /// <typeparam name="T">The tensor element type, must implement <see cref="IBinaryFloatingPointIeee754{TSelf}"/>.</typeparam>
+    /// <param name="input">The input tensor.</param>
+    /// <returns>The resulting tensor after the ReLU operation.</returns>
     public static Tensor<T> ReLU<T>(Tensor<T> input)
         where T : IBinaryFloatingPointIeee754<T>
     {
@@ -38,15 +38,15 @@ public static partial class Layers
 
 
     /// <summary>
-    /// 对输入张量执行 ReLU 激活函数操作。
+    /// Performs a ReLU activation function operation on the input tensor.
     /// </summary>
-    /// <param name="input">输入的张量。</param>
-    /// <returns>执行 ReLU 操作后的张量。</returns>
-    public static Tensor ReLU(Tensor input)
+    /// <param name="input">The input tensor.</param>
+    /// <returns>The resulting tensor after the ReLU operation.</returns>
+    public static TensorFp32 ReLU(TensorFp32 input)
     {
         var height = input.Height;
         var width = input.Width;
-        var result = new Tensor(input.Width, input.Height, input.Depth);
+        var result = new TensorFp32(input.Width, input.Height, input.Depth);
 
         long workPer = (long)height * width;
         ForEachDepth(input.Depth, workPer, d =>

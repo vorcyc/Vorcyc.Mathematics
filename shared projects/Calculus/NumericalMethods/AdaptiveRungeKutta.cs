@@ -55,14 +55,14 @@ public sealed class AdaptiveRungeKutta<T> where T : struct, IFloatingPointIeee75
         while (forward ? x < xEnd - _endTol : x > xEnd + _endTol)
         {
             if (++totalSteps > 10_000)
-                throw new InvalidOperationException("自适应积分超过最大步数");
+                throw new InvalidOperationException("Adaptive integration exceeded the maximum number of steps.");
 
             T remaining = xEnd - x;
             if (T.Abs(h) > T.Abs(remaining))
                 h = remaining;
 
             if (!TryAdaptiveStep(x, y, h, relativeTolerance, absoluteTolerance, out T yTrial, out T scaledError, out T acceptedH))
-                throw new InvalidOperationException("自适应步长低于最小步长，积分失败");
+                throw new InvalidOperationException("Adaptive step size fell below the minimum step size; integration failed.");
 
             x += acceptedH;
             y = yTrial;
@@ -82,7 +82,7 @@ public sealed class AdaptiveRungeKutta<T> where T : struct, IFloatingPointIeee75
         OdeEvent<T>? odeEvent = null,
         int maxPoints = 10_000)
     {
-        if (maxPoints < 1) throw new ArgumentException("maxPoints 必须大于等于 1", nameof(maxPoints));
+        if (maxPoints < 1) throw new ArgumentException("maxPoints must be greater than or equal to 1.", nameof(maxPoints));
 
         var xs = new T[maxPoints];
         var ys = new T[maxPoints];
@@ -108,7 +108,7 @@ public sealed class AdaptiveRungeKutta<T> where T : struct, IFloatingPointIeee75
         while (forward ? x < xEnd - _endTol : x > xEnd + _endTol)
         {
             if (++totalSteps > 10_000)
-                throw new InvalidOperationException("自适应积分超过最大步数");
+                throw new InvalidOperationException("Adaptive integration exceeded the maximum number of steps.");
             if (count >= maxPoints)
                 break;
 
@@ -117,7 +117,7 @@ public sealed class AdaptiveRungeKutta<T> where T : struct, IFloatingPointIeee75
                 h = remaining;
 
             if (!TryAdaptiveStep(x, y, h, relativeTolerance, absoluteTolerance, out T yTrial, out T scaledError, out T acceptedH))
-                throw new InvalidOperationException("自适应步长低于最小步长，积分失败");
+                throw new InvalidOperationException("Adaptive step size fell below the minimum step size; integration failed.");
 
             x += acceptedH;
             y = yTrial;

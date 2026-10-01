@@ -2,21 +2,21 @@
 
 using Vorcyc.Mathematics.Framework;
 
-///<summary>3维张量，数据类型为 <see cref="float"/>。</summary>
-public class Tensor : ICloneable<Tensor>
+///<summary>A 3D tensor with <see cref="float"/> element type.</summary>
+public class TensorFp32 : ICloneable<TensorFp32>
 {
     private readonly float[] _values;
 
-    ///<summary>使用指定的大小初始化张量。</summary>
-    ///<param name="w">宽度。</param>
-    ///<param name="h">高度。</param>
-    ///<param name="d">深度。</param>
+    ///<summary>Initializes a tensor with the specified dimensions.</summary>
+    ///<param name="w">Width.</param>
+    ///<param name="h">Height.</param>
+    ///<param name="d">Depth.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor(int w, int h, int d)
+    public TensorFp32(int w, int h, int d)
     {
         if (w <= 0 || h <= 0 || d <= 0)
         {
-            throw new ArgumentException("维度必须是正数且非零。");
+            throw new ArgumentException("Dimensions must be positive and non-zero.");
         }
 
         this._values = new float[w * h * d];
@@ -25,13 +25,13 @@ public class Tensor : ICloneable<Tensor>
         this.Depth = d;
     }
 
-    ///<summary>使用指定的大小和初始值初始化张量。</summary>
-    ///<param name="w">宽度。</param>
-    ///<param name="h">高度。</param>
-    ///<param name="d">深度。</param>
-    ///<param name="initialValue">所有元素的初始值。</param>
+    ///<summary>Initializes a tensor with the specified dimensions and initial value.</summary>
+    ///<param name="w">Width.</param>
+    ///<param name="h">Height.</param>
+    ///<param name="d">Depth.</param>
+    ///<param name="initialValue">The initial value for all elements.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor(int w, int h, int d, float initialValue) : this(w, h, d)
+    public TensorFp32(int w, int h, int d, float initialValue) : this(w, h, d)
     {
         for (int i = 0; i < _values.Length; i++)
         {
@@ -39,10 +39,10 @@ public class Tensor : ICloneable<Tensor>
         }
     }
 
-    ///<summary>从三维数组初始化张量。</summary>
-    ///<param name="array">用于初始化张量的三维数组。</param>
+    ///<summary>Initializes a tensor from a 3D array.</summary>
+    ///<param name="array">The 3D array used to initialize the tensor.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor(float[,,] array)
+    public TensorFp32(float[,,] array)
     {
         this.Width = array.GetLength(0);
         this.Height = array.GetLength(1);
@@ -61,25 +61,25 @@ public class Tensor : ICloneable<Tensor>
         }
     }
 
-    ///<summary>张量的值。</summary>
+    ///<summary>The tensor values.</summary>
     public float[] Values => _values;
 
-    ///<summary>宽度。</summary>
+    ///<summary>Width.</summary>
     public int Width { get; }
 
-    ///<summary>高度。</summary>
+    ///<summary>Height.</summary>
     public int Height { get; }
 
-    ///<summary>深度。</summary>
+    ///<summary>Depth.</summary>
     public int Depth { get; }
 
     /// <summary>
-    /// 获取或设置指定坐标的值。
+    /// Gets or sets the value at the specified coordinates.
     /// </summary>
-    /// <param name="x">X 坐标（宽度）。</param>
-    /// <param name="y">Y 坐标（高度）。</param>
-    /// <param name="z">Z 坐标（深度）。</param>
-    /// <returns>指定坐标的值。</returns>
+    /// <param name="x">X coordinate (width).</param>
+    /// <param name="y">Y coordinate (height).</param>
+    /// <param name="z">Z coordinate (depth).</param>
+    /// <returns>The value at the specified coordinates.</returns>
     public ref float this[int x, int y, int z]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -91,24 +91,24 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 验证提供的索引。
+    /// Validates the provided indices.
     /// </summary>
-    /// <param name="x">X 坐标（宽度）。</param>
-    /// <param name="y">Y 坐标（高度）。</param>
-    /// <param name="z">Z 坐标（深度）。</param>
+    /// <param name="x">X coordinate (width).</param>
+    /// <param name="y">Y coordinate (height).</param>
+    /// <param name="z">Z coordinate (depth).</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ValidateIndices(int x, int y, int z)
     {
         if (x < 0 || x >= Width || y < 0 || y >= Height || z < 0 || z >= Depth)
         {
-            throw new ArgumentOutOfRangeException("索引超出范围。");
+            throw new ArgumentOutOfRangeException("Index out of range.");
         }
     }
 
     /// <summary>
-    /// 用指定的值填充张量。
+    /// Fills the tensor with the specified value.
     /// </summary>
-    /// <param name="value">用于填充张量的值。</param>
+    /// <param name="value">The value used to fill the tensor.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Fill(float value)
     {
@@ -121,11 +121,11 @@ public class Tensor : ICloneable<Tensor>
     #region operators inline
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Add(Tensor other)
+    public void Add(TensorFp32 other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
         {
-            throw new ArgumentException("张量维度必须匹配。");
+            throw new ArgumentException("TensorFp32 dimensions must match.");
         }
 
         int vectorSize = System.Numerics.Vector<float>.Count;
@@ -146,11 +146,11 @@ public class Tensor : ICloneable<Tensor>
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Subtract(Tensor other)
+    public void Subtract(TensorFp32 other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
         {
-            throw new ArgumentException("张量维度必须匹配。");
+            throw new ArgumentException("TensorFp32 dimensions must match.");
         }
 
         int vectorSize = System.Numerics.Vector<float>.Count;
@@ -192,21 +192,21 @@ public class Tensor : ICloneable<Tensor>
     #endregion
 
     /// <summary>
-    /// 克隆张量。
+    /// Clones the tensor.
     /// </summary>
-    /// <returns>一个新的张量，它是当前张量的副本。</returns>
+    /// <returns>A new tensor that is a copy of the current tensor.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor Clone()
+    public TensorFp32 Clone()
     {
-        Tensor clone = new(Width, Height, Depth);
+        TensorFp32 clone = new(Width, Height, Depth);
         Array.Copy(_values, clone._values, _values.Length);
         return clone;
     }
 
     /// <summary>
-    /// 返回张量的字符串表示形式。
+    /// Returns the string representation of the tensor.
     /// </summary>
-    /// <returns>张量的字符串表示形式。</returns>
+    /// <returns>The string representation of the tensor.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {
@@ -216,20 +216,20 @@ public class Tensor : ICloneable<Tensor>
     #region operators
 
     /// <summary>
-    /// 将两个张量相加。
+    /// Adds two tensors.
     /// </summary>
-    /// <param name="a">第一个张量。</param>
-    /// <param name="b">第二个张量。</param>
-    /// <returns>两个张量相加的结果。</returns>
+    /// <param name="a">The first tensor.</param>
+    /// <param name="b">The second tensor.</param>
+    /// <returns>The result of adding the two tensors.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Tensor operator +(Tensor a, Tensor b)
+    public static TensorFp32 operator +(TensorFp32 a, TensorFp32 b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
         {
-            throw new ArgumentException("张量维度必须匹配。");
+            throw new ArgumentException("TensorFp32 dimensions must match.");
         }
 
-        Tensor result = new Tensor(a.Width, a.Height, a.Depth);
+        TensorFp32 result = new TensorFp32(a.Width, a.Height, a.Depth);
         for (int i = 0; i < a._values.Length; i++)
         {
             result._values[i] = a._values[i] + b._values[i];
@@ -238,20 +238,20 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 将一个张量从另一个张量中减去。
+    /// Subtracts one tensor from another.
     /// </summary>
-    /// <param name="a">第一个张量。</param>
-    /// <param name="b">第二个张量。</param>
-    /// <returns>从第一个张量中减去第二个张量的结果。</returns>
+    /// <param name="a">The first tensor.</param>
+    /// <param name="b">The second tensor.</param>
+    /// <returns>The result of subtracting the second tensor from the first.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Tensor operator -(Tensor a, Tensor b)
+    public static TensorFp32 operator -(TensorFp32 a, TensorFp32 b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
         {
-            throw new ArgumentException("张量维度必须匹配。");
+            throw new ArgumentException("TensorFp32 dimensions must match.");
         }
 
-        Tensor result = new Tensor(a.Width, a.Height, a.Depth);
+        TensorFp32 result = new TensorFp32(a.Width, a.Height, a.Depth);
         for (int i = 0; i < a._values.Length; i++)
         {
             result._values[i] = a._values[i] - b._values[i];
@@ -260,15 +260,15 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 将张量乘以一个标量值。
+    /// Multiplies a tensor by a scalar value.
     /// </summary>
-    /// <param name="tensor">张量。</param>
-    /// <param name="scalar">标量值。</param>
-    /// <returns>张量乘以标量值的结果。</returns>
+    /// <param name="tensor">The tensor.</param>
+    /// <param name="scalar">The scalar value.</param>
+    /// <returns>The result of multiplying the tensor by the scalar value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Tensor operator *(Tensor tensor, float scalar)
+    public static TensorFp32 operator *(TensorFp32 tensor, float scalar)
     {
-        Tensor result = new Tensor(tensor.Width, tensor.Height, tensor.Depth);
+        TensorFp32 result = new TensorFp32(tensor.Width, tensor.Height, tensor.Depth);
         for (int i = 0; i < tensor._values.Length; i++)
         {
             result._values[i] = tensor._values[i] * scalar;
@@ -277,13 +277,13 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 将张量乘以一个标量值。
+    /// Multiplies a tensor by a scalar value.
     /// </summary>
-    /// <param name="scalar">标量值。</param>
-    /// <param name="tensor">张量。</param>
-    /// <returns>张量乘以标量值的结果。</returns>
+    /// <param name="scalar">The scalar value.</param>
+    /// <param name="tensor">The tensor.</param>
+    /// <returns>The result of multiplying the tensor by the scalar value.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Tensor operator *(float scalar, Tensor tensor)
+    public static TensorFp32 operator *(float scalar, TensorFp32 tensor)
     {
         return tensor * scalar;
     }
@@ -291,17 +291,17 @@ public class Tensor : ICloneable<Tensor>
     #endregion
 
     /// <summary>
-    /// 沿指定轴转置张量。
+    /// Transposes the tensor along the specified axes.
     /// </summary>
-    /// <param name="axis1">第一个轴。</param>
-    /// <param name="axis2">第二个轴。</param>
-    /// <returns>转置后的新张量。</returns>
+    /// <param name="axis1">The first axis.</param>
+    /// <param name="axis2">The second axis.</param>
+    /// <returns>The transposed tensor.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor Transpose(int axis1, int axis2)
+    public TensorFp32 Transpose(int axis1, int axis2)
     {
         if (axis1 < 0 || axis1 > 2 || axis2 < 0 || axis2 > 2 || axis1 == axis2)
         {
-            throw new ArgumentException("无效的转置轴。");
+            throw new ArgumentException("Invalid transpose axis.");
         }
 
         int[] dims = { Width, Height, Depth };
@@ -309,7 +309,7 @@ public class Tensor : ICloneable<Tensor>
         int newHeight = dims[axis2];
         int newDepth = dims[3 - axis1 - axis2];
 
-        Tensor result = new Tensor(newWidth, newHeight, newDepth);
+        TensorFp32 result = new TensorFp32(newWidth, newHeight, newDepth);
 
         for (int x = 0; x < Width; x++)
         {
@@ -327,9 +327,9 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 计算张量中所有元素的和。
+    /// Computes the sum of all elements in the tensor.
     /// </summary>
-    /// <returns>张量中所有元素的和。</returns>
+    /// <returns>The sum of all elements in the tensor.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Sum()
     {
@@ -342,16 +342,16 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 计算两个张量的点积。
+    /// Computes the dot product of two tensors.
     /// </summary>
-    /// <param name="other">另一个张量。</param>
-    /// <returns>两个张量的点积。</returns>
+    /// <param name="other">The other tensor.</param>
+    /// <returns>The dot product of the two tensors.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float Dot(Tensor other)
+    public float Dot(TensorFp32 other)
     {
         if (this.Width != other.Width || this.Height != other.Height || this.Depth != other.Depth)
         {
-            throw new ArgumentException("张量维度必须匹配。");
+            throw new ArgumentException("TensorFp32 dimensions must match.");
         }
 
         int vectorSize = System.Numerics.Vector<float>.Count;
@@ -380,7 +380,7 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 归一化张量。
+    /// Normalizes the tensor.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Normalize()
@@ -388,7 +388,7 @@ public class Tensor : ICloneable<Tensor>
         float norm = Norm();
         if (norm == 0)
         {
-            throw new InvalidOperationException("无法归一化范数为零的张量。");
+            throw new InvalidOperationException("Cannot normalize a tensor with zero norm.");
         }
 
         int vectorSize = System.Numerics.Vector<float>.Count;
@@ -409,9 +409,9 @@ public class Tensor : ICloneable<Tensor>
 
 
     /// <summary>
-    /// 计算张量的范数。
+    /// Computes the norm of the tensor.
     /// </summary>
-    /// <returns>张量的范数。</returns>
+    /// <returns>The norm of the tensor.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Norm()
     {
@@ -440,30 +440,30 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 沿指定轴切片张量。
+    /// Slices the tensor along the specified axis.
     /// </summary>
-    /// <param name="axis">要切片的轴。</param>
-    /// <param name="index">切片的索引。</param>
-    /// <returns>切片后的新张量。</returns>
+    /// <param name="axis">The axis to slice.</param>
+    /// <param name="index">The slice index.</param>
+    /// <returns>The sliced tensor.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Tensor Slice(int axis, int index)
+    public TensorFp32 Slice(int axis, int index)
     {
         if (axis < 0 || axis > 2)
         {
-            throw new ArgumentException("无效的切片轴。");
+            throw new ArgumentException("Invalid slice axis.");
         }
 
         int[] dims = { Width, Height, Depth };
         if (index < 0 || index >= dims[axis])
         {
-            throw new ArgumentOutOfRangeException("索引超出范围。");
+            throw new ArgumentOutOfRangeException("Index out of range.");
         }
 
         int newWidth = axis == 0 ? 1 : Width;
         int newHeight = axis == 1 ? 1 : Height;
         int newDepth = axis == 2 ? 1 : Depth;
 
-        Tensor result = new Tensor(newWidth, newHeight, newDepth);
+        TensorFp32 result = new TensorFp32(newWidth, newHeight, newDepth);
 
         for (int x = 0; x < newWidth; x++)
         {
@@ -482,13 +482,13 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 检查两个张量是否相等。
+    /// Checks whether two tensors are equal.
     /// </summary>
-    /// <param name="a">第一个张量。</param>
-    /// <param name="b">第二个张量。</param>
-    /// <returns>如果张量相等，则为 true，否则为 false。</returns>
+    /// <param name="a">The first tensor.</param>
+    /// <param name="b">The second tensor.</param>
+    /// <returns><see langword="true"/> if the tensors are equal; otherwise, <see langword="false"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Tensor a, Tensor b)
+    public static bool operator ==(TensorFp32 a, TensorFp32 b)
     {
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)
         {
@@ -506,26 +506,26 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 检查两个张量是否不相等。
+    /// Checks whether two tensors are not equal.
     /// </summary>
-    /// <param name="a">第一个张量。</param>
-    /// <param name="b">第二个张量。</param>
-    /// <returns>如果张量不相等，则为 true，否则为 false。</returns>
+    /// <param name="a">The first tensor.</param>
+    /// <param name="b">The second tensor.</param>
+    /// <returns><see langword="true"/> if the tensors are not equal; otherwise, <see langword="false"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(Tensor a, Tensor b)
+    public static bool operator !=(TensorFp32 a, TensorFp32 b)
     {
         return !(a == b);
     }
 
     /// <summary>
-    /// 确定指定对象是否等于当前对象。
+    /// Determines whether the specified object is equal to the current object.
     /// </summary>
-    /// <param name="obj">要与当前对象进行比较的对象。</param>
-    /// <returns>如果指定对象等于当前对象，则为 true，否则为 false。</returns>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj)
     {
-        if (obj is Tensor other)
+        if (obj is TensorFp32 other)
         {
             return this == other;
         }
@@ -533,9 +533,9 @@ public class Tensor : ICloneable<Tensor>
     }
 
     /// <summary>
-    /// 作为默认的哈希函数。
+    /// Serves as the default hash function.
     /// </summary>
-    /// <returns>当前对象的哈希代码。</returns>
+    /// <returns>A hash code for the current object.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode()
     {

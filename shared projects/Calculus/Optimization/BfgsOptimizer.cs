@@ -32,7 +32,7 @@ public sealed class BfgsOptimizer<T> where T : struct, IFloatingPointIeee754<T>
     /// <summary>求解无约束极小点。</summary>
     public T[] Minimize(T[] initial, int maxIterations = 200, T? tolerance = null)
     {
-        if (initial.Length == 0) throw new ArgumentException("初始点不能为空", nameof(initial));
+        if (initial.Length == 0) throw new ArgumentException("Initial point cannot be empty.", nameof(initial));
         EnsureCapacity(initial.Length);
 
         T tol = tolerance ?? T.CreateChecked(1e-8);

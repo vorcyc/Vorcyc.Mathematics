@@ -42,11 +42,11 @@ public static class LinearEquationSolver
         T[,]? augmentedWorkspace = null) where T : struct, IFloatingPointIeee754<T>
     {
         if (A.Rows != A.Columns)
-            throw new ArgumentException("矩阵 A 必须是方阵。", nameof(A));
+            throw new ArgumentException("Matrix A must be square.", nameof(A));
         if (A.Rows != b.Length)
-            throw new ArgumentException("矩阵 A 的行数必须与向量 b 的长度匹配。", nameof(b));
+            throw new ArgumentException("The number of rows in matrix A must match the length of vector b.", nameof(b));
         if (x.Length < b.Length)
-            throw new ArgumentException("解向量缓冲区长度不足", nameof(x));
+            throw new ArgumentException("Solution vector buffer length is insufficient.", nameof(x));
 
         int n = A.Rows;
         T[,] augmented = augmentedWorkspace is not null
@@ -72,7 +72,7 @@ public static class LinearEquationSolver
             }
 
             if (T.Abs(augmented[maxRow, i]) < T.CreateChecked(1e-10))
-                throw new InvalidOperationException("矩阵不可逆，无法求解。");
+                throw new InvalidOperationException("The matrix is not invertible; cannot solve.");
 
             if (maxRow != i)
             {
@@ -110,9 +110,9 @@ public static class LinearEquationSolver
     public static T[] LUSolve<T>(Matrix<T> A, T[] b) where T : struct, IFloatingPointIeee754<T>
     {
         if (A.Rows != A.Columns)
-            throw new ArgumentException("矩阵 A 必须是方阵。", nameof(A));
+            throw new ArgumentException("Matrix A must be square.", nameof(A));
         if (A.Rows != b.Length)
-            throw new ArgumentException("矩阵 A 的行数必须与向量 b 的长度匹配。", nameof(b));
+            throw new ArgumentException("The number of rows in matrix A must match the length of vector b.", nameof(b));
 
         int n = A.Rows;
         A.LUDecomposition(out Matrix<T> L, out Matrix<T> U, out int[] P);
@@ -121,7 +121,7 @@ public static class LinearEquationSolver
         for (int i = 0; i < n; i++)
         {
             if (T.Abs(U[i, i]) < T.CreateChecked(1e-10))
-                throw new InvalidOperationException("矩阵不可逆，无法求解。");
+                throw new InvalidOperationException("The matrix is not invertible; cannot solve.");
         }
 
         // 前向代入 Ly = Pb
@@ -158,9 +158,9 @@ public static class LinearEquationSolver
         where T : struct, IFloatingPointIeee754<T>
     {
         if (A.Rows != A.Columns)
-            throw new ArgumentException("矩阵 A 必须是方阵。", nameof(A));
+            throw new ArgumentException("Matrix A must be square.", nameof(A));
         if (A.Rows != b.Length)
-            throw new ArgumentException("矩阵 A 的行数必须与向量 b 的长度匹配。", nameof(b));
+            throw new ArgumentException("The number of rows in matrix A must match the length of vector b.", nameof(b));
 
         int n = A.Rows;
         Matrix<T> L = A.CholeskyDecomposition();
@@ -195,7 +195,7 @@ public static class LinearEquationSolver
         where T : struct, IFloatingPointIeee754<T>
     {
         if (y.Length != designMatrix.Rows)
-            throw new ArgumentException("观测向量长度必须与矩阵行数一致。", nameof(y));
+            throw new ArgumentException("Observation vector length must match the number of matrix rows.", nameof(y));
 
         var xt = designMatrix.Transpose();
         var xtx = xt * designMatrix;
@@ -223,7 +223,7 @@ public static class LinearEquationSolver
         where T : struct, IFloatingPointIeee754<T>
     {
         if (y.Length != designMatrix.Rows)
-            throw new ArgumentException("观测向量长度必须与矩阵行数一致。", nameof(y));
+            throw new ArgumentException("Observation vector length must match the number of matrix rows.", nameof(y));
 
         var xt = designMatrix.Transpose();
         var xtx = xt * designMatrix;
@@ -282,7 +282,7 @@ public static class LinearEquationSolver
         where T : struct, IFloatingPointIeee754<T>
     {
         if (y.Length != designMatrix.Rows)
-            throw new ArgumentException("观测向量长度必须与矩阵行数一致。", nameof(y));
+            throw new ArgumentException("Observation vector length must match the number of matrix rows.", nameof(y));
 
         var pseudoinverse = MatrixDecomposition.Pseudoinverse(designMatrix, tolerance);
         return pseudoinverse.Multiply(y);
@@ -302,9 +302,9 @@ public static class LinearEquationSolver
     public static T[] JacobiSolve<T>(Matrix<T> A, T[] b, T tolerance, int maxIterations = 1000) where T : struct, IFloatingPointIeee754<T>
     {
         if (A.Rows != A.Columns)
-            throw new ArgumentException("矩阵 A 必须是方阵。", nameof(A));
+            throw new ArgumentException("Matrix A must be square.", nameof(A));
         if (A.Rows != b.Length)
-            throw new ArgumentException("矩阵 A 的行数必须与向量 b 的长度匹配。", nameof(b));
+            throw new ArgumentException("The number of rows in matrix A must match the length of vector b.", nameof(b));
 
         int n = A.Rows;
         var x = new T[n];
@@ -314,7 +314,7 @@ public static class LinearEquationSolver
         for (int i = 0; i < n; i++)
         {
             if (T.Abs(A[i, i]) < T.CreateChecked(1e-10))
-                throw new InvalidOperationException("对角线元素不能为零或过小，Jacobi 法无法收敛。");
+                throw new InvalidOperationException("Diagonal elements must not be zero or too small; the Jacobi method cannot converge.");
         }
 
         for (int iter = 0; iter < maxIterations; iter++)
@@ -338,7 +338,7 @@ public static class LinearEquationSolver
             Array.Copy(xNew, x, n);
         }
 
-        throw new InvalidOperationException($"Jacobi 迭代未能在 {maxIterations} 次迭代内收敛到容差 {tolerance}。");
+        throw new InvalidOperationException($"Jacobi iteration failed to converge to tolerance {tolerance} within {maxIterations} iterations.");
     }
 
     /// <summary>
@@ -355,9 +355,9 @@ public static class LinearEquationSolver
     public static T[] GaussSeidelSolve<T>(Matrix<T> A, T[] b, T tolerance, int maxIterations = 1000) where T : struct, IFloatingPointIeee754<T>
     {
         if (A.Rows != A.Columns)
-            throw new ArgumentException("矩阵 A 必须是方阵。", nameof(A));
+            throw new ArgumentException("Matrix A must be square.", nameof(A));
         if (A.Rows != b.Length)
-            throw new ArgumentException("矩阵 A 的行数必须与向量 b 的长度匹配。", nameof(b));
+            throw new ArgumentException("The number of rows in matrix A must match the length of vector b.", nameof(b));
 
         int n = A.Rows;
         var x = new T[n];
@@ -366,7 +366,7 @@ public static class LinearEquationSolver
         for (int i = 0; i < n; i++)
         {
             if (T.Abs(A[i, i]) < T.CreateChecked(1e-10))
-                throw new InvalidOperationException("对角线元素不能为零或过小，Gauss-Seidel 法无法收敛。");
+                throw new InvalidOperationException("Diagonal elements must not be zero or too small; the Gauss-Seidel method cannot converge.");
         }
 
         for (int iter = 0; iter < maxIterations; iter++)
@@ -389,6 +389,6 @@ public static class LinearEquationSolver
                 return x;
         }
 
-        throw new InvalidOperationException($"Gauss-Seidel 迭代未能在 {maxIterations} 次迭代内收敛到容差 {tolerance}。");
+        throw new InvalidOperationException($"Gauss-Seidel iteration failed to converge to tolerance {tolerance} within {maxIterations} iterations.");
     }
 }

@@ -25,7 +25,7 @@ public sealed class ImplicitEuler<T> where T : struct, IFloatingPointIeee754<T>
     /// <summary>从 x0 积分到 xEnd。</summary>
     public T Solve(T x0, T y0, T xEnd, int steps = 100, T? h = null, int newtonIterations = 8)
     {
-        if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
+        if (steps < 1) throw new ArgumentException("Step count must be greater than or equal to 1.", nameof(steps));
         if (x0 == xEnd) return y0;
 
         T step = h ?? (xEnd - x0) / T.CreateChecked(steps);

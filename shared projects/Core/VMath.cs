@@ -17,13 +17,13 @@ using System.Runtime.CompilerServices;
 public static partial class VMath
 {
 
-    #region 最大公约数 或 最小公倍数
+    #region GCD or LCM
     /// <summary>
-    /// 使用欧几里得算法计算两个整数的最大公约数（GCD）。
+    /// Computes the greatest common divisor (GCD) of two integers using the Euclidean algorithm.
     /// </summary>
-    /// <param name="n">第一个整数。</param>
-    /// <param name="m">第二个整数。</param>
-    /// <returns>两个整数的最大公约数。</returns>
+    /// <param name="n">The first integer.</param>
+    /// <param name="m">The second integer.</param>
+    /// <returns>The greatest common divisor of the two integers.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Gcd(int n, int m)
     {
@@ -37,12 +37,12 @@ public static partial class VMath
         return n;
     }
     /// <summary>
-    /// 使用欧几里得算法计算两个泛型整数的最大公约数（GCD）。
+    /// Computes the greatest common divisor (GCD) of two generic integers using the Euclidean algorithm.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IBinaryInteger{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="a">第一个整数。</param>
-    /// <param name="b">第二个整数。</param>
-    /// <returns>两个整数的最大公约数。</returns>
+    /// <typeparam name="T">The generic type, must implement <see cref="IBinaryInteger{T}"/>.</typeparam>
+    /// <param name="a">The first integer.</param>
+    /// <param name="b">The second integer.</param>
+    /// <returns>The greatest common divisor of the two integers.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Gcd<T>(this T a, T b) where T : IBinaryInteger<T>
     {
@@ -55,11 +55,11 @@ public static partial class VMath
         return a;
     }
     /// <summary>
-    /// 计算两个整数的最大公约数（HCF），使用递归方法。
+    /// Computes the highest common factor (HCF) of two integers using recursion.
     /// </summary>
-    /// <param name="a">第一个整数。</param>
-    /// <param name="b">第二个整数。</param>
-    /// <returns>两个整数的最大公约数。</returns>
+    /// <param name="a">The first integer.</param>
+    /// <param name="b">The second integer.</param>
+    /// <returns>The highest common factor of the two integers.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Hcf(int a, int b)
     {
@@ -105,8 +105,8 @@ public static partial class VMath
     //    return b;
     //}
     /// <summary>
-    /// 求最小公倍数.
-    /// 几个数共有的倍数叫做这几个数的公倍数，其中除0以外最小的一个公倍数，叫做这几个数的最小公倍数。
+    /// Computes the least common multiple (LCM).
+    /// The least common multiple of several numbers is the smallest positive number (other than 0) that is a multiple of all of them.
     /// Least Common Multiple 
     /// </summary>
     /// <param name="a"></param>
@@ -119,7 +119,7 @@ public static partial class VMath
     }
     //Fraction
     /// <summary>
-    /// 取分数的最简整数比
+    /// Reduces a fraction to its simplest integer ratio.
     /// </summary>
     /// <param name="numerator"></param>
     /// <param name="denominator"></param>
@@ -132,7 +132,7 @@ public static partial class VMath
     #endregion
 
     /// <summary>
-    /// 算三角形斜边
+    /// Computes the hypotenuse of a right triangle.
     ///   Hypotenuse calculus without overflow/underflow
     /// </summary>
     /// <param name="a">First value</param>
@@ -395,11 +395,11 @@ public static partial class VMath
     /// <param name="x">Source integer number.</param>
     /// <returns>Power of the number (base of binary logarithm).</returns>
     /// <remarks>
-    /// <para><strong>这是最快版本的</strong></para>
-    /// <para><em>在AMD 5950X 上执行 : for (int i = 1; i &lt; 50000000; i++) </em></para>
+    /// <para><strong>This is the fastest version.</strong></para>
+    /// <para><em>Measured on AMD 5950X: for (int i = 1; i &lt; 50000000; i++) </em></para>
     /// <list type="bullet">
-    /// <item><description><para><em> 本版本耗时  ：00:00:00.4058618 </em></para></description></item>
-    /// <item><description><para><em> 第二个(移位)版本耗时 ：00:00:02.1504855 </em></para></description></item>
+    /// <item><description><para><em> This version took: 00:00:00.4058618 </em></para></description></item>
+    /// <item><description><para><em> The second (shift) version took: 00:00:02.1504855 </em></para></description></item>
     /// </list>
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -503,7 +503,7 @@ public static partial class VMath
     }
 
     ///// <summary>  
-    ///// 快速整数版本的以2为底的对数
+    ///// Fast integer version of base-2 logarithm
     ///// </summary>
     ///// <param name="x"></param>
     ///// <returns></returns>
@@ -523,14 +523,14 @@ public static partial class VMath
     //        x >>= 1;
     //    return i;
     //}
-    /* 被注释的版本不要了，只要最快的int那个版本，另外再提供一个泛型版本的 */
+    /* Commented-out version removed; keep only the fastest int version, plus a generic version. */
     /// <summary>
-    /// 计算泛型整数的以2为底的对数。
+    /// Computes the base-2 logarithm of a generic integer.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IBinaryInteger{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">要计算对数的整数。</param>
-    /// <returns>输入值的以2为底的对数。</returns>
-    /// <exception cref="ArgumentOutOfRangeException">当输入值小于或等于零时抛出。</exception>
+    /// <typeparam name="T">The generic type, must implement <see cref="IBinaryInteger{T}"/>.</typeparam>
+    /// <param name="x">The integer to compute the logarithm of.</param>
+    /// <returns>The base-2 logarithm of the input value.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the input value is less than or equal to zero.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Log2<T>(T x)
         where T : IBinaryInteger<T>
@@ -548,23 +548,23 @@ public static partial class VMath
             x >>= 1;
         return i;
     }
-    #region 阶乘
+    #region Factorial
     /// <summary>
-    /// 计算一个整数的阶乘。
+    /// Computes the factorial of an integer.
     /// </summary>
-    /// <param name="n">要计算阶乘的整数。</param>
-    /// <returns>输入整数的阶乘值。</returns>
-    /// <exception cref="ArgumentOutOfRangeException">当 n 为负数时抛出。</exception>
+    /// <param name="n">The integer to compute the factorial of.</param>
+    /// <returns>The factorial of the input integer.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when n is negative.</exception>
     /// <remarks>
-    /// 阶乘是所有小于或等于 n 的正整数的乘积，记作 n!。
-    /// 对于 n = 0，阶乘定义为 1。
+    /// The factorial is the product of all positive integers less than or equal to n, denoted n!.
+    /// For n = 0, the factorial is defined as 1.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Factorial(int n)
     {
         if (n < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(n), "阶乘未定义负数。");
+            throw new ArgumentOutOfRangeException(nameof(n), "Factorial is not defined for negative numbers.");
         }
         if (n == 0)
         {
@@ -573,22 +573,22 @@ public static partial class VMath
         return n * Factorial(n - 1);
     }
     /// <summary>
-    /// 计算一个泛型整数的阶乘。
+    /// Computes the factorial of a generic integer.
     /// </summary>
-    /// <typeparam name="T">整数类型。</typeparam>
-    /// <param name="n">要计算阶乘的整数。</param>
-    /// <returns>输入整数的阶乘值。</returns>
-    /// <exception cref="ArgumentOutOfRangeException">当 n 为负数时抛出。</exception>
+    /// <typeparam name="T">The integer type.</typeparam>
+    /// <param name="n">The integer to compute the factorial of.</param>
+    /// <returns>The factorial of the input integer.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when n is negative.</exception>
     /// <remarks>
-    /// 阶乘是所有小于或等于 n 的正整数的乘积，记作 n!。
-    /// 对于 n = 0，阶乘定义为 1。
+    /// The factorial is the product of all positive integers less than or equal to n, denoted n!.
+    /// For n = 0, the factorial is defined as 1.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Factorial<T>(T n) where T : INumber<T>
     {
         if (n < T.Zero)
         {
-            throw new ArgumentOutOfRangeException(nameof(n), "阶乘未定义负数。");
+            throw new ArgumentOutOfRangeException(nameof(n), "Factorial is not defined for negative numbers.");
         }
         if (n == T.Zero)
         {
@@ -597,30 +597,30 @@ public static partial class VMath
         return n * Factorial(n - T.One);
     }
     #endregion
-    #region gamma函数
+    #region Gamma Function
     /// <summary>
-    /// 使用近似公式计算Gamma函数。
+    /// Computes the Gamma function using an approximation formula.
     /// </summary>
-    /// <param name="x">输入值。</param>
-    /// <returns>Gamma函数的值。</returns>
+    /// <param name="x">The input value.</param>
+    /// <returns>The value of the Gamma function.</returns>
     /// <remarks>
-    /// Gamma函数 (Gamma Function) 是数学中的一个重要函数，广泛应用于概率论、统计学和组合数学等领域。
-    /// 它是阶乘函数的扩展，对于正整数 n，Gamma 函数满足 Gamma(n) = (n-1)!。
-    /// 该函数使用Lanczos近似公式进行计算，能够在复数平面上对实数和复数进行扩展。
+    /// The Gamma function is an important function in mathematics, widely used in probability theory, statistics, and combinatorics.
+    /// It extends the factorial function: for a positive integer n, Gamma(n) = (n-1)!.
+    /// This function is computed using the Lanczos approximation, which extends to real and complex numbers on the complex plane.
     /// <para>
-    /// 具体实现步骤如下：
+    /// Implementation steps:
     /// <list type="number">
-    /// <item>定义了一组常数 p，用于近似计算。</item>
-    /// <item>如果 x 小于 0.5，使用反射公式计算 Gamma 函数值。</item>
-    /// <item>否则，使用近似公式计算 Gamma 函数值。</item>
+    /// <item>A set of constants p is defined for the approximation.</item>
+    /// <item>If x is less than 0.5, the reflection formula is used to compute the Gamma value.</item>
+    /// <item>Otherwise, the approximation formula is used to compute the Gamma value.</item>
     /// </list>
     /// </para>
-    /// 该实现能够在较大范围内提供高精度的 Gamma 函数值。
+    /// This implementation provides high precision over a wide range of values.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Gamma(double x)
     {
-        // 使用近似公式计算Gamma函数
+        // Computes the Gamma function using an approximation formula
         double[] p =
         [
             0.99999999999980993,
@@ -646,35 +646,35 @@ public static partial class VMath
         return Math.Sqrt(TWO_PI) * Math.Pow(t, x + 0.5) * Math.Exp(-t) * a;
     }
     /// <summary>
-    /// 计算Gamma函数的自然对数。
+    /// Computes the natural logarithm of the Gamma function.
     /// </summary>
-    /// <param name="x">输入的值</param>
-    /// <returns>Gamma函数的值的自然对数</returns>
+    /// <param name="x">The input value</param>
+    /// <returns>The natural logarithm of the value of the Gamma function</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double GammaLog(double x) => Math.Log(Gamma(x));
     /// <summary>
-    /// 使用近似公式计算Gamma函数。
+    /// Computes the Gamma function using an approximation formula.
     /// </summary>
-    /// <param name="x">输入值。</param>
-    /// <returns>Gamma函数的值。</returns>
+    /// <param name="x">The input value.</param>
+    /// <returns>The value of the Gamma function.</returns>
     /// <remarks>
-    /// Gamma函数 (Gamma Function) 是数学中的一个重要函数，广泛应用于概率论、统计学和组合数学等领域。
-    /// 它是阶乘函数的扩展，对于正整数 n，Gamma 函数满足 Gamma(n) = (n-1)!。
-    /// 该函数使用Lanczos近似公式进行计算，能够在复数平面上对实数和复数进行扩展。
+    /// The Gamma function is an important function in mathematics, widely used in probability theory, statistics, and combinatorics.
+    /// It extends the factorial function: for a positive integer n, Gamma(n) = (n-1)!.
+    /// This function is computed using the Lanczos approximation, which extends to real and complex numbers on the complex plane.
     /// <para>
-    /// 具体实现步骤如下：
+    /// Implementation steps:
     /// <list type="number">
-    /// <item>定义了一组常数 p，用于近似计算。</item>
-    /// <item>如果 x 小于 0.5，使用反射公式计算 Gamma 函数值。</item>
-    /// <item>否则，使用近似公式计算 Gamma 函数值。</item>
+    /// <item>A set of constants p is defined for the approximation.</item>
+    /// <item>If x is less than 0.5, the reflection formula is used to compute the Gamma value.</item>
+    /// <item>Otherwise, the approximation formula is used to compute the Gamma value.</item>
     /// </list>
     /// </para>
-    /// 该实现能够在较大范围内提供高精度的 Gamma 函数值。
+    /// This implementation provides high precision over a wide range of values.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Gamma(float x)
     {
-        // 使用近似公式计算Gamma函数
+        // Computes the Gamma function using an approximation formula
         float[] p =
         [
             0.99999999999980993f,
@@ -699,36 +699,36 @@ public static partial class VMath
         return MathF.Sqrt(ConstantsFp32.TWO_PI) * MathF.Pow(t, x + 0.5f) * MathF.Exp(-t) * a;
     }
     /// <summary>
-    /// 计算Gamma函数的自然对数。
+    /// Computes the natural logarithm of the Gamma function.
     /// </summary>
-    /// <param name="x">输入的值</param>
-    /// <returns>Gamma函数的值的自然对数</returns>
+    /// <param name="x">The input value</param>
+    /// <returns>The natural logarithm of the value of the Gamma function</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float GammaLog(float x) => MathF.Log(Gamma(x));
     /// <summary>
-    /// 使用近似公式计算Gamma函数。
+    /// Computes the Gamma function using an approximation formula.
     /// </summary>
-    /// <typeparam name="T">数值类型。</typeparam>
-    /// <param name="x">输入值。</param>
-    /// <returns>Gamma函数的值。</returns>
+    /// <typeparam name="T">The numeric type.</typeparam>
+    /// <param name="x">The input value.</param>
+    /// <returns>The value of the Gamma function.</returns>
     /// <remarks>
-    /// Gamma函数 (Gamma Function) 是数学中的一个重要函数，广泛应用于概率论、统计学和组合数学等领域。
-    /// 它是阶乘函数的扩展，对于正整数 n，Gamma 函数满足 Gamma(n) = (n-1)!。
-    /// 该函数使用Lanczos近似公式进行计算，能够在复数平面上对实数和复数进行扩展。
+    /// The Gamma function is an important function in mathematics, widely used in probability theory, statistics, and combinatorics.
+    /// It extends the factorial function: for a positive integer n, Gamma(n) = (n-1)!.
+    /// This function is computed using the Lanczos approximation, which extends to real and complex numbers on the complex plane.
     /// <para>
-    /// 具体实现步骤如下：
+    /// Implementation steps:
     /// <list type="number">
-    /// <item>定义了一组常数 p，用于近似计算。</item>
-    /// <item>如果 x 小于 0.5，使用反射公式计算 Gamma 函数值。</item>
-    /// <item>否则，使用近似公式计算 Gamma 函数值。</item>
+    /// <item>A set of constants p is defined for the approximation.</item>
+    /// <item>If x is less than 0.5, the reflection formula is used to compute the Gamma value.</item>
+    /// <item>Otherwise, the approximation formula is used to compute the Gamma value.</item>
     /// </list>
     /// </para>
-    /// 该实现能够在较大范围内提供高精度的 Gamma 函数值。
+    /// This implementation provides high precision over a wide range of values.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Gamma<T>(T x) where T : IFloatingPointIeee754<T>
     {
-        // 使用近似公式计算Gamma函数
+        // Computes the Gamma function using an approximation formula
         T[] p =
         [
             T.CreateChecked(0.99999999999980993),
@@ -760,46 +760,46 @@ public static partial class VMath
         return T.Sqrt(twoPi) * T.Pow(t, x + half) * T.Exp(-t) * a;
     }
     /// <summary>
-    /// 计算Gamma函数的自然对数。
+    /// Computes the natural logarithm of the Gamma function.
     /// </summary>
-    /// <typeparam name="T">数值类型</typeparam>
-    /// <param name="x">输入的值</param>
-    /// <returns>Gamma函数的值的自然对数</returns>
+    /// <typeparam name="T">The numeric type</typeparam>
+    /// <param name="x">The input value</param>
+    /// <returns>The natural logarithm of the value of the Gamma function</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T GammaLog<T>(T x) where T : IFloatingPointIeee754<T>
     {
         return T.Log(Gamma(x));
     }
     #endregion
-    #region 误差函数
+    #region Error Function
     /// <summary>
-    /// 计算误差函数（Error Function）。
+    /// Computes the error function (erf).
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">输入值。</param>
-    /// <returns>误差函数的值。</returns>
+    /// <typeparam name="T">The generic type, must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
+    /// <param name="x">The input value.</param>
+    /// <returns>The value of the error function.</returns>
     /// <remarks>
-    /// 误差函数（Error Function，简称 erf）在统计学和概率论中有重要的应用。它主要用于计算正态分布的累积分布函数（CDF）。
-    /// 误差函数的定义为：
+    /// The error function (erf) has important applications in statistics and probability theory. It is mainly used to compute the cumulative distribution function (CDF) of the normal distribution.
+    /// The error function is defined as:
     /// <code>
     /// erf(x) = (2 / √π) ∫[0, x] e^(-t^2) dt
     /// </code>
-    /// 其中，e 是自然对数的底数，π 是圆周率。
+    /// where e is the base of the natural logarithm and π is pi.
     /// 
     /// <para>
-    /// 误差函数的主要用途包括：
+    /// Main uses of the error function include:
     /// <list type="number">
-    /// <item>正态分布的累积分布函数 ：误差函数用于计算标准正态分布的累积分布函数（CDF）。在正态分布中，累积分布函数表示随机变量小于或等于某个值的概率。
-    /// 公式：Φ(x) = 0.5 * (1 + erf(x / √2))，其中 Φ(x) 是正态分布的累积分布函数，erf 是误差函数。
+    /// <item>Cumulative distribution function of the normal distribution: the error function is used to compute the CDF of the standard normal distribution. In a normal distribution, the CDF represents the probability that a random variable is less than or equal to a given value.
+    /// Formula: Φ(x) = 0.5 * (1 + erf(x / √2)), where Φ(x) is the CDF of the normal distribution and erf is the error function.
     /// </item>
     /// <item>
-    /// 概率计算 ：误差函数用于计算正态分布下的概率值。例如，计算某个范围内的概率时，可以使用误差函数来简化计算。
+    /// Probability computation: the error function is used to compute probability values under the normal distribution. For example, it simplifies computing the probability within a given range.
     /// </item>
     /// <item>
-    /// 数值分析 ：误差函数在数值分析中也有广泛应用，特别是在处理高斯积分和其他涉及正态分布的计算时。
+    /// Numerical analysis: the error function is widely used in numerical analysis, especially when dealing with Gaussian integrals and other normal-distribution-related computations.
     /// </item>
     /// <item>
-    /// 工程和物理学 ：在工程和物理学中，误差函数用于解决涉及正态分布和高斯函数的问题，如信号处理、热传导等领域。
+    /// Engineering and physics: in engineering and physics, the error function is used to solve problems involving normal distributions and Gaussian functions, such as signal processing and heat conduction.
     /// </item>
     /// </list>
     /// </para>
@@ -807,7 +807,7 @@ public static partial class VMath
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Erf<T>(T x) where T : IFloatingPointIeee754<T>
     {
-        // 使用近似公式计算误差函数
+        // Computes the error function using an approximation formula
         T sign = x < T.Zero ? T.NegativeOne : T.One;
         x = T.Abs(x);
         T a1 = T.CreateChecked(0.254829592);
@@ -821,47 +821,51 @@ public static partial class VMath
         return sign * y;
     }
     #endregion
-    #region 不完全Gamma函数
+    #region Lower Incomplete Gamma Function
     /// <summary>
-    /// 使用近似公式计算下不完全Gamma函数。
+    /// Computes the lower incomplete Gamma function using a convergent series.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="s">形状参数。</param>
-    /// <param name="x">变量值。</param>
-    /// <returns>下不完全Gamma函数的值。</returns>
+    /// <typeparam name="T">The generic type, must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
+    /// <param name="s">The shape parameter.</param>
+    /// <param name="x">The variable value.</param>
+    /// <returns>The value of the lower incomplete Gamma function.</returns>
     /// <remarks>
-    /// 下不完全Gamma函数（Lower Incomplete Gamma Function）是Gamma函数的扩展，定义为：
+    /// The lower incomplete Gamma function extends the Gamma function and is defined as:
     /// <code>
     /// γ(s, x) = ∫[0, x] t^(s-1) * e^(-t) dt
     /// </code>
-    /// 其中，s 是形状参数，x 是变量值。
+    /// where s is the shape parameter and x is the variable value.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T LowerIncompleteGamma<T>(T s, T x) where T : IFloatingPointIeee754<T>
     {
-        T sum = T.Zero;
-        for (int k = 0; k < 100; k++)
+        // γ(s,x) = x^s * e^(-x) * Σ_{k=0..∞} x^k / (s(s+1)...(s+k))
+        T term = T.One / s;
+        T sum = term;
+        for (int k = 1; k < 100; k++)
         {
-            sum += T.Pow(x, s + T.CreateChecked(k)) * T.Exp(-x) / VMath.Factorial<T>(T.CreateChecked(k));
+            term *= x / (s + T.CreateChecked(k));
+            sum += term;
+            if (T.Abs(term) < T.Abs(sum) * T.CreateChecked(1e-15)) break;
         }
-        return sum;
+        return T.Pow(x, s) * T.Exp(-x) * sum;
     }
     #endregion
     #region Beta
     /// <summary>
-    /// 计算 Beta 函数的值。
+    /// Computes the value of the Beta function.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="alpha">形状参数 α。</param>
-    /// <param name="beta">形状参数 β。</param>
-    /// <returns>Beta 函数的值。</returns>
+    /// <typeparam name="T">The generic type, must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
+    /// <param name="alpha">The shape parameter α.</param>
+    /// <param name="beta">The shape parameter β.</param>
+    /// <returns>The value of the Beta function.</returns>
     /// <remarks>
-    /// Beta 函数的公式为：
+    /// The Beta function formula is:
     /// <code>
     /// B(α, β) = Γ(α) * Γ(β) / Γ(α + β)
     /// </code>
-    /// 其中，Γ 是 Gamma 函数。
-    /// Beta 函数在概率论和统计学中有广泛的应用，特别是在处理 Beta 分布时。
+    /// where Γ is the Gamma function.
+    /// The Beta function is widely used in probability theory and statistics, especially when dealing with the Beta distribution.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Beta<T>(T alpha, T beta) where T : IFloatingPointIeee754<T>
@@ -869,19 +873,19 @@ public static partial class VMath
         return VMath.Gamma(alpha) * VMath.Gamma(beta) / VMath.Gamma(alpha + beta);
     }
     /// <summary>
-    /// 计算正则化不完全 Beta 函数的值。
+    /// Computes the value of the regularized incomplete Beta function.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="alpha">形状参数 α。</param>
-    /// <param name="beta">形状参数 β。</param>
-    /// <returns>正则化不完全 Beta 函数的值。</returns>
+    /// <typeparam name="T">The generic type, must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="alpha">The shape parameter α.</param>
+    /// <param name="beta">The shape parameter β.</param>
+    /// <returns>The value of the regularized incomplete Beta function.</returns>
     /// <remarks>
-    /// 正则化不完全 Beta 函数的公式为：
+    /// The regularized incomplete Beta function formula is:
     /// <code>
     /// I_x(α, β) = (1 / B(α, β)) * ∫[0, x] t^(α-1) * (1-t)^(β-1) dt
     /// </code>
-    /// 其中，B(α, β) 是 Beta 函数。
+    /// where B(α, β) is the Beta function.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T RegularizedIncompleteBeta<T>(T x, T alpha, T beta) where T : IFloatingPointIeee754<T>
@@ -898,15 +902,15 @@ public static partial class VMath
         }
     }
     /// <summary>
-    /// 使用连分数展开计算 Beta 函数的值。
+    /// Computes the Beta function value using a continued-fraction expansion.
     /// </summary>
-    /// <typeparam name="T">必须实现 <see cref="IFloatingPointIeee754{T}"/> 接口的泛型类型。</typeparam>
-    /// <param name="x">变量值。</param>
-    /// <param name="alpha">形状参数 α。</param>
-    /// <param name="beta">形状参数 β。</param>
-    /// <returns>Beta 函数的值。</returns>
+    /// <typeparam name="T">The generic type, must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
+    /// <param name="x">The variable value.</param>
+    /// <param name="alpha">The shape parameter α.</param>
+    /// <param name="beta">The shape parameter β.</param>
+    /// <returns>The value of the Beta function.</returns>
     /// <remarks>
-    /// 使用连分数展开计算 Beta 函数的值，公式为：
+    /// Computes the Beta function value using a continued-fraction expansion, with formula:
     /// <code>
     /// B(x; α, β) = ∑[m=0, ∞] (m * (β - m) * x) / ((α + 2m - 1) * (α + 2m))
     /// </code>
@@ -916,9 +920,8 @@ public static partial class VMath
     {
         int maxIterations = 100;
         T epsilon = T.CreateChecked(3.0e-7);
-        T a = T.One;
         T b = T.One - (alpha + beta) * x / (alpha + T.One);
-        T c = T.One / epsilon;
+        T c = T.One;
         T d = T.One / b;
         T h = d;
         for (int m = 1; m <= maxIterations; m++)
@@ -929,12 +932,14 @@ public static partial class VMath
             if (T.Abs(d) < epsilon) d = epsilon;
             c = T.One + aa / c;
             if (T.Abs(c) < epsilon) c = epsilon;
+            d = T.One / d;
             h *= d * c;
             aa = -(alpha + T.CreateChecked(m)) * (alpha + beta + T.CreateChecked(m)) * x / ((alpha + T.CreateChecked(m2)) * (alpha + T.One + T.CreateChecked(m2)));
             d = T.One + aa * d;
             if (T.Abs(d) < epsilon) d = epsilon;
             c = T.One + aa / c;
             if (T.Abs(c) < epsilon) c = epsilon;
+            d = T.One / d;
             h *= d * c;
         }
         return h;
@@ -960,14 +965,14 @@ public static partial class VMath
         return current;
     }
     /// <summary>
-    /// 计算输入值的最后一位单位（ULP），即相邻两个浮点数之间可能的最小差异。
+    /// Computes the unit in the last place (ULP) of the input value, i.e., the smallest possible difference between two adjacent floating-point numbers.
     /// </summary>
-    /// <param name="value">要计算ULP的双精度浮点数。</param>
-    /// <returns>输入值的最后一位单位（ULP）。</returns>
+    /// <param name="value">The double-precision floating-point value to compute the ULP of.</param>
+    /// <returns>The unit in the last place (ULP) of the input value.</returns>
     /// <remarks>
-    /// 该方法首先使用 <see cref="BitConverter.DoubleToInt64Bits(double)"/> 方法将输入值转换为长整型整数。
-    /// 然后将1添加到整数值以获取下一个相邻的整数值，并使用 <see cref="BitConverter.Int64BitsToDouble(long)"/> 方法将其转换回双精度浮点数。
-    /// 最后计算下一个值与输入值之间的差异，并将其作为输入值的ULP返回。
+    /// This method first converts the input value to a 64-bit integer using <see cref="BitConverter.DoubleToInt64Bits(double)"/>.
+    /// It then adds 1 to the integer value to get the next adjacent integer value, and converts it back to a double using <see cref="BitConverter.Int64BitsToDouble(long)"/>.
+    /// Finally, it computes the difference between the next value and the input value, and returns it as the ULP of the input value.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double Ulp(double value)
@@ -978,14 +983,14 @@ public static partial class VMath
         return result;
     }
     /// <summary>
-    /// 计算输入值的最后一位单位（ULP），即相邻两个浮点数之间可能的最小差异。
+    /// Computes the unit in the last place (ULP) of the input value, i.e., the smallest possible difference between two adjacent floating-point numbers.
     /// </summary>
-    /// <param name="value">要计算ULP的单精度浮点数。</param>
-    /// <returns>输入值的最后一位单位（ULP）。</returns>
+    /// <param name="value">The single-precision floating-point value to compute the ULP of.</param>
+    /// <returns>The unit in the last place (ULP) of the input value.</returns>
     /// <remarks>
-    /// 该方法首先使用 <see cref="BitConverter.SingleToInt32Bits(float)"/> 方法将输入值转换为整型整数。
-    /// 然后将1添加到整数值以获取下一个相邻的整数值，并使用 <see cref="BitConverter.Int32BitsToSingle(int)"/> 方法将其转换回单精度浮点数。
-    /// 最后计算下一个值与输入值之间的差异，并将其作为输入值的ULP返回。
+    /// This method first converts the input value to a 32-bit integer using <see cref="BitConverter.SingleToInt32Bits(float)"/>.
+    /// It then adds 1 to the integer value to get the next adjacent integer value, and converts it back to a float using <see cref="BitConverter.Int32BitsToSingle(int)"/>.
+    /// Finally, it computes the difference between the next value and the input value, and returns it as the ULP of the input value.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Ulp(float value)
@@ -996,14 +1001,14 @@ public static partial class VMath
         return result;
     }
     /// <summary>
-    /// 计算输入值的最后一位单位（ULP），即相邻两个半精度浮点数之间可能的最小差异。
+    /// Computes the unit in the last place (ULP) of the input value, i.e., the smallest possible difference between two adjacent half-precision floating-point numbers.
     /// </summary>
-    /// <param name="value">要计算ULP的半精度浮点数。</param>
-    /// <returns>输入值的最后一位单位（ULP）。</returns>
+    /// <param name="value">The half-precision floating-point value to compute the ULP of.</param>
+    /// <returns>The unit in the last place (ULP) of the input value.</returns>
     /// <remarks>
-    /// 该方法首先使用 <see cref="BitConverter.HalfToInt16Bits(Half)"/> 方法将输入值转换为短整型整数。
-    /// 然后将1添加到整数值以获取下一个相邻的整数值，并使用 <see cref="BitConverter.Int16BitsToHalf(short)"/> 方法将其转换回半精度浮点数。
-    /// 最后计算下一个值与输入值之间的差异，并将其作为输入值的ULP返回。
+    /// This method first converts the input value to a 16-bit integer using <see cref="BitConverter.HalfToInt16Bits(Half)"/>.
+    /// It then adds 1 to the integer value to get the next adjacent integer value, and converts it back to a Half using <see cref="BitConverter.Int16BitsToHalf(short)"/>.
+    /// Finally, it computes the difference between the next value and the input value, and returns it as the ULP of the input value.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Half Ulp(Half value)

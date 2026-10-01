@@ -7,12 +7,12 @@ public static partial class Layers
 {
 
     /// <summary>
-    /// 合并两个张量。
+    /// Fuses two tensors.
     /// </summary>
-    /// <typeparam name="T">张量元素的类型，必须实现 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 接口。</typeparam>
-    /// <param name="input">输入的张量。</param>
-    /// <param name="joint">要合并的张量。</param>
-    /// <returns>合并后的张量。</returns>
+    /// <typeparam name="T">The tensor element type, must implement <see cref="IBinaryFloatingPointIeee754{TSelf}"/>.</typeparam>
+    /// <param name="input">The input tensor.</param>
+    /// <param name="joint">The tensor to fuse.</param>
+    /// <returns>The fused tensor.</returns>
     public static Tensor<T> Fusion<T>(Tensor<T> input, Tensor<T> joint)
         where T : IBinaryFloatingPointIeee754<T>
     {
@@ -51,16 +51,16 @@ public static partial class Layers
 
 
     /// <summary>
-    /// 合并两个张量。
+    /// Fuses two tensors.
     /// </summary>
-    /// <param name="input">输入的张量。</param>
-    /// <param name="joint">要合并的张量。</param>
-    /// <returns>合并后的张量。</returns>
-    public static Tensor Fusion(Tensor input, Tensor joint)
+    /// <param name="input">The input tensor.</param>
+    /// <param name="joint">The tensor to fuse.</param>
+    /// <returns>The fused tensor.</returns>
+    public static TensorFp32 Fusion(TensorFp32 input, TensorFp32 joint)
     {
         var height = input.Height;
         var width = input.Width;
-        var result = new Tensor(input.Width, input.Height, input.Depth + joint.Depth);
+        var result = new TensorFp32(input.Width, input.Height, input.Depth + joint.Depth);
 
         long workPer = (long)height * width;
         ForEachDepth(input.Depth, workPer, d =>

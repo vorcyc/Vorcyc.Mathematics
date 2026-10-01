@@ -29,8 +29,8 @@ public sealed class LevenbergMarquardt<T> where T : struct, IFloatingPointIeee75
     public LevenbergMarquardt(VectorFieldFunction<T> residuals, int dimension, int residualCount, T defaultH)
     {
         _residuals = residuals ?? throw new ArgumentNullException(nameof(residuals));
-        if (dimension < 1) throw new ArgumentException("维数必须大于等于 1", nameof(dimension));
-        if (residualCount < 1) throw new ArgumentException("残差维数必须大于等于 1", nameof(residualCount));
+        if (dimension < 1) throw new ArgumentException("Dimension must be greater than or equal to 1.", nameof(dimension));
+        if (residualCount < 1) throw new ArgumentException("Residual dimension must be greater than or equal to 1.", nameof(residualCount));
         _dim = dimension;
         _residualCount = residualCount;
         _jacobian = new Jacobian<T>(residuals, residualCount, defaultH);
@@ -42,7 +42,7 @@ public sealed class LevenbergMarquardt<T> where T : struct, IFloatingPointIeee75
     public T[] Solve(T[] initial, int maxIterations = 100, T? tolerance = null, T? initialLambda = null)
     {
         if (initial.Length != _dim)
-            throw new ArgumentException("初始点维数不匹配", nameof(initial));
+            throw new ArgumentException("Initial point dimension does not match.", nameof(initial));
 
         EnsureCapacity();
         initial.AsSpan().CopyTo(_x!);

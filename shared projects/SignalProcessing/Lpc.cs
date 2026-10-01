@@ -200,17 +200,17 @@ public static class Lpc
             qPoles[n + 1] = new ComplexFp32(MathF.Cos(lsf[n - 1]), MathF.Sin(-lsf[n - 1]));
         }
 
-        var ps = new ComplexDiscreteSignal(1, TransferFunction.ZpToTf(pPoles));
-        var qs = new ComplexDiscreteSignal(1, TransferFunction.ZpToTf(qPoles));
+        var ps = new ComplexDiscreteSignalFp32(1, TransferFunction.ZpToTf(pPoles));
+        var qs = new ComplexDiscreteSignalFp32(1, TransferFunction.ZpToTf(qPoles));
 
         if (n % 2 == 1)
         {
-            ps = Operation.Convolve(ps, new ComplexDiscreteSignal(1, new[] { 1.0f, 0f, -1.0f }));
+            ps = Operation.Convolve(ps, new ComplexDiscreteSignalFp32(1, new[] { 1.0f, 0f, -1.0f }));
         }
         else
         {
-            ps = Operation.Convolve(ps, new ComplexDiscreteSignal(1, new[] { 1.0f, -1.0f }));
-            qs = Operation.Convolve(qs, new ComplexDiscreteSignal(1, new[] { 1.0f, 1.0f }));
+            ps = Operation.Convolve(ps, new ComplexDiscreteSignalFp32(1, new[] { 1.0f, -1.0f }));
+            qs = Operation.Convolve(qs, new ComplexDiscreteSignalFp32(1, new[] { 1.0f, 1.0f }));
         }
 
         for (var i = 0; i < lpc.Length; i++)

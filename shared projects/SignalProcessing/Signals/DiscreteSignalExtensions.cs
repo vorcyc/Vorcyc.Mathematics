@@ -331,13 +331,13 @@ public static partial class DiscreteSignalExtensions
         signal.Amplify(norm);
     }
     /// <summary>
-    /// Creates <see cref="ComplexDiscreteSignal"/> from <see cref="DiscreteSignal"/>. 
+    /// Creates <see cref="ComplexDiscreteSignalFp32"/> from <see cref="DiscreteSignal"/>. 
     /// Imaginary parts will be filled with zeros.
     /// </summary>
     /// <param name="signal">Real-valued signal</param>
-    public static ComplexDiscreteSignal ToComplex(this DiscreteSignal signal)
+    public static ComplexDiscreteSignalFp32 ToComplex(this DiscreteSignal signal)
     {
-        return new ComplexDiscreteSignal(signal.SamplingRate, signal.Samples);
+        return new ComplexDiscreteSignalFp32(signal.SamplingRate, signal.Samples);
     }
     /// <summary>
     /// Fades signal in and out linearly (in-place).

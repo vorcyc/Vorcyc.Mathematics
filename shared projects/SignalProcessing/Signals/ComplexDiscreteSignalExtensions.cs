@@ -14,7 +14,7 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="delay">Delay (positive or negative number of delay samples)</param>
-    public static ComplexDiscreteSignal Delay(this ComplexDiscreteSignal signal, int delay)
+    public static ComplexDiscreteSignalFp32 Delay(this ComplexDiscreteSignalFp32 signal, int delay)
     {
         var length = signal.Length;
 
@@ -24,13 +24,13 @@ public static partial class ComplexDiscreteSignalExtensions
 
             Guard.AgainstInvalidRange(delay, length, "Delay", "signal length");
 
-            return new ComplexDiscreteSignal(
+            return new ComplexDiscreteSignalFp32(
                             signal.SamplingRate,
                             signal.Real.FastCopyFragment(length - delay, delay),
                             signal.Imag.FastCopyFragment(length - delay, delay));
         }
 
-        return new ComplexDiscreteSignal(
+        return new ComplexDiscreteSignalFp32(
                         signal.SamplingRate,
                         signal.Real.FastCopyFragment(length, destinationOffset: delay),
                         signal.Imag.FastCopyFragment(length, destinationOffset: delay));
@@ -42,12 +42,12 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal1">First signal</param>
     /// <param name="signal2">Second signal</param>
-    public static ComplexDiscreteSignal Superimpose(this ComplexDiscreteSignal signal1, ComplexDiscreteSignal signal2)
+    public static ComplexDiscreteSignalFp32 Superimpose(this ComplexDiscreteSignalFp32 signal1, ComplexDiscreteSignalFp32 signal2)
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
 
-        ComplexDiscreteSignal superimposed;
+        ComplexDiscreteSignalFp32 superimposed;
 
         if (signal1.Length > signal2.Length)
         {
@@ -79,12 +79,12 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal1">First signal</param>
     /// <param name="signal2">Second signal</param>
-    public static ComplexDiscreteSignal Concatenate(this ComplexDiscreteSignal signal1, ComplexDiscreteSignal signal2)
+    public static ComplexDiscreteSignalFp32 Concatenate(this ComplexDiscreteSignalFp32 signal1, ComplexDiscreteSignalFp32 signal2)
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
 
-        return new ComplexDiscreteSignal(
+        return new ComplexDiscreteSignalFp32(
                         signal1.SamplingRate,
                         signal1.Real.Merge(signal2.Real),
                         signal1.Imag.Merge(signal2.Imag));
@@ -95,11 +95,11 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="n">Number of times to repeat <paramref name="signal"/></param>
-    public static ComplexDiscreteSignal Repeat(this ComplexDiscreteSignal signal, int n)
+    public static ComplexDiscreteSignalFp32 Repeat(this ComplexDiscreteSignalFp32 signal, int n)
     {
         Guard.AgainstNonPositive(n, "Number of repeat times");
 
-        return new ComplexDiscreteSignal(
+        return new ComplexDiscreteSignalFp32(
                         signal.SamplingRate,
                         signal.Real.Repeat(n),
                         signal.Imag.Repeat(n));
@@ -110,7 +110,7 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="coeff">Amplification coefficient</param>
-    public static void Amplify(this ComplexDiscreteSignal signal, float coeff)
+    public static void Amplify(this ComplexDiscreteSignalFp32 signal, float coeff)
     {
         for (var i = 0; i < signal.Length; i++)
         {
@@ -124,7 +124,7 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="coeff">Attenuation coefficient</param>
-    public static void Attenuate(this ComplexDiscreteSignal signal, float coeff)
+    public static void Attenuate(this ComplexDiscreteSignalFp32 signal, float coeff)
     {
         Guard.AgainstNonPositive(coeff, "Attenuation coefficient");
 
@@ -136,12 +136,12 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="n">Number of samples to copy</param>
-    public static ComplexDiscreteSignal First(this ComplexDiscreteSignal signal, int n)
+    public static ComplexDiscreteSignalFp32 First(this ComplexDiscreteSignalFp32 signal, int n)
     {
         Guard.AgainstNonPositive(n, "Number of samples");
         Guard.AgainstExceedance(n, signal.Length, "Number of samples", "signal length");
 
-        return new ComplexDiscreteSignal(
+        return new ComplexDiscreteSignalFp32(
                         signal.SamplingRate,
                         signal.Real.FastCopyFragment(n),
                         signal.Imag.FastCopyFragment(n));
@@ -152,12 +152,12 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="n">Number of samples to copy</param>
-    public static ComplexDiscreteSignal Last(this ComplexDiscreteSignal signal, int n)
+    public static ComplexDiscreteSignalFp32 Last(this ComplexDiscreteSignalFp32 signal, int n)
     {
         Guard.AgainstNonPositive(n, "Number of samples");
         Guard.AgainstExceedance(n, signal.Length, "Number of samples", "signal length");
 
-        return new ComplexDiscreteSignal(
+        return new ComplexDiscreteSignalFp32(
                         signal.SamplingRate,
                         signal.Real.FastCopyFragment(n, signal.Length - n),
                         signal.Imag.FastCopyFragment(n, signal.Imag.Length - n));
@@ -168,14 +168,14 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal">Signal</param>
     /// <param name="length">The length of a zero-padded signal.</param>
-    public static ComplexDiscreteSignal ZeroPadded(this ComplexDiscreteSignal signal, int length)
+    public static ComplexDiscreteSignalFp32 ZeroPadded(this ComplexDiscreteSignalFp32 signal, int length)
     {
         if (length <= 0)
         {
             length = signal.Length.NextPowerOf2();
         }
 
-        return new ComplexDiscreteSignal(
+        return new ComplexDiscreteSignalFp32(
                         signal.SamplingRate,
                         signal.Real.PadZeros(length),
                         signal.Imag.PadZeros(length));
@@ -186,8 +186,8 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal1">First signal</param>
     /// <param name="signal2">Second signal</param>
-    public static ComplexDiscreteSignal Multiply(
-        this ComplexDiscreteSignal signal1, ComplexDiscreteSignal signal2)
+    public static ComplexDiscreteSignalFp32 Multiply(
+        this ComplexDiscreteSignalFp32 signal1, ComplexDiscreteSignalFp32 signal2)
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
@@ -208,7 +208,7 @@ public static partial class ComplexDiscreteSignalExtensions
             imag[i] = real1[i] * imag2[i] + imag1[i] * real2[i];
         }
 
-        return new ComplexDiscreteSignal(signal1.SamplingRate, real, imag);
+        return new ComplexDiscreteSignalFp32(signal1.SamplingRate, real, imag);
     }
 
     /// <summary>
@@ -216,8 +216,8 @@ public static partial class ComplexDiscreteSignalExtensions
     /// </summary>
     /// <param name="signal1">First signal</param>
     /// <param name="signal2">Second signal</param>
-    public static ComplexDiscreteSignal Divide(
-        this ComplexDiscreteSignal signal1, ComplexDiscreteSignal signal2)
+    public static ComplexDiscreteSignalFp32 Divide(
+        this ComplexDiscreteSignalFp32 signal1, ComplexDiscreteSignalFp32 signal2)
     {
         Guard.AgainstInequality(signal1.SamplingRate, signal2.SamplingRate,
                                     "Sampling rate of signal1", "sampling rate of signal2");
@@ -239,7 +239,7 @@ public static partial class ComplexDiscreteSignalExtensions
             imag[i] = (real2[i] * imag1[i] - imag2[i] * real1[i]) / den;
         }
 
-        return new ComplexDiscreteSignal(signal1.SamplingRate, real, imag);
+        return new ComplexDiscreteSignalFp32(signal1.SamplingRate, real, imag);
     }
 
     /// <summary>
@@ -256,7 +256,7 @@ public static partial class ComplexDiscreteSignalExtensions
     /// Yields complex numbers as type <see cref="ComplexFp32"/> from <paramref name="signal"/> samples.
     /// </summary>
     /// <param name="signal">Complex discrete signal</param>
-    public static IEnumerable<ComplexFp32> ToComplexNumbers(this ComplexDiscreteSignal signal)
+    public static IEnumerable<ComplexFp32> ToComplexNumbers(this ComplexDiscreteSignalFp32 signal)
     {
         for (var i = 0; i < signal.Length; i++)
         {

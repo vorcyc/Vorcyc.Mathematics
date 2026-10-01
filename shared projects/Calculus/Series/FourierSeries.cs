@@ -4,9 +4,9 @@ using System.Numerics;
 
 
 /// <summary>
-/// 提供傅里叶级数展开计算的实例类，支持泛型浮点类型。
+/// Provides an instance class for computing Fourier series expansions, supporting generic floating-point types.
 /// </summary>
-/// <typeparam name="T">浮点类型，必须实现 <see cref="IFloatingPointIeee754{T}"/></typeparam>
+/// <typeparam name="T">The floating-point type, must implement <see cref="IFloatingPointIeee754{T}"/>.</typeparam>
 public sealed class FourierSeries<T> where T : struct, IFloatingPointIeee754<T>
 {
     private readonly SingleVariableFunction<T> _func;
@@ -41,7 +41,7 @@ public sealed class FourierSeries<T> where T : struct, IFloatingPointIeee754<T>
 
     public T Calculate(T x, int order = 5, int segments = 1000)
     {
-        if (order < 0) throw new ArgumentException("阶数必须大于等于 0", nameof(order));
+        if (order < 0) throw new ArgumentException("Order must be greater than or equal to 0.", nameof(order));
 
         EnsureSamples(segments);
 
@@ -58,18 +58,18 @@ public sealed class FourierSeries<T> where T : struct, IFloatingPointIeee754<T>
     }
 
     /// <summary>
-    /// 获取傅里叶级数的系数（aₙ 或 bₙ）。
+    /// Gets the Fourier series coefficient (aₙ or bₙ).
     /// </summary>
-    /// <param name="isCosine">true 表示余弦系数 aₙ，false 表示正弦系数 bₙ</param>
-    /// <param name="n">谐波阶数</param>
-    /// <param name="segments">积分分段数，默认值为 1000</param>
-    /// <returns>第 <paramref name="n"/> 阶傅里叶系数</returns>
-    /// <exception cref="ArgumentException">当 <paramref name="n"/> 小于 0 或 <paramref name="segments"/> 小于 1 时抛出</exception>
-    /// <exception cref="InvalidOperationException">当积分结果无效时抛出</exception>
+    /// <param name="isCosine">true for the cosine coefficient aₙ, false for the sine coefficient bₙ.</param>
+    /// <param name="n">The harmonic order.</param>
+    /// <param name="segments">The number of integration segments, default is 1000.</param>
+    /// <returns>The <paramref name="n"/>th-order Fourier coefficient.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="n"/> is less than 0 or <paramref name="segments"/> is less than 1.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the integration result is invalid.</exception>
     public T GetFourierCoefficient(bool isCosine, int n, int segments = 1000)
     {
-        if (n < 0) throw new ArgumentException("阶数必须大于等于 0", nameof(n));
-        if (segments < 1) throw new ArgumentException("分段数必须大于等于 1", nameof(segments));
+        if (n < 0) throw new ArgumentException("Order must be greater than or equal to 0.", nameof(n));
+        if (segments < 1) throw new ArgumentException("Segment count must be greater than or equal to 1.", nameof(segments));
 
         EnsureSamples(segments);
         InvalidateCoeffCacheIfSegmentsChanged(segments);
@@ -80,7 +80,7 @@ public sealed class FourierSeries<T> where T : struct, IFloatingPointIeee754<T>
         {
             T coeff = IntegrateTrigProduct(n, isCosine);
             if (T.IsNaN(coeff) || T.IsInfinity(coeff))
-                throw new InvalidOperationException($"傅里叶系数 a_{n} 或 b_{n} 计算结果无效");
+                throw new InvalidOperationException($"Fourier coefficient a_{n} or b_{n} computation result is invalid.");
 
             slot = coeff;
             valid = true;

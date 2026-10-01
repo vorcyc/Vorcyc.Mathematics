@@ -7,13 +7,13 @@ public static partial class Layers
 {
 
     /// <summary>
-    /// 对输入张量执行密集（全连接）层操作。
+    /// Performs a dense (fully connected) layer operation on the input tensor.
     /// </summary>
-    /// <typeparam name="T">张量元素的类型，必须实现 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 接口。</typeparam>
-    /// <param name="input">输入的张量。</param>
-    /// <param name="weights">权重张量的数组。</param>
-    /// <param name="biases">偏置张量。</param>
-    /// <returns>执行密集操作后的张量。</returns>
+    /// <typeparam name="T">The tensor element type, must implement <see cref="IBinaryFloatingPointIeee754{TSelf}"/>.</typeparam>
+    /// <param name="input">The input tensor.</param>
+    /// <param name="weights">The array of weight tensors.</param>
+    /// <param name="biases">The bias tensor.</param>
+    /// <returns>The resulting tensor after the dense operation.</returns>
     public static Tensor<T> Dense<T>(Tensor<T> input, Tensor<T>[] weights, Tensor<T> biases)
         where T : IBinaryFloatingPointIeee754<T>
     {
@@ -48,18 +48,18 @@ public static partial class Layers
 
 
     /// <summary>
-    /// 对输入张量执行密集（全连接）层操作。
+    /// Performs a dense (fully connected) layer operation on the input tensor.
     /// </summary>
-    /// <param name="input">输入的张量。</param>
-    /// <param name="weights">权重张量的数组。</param>
-    /// <param name="biases">偏置张量。</param>
-    /// <returns>执行密集操作后的张量。</returns>
-    public static Tensor Dense(Tensor input, Tensor[] weights, Tensor biases)
+    /// <param name="input">The input tensor.</param>
+    /// <param name="weights">The array of weight tensors.</param>
+    /// <param name="biases">The bias tensor.</param>
+    /// <returns>The resulting tensor after the dense operation.</returns>
+    public static TensorFp32 Dense(TensorFp32 input, TensorFp32[] weights, TensorFp32 biases)
     {
 
         var height = input.Height;
         var width = input.Width;
-        var result = new Tensor(1, 1, weights.Length);
+        var result = new TensorFp32(1, 1, weights.Length);
 
         long workPer = (long)height * width * input.Depth;
         ForEachDepth(weights.Length, workPer, d =>

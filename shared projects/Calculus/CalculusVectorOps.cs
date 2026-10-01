@@ -10,7 +10,7 @@ internal static class CalculusVectorOps
     public static T Dot<T>(ReadOnlySpan<T> a, ReadOnlySpan<T> b) where T : struct, IFloatingPointIeee754<T>
     {
         if (a.Length != b.Length)
-            throw new ArgumentException("向量长度不匹配");
+            throw new ArgumentException("Vector lengths do not match.");
 
         if (typeof(T) == typeof(double))
             return (T)(object)DotDouble(MemoryMarshal.Cast<T, double>(a), MemoryMarshal.Cast<T, double>(b));
@@ -28,7 +28,7 @@ internal static class CalculusVectorOps
         where T : struct, IFloatingPointIeee754<T>
     {
         if (v.Length < n || result.Length < n || m.Length < n * n)
-            throw new ArgumentException("矩阵/向量维数不匹配");
+            throw new ArgumentException("Matrix/vector dimensions do not match.");
 
         if (typeof(T) == typeof(double))
         {
@@ -60,7 +60,7 @@ internal static class CalculusVectorOps
         where T : struct, IFloatingPointIeee754<T>
     {
         if (dest.Length != base_.Length || dest.Length != delta.Length)
-            throw new ArgumentException("向量长度不匹配");
+            throw new ArgumentException("Vector lengths do not match.");
 
         if (typeof(T) == typeof(double))
         {
@@ -90,7 +90,7 @@ internal static class CalculusVectorOps
     public static void AddScaled<T>(Span<T> y, ReadOnlySpan<T> x, T alpha) where T : struct, IFloatingPointIeee754<T>
     {
         if (y.Length != x.Length)
-            throw new ArgumentException("向量长度不匹配");
+            throw new ArgumentException("Vector lengths do not match.");
 
         if (typeof(T) == typeof(double))
         {
@@ -112,7 +112,7 @@ internal static class CalculusVectorOps
     public static void SubScaled<T>(Span<T> y, ReadOnlySpan<T> x, T alpha) where T : struct, IFloatingPointIeee754<T>
     {
         if (y.Length != x.Length)
-            throw new ArgumentException("向量长度不匹配");
+            throw new ArgumentException("Vector lengths do not match.");
 
         if (typeof(T) == typeof(double))
         {
@@ -155,7 +155,7 @@ internal static class CalculusVectorOps
         where T : struct, IFloatingPointIeee754<T>
     {
         if (s.Length < n || hy.Length < n || hFlat.Length < n * n)
-            throw new ArgumentException("矩阵/向量维数不匹配");
+            throw new ArgumentException("Matrix/vector dimensions do not match.");
 
         if (typeof(T) == typeof(double))
         {
@@ -200,7 +200,7 @@ internal static class CalculusVectorOps
         where T : struct, IFloatingPointIeee754<T>
     {
         if (y.Length != k1.Length || y.Length != k2.Length || y.Length != k3.Length || y.Length != k4.Length)
-            throw new ArgumentException("向量长度不匹配");
+            throw new ArgumentException("Vector lengths do not match.");
 
         if (typeof(T) == typeof(double))
         {
@@ -237,7 +237,7 @@ internal static class CalculusVectorOps
         where T : struct, IFloatingPointIeee754<T>
     {
         if (yFull.Length != yHalf.Length)
-            throw new ArgumentException("向量长度不匹配");
+            throw new ArgumentException("Vector lengths do not match.");
 
         if (typeof(T) == typeof(double))
             return (T)(object)ScaledMaxErrorDouble(
@@ -272,7 +272,7 @@ internal static class CalculusVectorOps
         int m = jacobian.Rows;
         int n = jacobian.Columns;
         if (result.Rows != n || result.Columns != n)
-            throw new ArgumentException("结果矩阵维数须为 n×n", nameof(result));
+            throw new ArgumentException("Result matrix dimensions must be n×n.", nameof(result));
 
         T[] jData = jacobian.GetInternalData();
         T[] rData = result.GetInternalData();
@@ -314,7 +314,7 @@ internal static class CalculusVectorOps
         int m = jacobian.Rows;
         int n = jacobian.Columns;
         if (residuals.Length < m || result.Length < n)
-            throw new ArgumentException("向量维数不匹配");
+            throw new ArgumentException("Vector dimensions do not match.");
 
         result[..n].Clear();
         T[] jData = jacobian.GetInternalData();

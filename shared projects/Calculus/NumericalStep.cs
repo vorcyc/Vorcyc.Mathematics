@@ -12,7 +12,7 @@ internal static class NumericalStep
     /// </summary>
     public static T Optimal<T>(T x, int order) where T : struct, IFloatingPointIeee754<T>
     {
-        if (order < 1) throw new ArgumentException("阶数必须大于等于 1", nameof(order));
+        if (order < 1) throw new ArgumentException("Order must be greater than or equal to 1.", nameof(order));
         return OptimalMagnitude(T.Max(T.One, T.Abs(x)), order);
     }
 
@@ -21,7 +21,7 @@ internal static class NumericalStep
     /// </summary>
     public static T OptimalMagnitude<T>(T scale, int order) where T : struct, IFloatingPointIeee754<T>
     {
-        if (order < 1) throw new ArgumentException("阶数必须大于等于 1", nameof(order));
+        if (order < 1) throw new ArgumentException("Order must be greater than or equal to 1.", nameof(order));
         if (scale < T.One) scale = T.One;
         T exponent = T.One / T.CreateChecked(order + 2);
         return T.Pow(MachineEpsilon<T>(), exponent) * scale;

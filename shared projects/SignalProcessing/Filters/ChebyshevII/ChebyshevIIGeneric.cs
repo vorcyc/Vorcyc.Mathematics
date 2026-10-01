@@ -4,7 +4,7 @@ using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Filters.ChebyshevII;
 
-/// <summary>Lowpass Chebyshev-II in <typeparamref name="T"/> (matches the float wrapper: poles only).</summary>
+/// <summary>Lowpass Chebyshev-II in <typeparamref name="T"/>.</summary>
 public class LowPassFilter<T> : ZiFilter<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
@@ -27,7 +27,7 @@ public class LowPassFilter<T> : ZiFilter<T>
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripple)
-        => DesignFilter.IirLpTf(frequency, PrototypeChebyshevII.Poles<T>(order, ripple));
+        => DesignFilter.IirLpTf(frequency, PrototypeChebyshevII.Poles<T>(order, ripple), PrototypeChebyshevII.Zeros<T>(order));
 }
 
 public sealed class LowPassFilter64 : LowPassFilter<double>
@@ -35,7 +35,7 @@ public sealed class LowPassFilter64 : LowPassFilter<double>
     public LowPassFilter64(double frequency, int order, double ripple = 0.1) : base(frequency, order, ripple) { }
 }
 
-/// <summary>Highpass Chebyshev-II in <typeparamref name="T"/> (matches the float wrapper: poles only).</summary>
+/// <summary>Highpass Chebyshev-II in <typeparamref name="T"/>.</summary>
 public class HighPassFilter<T> : ZiFilter<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
@@ -58,7 +58,7 @@ public class HighPassFilter<T> : ZiFilter<T>
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripple)
-        => DesignFilter.IirHpTf(frequency, PrototypeChebyshevII.Poles<T>(order, ripple));
+        => DesignFilter.IirHpTf(frequency, PrototypeChebyshevII.Poles<T>(order, ripple), PrototypeChebyshevII.Zeros<T>(order));
 }
 
 public sealed class HighPassFilter64 : HighPassFilter<double>

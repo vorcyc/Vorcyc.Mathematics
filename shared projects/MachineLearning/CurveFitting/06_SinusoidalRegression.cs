@@ -31,9 +31,9 @@ internal static class SinusoidalRegression
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 4)
-            throw new ArgumentException("数据点数量必须相等且至少有4个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 4 points.");
         if (maxIterations <= 0)
-            throw new ArgumentException("最大迭代次数必须大于0");
+            throw new ArgumentException("Maximum iterations must be greater than 0.");
 
         int n = xData.Length;
         T[] xArr = xData.ToArray();
@@ -55,7 +55,7 @@ internal static class SinusoidalRegression
 
         T xRange = xMax - xMin;
         if (xRange <= T.Zero)
-            throw new ArgumentException("xData 必须具有非零跨度。");
+            throw new ArgumentException("xData must have a non-zero span.");
 
         T yMean = ySum / T.CreateChecked(n);
         T yRange = yMax - yMin;
@@ -97,7 +97,7 @@ internal static class SinusoidalRegression
         }
         mse /= T.CreateChecked(n);
         if (!T.IsFinite(mse))
-            throw new InvalidOperationException("正弦拟合未能收敛到有限参数。");
+            throw new InvalidOperationException("Sinusoidal fit failed to converge to finite parameters.");
 
         return new FitResult<T>(predict, parameters, mse);
     }
@@ -371,7 +371,7 @@ internal static class SinusoidalRegression
             }
 
             if (pivotAbs == T.Zero || !T.IsFinite(pivotAbs))
-                throw new InvalidOperationException("矩阵奇异，无法求解");
+                throw new InvalidOperationException("The matrix is singular; cannot solve.");
 
             if (pivotRow != i)
                 (aug[i], aug[pivotRow]) = (aug[pivotRow], aug[i]);
@@ -433,7 +433,7 @@ internal static class SinusoidalRegression
         for (int i = 0; i < parameters.Length; i++)
         {
             if (!T.IsFinite(parameters[i]))
-                throw new InvalidOperationException("正弦拟合未能收敛到有限参数。");
+                throw new InvalidOperationException("Sinusoidal fit failed to converge to finite parameters.");
         }
     }
 

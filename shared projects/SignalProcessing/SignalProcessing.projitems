@@ -239,7 +239,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Generators\TriangleOscillator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Generators\WaveTableGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\Generators\WhiteNoiseGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Signals\ComplexDiscreteSignal.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Signals\ComplexDiscreteSignalFp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ComplexDiscreteSignalExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ComplexDiscreteSignalExtensions_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Signals\ComplexDiscreteSignal_g.cs" />
@@ -323,12 +323,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_ComplexFP322.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_complex_f.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_complex.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_Complex_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_complex_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_FP32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\x_Windowing_g.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_real_f.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_real.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowApplier_real_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Windowing\WindowType.cs" />
   </ItemGroup>

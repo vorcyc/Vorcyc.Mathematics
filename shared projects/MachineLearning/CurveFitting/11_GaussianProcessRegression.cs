@@ -14,7 +14,7 @@ internal static class GaussianProcessRegression
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
-            throw new ArgumentException("数据点数量必须相等且至少有1个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 1 point.");
 
         int n = xData.Length;
         T l = lengthScale == T.Zero ? T.One : lengthScale;
@@ -85,14 +85,14 @@ internal static class GaussianProcessRegression
         where T : unmanaged, IFloatingPointIeee754<T>
     {
         if (xData.Length != yData.Length || xData.Length < 1)
-            throw new ArgumentException("数据点数量必须相等且至少有1个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 1 point.");
         if (xData.Any(row => row.ColumnCount == 0))
-            throw new ArgumentException("X 数据中不能包含空行");
+            throw new ArgumentException("X data cannot contain empty rows.");
 
         int n = xData.Length;
         int inputDim = xData[0].ColumnCount;
         if (xData.Any(row => row.ColumnCount != inputDim))
-            throw new ArgumentException("所有数据点的输入维度必须一致");
+            throw new ArgumentException("All data points must have a consistent input dimension.");
 
         T l = lengthScale == T.Zero ? T.One : lengthScale;
         T sigmaF = signalVariance == T.Zero ? T.One : signalVariance;
@@ -206,7 +206,7 @@ internal static class GaussianProcessRegression
 
             T pivot = augmented[i][i];
             if (pivot == T.Zero)
-                throw new InvalidOperationException("矩阵奇异，无法求逆");
+                throw new InvalidOperationException("The matrix is singular; cannot invert.");
 
             for (int j = 0; j < 2 * n; j++)
                 augmented[i][j] /= pivot;

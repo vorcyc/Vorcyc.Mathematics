@@ -5,7 +5,7 @@ using Vorcyc.Mathematics.SignalProcessing.Transforms;
 using Vorcyc.Mathematics.SignalProcessing.Fourier;
 
 /// <summary>
-/// 从周期采样数据估计傅里叶级数系数（基于 FFT，要求采样数为 2 的幂）。
+/// Estimates Fourier series coefficients from periodic sample data (FFT-based; the sample count must be a power of 2).
 /// </summary>
 public sealed class FourierSeriesFromSamples
 {
@@ -23,16 +23,16 @@ public sealed class FourierSeriesFromSamples
     private int _cachedMaxOrder = -1;
 
     /// <summary>
-    /// 使用一个周期内的均匀采样初始化。
+    /// Initializes the instance using uniform samples over one period.
     /// </summary>
-    /// <param name="samples">一个周期内的函数采样，长度须为 2 的幂</param>
-    /// <param name="period">周期 T</param>
+    /// <param name="samples">The function samples over one period; the length must be a power of 2.</param>
+    /// <param name="period">The period T.</param>
     public FourierSeriesFromSamples(ReadOnlySpan<float> samples, float period)
     {
-        if (samples.IsEmpty) throw new ArgumentException("采样不能为空", nameof(samples));
-        if (period <= 0) throw new ArgumentException("周期必须为正", nameof(period));
+        if (samples.IsEmpty) throw new ArgumentException("Samples cannot be empty.", nameof(samples));
+        if (period <= 0) throw new ArgumentException("Period must be positive.", nameof(period));
         if (!IsPowerOfTwo(samples.Length))
-            throw new ArgumentException("采样数必须为 2 的幂", nameof(samples));
+            throw new ArgumentException("Sample count must be a power of 2.", nameof(samples));
 
         _sampleCount = samples.Length;
         _period = period;
@@ -49,14 +49,14 @@ public sealed class FourierSeriesFromSamples
         fft.Direct(_realSpectrum, _imagSpectrum);
     }
 
-    /// <summary>采样点数。</summary>
+    /// <summary>The number of samples.</summary>
     public int SampleCount => _sampleCount;
 
-    /// <summary>周期。</summary>
+    /// <summary>The period.</summary>
     public float Period => _period;
 
     /// <summary>
-    /// 获取余弦系数 aₙ（与 <see cref="FourierSeries{T}"/> 定义一致）。
+    /// Gets the cosine coefficient aₙ (consistent with the definition in <see cref="FourierSeries{T}"/>).
     /// </summary>
     public float GetCosineCoefficient(int n)
     {
@@ -66,7 +66,7 @@ public sealed class FourierSeriesFromSamples
     }
 
     /// <summary>
-    /// 获取正弦系数 bₙ。
+    /// Gets the sine coefficient bₙ.
     /// </summary>
     public float GetSineCoefficient(int n)
     {
@@ -76,11 +76,11 @@ public sealed class FourierSeriesFromSamples
     }
 
     /// <summary>
-    /// 用估计系数重构 f(x)。
+    /// Reconstructs f(x) using the estimated coefficients.
     /// </summary>
     public float Evaluate(float x, int order)
     {
-        if (order < 0) throw new ArgumentException("阶数必须非负", nameof(order));
+        if (order < 0) throw new ArgumentException("Order must be non-negative.", nameof(order));
 
         EnsureHarmonicCoeffs(order);
 
@@ -126,9 +126,9 @@ public sealed class FourierSeriesFromSamples
 
     private void ValidateHarmonic(int n)
     {
-        if (n < 0) throw new ArgumentException("谐波阶数必须非负", nameof(n));
+        if (n < 0) throw new ArgumentException("Harmonic order must be non-negative.", nameof(n));
         if (n > _sampleCount / 2)
-            throw new ArgumentException($"谐波阶数不能超过 {_sampleCount / 2}", nameof(n));
+            throw new ArgumentException($"Harmonic order cannot exceed {_sampleCount / 2}.", nameof(n));
     }
 
     private static bool IsPowerOfTwo(int value) => value > 0 && (value & (value - 1)) == 0;

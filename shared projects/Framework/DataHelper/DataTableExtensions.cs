@@ -23,7 +23,7 @@ public static class DataTableExtensions
         if (table == null)
             throw new ArgumentNullException(nameof(table));
         if (table.RowCount == 0 || table.ColumnCount == 0)
-            throw new InvalidOperationException("数据表为空，无法转换为矩阵。");
+            throw new InvalidOperationException("The data table is empty; it cannot be converted to a matrix.");
 
         int rows = table.RowCount;
         int cols = table.ColumnCount;

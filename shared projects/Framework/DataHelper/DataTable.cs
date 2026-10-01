@@ -5,9 +5,9 @@ using System.Text;
 namespace Vorcyc.Mathematics.Framework.DataHelper;
 
 /// <summary>
-/// 表示数据表中的一行，包含指定数量的列值，并带有行索引。
+/// Represents a row in a data table, containing a specified number of column values along with a row index.
 /// </summary>
-/// <typeparam name="T">值的类型，必须实现 INumber{T} 接口。</typeparam>
+/// <typeparam name="T">The value type, must implement the INumber{T} interface.</typeparam>
 public class DataRow<T>
     where T : INumber<T>
 {
@@ -16,12 +16,12 @@ public class DataRow<T>
     private readonly DataColumnCollection<T> _columns; // 用于支持列名访问
 
     /// <summary>
-    /// 初始化 <see cref="DataRow{T}"/> 类的新实例。
+    /// Initializes a new instance of the <see cref="DataRow{T}"/> class.
     /// </summary>
-    /// <param name="data">数据表的共享数据数组。</param>
-    /// <param name="rowIndex">行索引。</param>
-    /// <param name="columns">列集合，用于支持按列名访问。</param>
-    /// <exception cref="ArgumentNullException">如果 <paramref name="data"/> 或 <paramref name="columns"/> 为 null。</exception>
+    /// <param name="data">The shared data array of the data table.</param>
+    /// <param name="rowIndex">The row index.</param>
+    /// <param name="columns">The column collection, used to support access by column name.</param>
+    /// <exception cref="ArgumentNullException">If <paramref name="data"/> or <paramref name="columns"/> is null.</exception>
     public DataRow(T[,] data, int rowIndex, DataColumnCollection<T> columns)
     {
         _data = data ?? throw new ArgumentNullException(nameof(data));
@@ -30,11 +30,11 @@ public class DataRow<T>
     }
 
     /// <summary>
-    /// 获取或设置指定列索引处的值。
+    /// Gets or sets the value at the specified column index.
     /// </summary>
-    /// <param name="index">列索引。</param>
-    /// <returns>指定列索引处的值的引用。</returns>
-    /// <exception cref="IndexOutOfRangeException">如果列索引超出范围。</exception>
+    /// <param name="index">The column index.</param>
+    /// <returns>A reference to the value at the specified column index.</returns>
+    /// <exception cref="IndexOutOfRangeException">If the column index is out of range.</exception>
     public ref T this[int index]
     {
         get
@@ -45,11 +45,11 @@ public class DataRow<T>
     }
 
     /// <summary>
-    /// 获取或设置指定列名处的值。
+    /// Gets or sets the value at the specified column name.
     /// </summary>
-    /// <param name="columnName">列名。</param>
-    /// <returns>指定列名处的值的引用。</returns>
-    /// <exception cref="ArgumentException">如果列名未找到。</exception>
+    /// <param name="columnName">The column name.</param>
+    /// <returns>A reference to the value at the specified column name.</returns>
+    /// <exception cref="ArgumentException">If the column name is not found.</exception>
     public ref T this[string columnName]
     {
         get
@@ -62,23 +62,23 @@ public class DataRow<T>
     private void ValidateColumnIndex(int index)
     {
         if (index < 0 || index >= _data.GetLength(1))
-            throw new IndexOutOfRangeException($"列索引 {index} 超出范围 [0, {_data.GetLength(1) - 1}]");
+            throw new IndexOutOfRangeException($"Column index {index} is out of range [0, {_data.GetLength(1) - 1}].");
     }
 
     /// <summary>
-    /// 获取行的列数。
+    /// Gets the number of columns in the row.
     /// </summary>
     public int Length => _data.GetLength(1);
 
     /// <summary>
-    /// 获取行索引。
+    /// Gets the row index.
     /// </summary>
     public int RowIndex => _rowIndex;
 
     /// <summary>
-    /// 返回表示当前行的字符串。
+    /// Returns a string representing the current row.
     /// </summary>
-    /// <returns>表示当前行的字符串，格式为 "Row {RowIndex}: [{值1}, {值2}, ...]"。</returns>
+    /// <returns>A string representing the current row, formatted as "Row {RowIndex}: [{value1}, {value2}, ...]".</returns>
     public override string ToString()
     {
         var sb = new StringBuilder($"Row {RowIndex}: [");
@@ -93,9 +93,9 @@ public class DataRow<T>
 }
 
 /// <summary>
-/// 表示数据表中的一列，包含指定数量的行值，并带有列索引和可选的名称。
+/// Represents a column in a data table, containing a specified number of row values along with a column index and an optional name.
 /// </summary>
-/// <typeparam name="T">值的类型，必须实现 INumber{T} 接口。</typeparam>
+/// <typeparam name="T">The value type, must implement the INumber{T} interface.</typeparam>
 public class DataColumn<T>
     where T : INumber<T>
 {
@@ -103,12 +103,12 @@ public class DataColumn<T>
     private readonly int _columnIndex;
 
     /// <summary>
-    /// 初始化 <see cref="DataColumn{T}"/> 类的新实例。
+    /// Initializes a new instance of the <see cref="DataColumn{T}"/> class.
     /// </summary>
-    /// <param name="data">数据表的共享数据数组。</param>
-    /// <param name="columnIndex">列索引。</param>
-    /// <param name="name">列名称。</param>
-    /// <exception cref="ArgumentNullException">如果 <paramref name="data"/> 为 null。</exception>
+    /// <param name="data">The shared data array of the data table.</param>
+    /// <param name="columnIndex">The column index.</param>
+    /// <param name="name">The column name.</param>
+    /// <exception cref="ArgumentNullException">If <paramref name="data"/> is null.</exception>
     public DataColumn(T[,] data, int columnIndex, string? name = null)
     {
         _data = data ?? throw new ArgumentNullException(nameof(data));
@@ -117,11 +117,11 @@ public class DataColumn<T>
     }
 
     /// <summary>
-    /// 获取或设置指定行索引处的值。
+    /// Gets or sets the value at the specified row index.
     /// </summary>
-    /// <param name="index">行索引。</param>
-    /// <returns>指定行索引处的值的引用。</returns>
-    /// <exception cref="IndexOutOfRangeException">如果行索引超出范围。</exception>
+    /// <param name="index">The row index.</param>
+    /// <returns>A reference to the value at the specified row index.</returns>
+    /// <exception cref="IndexOutOfRangeException">If the row index is out of range.</exception>
     public ref T this[int index]
     {
         get
@@ -134,28 +134,28 @@ public class DataColumn<T>
     private void ValidateRowIndex(int index)
     {
         if (index < 0 || index >= _data.GetLength(0))
-            throw new IndexOutOfRangeException($"行索引 {index} 超出范围 [0, {_data.GetLength(0) - 1}]");
+            throw new IndexOutOfRangeException($"Row index {index} is out of range [0, {_data.GetLength(0) - 1}].");
     }
 
     /// <summary>
-    /// 获取列的行数。
+    /// Gets the number of rows in the column.
     /// </summary>
     public int Length => _data.GetLength(0);
 
     /// <summary>
-    /// 获取列索引。
+    /// Gets the column index.
     /// </summary>
     public int ColumnIndex => _columnIndex;
 
     /// <summary>
-    /// 获取列名称。
+    /// Gets the column name.
     /// </summary>
     public string? Name { get; }
 
     /// <summary>
-    /// 返回表示当前列的字符串。
+    /// Returns a string representing the current column.
     /// </summary>
-    /// <returns>表示当前列的字符串，格式为 "{Name 或 Column{ColumnIndex}} (Index {ColumnIndex}): [{值1}, {值2}, ...]"。</returns>
+    /// <returns>A string representing the current column, formatted as "{Name or Column{ColumnIndex}} (Index {ColumnIndex}): [{value1}, {value2}, ...]".</returns>
     public override string ToString()
     {
         var sb = new StringBuilder($"{Name ?? $"Column{ColumnIndex}"} (Index {ColumnIndex}): [");
@@ -171,9 +171,9 @@ public class DataColumn<T>
 
 
 /// <summary>
-/// 表示数据表中的行集合，管理一组 <see cref="DataRow{T}"/> 对象。
+/// Represents the collection of rows in a data table, managing a set of <see cref="DataRow{T}"/> objects.
 /// </summary>
-/// <typeparam name="T">值的类型，必须实现 INumber{T} 接口。</typeparam>
+/// <typeparam name="T">The value type, must implement the INumber{T} interface.</typeparam>
 public class DataRowCollection<T> : IEnumerable<DataRow<T>>
     where T : INumber<T>
 {
@@ -182,17 +182,17 @@ public class DataRowCollection<T> : IEnumerable<DataRow<T>>
     private readonly DataColumnCollection<T> _columns;
 
     /// <summary>
-    /// 初始化 <see cref="DataRowCollection{T}"/> 类的新实例。
+    /// Initializes a new instance of the <see cref="DataRowCollection{T}"/> class.
     /// </summary>
-    /// <param name="data">数据表的共享数据数组。</param>
-    /// <param name="rowCount">行数。</param>
-    /// <param name="columns">列集合，用于支持按列名访问。</param>
-    /// <exception cref="ArgumentException">如果 <paramref name="rowCount"/> 小于 0。</exception>
-    /// <exception cref="ArgumentNullException">如果 <paramref name="data"/> 或 <paramref name="columns"/> 为 null。</exception>
+    /// <param name="data">The shared data array of the data table.</param>
+    /// <param name="rowCount">The number of rows.</param>
+    /// <param name="columns">The column collection, used to support access by column name.</param>
+    /// <exception cref="ArgumentException">If <paramref name="rowCount"/> is less than 0.</exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="data"/> or <paramref name="columns"/> is null.</exception>
     internal DataRowCollection(T[,] data, int rowCount, DataColumnCollection<T> columns)
     {
         if (rowCount < 0)
-            throw new ArgumentException("行数必须是非负数", nameof(rowCount));
+            throw new ArgumentException("Row count must be non-negative.", nameof(rowCount));
         if (data == null)
             throw new ArgumentNullException(nameof(data));
         if (columns == null)
@@ -208,30 +208,30 @@ public class DataRowCollection<T> : IEnumerable<DataRow<T>>
     }
 
     /// <summary>
-    /// 获取指定索引处的行。
+    /// Gets the row at the specified index.
     /// </summary>
-    /// <param name="index">行索引。</param>
-    /// <returns>指定索引处的行。</returns>
-    /// <exception cref="IndexOutOfRangeException">如果行索引超出范围。</exception>
+    /// <param name="index">The row index.</param>
+    /// <returns>The row at the specified index.</returns>
+    /// <exception cref="IndexOutOfRangeException">If the row index is out of range.</exception>
     public DataRow<T> this[int index]
     {
         get
         {
             if (index < 0 || index >= _rows.Length)
-                throw new IndexOutOfRangeException($"行索引 {index} 超出范围 [0, {_rows.Length - 1}]");
+                throw new IndexOutOfRangeException($"Row index {index} is out of range [0, {_rows.Length - 1}].");
             return _rows[index];
         }
     }
 
     /// <summary>
-    /// 获取行数。
+    /// Gets the number of rows.
     /// </summary>
     public int Count => _rows.Length;
 
     /// <summary>
-    /// 添加新行。
+    /// Adds a new row.
     /// </summary>
-    /// <param name="defaultValue">新行的默认值（可选）。</param>
+    /// <param name="defaultValue">The default value for the new row (optional).</param>
     public void AddRow(T? defaultValue = default)
     {
         int newRowCount = Count + 1;
@@ -256,17 +256,17 @@ public class DataRowCollection<T> : IEnumerable<DataRow<T>>
     }
 
     /// <summary>
-    /// 删除指定索引处的行。
+    /// Removes the row at the specified index.
     /// </summary>
-    /// <param name="rowIndex">要删除的行索引。</param>
-    /// <exception cref="IndexOutOfRangeException">如果行索引超出范围。</exception>
-    /// <exception cref="InvalidOperationException">如果尝试删除最后一行。</exception>
+    /// <param name="rowIndex">The row index to remove.</param>
+    /// <exception cref="IndexOutOfRangeException">If the row index is out of range.</exception>
+    /// <exception cref="InvalidOperationException">If attempting to remove the last row.</exception>
     public void RemoveRow(int rowIndex)
     {
         if (rowIndex < 0 || rowIndex >= Count)
-            throw new IndexOutOfRangeException($"行索引 {rowIndex} 超出范围 [0, {Count - 1}]");
+            throw new IndexOutOfRangeException($"Row index {rowIndex} is out of range [0, {Count - 1}].");
         if (Count <= 1)
-            throw new InvalidOperationException("无法删除最后一行");
+            throw new InvalidOperationException("Cannot remove the last row.");
 
         int newRowCount = Count - 1;
         var newData = new T[newRowCount, _data.GetLength(1)];
@@ -293,9 +293,9 @@ public class DataRowCollection<T> : IEnumerable<DataRow<T>>
     }
 
     /// <summary>
-    /// 返回表示当前行集合的字符串。
+    /// Returns a string representing the current row collection.
     /// </summary>
-    /// <returns>表示当前行集合的字符串。如果为空，返回 "DataRowCollection: Empty"；否则返回每行的字符串表示，按行排列。</returns>
+    /// <returns>A string representing the current row collection. If empty, returns "DataRowCollection: Empty"; otherwise returns the string representation of each row, listed by row.</returns>
     public override string ToString()
     {
         if (Count == 0)
@@ -309,9 +309,9 @@ public class DataRowCollection<T> : IEnumerable<DataRow<T>>
 
 
 /// <summary>
-/// 表示一个泛型数据列的集合，支持按索引或名称访问列。
+/// Represents a collection of generic data columns, supporting access to columns by index or name.
 /// </summary>
-/// <typeparam name="T">列数据的类型，必须实现 <see cref="INumber{T}"/> 接口。</typeparam>
+/// <typeparam name="T">The column data type, must implement the <see cref="INumber{T}"/> interface.</typeparam>
 public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     where T : INumber<T>
 {
@@ -321,27 +321,27 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     private readonly List<string?> _columnNames; // 缓存所有列名的列表
 
     /// <summary>
-    /// 获取所有列的名称。
+    /// Gets the names of all columns.
     /// </summary>
     public string[]? Names => _columnNames.ToArray();
 
     /// <summary>
-    /// 获取集合中的列数。
+    /// Gets the number of columns in the collection.
     /// </summary>
     public int Count => _columns.Length;
 
     /// <summary>
-    /// 初始化 <see cref="DataColumnCollection{T}"/> 的新实例。
+    /// Initializes a new instance of <see cref="DataColumnCollection{T}"/>.
     /// </summary>
-    /// <param name="data">底层数据数组。</param>
-    /// <param name="columnCount">列数。</param>
-    /// <param name="columnNames">列名数组（可选）。</param>
-    /// <exception cref="ArgumentException">如果列数为负数，则抛出此异常。</exception>
-    /// <exception cref="ArgumentNullException">如果数据数组为 null，则抛出此异常。</exception>
+    /// <param name="data">The underlying data array.</param>
+    /// <param name="columnCount">The number of columns.</param>
+    /// <param name="columnNames">The array of column names (optional).</param>
+    /// <exception cref="ArgumentException">Thrown if the column count is negative.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if the data array is null.</exception>
     internal DataColumnCollection(T[,] data, int columnCount, string[]? columnNames = null)
     {
         if (columnCount < 0)
-            throw new ArgumentException("列数必须是非负数", nameof(columnCount));
+            throw new ArgumentException("Column count must be non-negative.", nameof(columnCount));
         if (data == null)
             throw new ArgumentNullException(nameof(data));
 
@@ -362,23 +362,23 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     }
 
     /// <summary>
-    /// 通过列索引获取或设置列。
+    /// Gets or sets a column by its column index.
     /// </summary>
-    /// <param name="columnIndex">列索引。</param>
-    /// <returns>对应的 <see cref="DataColumn{T}"/> 对象。</returns>
-    /// <exception cref="IndexOutOfRangeException">如果索引超出范围，则抛出此异常。</exception>
+    /// <param name="columnIndex">The column index.</param>
+    /// <returns>The corresponding <see cref="DataColumn{T}"/> object.</returns>
+    /// <exception cref="IndexOutOfRangeException">Thrown if the index is out of range.</exception>
     public DataColumn<T> this[int columnIndex]
     {
         get
         {
             if (columnIndex < 0 || columnIndex >= Count)
-                throw new IndexOutOfRangeException($"列索引 {columnIndex} 超出范围 [0, {Count - 1}]");
+                throw new IndexOutOfRangeException($"Column index {columnIndex} is out of range [0, {Count - 1}].");
             return _columns[columnIndex];
         }
         set
         {
             if (columnIndex < 0 || columnIndex >= Count)
-                throw new IndexOutOfRangeException($"列索引 {columnIndex} 超出范围 [0, {Count - 1}]");
+                throw new IndexOutOfRangeException($"Column index {columnIndex} is out of range [0, {Count - 1}].");
             _columns[columnIndex] = value;
             // 更新列名映射
             if (_columns[columnIndex].Name != null)
@@ -394,26 +394,26 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     }
 
     /// <summary>
-    /// 通过列名获取列。
+    /// Gets a column by its name.
     /// </summary>
-    /// <param name="name">列名。</param>
-    /// <returns>对应的 <see cref="DataColumn{T}"/> 对象。</returns>
-    /// <exception cref="ArgumentException">如果列名不存在，则抛出此异常。</exception>
+    /// <param name="name">The column name.</param>
+    /// <returns>The corresponding <see cref="DataColumn{T}"/> object.</returns>
+    /// <exception cref="ArgumentException">Thrown if the column name does not exist.</exception>
     public DataColumn<T> this[string name]
     {
         get
         {
             if (!_nameToColumn.TryGetValue(name, out var column))
-                throw new ArgumentException($"未找到名为 '{name}' 的列");
+                throw new ArgumentException($"No column named '{name}' was found.");
             return column;
         }
     }
 
     /// <summary>
-    /// 添加一列到集合中。
+    /// Adds a column to the collection.
     /// </summary>
-    /// <param name="columnName">新列的名称（可选）。</param>
-    /// <param name="defaultValue">新列的默认值（可选）。</param>
+    /// <param name="columnName">The name of the new column (optional).</param>
+    /// <param name="defaultValue">The default value for the new column (optional).</param>
     public void AddColumn(string? columnName = null, T? defaultValue = default)
     {
         int newColumnCount = Count + 1;
@@ -438,17 +438,17 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     }
 
     /// <summary>
-    /// 从集合中移除指定索引的列。
+    /// Removes the column at the specified index from the collection.
     /// </summary>
-    /// <param name="columnIndex">要移除的列索引。</param>
-    /// <exception cref="IndexOutOfRangeException">如果索引超出范围，则抛出此异常。</exception>
-    /// <exception cref="InvalidOperationException">如果尝试移除最后一列，则抛出此异常。</exception>
+    /// <param name="columnIndex">The column index to remove.</param>
+    /// <exception cref="IndexOutOfRangeException">Thrown if the index is out of range.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if attempting to remove the last column.</exception>
     public void RemoveColumn(int columnIndex)
     {
         if (columnIndex < 0 || columnIndex >= Count)
-            throw new IndexOutOfRangeException($"列索引 {columnIndex} 超出范围 [0, {Count - 1}]");
+            throw new IndexOutOfRangeException($"Column index {columnIndex} is out of range [0, {Count - 1}].");
         if (Count <= 1)
-            throw new InvalidOperationException("无法删除最后一列");
+            throw new InvalidOperationException("Cannot remove the last column.");
 
         int newColumnCount = Count - 1;
         var newData = new T[_data.GetLength(0), newColumnCount];
@@ -484,9 +484,9 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     }
 
     /// <summary>
-    /// 更新底层数据数组。
+    /// Updates the underlying data array.
     /// </summary>
-    /// <param name="newData">新的数据数组。</param>
+    /// <param name="newData">The new data array.</param>
     internal void UpdateData(T[,] newData)
     {
         _data = newData;
@@ -496,27 +496,27 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
     }
 
     /// <summary>
-    /// 返回列集合的枚举器。
+    /// Returns an enumerator for the column collection.
     /// </summary>
-    /// <returns>列的枚举器。</returns>
+    /// <returns>An enumerator for the columns.</returns>
     public IEnumerator<DataColumn<T>> GetEnumerator()
     {
         return ((IEnumerable<DataColumn<T>>)_columns).GetEnumerator();
     }
 
     /// <summary>
-    /// 返回列集合的非泛型枚举器。
+    /// Returns a non-generic enumerator for the column collection.
     /// </summary>
-    /// <returns>列的非泛型枚举器。</returns>
+    /// <returns>A non-generic enumerator for the columns.</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
 
     /// <summary>
-    /// 返回集合的字符串表示形式。
+    /// Returns the string representation of the collection.
     /// </summary>
-    /// <returns>包含列信息的字符串。</returns>
+    /// <returns>A string containing the column information.</returns>
     public override string ToString()
     {
         var sb = new System.Text.StringBuilder();
@@ -528,7 +528,7 @@ public class DataColumnCollection<T> : IEnumerable<DataColumn<T>>
 }
 
 /// <summary>
-/// 定义过滤条件类型。
+/// Defines the filter condition types.
 /// </summary>
 public enum FilterCondition
 {
@@ -541,9 +541,9 @@ public enum FilterCondition
 }
 
 /// <summary>
-/// 表示一个二维数据表，包含行和列的集合。
+/// Represents a 2D data table, containing collections of rows and columns.
 /// </summary>
-/// <typeparam name="T">值的类型，必须实现 INumber{T} 接口。</typeparam>
+/// <typeparam name="T">The value type, must implement the INumber{T} interface.</typeparam>
 public class DataTable<T>
     where T : INumber<T>
 {
@@ -552,18 +552,18 @@ public class DataTable<T>
     private readonly DataColumnCollection<T> _columns;
 
     /// <summary>
-    /// 初始化 <see cref="DataTable{T}"/> 类的新实例。
+    /// Initializes a new instance of the <see cref="DataTable{T}"/> class.
     /// </summary>
-    /// <param name="rowCount">行数。</param>
-    /// <param name="columnCount">列数。</param>
-    /// <param name="columnNames">列名称数组。</param>
-    /// <exception cref="ArgumentException">如果 <paramref name="rowCount"/> 或 <paramref name="columnCount"/> 小于 0，或 <paramref name="columnNames"/> 的长度与 <paramref name="columnCount"/> 不匹配。</exception>
+    /// <param name="rowCount">The number of rows.</param>
+    /// <param name="columnCount">The number of columns.</param>
+    /// <param name="columnNames">The array of column names.</param>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="rowCount"/> or <paramref name="columnCount"/> is less than 0, or the length of <paramref name="columnNames"/> does not match <paramref name="columnCount"/>.</exception>
     public DataTable(int rowCount, int columnCount, string[]? columnNames = null)
     {
         if (rowCount < 0 || columnCount < 0)
-            throw new ArgumentException("行数和列数必须是非负数");
+            throw new ArgumentException("Row count and column count must be non-negative.");
         if (columnNames != null && columnNames.Length != columnCount)
-            throw new ArgumentException("列名数量必须与列数匹配", nameof(columnNames));
+            throw new ArgumentException("The number of column names must match the column count.", nameof(columnNames));
 
         _data = new T[rowCount, columnCount];
         _columns = new DataColumnCollection<T>(_data, columnCount, columnNames);
@@ -571,54 +571,54 @@ public class DataTable<T>
     }
 
     /// <summary>
-    /// 获取行集合。
+    /// Gets the row collection.
     /// </summary>
     public DataRowCollection<T> Rows => _rows;
 
     /// <summary>
-    /// 获取列集合。
+    /// Gets the column collection.
     /// </summary>
     public DataColumnCollection<T> Columns => _columns;
 
     /// <summary>
-    /// 获取行数。
+    /// Gets the number of rows.
     /// </summary>
     public int RowCount => _rows.Count;
 
     /// <summary>
-    /// 获取列数。
+    /// Gets the number of columns.
     /// </summary>
     public int ColumnCount => _columns.Count;
 
     /// <summary>
-    /// 获取或设置指定行索引和列索引处的值。
+    /// Gets or sets the value at the specified row and column index.
     /// </summary>
-    /// <param name="rowIndex">行索引。</param>
-    /// <param name="columnIndex">列索引。</param>
-    /// <returns>指定行索引和列索引处的值的引用。</returns>
-    /// <exception cref="IndexOutOfRangeException">如果行索引或列索引超出范围。</exception>
+    /// <param name="rowIndex">The row index.</param>
+    /// <param name="columnIndex">The column index.</param>
+    /// <returns>A reference to the value at the specified row and column index.</returns>
+    /// <exception cref="IndexOutOfRangeException">If the row index or column index is out of range.</exception>
     public ref T this[int rowIndex, int columnIndex]
     {
         get
         {
             if (rowIndex < 0 || rowIndex >= RowCount)
-                throw new IndexOutOfRangeException($"行索引 {rowIndex} 超出范围 [0, {RowCount - 1}]");
+                throw new IndexOutOfRangeException($"Row index {rowIndex} is out of range [0, {RowCount - 1}].");
             if (columnIndex < 0 || columnIndex >= ColumnCount)
-                throw new IndexOutOfRangeException($"列索引 {columnIndex} 超出范围 [0, {ColumnCount - 1}]");
+                throw new IndexOutOfRangeException($"Column index {columnIndex} is out of range [0, {ColumnCount - 1}].");
             return ref _data[rowIndex, columnIndex];
         }
     }
 
     /// <summary>
-    /// 获取底层数据数组（仅限内部使用）。
+    /// Gets the underlying data array (internal use only).
     /// </summary>
-    /// <returns>底层数据的二维数组。</returns>
+    /// <returns>The underlying data as a 2D array.</returns>
     internal T[,] GetInternalData() => _data;
 
     /// <summary>
-    /// 返回表示当前数据表的字符串。
+    /// Returns a string representing the current data table.
     /// </summary>
-    /// <returns>表示当前数据表的字符串，包含行数、列数以及行和列的详细信息。</returns>
+    /// <returns>A string representing the current data table, including the row count, column count, and details of the rows and columns.</returns>
     public override string ToString()
     {
         return $"DataTable ({RowCount} rows, {ColumnCount} columns):\nRows:\n{_rows}\nColumns:\n{_columns}";

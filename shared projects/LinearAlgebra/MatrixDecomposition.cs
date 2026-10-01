@@ -20,7 +20,7 @@ public static class MatrixDecomposition
         where T : struct, IFloatingPointIeee754<T>
     {
         if (matrix.Rows != matrix.Columns)
-            throw new ArgumentException("矩阵必须是方阵。", nameof(matrix));
+            throw new ArgumentException("Matrix must be square.", nameof(matrix));
 
         int n = matrix.Rows;
         var working = matrix.Clone();
@@ -56,6 +56,9 @@ public static class MatrixDecomposition
         where T : struct, IFloatingPointIeee754<T>
     {
         pivotP = 0;
+        pivotQ = 0;
+        if (n < 2) return false; // 1x1 矩阵无非对角元素可消去，避免下面越界访问 matrix[0,1]
+
         pivotQ = 1;
         T max = T.Abs(matrix[0, 1]);
 
@@ -171,7 +174,7 @@ public static class MatrixDecomposition
         int m = matrix.Rows;
         int n = matrix.Columns;
         if (m == 0 || n == 0)
-            throw new ArgumentException("矩阵不能为空。", nameof(matrix));
+            throw new ArgumentException("Matrix cannot be empty.", nameof(matrix));
 
         T tol = tolerance ?? T.CreateChecked(1e-12);
         cancellationToken.ThrowIfCancellationRequested();

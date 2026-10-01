@@ -120,8 +120,8 @@ internal static class Conv_019_test
         Fill(rng, bRe);
         Fill(rng, bIm);
 
-        var a = new ComplexDiscreteSignal(1, aRe, aIm, allocateNew: true);
-        var b = new ComplexDiscreteSignal(1, bRe, bIm, allocateNew: true);
+        var a = new ComplexDiscreteSignalFp32(1, aRe, aIm, allocateNew: true);
+        var b = new ComplexDiscreteSignalFp32(1, bRe, bIm, allocateNew: true);
         var y = new ComplexConvolver().Convolve(a, b);
         DirectComplexConv(aRe, aIm, bRe, bIm, out var dRe, out var dIm);
         ExpectClose("ComplexConvolver conv Re vs direct", dRe, y.Real, 2e-5f);
@@ -212,8 +212,8 @@ internal static class Conv_019_test
         Fill(rng, bRe);
         Fill(rng, bIm);
 
-        var a32 = new ComplexDiscreteSignal(1, aRe, aIm, allocateNew: true);
-        var b32 = new ComplexDiscreteSignal(1, bRe, bIm, allocateNew: true);
+        var a32 = new ComplexDiscreteSignalFp32(1, aRe, aIm, allocateNew: true);
+        var b32 = new ComplexDiscreteSignalFp32(1, bRe, bIm, allocateNew: true);
         var aT = new ComplexDiscreteSignal<float>(1, (float[])aRe.Clone(), (float[])aIm.Clone());
         var bT = new ComplexDiscreteSignal<float>(1, (float[])bRe.Clone(), (float[])bIm.Clone());
 

@@ -1,7 +1,7 @@
 using System.Numerics;
 namespace Vorcyc.Mathematics;
 /// <summary>
-/// 提供将任意实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型转换为指定进制的字符串表示和从指定进制的字符串表示转换为整数的方法。
+/// Provides methods for converting any integer type that implements <see cref="IBinaryInteger{TSelf}"/> to a string representation in a specified base, and for parsing such string representations back into integers.
 /// </summary>
 public static class BaseConverter
 {
@@ -47,28 +47,28 @@ public static class BaseConverter
     //}
 
     /// <summary>
-    /// 将任意实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型转换为指定进制的字符串表示。
-    /// 进制的范围咋2到94之间。
+    /// Converts any integer type that implements <see cref="IBinaryInteger{TSelf}"/> to a string representation in the specified base.
+    /// The base must be between 2 and 94.
     /// </summary>
-    /// <typeparam name="TSelf">实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型</typeparam>
-    /// <param name="integer">要转换的整数</param>
-    /// <param name="baseNumber">进制数。要求大于或等于2，小于或等于94</param>
-    /// <returns>字符串形式的进制数</returns>
+    /// <typeparam name="TSelf">An integer type that implements <see cref="IBinaryInteger{TSelf}"/>.</typeparam>
+    /// <param name="integer">The integer to convert.</param>
+    /// <param name="baseNumber">The base. Must be greater than or equal to 2 and less than or equal to 94.</param>
+    /// <returns>The string representation in the specified base.</returns>
     /// <exception cref="ArgumentOutOfRangeException"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ToBaseString<TSelf>(this TSelf integer, TSelf baseNumber)
         where TSelf : IBinaryInteger<TSelf>
     {
         const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-        // 检查进制数和源数
+        // Validate the base and source value
         if (integer < TSelf.Zero)
-            throw new ArgumentOutOfRangeException(nameof(integer), "值必须为正");
+            throw new ArgumentOutOfRangeException(nameof(integer), "Value must be positive.");
         if (baseNumber < TSelf.CreateChecked(2) || baseNumber > TSelf.CreateChecked(digits.Length))
-            throw new ArgumentOutOfRangeException(nameof(baseNumber), $"基数必须在2到{digits.Length}间");
-        // 特殊处理零
+            throw new ArgumentOutOfRangeException(nameof(baseNumber), $"The base must be between 2 and {digits.Length}.");
+        // Handle zero specially
         if (integer == TSelf.Zero)
             return "0";
-        Span<char> buffer = stackalloc char[128]; // 足够大以容纳所有可能的结果
+        Span<char> buffer = stackalloc char[128]; // Large enough to hold any possible result
         int index = buffer.Length;
         while (integer > TSelf.Zero)
         {
@@ -80,29 +80,29 @@ public static class BaseConverter
     }
 
     /// <summary>
-    /// 将指定进制的字符串表示转换为任意实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型。
-    /// 进制的范围在2到94之间。
+    /// Converts a string representation in the specified base to any integer type that implements <see cref="IBinaryInteger{TSelf}"/>.
+    /// The base must be between 2 and 94.
     /// </summary>
-    /// <typeparam name="TSelf">实现了 <see cref="IBinaryInteger{TSelf}"/> 接口的整数类型</typeparam>
-    /// <param name="value">要转换的字符串</param>
-    /// <param name="baseNumber">进制数。要求大于或等于2，小于或等于94</param>
-    /// <returns>转换后的整数</returns>
+    /// <typeparam name="TSelf">An integer type that implements <see cref="IBinaryInteger{TSelf}"/>.</typeparam>
+    /// <param name="value">The string to convert.</param>
+    /// <param name="baseNumber">The base. Must be greater than or equal to 2 and less than or equal to 94.</param>
+    /// <returns>The converted integer.</returns>
     /// <exception cref="ArgumentOutOfRangeException"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TSelf FromBaseString<TSelf>(this string value, TSelf baseNumber)
         where TSelf : IBinaryInteger<TSelf>
     {
         const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-        // 检查进制数和源数
+        // Validate the base and source value
         if (baseNumber < TSelf.CreateChecked(2) || baseNumber > TSelf.CreateChecked(digits.Length))
-            throw new ArgumentOutOfRangeException(nameof(baseNumber), $"基数必须在2到{digits.Length}间");
+            throw new ArgumentOutOfRangeException(nameof(baseNumber), $"The base must be between 2 and {digits.Length}.");
         TSelf result = TSelf.Zero;
         TSelf baseValue = TSelf.One;
         for (int i = value.Length - 1; i >= 0; i--)
         {
             int digitValue = digits.IndexOf(value[i]);
             if (digitValue == -1)
-                throw new ArgumentOutOfRangeException(nameof(value), $"字符串包含无效字符 '{value[i]}'");
+                throw new ArgumentOutOfRangeException(nameof(value), $"The string contains an invalid character '{value[i]}'.");
             result += TSelf.CreateChecked(digitValue) * baseValue;
             baseValue *= baseNumber;
         }

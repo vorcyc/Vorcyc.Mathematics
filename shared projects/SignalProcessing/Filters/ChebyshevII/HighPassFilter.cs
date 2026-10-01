@@ -43,7 +43,7 @@ public class HighPassFilter : ZiFilter
     /// <param name="ripple">Ripple (in dB)</param>
     private static TransferFunction MakeTf(float frequency, int order, float ripple = 0.1f)
     {
-        return DesignFilter.IirHpTf(frequency, PrototypeChebyshevII.Poles(order, ripple));
+        return DesignFilter.IirHpTf(frequency, PrototypeChebyshevII.Poles(order, ripple), PrototypeChebyshevII.Zeros(order));
     }
 
     /// <summary>

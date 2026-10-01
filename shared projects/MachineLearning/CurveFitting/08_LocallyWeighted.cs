@@ -12,13 +12,13 @@ internal class LocallyWeightedRegression<T> where T : unmanaged, IFloatingPointI
     public LocallyWeightedRegression(Span<T> xData, Span<T> yData, T? bandwidth = null)
     {
         if (xData.Length != yData.Length || xData.Length < 2)
-            throw new ArgumentException("数据点数量必须相等且至少有2个点");
+            throw new ArgumentException("Data point counts must be equal and there must be at least 2 points.");
         _xData = xData.ToArray();
         _yData = yData.ToArray();
         T defaultBandwidth = (_xData.AsSpan().Max() - _xData.AsSpan().Min()) * T.CreateChecked(0.3);
         _bandwidth = bandwidth ?? defaultBandwidth;
         if (_bandwidth <= T.Zero)
-            throw new ArgumentException("带宽必须大于0");
+            throw new ArgumentException("Bandwidth must be greater than 0.");
     }
 
     public FitResult<T> Fit(ComputingContext? computingContext = null, CancellationToken cancellationToken = default)

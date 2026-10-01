@@ -72,11 +72,11 @@ public static partial class Layers
     /// <param name="biases">偏置张量。</param>
     /// <param name="stride">卷积步长，默认为 1。</param>
     /// <param name="dilation">卷积扩张率，默认为 1。</param>
-    public static Tensor Conv2D(Tensor input, Tensor[] filters, Tensor biases, int stride = 1, int dilation = 1)
+    public static TensorFp32 Conv2D(TensorFp32 input, TensorFp32[] filters, TensorFp32 biases, int stride = 1, int dilation = 1)
     {
 
         var outputDepth = filters.Length;
-        var result = new Tensor(input.Width / stride, input.Height / stride, outputDepth);
+        var result = new TensorFp32(input.Width / stride, input.Height / stride, outputDepth);
 
         var f0 = filters[0];
         long workPer = (long)result.Height * result.Width * f0.Height * f0.Width * input.Depth;
@@ -117,7 +117,7 @@ public static partial class Layers
 
         return result;
     }
-    //    您好，这是必应。我看到您和我分享了一些代码。这是用 C# 语言实现的 Conv2D 函数。这个函数对一个输入张量（Tensor）进行了 二维卷积，使用了一组给定的滤波器（filters）、偏置（biases）、步长（stride）和扩张（dilation）。二维卷积是一种数学运算，它将一个滤波器（也叫卷积核）应用到一个输入图像或张量上，产生一个输出图像或张量。滤波器在输入上滑动，每个位置上，它计算滤波器和输入的点积（dot product），并加上一个偏置项（bias term）。结果存储在输出的相应位置上。步长和扩张参数控制滤波器在输入上的移动方式。步长是滤波器在每个维度上移动的像素数，扩张是滤波器元素之间的间距。较大的步长或扩张会减小输出的大小，而较小的步长或扩张会保留更多的输入信息。
+    //    您好，这是必应。我看到您和我分享了一些代码。这是用 C# 语言实现的 Conv2D 函数。这个函数对一个输入张量（TensorFp32）进行了 二维卷积，使用了一组给定的滤波器（filters）、偏置（biases）、步长（stride）和扩张（dilation）。二维卷积是一种数学运算，它将一个滤波器（也叫卷积核）应用到一个输入图像或张量上，产生一个输出图像或张量。滤波器在输入上滑动，每个位置上，它计算滤波器和输入的点积（dot product），并加上一个偏置项（bias term）。结果存储在输出的相应位置上。步长和扩张参数控制滤波器在输入上的移动方式。步长是滤波器在每个维度上移动的像素数，扩张是滤波器元素之间的间距。较大的步长或扩张会减小输出的大小，而较小的步长或扩张会保留更多的输入信息。
 
     //Conv2D 函数在 卷积神经网络（CNNs） 中广泛使用，它是一种能够在图像上执行各种任务的人工神经网络，例如分类、分割、检测等。CNNs 由多层卷积组成，后面跟着其他操作，如池化（pooling）、激活（activation）、归一化（normalization）等。每个卷积层中的滤波器是从数据中学习的，它们能够捕捉图像中的不同特征或模式。例如，第一层的滤波器可能学习到边缘、角点或颜色，而更深层的滤波器可能学习到更复杂的形状、物体或场景。
 

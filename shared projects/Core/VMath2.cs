@@ -202,7 +202,7 @@ public static partial class VMath
     public static T[] Unwrap<T>(T[] phase, T? tolerance = null)
         where T : unmanaged, IFloatingPointIeee754<T>
     {
-        tolerance = T.Pi;
+        tolerance ??= T.Pi;
         var unwrapped = phase.Copy();
         T offset = T.Zero;
         for (var n = 1; n < phase.Length; n++)

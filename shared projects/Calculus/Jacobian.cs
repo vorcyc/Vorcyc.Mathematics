@@ -4,9 +4,9 @@ using Vorcyc.Mathematics.LinearAlgebra;
 namespace Vorcyc.Mathematics.Calculus;
 
 /// <summary>
-/// 计算向量值函数的雅可比矩阵。
+/// Computes the Jacobian matrix of a vector-valued function.
 /// </summary>
-/// <typeparam name="T">浮点类型</typeparam>
+/// <typeparam name="T">The floating-point type.</typeparam>
 public sealed class Jacobian<T> where T : struct, IFloatingPointIeee754<T>
 {
     private readonly VectorFieldFunction<T> _func;
@@ -23,32 +23,32 @@ public sealed class Jacobian<T> where T : struct, IFloatingPointIeee754<T>
     private int _inputDim;
 
     /// <summary>
-    /// 初始化 <see cref="Jacobian{T}"/> 实例。
+    /// Initializes a new instance of <see cref="Jacobian{T}"/>.
     /// </summary>
-    /// <param name="func">向量场函数，将结果写入 output</param>
-    /// <param name="outputDim">输出维度 m</param>
-    /// <param name="defaultH">默认差分步长</param>
+    /// <param name="func">The vector field function, which writes its result to output.</param>
+    /// <param name="outputDim">The output dimension m.</param>
+    /// <param name="defaultH">The default finite-difference step size.</param>
     public Jacobian(VectorFieldFunction<T> func, int outputDim, T defaultH)
     {
         _func = func ?? throw new ArgumentNullException(nameof(func));
-        if (outputDim < 1) throw new ArgumentException("输出维度必须大于等于 1", nameof(outputDim));
+        if (outputDim < 1) throw new ArgumentException("Output dimension must be greater than or equal to 1.", nameof(outputDim));
         _outputDim = outputDim;
         _defaultH = defaultH;
         _minH = T.CreateChecked(1e-15);
     }
 
     /// <summary>
-    /// 在指定点计算 m×n 雅可比矩阵，J[i,j] = ∂f_i/∂x_j。
+    /// Computes the m×n Jacobian matrix at the specified point, J[i,j] = ∂f_i/∂x_j.
     /// </summary>
     public Matrix<T> Calculate(Span<T> point, T? h = null, Derivative<T>.Method method = Derivative<T>.Method.Central) =>
         Calculate(point, h, method, null);
 
     /// <summary>
-    /// 在指定点计算雅可比；若提供 <paramref name="matrix"/> 则复用存储（维数须匹配）。
+    /// Computes the Jacobian at the specified point; if <paramref name="matrix"/> is provided, its storage is reused (dimensions must match).
     /// </summary>
     public Matrix<T> Calculate(Span<T> point, T? h, Derivative<T>.Method method, Matrix<T>? matrix)
     {
-        if (point.IsEmpty) throw new ArgumentException("输入点不能为空", nameof(point));
+        if (point.IsEmpty) throw new ArgumentException("Input point cannot be empty.", nameof(point));
 
         T step = ResolveStep(point, h);
         int n = point.Length;
@@ -71,7 +71,7 @@ public sealed class Jacobian<T> where T : struct, IFloatingPointIeee754<T>
         {
             T step = h.GetValueOrDefault();
             if (step <= _minH)
-                throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+                throw new ArgumentException($"Step size must be greater than {_minH}.", nameof(h));
             return step;
         }
 
@@ -86,7 +86,7 @@ public sealed class Jacobian<T> where T : struct, IFloatingPointIeee754<T>
         if (floor <= _minH)
             floor = T.Max(_defaultH, floor);
         if (floor <= _minH)
-            throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+            throw new ArgumentException($"Step size must be greater than {_minH}.", nameof(h));
         return floor;
     }
 

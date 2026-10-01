@@ -16,7 +16,7 @@ public static partial class VectorSpan
     {
         if (a.Length != b.Length)
         {
-            throw new ArgumentException("向量长度必须相同。", nameof(b));
+            throw new ArgumentException("Vector lengths must be the same.", nameof(b));
         }
 
         if (ComputingContextExecution.UseParallel(context, a.Length))
@@ -77,7 +77,7 @@ public static partial class VectorSpan
     {
         if (x.Length != y.Length)
         {
-            throw new ArgumentException("向量长度必须相同。", nameof(x));
+            throw new ArgumentException("Vector lengths must be the same.", nameof(x));
         }
 
         if (ComputingContextExecution.UseParallel(context, x.Length))
@@ -122,7 +122,7 @@ public static partial class VectorSpan
     {
         if (result.Length != vector.Length)
         {
-            throw new ArgumentException("结果向量长度必须与输入向量相同。", nameof(result));
+            throw new ArgumentException("Result vector length must match the input vector length.", nameof(result));
         }
 
         if (ComputingContextExecution.UseParallel(context, vector.Length))
@@ -144,12 +144,12 @@ public static partial class VectorSpan
     {
         if (a.Length != b.Length)
         {
-            throw new ArgumentException("向量长度必须相同。", nameof(b));
+            throw new ArgumentException("Vector lengths must be the same.", nameof(b));
         }
 
         if (result.Length != a.Length)
         {
-            throw new ArgumentException("结果向量长度必须与输入向量相同。", nameof(result));
+            throw new ArgumentException("Result vector length must match the input vector length.", nameof(result));
         }
     }
 

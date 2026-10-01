@@ -25,7 +25,7 @@ public sealed class Bisection<T> where T : struct, IFloatingPointIeee754<T>
     /// </summary>
     public T Solve(T a, T b, int maxIterations = 100, T? tolerance = null)
     {
-        if (maxIterations < 1) throw new ArgumentException("迭代次数必须大于等于 1", nameof(maxIterations));
+        if (maxIterations < 1) throw new ArgumentException("Iteration count must be greater than or equal to 1.", nameof(maxIterations));
         T tol = tolerance ?? T.CreateChecked(1e-10);
 
         T fa = _func(a);
@@ -33,7 +33,7 @@ public sealed class Bisection<T> where T : struct, IFloatingPointIeee754<T>
         if (fa == T.Zero) return a;
         if (fb == T.Zero) return b;
         if (fa * fb > T.Zero)
-            throw new ArgumentException("区间端点函数值必须异号", nameof(b));
+            throw new ArgumentException("The function values at the interval endpoints must have opposite signs.", nameof(b));
 
         T left = a;
         T right = b;

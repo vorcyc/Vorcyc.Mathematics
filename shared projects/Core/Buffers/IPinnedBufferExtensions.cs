@@ -108,9 +108,9 @@ public static class IPinnedBufferExtensions
             pinnedBuffer.ThrowIfDisposed();
             ArgumentNullException.ThrowIfNull(array);
             if (offset < 0 || offset >= array.Length)
-                throw new ArgumentOutOfRangeException(nameof(offset), "起始索引超出数组范围。");
+                throw new ArgumentOutOfRangeException(nameof(offset), "The starting index is out of range for the array.");
             if (length < 0 || offset + length > array.Length)
-                throw new ArgumentOutOfRangeException(nameof(length), "长度超出数组范围。");
+                throw new ArgumentOutOfRangeException(nameof(length), "The length is out of range for the array.");
             var minLength = Math.Min(pinnedBuffer.Length, length);
             array.AsSpan(offset, minLength).CopyTo(pinnedBuffer.Span);
         }
@@ -143,7 +143,7 @@ public static class IPinnedBufferExtensions
         {
             pinnedBuffer.ThrowIfDisposed();
             if (segment.Array is null || segment.Count == 0)
-                throw new ArgumentNullException(nameof(segment), "ArraySegment 的 Array 不能为空。");
+                throw new ArgumentNullException(nameof(segment), "The Array of the ArraySegment cannot be null or empty.");
             var minLength = Math.Min(pinnedBuffer.Length, segment.Count);
             segment.AsSpan(0, minLength).CopyTo(pinnedBuffer.Span);
         }
@@ -197,7 +197,7 @@ public static class IPinnedBufferExtensions
         {
             pinnedBuffer.ThrowIfDisposed();
             if (memory.IsEmpty)
-                throw new ArgumentNullException(nameof(memory), "Memory 不能为空。");
+                throw new ArgumentNullException(nameof(memory), "The Memory cannot be empty.");
             var minLength = Math.Min(pinnedBuffer.Length, memory.Length);
             memory.Slice(0, minLength).CopyTo(pinnedBuffer.Memory);
         }
@@ -236,9 +236,9 @@ public static class IPinnedBufferExtensions
             pinnedBuffer.ThrowIfDisposed();
             ArgumentNullException.ThrowIfNull(array);
             if (offset < 0 || offset >= array.Length)
-                throw new ArgumentOutOfRangeException(nameof(offset), "起始索引超出数组范围。");
+                throw new ArgumentOutOfRangeException(nameof(offset), "The starting index is out of range for the array.");
             if (length < 0 || offset + length > array.Length)
-                throw new ArgumentOutOfRangeException(nameof(length), "长度超出数组范围。");
+                throw new ArgumentOutOfRangeException(nameof(length), "The length is out of range for the array.");
 
             var minLength = Math.Min(pinnedBuffer.Length, length);
             pinnedBuffer.Span.Slice(0, minLength).CopyTo(array.AsSpan(offset, minLength));
@@ -268,7 +268,7 @@ public static class IPinnedBufferExtensions
         {
             pinnedBuffer.ThrowIfDisposed();
             if (memory.IsEmpty)
-                throw new ArgumentNullException(nameof(memory), "Memory 不能为空。");
+                throw new ArgumentNullException(nameof(memory), "The Memory cannot be empty.");
             var minLength = Math.Min(pinnedBuffer.Length, memory.Length);
             pinnedBuffer.Span.Slice(0, minLength).CopyTo(memory.Span);
         }
@@ -504,7 +504,7 @@ public static class IPinnedBufferFactoryExtensions
     public static POHBuffer<T> ToPohBuffer<T>(this ArraySegment<T> segment) where T : unmanaged, INumberBase<T>
     {
         if (segment.Array is null || segment.Count == 0)
-            throw new ArgumentNullException(nameof(segment), "ArraySegment 的 Array 不能为空。");
+            throw new ArgumentNullException(nameof(segment), "The Array of the ArraySegment cannot be null or empty.");
         return new POHBuffer<T>(segment);
     }
 
@@ -519,7 +519,7 @@ public static class IPinnedBufferFactoryExtensions
     /// </exception>
     public static POHBuffer<T> ToPohBuffer<T>(this ReadOnlyMemory<T> readOnlyMemory) where T : unmanaged, INumberBase<T>
     {
-        if (readOnlyMemory.Length == 0) throw new ArgumentNullException(nameof(readOnlyMemory), "ReadOnlyMemory 不能为空。");
+        if (readOnlyMemory.Length == 0) throw new ArgumentNullException(nameof(readOnlyMemory), "The ReadOnlyMemory cannot be empty.");
         return new POHBuffer<T>(readOnlyMemory);
     }
 
@@ -574,7 +574,7 @@ public static class IPinnedBufferFactoryExtensions
     public static NativeBuffer<T> ToNativeBuffer<T>(this ArraySegment<T> segment) where T : unmanaged, INumberBase<T>
     {
         if (segment.Array is null || segment.Count == 0)
-            throw new ArgumentNullException(nameof(segment), "ArraySegment 的 Array 不能为空。");
+            throw new ArgumentNullException(nameof(segment), "The Array of the ArraySegment cannot be null or empty.");
         return new NativeBuffer<T>(segment);
     }
 
@@ -589,7 +589,7 @@ public static class IPinnedBufferFactoryExtensions
     /// </exception>
     public static NativeBuffer<T> ToNativeBuffer<T>(this ReadOnlyMemory<T> readOnlyMemory) where T : unmanaged, INumberBase<T>
     {
-        if (readOnlyMemory.Length == 0) throw new ArgumentNullException(nameof(readOnlyMemory), "ReadOnlyMemory 不能为空。");
+        if (readOnlyMemory.Length == 0) throw new ArgumentNullException(nameof(readOnlyMemory), "The ReadOnlyMemory cannot be empty.");
         return new NativeBuffer<T>(readOnlyMemory);
     }
 

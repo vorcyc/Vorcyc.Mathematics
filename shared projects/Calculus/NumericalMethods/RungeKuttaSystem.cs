@@ -31,8 +31,8 @@ public sealed class RungeKuttaSystem<T> where T : struct, IFloatingPointIeee754<
 
     public T[] Solve(T x0, ReadOnlySpan<T> y0, T xEnd, int steps = 100, T? h = null)
     {
-        if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
-        if (y0.IsEmpty) throw new ArgumentException("初始状态不能为空", nameof(y0));
+        if (steps < 1) throw new ArgumentException("Step count must be greater than or equal to 1.", nameof(steps));
+        if (y0.IsEmpty) throw new ArgumentException("Initial state cannot be empty.", nameof(y0));
 
         var y = y0.ToArray();
         SolveInPlace(x0, y, xEnd, steps, h);
@@ -44,8 +44,8 @@ public sealed class RungeKuttaSystem<T> where T : struct, IFloatingPointIeee754<
     /// </summary>
     public void SolveInPlace(T x0, Span<T> y, T xEnd, int steps = 100, T? h = null)
     {
-        if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
-        if (y.IsEmpty) throw new ArgumentException("初始状态不能为空", nameof(y));
+        if (steps < 1) throw new ArgumentException("Step count must be greater than or equal to 1.", nameof(steps));
+        if (y.IsEmpty) throw new ArgumentException("Initial state cannot be empty.", nameof(y));
         if (x0 == xEnd) return;
 
         EnsureBuffers(y.Length);
@@ -70,8 +70,8 @@ public sealed class RungeKuttaSystem<T> where T : struct, IFloatingPointIeee754<
         OdeSystemEvent<T>? odeEvent = null,
         int maxPoints = 10_000)
     {
-        if (steps < 1) throw new ArgumentException("步数必须大于等于 1", nameof(steps));
-        if (y0.IsEmpty) throw new ArgumentException("初始状态不能为空", nameof(y0));
+        if (steps < 1) throw new ArgumentException("Step count must be greater than or equal to 1.", nameof(steps));
+        if (y0.IsEmpty) throw new ArgumentException("Initial state cannot be empty.", nameof(y0));
 
         int dim = y0.Length;
         int cap = Math.Min(maxPoints, steps + 1);
@@ -125,7 +125,7 @@ public sealed class RungeKuttaSystem<T> where T : struct, IFloatingPointIeee754<
     public void Step(T x, ReadOnlySpan<T> y, T h, Span<T> output)
     {
         if (y.Length != output.Length)
-            throw new ArgumentException("状态向量维数不匹配");
+            throw new ArgumentException("State vector dimensions do not match.");
 
         EnsureBuffers(y.Length);
         y.CopyTo(output);

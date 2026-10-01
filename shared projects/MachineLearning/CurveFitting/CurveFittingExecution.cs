@@ -1,7 +1,7 @@
 using System.Numerics;
-using System.Numerics.Tensors;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace Vorcyc.Mathematics.MachineLearning.CurveFitting;
 
@@ -81,12 +81,7 @@ internal static class CurveFittingExecution
             return T.Zero;
 
         if (useSimd && CanUseSimdHardware<T>())
-        {
-            if (typeof(T) == typeof(float))
-                return T.CreateTruncating(TensorPrimitives.Sum(MemoryMarshal.Cast<T, float>(values.Slice(start, count))));
-            if (typeof(T) == typeof(double))
-                return T.CreateTruncating(TensorPrimitives.Sum(MemoryMarshal.Cast<T, double>(values.Slice(start, count))));
-        }
+            return VectorSpan.Sum(values.Slice(start, count));
 
         T sum = T.Zero;
         for (int j = start; j <= end; j++)
@@ -105,22 +100,9 @@ internal static class CurveFittingExecution
 
         if (useSimd && CanUseSimdHardware<T>())
         {
-            if (typeof(T) == typeof(float))
-            {
-                var af = MemoryMarshal.Cast<T, float>(a);
-                var bf = MemoryMarshal.Cast<T, float>(b);
-                Span<float> diff = n <= 256 ? stackalloc float[n] : new float[n];
-                TensorPrimitives.Subtract(af, bf, diff);
-                return T.CreateTruncating(TensorPrimitives.SumOfSquares(diff) / n);
-            }
-            if (typeof(T) == typeof(double))
-            {
-                var ad = MemoryMarshal.Cast<T, double>(a);
-                var bd = MemoryMarshal.Cast<T, double>(b);
-                Span<double> diff = n <= 256 ? stackalloc double[n] : new double[n];
-                TensorPrimitives.Subtract(ad, bd, diff);
-                return T.CreateTruncating(TensorPrimitives.SumOfSquares(diff) / n);
-            }
+            Span<T> diff = n <= 256 ? stackalloc T[n] : new T[n];
+            VectorSpan.Subtract(a, b, diff);
+            return VectorSpan.Dot(diff, diff) / T.CreateChecked(n);
         }
 
         T mse = T.Zero;
@@ -201,9 +183,9 @@ internal static class CurveFittingExecution
             float d = x[j] - xRef;
             destination[j] = d * d * inv;
         }
-        TensorPrimitives.Negate(destination, destination);
-        TensorPrimitives.Exp(destination, destination);
-        TensorPrimitives.Multiply(destination, signalVariance, destination);
+        VectorSpan.Scale<float>(destination, -1f, destination);
+        VectorSpan.Exp<float>(destination, destination);
+        VectorSpan.Scale<float>(destination, signalVariance, destination);
     }
 
     private static void FillRbfKernelRowDouble(
@@ -225,9 +207,9 @@ internal static class CurveFittingExecution
             double d = x[j] - xRef;
             destination[j] = d * d * inv;
         }
-        TensorPrimitives.Negate(destination, destination);
-        TensorPrimitives.Exp(destination, destination);
-        TensorPrimitives.Multiply(destination, signalVariance, destination);
+        VectorSpan.Scale<double>(destination, -1.0, destination);
+        VectorSpan.Exp<double>(destination, destination);
+        VectorSpan.Scale<double>(destination, signalVariance, destination);
     }
 
     public static void AccumWeightedLinearSums<T>(

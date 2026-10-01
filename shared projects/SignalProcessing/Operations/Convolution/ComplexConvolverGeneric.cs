@@ -10,7 +10,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Operations.Convolution;
 /// Fast (FFT) complex convolver in <typeparamref name="T"/>.
 /// <see cref="float"/> matches <see cref="ComplexConvolver"/> on
 /// <see cref="ComplexDiscreteSignal{T}"/>; <see cref="double"/> uses <see cref="Fft64"/>.
-/// Existing <see cref="ComplexConvolver"/> / <see cref="ComplexDiscreteSignal"/> stay float.
+/// Existing <see cref="ComplexConvolver"/> / <see cref="ComplexDiscreteSignalFp32"/> stay float.
 /// </summary>
 public class ComplexConvolver<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>

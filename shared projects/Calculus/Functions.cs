@@ -24,24 +24,24 @@ public delegate T MultiVariableFunction<T>(ReadOnlySpan<T> args) where T : struc
 
 
 /// <summary>
-/// 表示微分方程 dy/dx = f(x,y) 的委托。
+/// Represents a delegate for the differential equation dy/dx = f(x,y).
 /// </summary>
-/// <param name="x">自变量 x</param>
-/// <param name="y">因变量 y</param>
-/// <returns>导数值 dy/dx</returns>
+/// <param name="x">The independent variable x.</param>
+/// <param name="y">The dependent variable y.</param>
+/// <returns>The derivative value dy/dx.</returns>
 public delegate T DifferentialFunction<T>(T x, T y) where T : struct, IFloatingPointIeee754<T>;
 
 /// <summary>
-/// 表示常微分方程组 dy/dx = f(x, y)，其中 y 为向量。
+/// Represents a system of ordinary differential equations dy/dx = f(x, y), where y is a vector.
 /// </summary>
-/// <param name="x">自变量</param>
-/// <param name="y">状态向量</param>
-/// <param name="dydx">输出导数向量，长度与 <paramref name="y"/> 相同</param>
+/// <param name="x">The independent variable.</param>
+/// <param name="y">The state vector.</param>
+/// <param name="dydx">The output derivative vector, with the same length as <paramref name="y"/>.</param>
 public delegate void OdeSystemFunction<T>(T x, ReadOnlySpan<T> y, Span<T> dydx) where T : struct, IFloatingPointIeee754<T>;
 
 /// <summary>
-/// 表示向量值函数 f: R^n → R^m，结果写入 <paramref name="output"/>。
+/// Represents a vector-valued function f: R^n → R^m, writing its result to <paramref name="output"/>.
 /// </summary>
-/// <param name="point">输入点</param>
-/// <param name="output">输出向量，长度为 m</param>
+/// <param name="point">The input point.</param>
+/// <param name="output">The output vector, with length m.</param>
 public delegate void VectorFieldFunction<T>(ReadOnlySpan<T> point, Span<T> output) where T : struct, IFloatingPointIeee754<T>;

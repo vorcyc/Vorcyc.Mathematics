@@ -32,16 +32,16 @@ public static class BasisTransformation
     public static T[] Transform<T>(T[] vector, Matrix<T> fromBasis, Matrix<T> toBasis) where T : struct, IFloatingPointIeee754<T>
     {
         if (fromBasis.Rows != fromBasis.Columns || toBasis.Rows != toBasis.Columns)
-            throw new ArgumentException("基矩阵必须是方阵。", nameof(fromBasis));
+            throw new ArgumentException("Basis matrices must be square.", nameof(fromBasis));
         if (fromBasis.Rows != vector.Length || toBasis.Rows != vector.Length)
-            throw new ArgumentException("基矩阵的维度必须与向量的长度匹配。", nameof(vector));
+            throw new ArgumentException("Basis matrix dimensions must match the vector length.", nameof(vector));
 
         int n = vector.Length;
 
         // 检查原基是否可逆
         T det = fromBasis.Determinant();
         if (T.Abs(det) < T.CreateChecked(1e-10))
-            throw new InvalidOperationException("原基矩阵不可逆，无法进行变换。");
+            throw new InvalidOperationException("The original basis matrix is not invertible; the transformation cannot be performed.");
 
         // 计算从原基到标准基的变换矩阵 (fromBasis⁻¹)
         var fromBasisInverse = fromBasis.Inverse();
@@ -78,9 +78,9 @@ public static class BasisTransformation
     public static T[] TransformWithLU<T>(T[] vector, Matrix<T> fromBasis, Matrix<T> toBasis) where T : struct, IFloatingPointIeee754<T>
     {
         if (fromBasis.Rows != fromBasis.Columns || toBasis.Rows != toBasis.Columns)
-            throw new ArgumentException("基矩阵必须是方阵。", nameof(fromBasis));
+            throw new ArgumentException("Basis matrices must be square.", nameof(fromBasis));
         if (fromBasis.Rows != vector.Length || toBasis.Rows != vector.Length)
-            throw new ArgumentException("基矩阵的维度必须与向量的长度匹配。", nameof(vector));
+            throw new ArgumentException("Basis matrix dimensions must match the vector length.", nameof(vector));
 
         int n = vector.Length;
 

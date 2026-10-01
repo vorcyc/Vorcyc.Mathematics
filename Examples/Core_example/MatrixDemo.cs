@@ -7,11 +7,11 @@ internal static class MatrixDemo
 {
     public static int Run()
     {
-        Console.WriteLine("--- 矩阵乘法 (Matrix.Multiply + ComputingContext) ---");
+        Console.WriteLine("--- 矩阵乘法 (MatrixFp32.Multiply + ComputingContext) ---");
 
         const int n = 32;
-        var a = new Matrix(n, n);
-        var b = new Matrix(n, n);
+        var a = new MatrixFp32(n, n);
+        var b = new MatrixFp32(n, n);
         for (var i = 0; i < n; i++)
         {
             for (var j = 0; j < n; j++)
@@ -22,7 +22,7 @@ internal static class MatrixDemo
         }
 
         var baseline = a * b;
-        var parallel = Matrix.Multiply(a, b, ComputingContext.Parallel);
+        var parallel = MatrixFp32.Multiply(a, b, ComputingContext.Parallel);
 
         float maxDiff = 0f;
         for (var i = 0; i < n; i++)
@@ -39,7 +39,7 @@ internal static class MatrixDemo
 
         using (ComputingScope.Enter(ComputingContext.Parallel))
         {
-            var scoped = Matrix.Multiply(a, b, context: null);
+            var scoped = MatrixFp32.Multiply(a, b, context: null);
             Console.WriteLine($"ComputingScope Parallel [0,0]: {scoped[0, 0]:F4}");
         }
 

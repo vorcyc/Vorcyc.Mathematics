@@ -137,7 +137,7 @@ public static class BitMathExtension
     /// <param name="x">Input value x.</param>
     /// <returns>Returns the previous power of 2 after the input value x.</returns>
     /// <remarks>
-    /// 来自于Accord.net framework
+    /// From the Accord.NET framework.
     /// </remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int PreviousPowerOf2(this int x)
@@ -497,7 +497,7 @@ public static class BitMathExtension
     }
     #region Odd Even
     /// <summary>
-    /// 判断是否是奇数
+    /// Determines whether the value is odd.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this long value)
@@ -506,7 +506,7 @@ public static class BitMathExtension
         return (value & 1L) == 1;
     }
     /// <summary>
-    /// 判断是否是奇数
+    /// Determines whether the value is odd.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this ulong value)
@@ -515,7 +515,7 @@ public static class BitMathExtension
         return (value & 1UL) == 1;
     }
     /// <summary>
-    /// 判断是否是奇数
+    /// Determines whether the value is odd.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this int value)
@@ -524,7 +524,7 @@ public static class BitMathExtension
         return (value & 1) == 1;
     }
     /// <summary>
-    /// 判断是否是奇数
+    /// Determines whether the value is odd.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOdd(this uint value)
@@ -534,7 +534,7 @@ public static class BitMathExtension
     }
 
     /// <summary>
-    /// 判断是否是偶数
+    /// Determines whether the value is even.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -550,7 +550,7 @@ public static class BitMathExtension
     }
 
     /// <summary>
-    /// 判断是否是偶数
+    /// Determines whether the value is even.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -566,7 +566,7 @@ public static class BitMathExtension
     }
 
     /// <summary>
-    /// 判断是否是偶数
+    /// Determines whether the value is even.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -582,7 +582,7 @@ public static class BitMathExtension
     }
 
     /// <summary>
-    /// 判断是否是偶数
+    /// Determines whether the value is even.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>

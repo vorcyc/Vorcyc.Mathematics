@@ -19,7 +19,7 @@ public sealed class OdeTrajectory<T> where T : struct, IFloatingPointIeee754<T>
         X = x ?? throw new ArgumentNullException(nameof(x));
         Y = y ?? throw new ArgumentNullException(nameof(y));
         if (X.Length != Y.Length)
-            throw new ArgumentException("轨迹 x/y 长度必须一致");
+            throw new ArgumentException("Trajectory x/y lengths must match.");
     }
 
     public int Count => X.Length;
@@ -35,9 +35,9 @@ public sealed class OdeSystemTrajectory<T> where T : struct, IFloatingPointIeee7
     {
         X = x ?? throw new ArgumentNullException(nameof(x));
         States = states ?? throw new ArgumentNullException(nameof(states));
-        if (States.Length == 0) throw new ArgumentException("状态维数必须大于 0", nameof(states));
+        if (States.Length == 0) throw new ArgumentException("State dimension must be greater than 0.", nameof(states));
         if (States[0].Length != X.Length)
-            throw new ArgumentException("轨迹长度必须一致");
+            throw new ArgumentException("Trajectory lengths must match.");
     }
 
     public int Dimension => States.Length;

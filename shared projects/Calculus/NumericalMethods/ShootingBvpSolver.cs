@@ -61,12 +61,12 @@ public sealed class ShootingBvpSolver<T> where T : struct, IFloatingPointIeee754
 
             T derivative = (_perturbed![0] - yEndValue) * _invSlopeStep;
             if (T.Abs(derivative) < _minJacobian)
-                throw new InvalidOperationException("打靶法雅可比接近奇异");
+                throw new InvalidOperationException("The shooting method Jacobian is near singular.");
 
             slope -= residual / derivative;
         }
 
-        throw new InvalidOperationException("打靶法未收敛");
+        throw new InvalidOperationException("The shooting method did not converge.");
     }
 
     private void EnsureBuffers()

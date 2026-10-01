@@ -36,7 +36,7 @@ public sealed class NewtonRaphson<T> where T : struct, IFloatingPointIeee754<T>
     /// <exception cref="InvalidOperationException">当导数为 0 或迭代未收敛时抛出</exception>
     public T Solve(T initialGuess, int maxIterations = 100, T? tolerance = null)
     {
-        if (maxIterations < 1) throw new ArgumentException("迭代次数必须大于等于 1", nameof(maxIterations));
+        if (maxIterations < 1) throw new ArgumentException("Iteration count must be greater than or equal to 1.", nameof(maxIterations));
         T tol = tolerance ?? T.CreateChecked(1e-10);
 
         T x = initialGuess;
@@ -46,7 +46,7 @@ public sealed class NewtonRaphson<T> where T : struct, IFloatingPointIeee754<T>
             T dfx = _derivative.Calculate(x);
 
             if (T.Abs(dfx) < _minDerivative)
-                throw new InvalidOperationException("导数接近 0，牛顿法无法继续");
+                throw new InvalidOperationException("The derivative is near zero; Newton's method cannot continue.");
 
             T dx = fx / dfx;
             if (T.Abs(dx) < tol)
@@ -55,6 +55,6 @@ public sealed class NewtonRaphson<T> where T : struct, IFloatingPointIeee754<T>
             x -= dx;
         }
 
-        throw new InvalidOperationException("牛顿法未在指定迭代次数内收敛");
+        throw new InvalidOperationException("Newton's method did not converge within the specified number of iterations.");
     }
 }

@@ -9,11 +9,11 @@ public static partial class Layers
     // In the current neural network only 2x upsampling is used so only it was implemented
 
     /// <summary>
-    /// 对输入张量执行二维上采样操作。
+    /// Performs a 2D upsampling operation on the input tensor.
     /// </summary>
-    /// <typeparam name="T">张量元素的类型，必须实现 <see cref="IBinaryFloatingPointIeee754{TSelf}"/> 接口。</typeparam>
-    /// <param name="input">输入的张量。</param>
-    /// <returns>上采样后的张量。</returns>
+    /// <typeparam name="T">The tensor element type, must implement <see cref="IBinaryFloatingPointIeee754{TSelf}"/>.</typeparam>
+    /// <param name="input">The input tensor.</param>
+    /// <returns>The upsampled tensor.</returns>
     public static Tensor<T> Upsample2D<T>(Tensor<T> input)
         where T : IBinaryFloatingPointIeee754<T>
     {
@@ -49,13 +49,13 @@ public static partial class Layers
 
 
     /// <summary>
-    /// 对输入张量执行二维上采样操作。
+    /// Performs a 2D upsampling operation on the input tensor.
     /// </summary>
-    /// <param name="input">输入的张量。</param>
-    /// <returns>上采样后的张量。</returns>
-    public static Tensor Upsample2D(Tensor input)
+    /// <param name="input">The input tensor.</param>
+    /// <returns>The upsampled tensor.</returns>
+    public static TensorFp32 Upsample2D(TensorFp32 input)
     {
-        var result = new Tensor(input.Width * 2, input.Height * 2, input.Depth);
+        var result = new TensorFp32(input.Width * 2, input.Height * 2, input.Depth);
 
         for (int d = 0; d < input.Depth; d++)
         {

@@ -67,7 +67,7 @@ public unsafe class POHBuffer<T> : IPinnedBuffer<T>
         : this(segment.Count)
     {
         if (segment.Array is null)
-            throw new ArgumentNullException(nameof(segment), "ArraySegment 的 Array 不能为空。");
+            throw new ArgumentNullException(nameof(segment), "The Array of the ArraySegment cannot be null.");
         segment.CopyTo(_buffer!);
     }
 
@@ -135,9 +135,9 @@ public unsafe class POHBuffer<T> : IPinnedBuffer<T>
         if (array is null)
             throw new ArgumentNullException(nameof(array));
         if ((uint)offset > (uint)array.Length)
-            throw new ArgumentOutOfRangeException(nameof(offset), "偏移量超出数组范围。");
+            throw new ArgumentOutOfRangeException(nameof(offset), "The offset is out of range for the array.");
         if (count < 0 || offset + count > array.Length)
-            throw new ArgumentOutOfRangeException(nameof(count), "计数超出数组范围。");
+            throw new ArgumentOutOfRangeException(nameof(count), "The count is out of range for the array.");
 
         InitCore(count);
         array.AsSpan(offset, count).CopyTo(_buffer);

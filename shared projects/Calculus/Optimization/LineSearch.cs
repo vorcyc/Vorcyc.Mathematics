@@ -46,9 +46,9 @@ public static class LineSearch
         int maxIterations = 40) where T : struct, IFloatingPointIeee754<T>
     {
         if (x.Length != direction.Length || x.Length != gradient.Length)
-            throw new ArgumentException("向量维数不匹配");
+            throw new ArgumentException("Vector dimensions do not match.");
         if (trial.Length < x.Length)
-            throw new ArgumentException("试探向量缓冲区长度不足", nameof(trial));
+            throw new ArgumentException("Trial vector buffer length is insufficient.", nameof(trial));
 
         c1 = c1 == T.Zero ? T.CreateChecked(1e-4) : c1;
         alpha0 = alpha0 == T.Zero ? T.One : alpha0;

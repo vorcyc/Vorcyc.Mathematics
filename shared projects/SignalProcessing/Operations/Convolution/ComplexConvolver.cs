@@ -18,7 +18,7 @@ public class ComplexConvolver
     /// <summary>
     /// Does fast convolution of <paramref name="signal"/> with <paramref name="kernel"/> via FFT. 
     /// </summary>
-    public ComplexDiscreteSignal Convolve(ComplexDiscreteSignal signal, ComplexDiscreteSignal kernel, int fftSize = 0)
+    public ComplexDiscreteSignalFp32 Convolve(ComplexDiscreteSignalFp32 signal, ComplexDiscreteSignalFp32 kernel, int fftSize = 0)
     {
         var length = signal.Length + kernel.Length - 1;
 
@@ -55,13 +55,13 @@ public class ComplexConvolver
 
         // 4) return resulting meaningful part of the signal (truncate size to N + M - 1)
 
-        return new ComplexDiscreteSignal(signal.SamplingRate, spectrum.Real, spectrum.Imag).First(length);
+        return new ComplexDiscreteSignalFp32(signal.SamplingRate, spectrum.Real, spectrum.Imag).First(length);
     }
 
     /// <summary>
     /// Does fast cross-correlation between <paramref name="signal"/> and <paramref name="kernel"/> via FFT. 
     /// </summary>
-    public ComplexDiscreteSignal CrossCorrelate(ComplexDiscreteSignal signal, ComplexDiscreteSignal kernel, int fftSize = 0)
+    public ComplexDiscreteSignalFp32 CrossCorrelate(ComplexDiscreteSignalFp32 signal, ComplexDiscreteSignalFp32 kernel, int fftSize = 0)
     {
         var reversedReal = new float[kernel.Length];
         var reversedImag = new float[kernel.Length];
@@ -71,13 +71,13 @@ public class ComplexConvolver
             reversedImag[i] = kernel.Imag[kernel.Length - 1 - i];
         }
 
-        return Convolve(signal, new ComplexDiscreteSignal(kernel.SamplingRate, reversedReal, reversedImag), fftSize);
+        return Convolve(signal, new ComplexDiscreteSignalFp32(kernel.SamplingRate, reversedReal, reversedImag), fftSize);
     }
 
     /// <summary>
     /// Does fast deconvolution of <paramref name="signal"/> from <paramref name="kernel"/> via polynomial division and FFT.
     /// </summary>
-    public ComplexDiscreteSignal Deconvolve(ComplexDiscreteSignal signal, ComplexDiscreteSignal kernel, int fftSize = 0)
+    public ComplexDiscreteSignalFp32 Deconvolve(ComplexDiscreteSignalFp32 signal, ComplexDiscreteSignalFp32 kernel, int fftSize = 0)
     {
         // first, try to divide polynomials
 
@@ -89,7 +89,7 @@ public class ComplexConvolver
         if (remainder.All(d => MathF.Abs(d.Real) < 1e-10f) &&
             remainder.All(d => MathF.Abs(d.Imaginary) < 1e-10f))
         {
-            return new ComplexDiscreteSignal(signal.SamplingRate,
+            return new ComplexDiscreteSignalFp32(signal.SamplingRate,
                                              quotient.Select(q => q.Real),
                                              quotient.Select(q => q.Imaginary));
         }
@@ -131,7 +131,7 @@ public class ComplexConvolver
 
         // 4) return resulting meaningful part of the signal (truncate to N - M + 1)
 
-        return new ComplexDiscreteSignal(signal.SamplingRate,
+        return new ComplexDiscreteSignalFp32(signal.SamplingRate,
                                          spectrum.Real.FastCopyFragment(length),
                                          spectrum.Imag.FastCopyFragment(length));
     }

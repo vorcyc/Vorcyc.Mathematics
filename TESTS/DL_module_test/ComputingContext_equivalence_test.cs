@@ -333,7 +333,7 @@ internal static class ComputingContext_equivalence_test
     private static bool LegacyConv2DForwardMatches()
     {
         var input = MakeLegacyTensor(16, 16, 4);
-        var filters = new Tensor[3];
+        var filters = new TensorFp32[3];
         for (int i = 0; i < filters.Length; i++)
         {
             filters[i] = MakeLegacyTensor(3, 3, 4);
@@ -343,7 +343,7 @@ internal static class ComputingContext_equivalence_test
         var bias = MakeLegacyTensor(1, 1, 3);
         FillPattern(bias.Values, 0.02f);
 
-        Tensor normal, parallel;
+        TensorFp32 normal, parallel;
         using (ComputingScope.Enter(ComputingContext.Normal))
             normal = Layers.Conv2D(input, filters, bias);
         using (ComputingScope.Enter(ComputingContext.Parallel))
@@ -354,7 +354,7 @@ internal static class ComputingContext_equivalence_test
     private static bool LegacyReLUForwardMatches()
     {
         var input = MakeLegacyTensor(8, 8, 6);
-        Tensor normal, parallel;
+        TensorFp32 normal, parallel;
         using (ComputingScope.Enter(ComputingContext.Normal))
             normal = Layers.ReLU(input);
         using (ComputingScope.Enter(ComputingContext.Parallel))
@@ -365,7 +365,7 @@ internal static class ComputingContext_equivalence_test
     private static bool LegacyDenseForwardMatches()
     {
         var input = MakeLegacyTensor(4, 4, 3);
-        var weights = new Tensor[2];
+        var weights = new TensorFp32[2];
         weights[0] = MakeLegacyTensor(1, 1, 3 * 4 * 4);
         weights[1] = MakeLegacyTensor(1, 1, 3 * 4 * 4);
         FillPattern(weights[0].Values, 0.01f);
@@ -373,7 +373,7 @@ internal static class ComputingContext_equivalence_test
         var bias = MakeLegacyTensor(1, 1, 2);
         FillPattern(bias.Values, 0.03f);
 
-        Tensor normal, parallel;
+        TensorFp32 normal, parallel;
         using (ComputingScope.Enter(ComputingContext.Normal))
             normal = Layers.Dense(input, weights, bias);
         using (ComputingScope.Enter(ComputingContext.Parallel))
@@ -384,7 +384,7 @@ internal static class ComputingContext_equivalence_test
     private static bool LegacyMaxPoolForwardMatches()
     {
         var input = MakeLegacyTensor(8, 8, 4);
-        Tensor normal, parallel;
+        TensorFp32 normal, parallel;
         using (ComputingScope.Enter(ComputingContext.Normal))
             normal = Layers.MaxPool2D(input);
         using (ComputingScope.Enter(ComputingContext.Parallel))
@@ -404,7 +404,7 @@ internal static class ComputingContext_equivalence_test
         FillPattern(shift.Values, 0.01f);
         FillPattern(scale.Values, 1.1f);
 
-        Tensor normal, parallel;
+        TensorFp32 normal, parallel;
         using (ComputingScope.Enter(ComputingContext.Normal))
             normal = Layers.BatchNorm(input, mean, variance, shift, scale);
         using (ComputingScope.Enter(ComputingContext.Parallel))
@@ -705,9 +705,9 @@ internal static class ComputingContext_equivalence_test
         return t;
     }
 
-    private static Tensor MakeLegacyTensor(int width, int height, int depth)
+    private static TensorFp32 MakeLegacyTensor(int width, int height, int depth)
     {
-        var t = new Tensor(width, height, depth);
+        var t = new TensorFp32(width, height, depth);
         FillPattern(t.Values, 0.03f);
         return t;
     }

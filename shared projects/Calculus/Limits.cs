@@ -48,9 +48,9 @@ public sealed class Limits<T> where T : struct, IFloatingPointIeee754<T>
     /// </summary>
     public T CalculateLimit(T a, Direction direction = Direction.Both, int maxSteps = 100, T? tolerance = null, T? h = null)
     {
-        if (maxSteps < 1) throw new ArgumentException("迭代步数必须大于等于 1", nameof(maxSteps));
+        if (maxSteps < 1) throw new ArgumentException("Iteration step count must be greater than or equal to 1.", nameof(maxSteps));
         T step = h ?? _defaultH;
-        if (step <= _minH) throw new ArgumentException($"步长必须大于 {_minH}", nameof(h));
+        if (step <= _minH) throw new ArgumentException($"Step size must be greater than {_minH}.", nameof(h));
         T tol = tolerance ?? T.CreateChecked(1e-10);
 
         return direction switch
@@ -58,7 +58,7 @@ public sealed class Limits<T> where T : struct, IFloatingPointIeee754<T>
             Direction.Left => CalculateOneSidedLimit(a, step, maxSteps, tol, fromLeft: true),
             Direction.Right => CalculateOneSidedLimit(a, step, maxSteps, tol, fromLeft: false),
             Direction.Both => CalculateBothLimit(a, step, maxSteps, tol),
-            _ => throw new ArgumentException("不支持的趋近方向")
+            _ => throw new ArgumentException("Unsupported approach direction.")
         };
     }
 
@@ -126,7 +126,7 @@ public sealed class Limits<T> where T : struct, IFloatingPointIeee754<T>
         if (T.Abs(leftLimit - rightLimit) < tolerance * scale)
             return (leftLimit + rightLimit) * _half;
 
-        throw new ArgumentException("双侧极限不相等，极限不存在");
+        throw new ArgumentException("The left and right limits are not equal; the limit does not exist.");
     }
 
     /// <summary>

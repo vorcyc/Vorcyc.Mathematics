@@ -22,7 +22,7 @@ internal static class ComputingContext_assert
         return maxDiff <= tol;
     }
 
-    public static bool TensorsClose(Vorcyc.Mathematics.LinearAlgebra.Tensor a, Vorcyc.Mathematics.LinearAlgebra.Tensor b, float tol, out float maxDiff)
+    public static bool TensorsClose(Vorcyc.Mathematics.LinearAlgebra.TensorFp32 a, Vorcyc.Mathematics.LinearAlgebra.TensorFp32 b, float tol, out float maxDiff)
     {
         maxDiff = 0f;
         if (a.Width != b.Width || a.Height != b.Height || a.Depth != b.Depth)

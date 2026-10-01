@@ -177,8 +177,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
 
             // 3) return TF with normalized coefficients
 
-            var tf = new TransferFunction(new ComplexDiscreteSignal(1, zre, zim),
-                                          new ComplexDiscreteSignal(1, pre, pim));
+            var tf = new TransferFunction(new ComplexDiscreteSignalFp32(1, zre, zim),
+                                          new ComplexDiscreteSignalFp32(1, pre, pim));
             tf.NormalizeAt(0);
 
             return tf;
@@ -243,8 +243,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
 
             // 3) return TF with normalized coefficients
 
-            var tf = new TransferFunction(new ComplexDiscreteSignal(1, zre, zim),
-                                          new ComplexDiscreteSignal(1, pre, pim));
+            var tf = new TransferFunction(new ComplexDiscreteSignalFp32(1, zre, zim),
+                                          new ComplexDiscreteSignalFp32(1, pre, pim));
             tf.NormalizeAt(ConstantsFp32.PI);
 
             return tf;
@@ -334,8 +334,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
 
             // 3) return TF with normalized coefficients
 
-            var tf = new TransferFunction(new ComplexDiscreteSignal(1, zre, zim),
-                                          new ComplexDiscreteSignal(1, pre, pim));
+            var tf = new TransferFunction(new ComplexDiscreteSignalFp32(1, zre, zim),
+                                          new ComplexDiscreteSignalFp32(1, pre, pim));
             tf.NormalizeAt(centerFreq);
 
             return tf;
@@ -434,8 +434,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
 
             // 3) return TF with normalized coefficients
 
-            var tf = new TransferFunction(new ComplexDiscreteSignal(1, zre, zim),
-                                          new ComplexDiscreteSignal(1, pre, pim));
+            var tf = new TransferFunction(new ComplexDiscreteSignalFp32(1, zre, zim),
+                                          new ComplexDiscreteSignalFp32(1, pre, pim));
             tf.NormalizeAt(0);
 
             return tf;

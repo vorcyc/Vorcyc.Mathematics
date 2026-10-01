@@ -28,7 +28,7 @@ public class ComplexDiscreteSignal<T>
     public int Length => Real.Length;
     /// <summary>
     /// The most efficient constructor for initializing complex discrete signals. 
-    /// By default, it just wraps <see cref="ComplexDiscreteSignal"/> 
+    /// By default, it just wraps <see cref="ComplexDiscreteSignalFp32"/> 
     /// around arrays <paramref name="real"/> and <paramref name="imag"/> (without copying).
     /// If a new memory should be allocated for signal data, set <paramref name="allocateNew"/> to true.
     /// </summary>

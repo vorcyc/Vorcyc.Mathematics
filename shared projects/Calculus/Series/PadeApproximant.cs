@@ -64,9 +64,9 @@ public sealed class PadeApproximant<T> where T : struct, IFloatingPointIeee754<T
     /// </summary>
     public PadeApproximant(ReadOnlySpan<T> taylorCoefficients, int m, int n, PadeWorkspace<T>? workspace)
     {
-        if (m < 0 || n < 0) throw new ArgumentException("m、n 必须非负");
+        if (m < 0 || n < 0) throw new ArgumentException("m and n must be non-negative.");
         if (taylorCoefficients.Length < m + n + 1)
-            throw new ArgumentException("泰勒系数数量不足");
+            throw new ArgumentException("Insufficient number of Taylor coefficients.");
 
         _pCoeffs = new T[m + 1];
         _qCoeffs = new T[n + 1];
