@@ -1,6 +1,5 @@
 using System.Drawing;
 using Emgu.CV;
-using Emgu.CV.Structure;
 using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace Colorization_example.Vision;
@@ -11,37 +10,28 @@ internal static class ColorNetIo
 
   public static (Tensor<float> original, Tensor<float> inputTensor224) Preprocess(Mat image)
   {
-    using var rgbImage = image.ToImage<Rgb, byte>();
-    var data = rgbImage.Data;
-    var original = new Tensor<float>(image.Cols, image.Rows, 1);
+    using var bgr8 = MatPixels.ToBgr8(image);
+    var bgr = MatPixels.ReadBgr(bgr8);
+    var original = new Tensor<float>(bgr8.Cols, bgr8.Rows, 1);
 
-    for (int y = 0; y < rgbImage.Height; y++)
+    for (int y = 0; y < bgr8.Rows; y++)
     {
-      for (int x = 0; x < rgbImage.Width; x++)
+      for (int x = 0; x < bgr8.Cols; x++)
       {
-        float b = data[y, x, 2] / 255f;
-        float g = data[y, x, 1] / 255f;
-        float r = data[y, x, 0] / 255f;
-        float yValue = 0.299f * r + 0.587f * g + 0.114f * b;
-        original[x, y, 0] = yValue - LumaOffset;
+        original[x, y, 0] = Luma(bgr, (y * bgr8.Cols + x) * 3) - LumaOffset;
       }
     }
 
     using var resized = new Mat();
-    CvInvoke.Resize(image, resized, new Size(224, 224));
-    using var resizedRgb = resized.ToImage<Rgb, byte>();
-    var resizedData = resizedRgb.Data;
+    CvInvoke.Resize(bgr8, resized, new Size(224, 224));
+    var resizedBgr = MatPixels.ReadBgr(resized);
     var inputTensor224 = new Tensor<float>(224, 224, 1);
 
-    for (int y = 0; y < resizedRgb.Height; y++)
+    for (int y = 0; y < 224; y++)
     {
-      for (int x = 0; x < resizedRgb.Width; x++)
+      for (int x = 0; x < 224; x++)
       {
-        float b = resizedData[y, x, 2] / 255f;
-        float g = resizedData[y, x, 1] / 255f;
-        float r = resizedData[y, x, 0] / 255f;
-        float yValue = 0.299f * r + 0.587f * g + 0.114f * b;
-        inputTensor224[x, y, 0] = yValue - LumaOffset;
+        inputTensor224[x, y, 0] = Luma(resizedBgr, (y * 224 + x) * 3) - LumaOffset;
       }
     }
 
@@ -52,7 +42,7 @@ internal static class ColorNetIo
   {
     int width = Math.Min(luma.Width, chromaUv.Width);
     int height = Math.Min(luma.Height, chromaUv.Height);
-    using var image = new Image<Bgr, byte>(width, height);
+    var bgr = new byte[width * height * 3];
 
     for (int y = 0; y < height; y++)
     {
@@ -66,15 +56,18 @@ internal static class ColorNetIo
           out float g,
           out float b);
 
-        image[y, x] = new Bgr(
-          Math.Clamp(b, 0f, 255f),
-          Math.Clamp(g, 0f, 255f),
-          Math.Clamp(r, 0f, 255f));
+        int i = (y * width + x) * 3;
+        bgr[i] = MatPixels.ToByte(b);
+        bgr[i + 1] = MatPixels.ToByte(g);
+        bgr[i + 2] = MatPixels.ToByte(r);
       }
     }
 
-    return image.Mat.Clone();
+    return MatPixels.CreateBgr(width, height, bgr);
   }
+
+  private static float Luma(byte[] bgr, int index)
+    => 0.299f * (bgr[index + 2] / 255f) + 0.587f * (bgr[index + 1] / 255f) + 0.114f * (bgr[index] / 255f);
 
   private static void LabToRgb(float l, float a, float b, out float r, out float g, out float blue)
   {

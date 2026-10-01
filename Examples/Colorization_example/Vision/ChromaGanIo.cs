@@ -1,6 +1,5 @@
 using System.Drawing;
 using Emgu.CV;
-using Emgu.CV.Structure;
 using Vorcyc.Mathematics.LinearAlgebra;
 
 namespace Colorization_example.Vision;
@@ -9,19 +8,18 @@ internal static class ChromaGanIo
 {
   public static Tensor<float> Preprocess(Mat image)
   {
+    using var bgr8 = MatPixels.ToBgr8(image);
     using var resized = new Mat();
-    CvInvoke.Resize(image, resized, new Size(224, 224));
-    using var bgrImage = resized.ToImage<Bgr, byte>();
+    CvInvoke.Resize(bgr8, resized, new Size(224, 224));
+    var bgr = MatPixels.ReadBgr(resized);
 
     var tensor = new Tensor<float>(224, 224, 3);
-    for (int y = 0; y < bgrImage.Height; y++)
+    for (int y = 0; y < 224; y++)
     {
-      for (int x = 0; x < bgrImage.Width; x++)
+      for (int x = 0; x < 224; x++)
       {
-        byte b = bgrImage.Data[y, x, 0];
-        byte g = bgrImage.Data[y, x, 1];
-        byte r = bgrImage.Data[y, x, 2];
-        float l = RgbToL(r, g, b) / 100f;
+        int i = (y * 224 + x) * 3;
+        float l = RgbToL(bgr[i + 2], bgr[i + 1], bgr[i]) / 100f;
         tensor[x, y, 0] = l;
         tensor[x, y, 1] = l;
         tensor[x, y, 2] = l;
@@ -33,17 +31,21 @@ internal static class ChromaGanIo
 
   public static Mat Deprocess(Mat original, Tensor<float> chromaAb)
   {
+    int abWidth = chromaAb.Width;
+    int abHeight = chromaAb.Height;
+    using var originalBgr = MatPixels.ToBgr8(original);
     using var resized = new Mat();
-    CvInvoke.Resize(original, resized, new Size(chromaAb.Width, chromaAb.Height));
-    using var imageAbSource = resized.ToImage<Bgr, byte>();
+    CvInvoke.Resize(originalBgr, resized, new Size(abWidth, abHeight));
+    var ab = MatPixels.ReadBgr(resized);
 
-    for (int y = 0; y < imageAbSource.Height; y++)
+    for (int y = 0; y < abHeight; y++)
     {
-      for (int x = 0; x < imageAbSource.Width; x++)
+      for (int x = 0; x < abWidth; x++)
       {
-        float r = imageAbSource.Data[y, x, 2];
-        float g = imageAbSource.Data[y, x, 1];
-        float b = imageAbSource.Data[y, x, 0];
+        int i = (y * abWidth + x) * 3;
+        float r = ab[i + 2];
+        float g = ab[i + 1];
+        float b = ab[i];
 
         LabToRgb(
           RgbToL((byte)r, (byte)g, (byte)b),
@@ -53,44 +55,39 @@ internal static class ChromaGanIo
           ref g,
           ref b);
 
-        imageAbSource[y, x] = new Bgr(
-          Math.Clamp(b, 0f, 255f),
-          Math.Clamp(g, 0f, 255f),
-          Math.Clamp(r, 0f, 255f));
+        ab[i] = MatPixels.ToByte(b);
+        ab[i + 1] = MatPixels.ToByte(g);
+        ab[i + 2] = MatPixels.ToByte(r);
       }
     }
 
+    using var abSmall = MatPixels.CreateBgr(abWidth, abHeight, ab);
     using var upscaled = new Mat();
-    CvInvoke.Resize(imageAbSource, upscaled, original.Size);
-    using var imageAbResized = upscaled.ToImage<Bgr, byte>();
-    using var imageL = original.ToImage<Bgr, byte>();
+    CvInvoke.Resize(abSmall, upscaled, originalBgr.Size);
+    var abResized = MatPixels.ReadBgr(upscaled);
+    var contentBgr = MatPixels.ReadBgr(originalBgr);
 
-    for (int y = 0; y < original.Height; y++)
+    int width = originalBgr.Cols;
+    int height = originalBgr.Rows;
+    for (int y = 0; y < height; y++)
     {
-      for (int x = 0; x < original.Width; x++)
+      for (int x = 0; x < width; x++)
       {
-        float rAb = imageAbResized.Data[y, x, 2];
-        float gAb = imageAbResized.Data[y, x, 1];
-        float bAb = imageAbResized.Data[y, x, 0];
-        RgbToLab(rAb, gAb, bAb, out _, out float colorA, out float colorB);
-
-        byte rL = imageL.Data[y, x, 2];
-        byte gL = imageL.Data[y, x, 1];
-        byte bL = imageL.Data[y, x, 0];
-        float contentL = RgbToL(rL, gL, bL);
+        int i = (y * width + x) * 3;
+        RgbToLab(abResized[i + 2], abResized[i + 1], abResized[i], out _, out float colorA, out float colorB);
+        float contentL = RgbToL(contentBgr[i + 2], contentBgr[i + 1], contentBgr[i]);
 
         float r = 0f;
         float g = 0f;
         float b = 0f;
         LabToRgb(contentL, colorA, colorB, ref r, ref g, ref b);
-        imageAbResized[y, x] = new Bgr(
-          Math.Clamp(b, 0f, 255f),
-          Math.Clamp(g, 0f, 255f),
-          Math.Clamp(r, 0f, 255f));
+        abResized[i] = MatPixels.ToByte(b);
+        abResized[i + 1] = MatPixels.ToByte(g);
+        abResized[i + 2] = MatPixels.ToByte(r);
       }
     }
 
-    return imageAbResized.Mat.Clone();
+    return MatPixels.CreateBgr(width, height, abResized);
   }
 
   private static float RgbToL(byte r, byte g, byte b)

@@ -75,7 +75,7 @@ public sealed class ColorizationEnhancer : IDisposable
       throw new FileNotFoundException("Input image was not found.", imagePath);
     }
 
-    using var image = CvInvoke.Imread(imagePath, ImreadModes.Color);
+    using var image = CvInvoke.Imread(imagePath, ImreadModes.ColorBgr);
     if (image.IsEmpty)
     {
       throw new InvalidDataException($"Failed to read image: {imagePath}");
