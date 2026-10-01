@@ -34,7 +34,8 @@ public static class PrototypeElliptic
         {
             kp *= Sne((2 * i + 1.0) / order, k1_landen);
         }
-        kp = ComplexFp32.Pow(k1 * k1, order / 2) * ComplexFp32.Pow(kp, 4);
+        // Degree equation: k' = k1'^N * prod(sn^4). The exponent is N, not 2 * floor(N / 2), which differs for odd orders.
+        kp = ComplexFp32.Pow(k1, order) * ComplexFp32.Pow(kp, 4);
 
         var k = MathF.Sqrt(1 - ComplexFp32.Abs(kp) * ComplexFp32.Abs(kp));
         var k_landen = Landen(k);
@@ -76,7 +77,8 @@ public static class PrototypeElliptic
         {
             kp *= Sne((2 * i + 1.0) / order, k1_landen);
         }
-        kp = Complex.Pow(k1 * k1, order / 2) * Complex.Pow(kp, 4);
+        // Degree equation: k' = k1'^N * prod(sn^4). The exponent is N, not 2 * floor(N / 2), which differs for odd orders.
+        kp = Complex.Pow(k1, order) * Complex.Pow(kp, 4);
 
         var k = Math.Sqrt(1 - Complex.Abs(kp) * Complex.Abs(kp));
         var k_landen = Landen(k);
@@ -87,9 +89,7 @@ public static class PrototypeElliptic
         {
             var w = (2 * i + 1.0) / order;
 
-            var d = (k * Cde(w, k_landen)).Real;
-            // Order 1 degenerates to k == 0 (no finite zero): a huge finite zero keeps the bilinear transform finite (it maps to z = -1).
-            zeros[i] = new Complex(0, d == 0 ? -1e16 : -1 / d);
+            zeros[i] = new Complex(0, -1 / (k * Cde(w, k_landen)).Real);
         }
 
         return zeros;
@@ -119,7 +119,8 @@ public static class PrototypeElliptic
         {
             kp *= Sne((2 * i + 1.0) / order, k1_landen);
         }
-        kp = ComplexFp32.Pow(k1 * k1, order / 2) * ComplexFp32.Pow(kp, 4);
+        // Degree equation: k' = k1'^N * prod(sn^4). The exponent is N, not 2 * floor(N / 2), which differs for odd orders.
+        kp = ComplexFp32.Pow(k1, order) * ComplexFp32.Pow(kp, 4);
 
         var k = MathF.Sqrt(1 - ComplexFp32.Abs(kp) * ComplexFp32.Abs(kp));
         var k_landen = Landen(k);
@@ -130,9 +131,7 @@ public static class PrototypeElliptic
         {
             var w = (2 * i + 1.0) / order;
 
-            var d = (k * Cde(w, k_landen)).Real;
-            // Order 1 degenerates to k == 0 (no finite zero): a huge finite zero keeps the bilinear transform finite (it maps to z = -1).
-            zeros[i] = new ComplexFp32(0, d == 0 ? -1e8f : -1 / d);
+            zeros[i] = new ComplexFp32(0, -1 / (k * Cde(w, k_landen)).Real);
         }
 
         return zeros;
@@ -143,7 +142,7 @@ public static class PrototypeElliptic
     /// </summary>
     /// <param name="k">K</param>
     /// <param name="iterCount">Number of iterations</param>
-    public static double[] Landen(double k, int iterCount = 5)
+    public static double[] Landen(double k, int iterCount = 12)
     {
         var coeffs = new double[iterCount];
 
@@ -162,7 +161,7 @@ public static class PrototypeElliptic
     /// </summary>
     /// <param name="k">K</param>
     /// <param name="iterCount">Number of iterations</param>
-    public static float[] Landen(float k, int iterCount = 5)
+    public static float[] Landen(float k, int iterCount = 12)
     {
         var coeffs = new float[iterCount];
 
@@ -252,7 +251,7 @@ public static class PrototypeElliptic
     /// <param name="x">X</param>
     /// <param name="k">K</param>
     /// <param name="iterCount">Number of iterations</param>
-    public static Complex Asne(Complex x, double k, int iterCount = 5)
+    public static Complex Asne(Complex x, double k, int iterCount = 12)
     {
         for (var i = 1; i <= iterCount; i++)
         {
@@ -274,7 +273,7 @@ public static class PrototypeElliptic
     /// <param name="x">X</param>
     /// <param name="k">K</param>
     /// <param name="iterCount">Number of iterations</param>
-    public static ComplexFp32 Asne(ComplexFp32 x, float k, int iterCount = 5)
+    public static ComplexFp32 Asne(ComplexFp32 x, float k, int iterCount = 12)
     {
         for (var i = 1; i <= iterCount; i++)
         {
@@ -309,7 +308,8 @@ public static class PrototypeElliptic
         var kp = Complex<T>.One;
         for (var i = 0; i < order / 2; i++)
             kp *= SneT(T.CreateChecked(2 * i + 1) / T.CreateChecked(order), k1Landen);
-        kp = Complex<T>.Pow(new Complex<T>(k1 * k1, T.Zero), T.CreateChecked(order / 2)) * Complex<T>.Pow(kp, T.CreateChecked(4));
+        // Degree equation: k' = k1'^N * prod(sn^4). The exponent is N, not 2 * floor(N / 2), which differs for odd orders.
+        kp = Complex<T>.Pow(new Complex<T>(k1, T.Zero), T.CreateChecked(order)) * Complex<T>.Pow(kp, T.CreateChecked(4));
 
         var k = T.Sqrt(T.One - Complex<T>.Abs(kp) * Complex<T>.Abs(kp));
         var kLanden = LandenT(k);
@@ -344,7 +344,8 @@ public static class PrototypeElliptic
         var kp = Complex<T>.One;
         for (var i = 0; i < order / 2; i++)
             kp *= SneT(T.CreateChecked(2 * i + 1) / T.CreateChecked(order), k1Landen);
-        kp = Complex<T>.Pow(new Complex<T>(k1 * k1, T.Zero), T.CreateChecked(order / 2)) * Complex<T>.Pow(kp, T.CreateChecked(4));
+        // Degree equation: k' = k1'^N * prod(sn^4). The exponent is N, not 2 * floor(N / 2), which differs for odd orders.
+        kp = Complex<T>.Pow(new Complex<T>(k1, T.Zero), T.CreateChecked(order)) * Complex<T>.Pow(kp, T.CreateChecked(4));
 
         var k = T.Sqrt(T.One - Complex<T>.Abs(kp) * Complex<T>.Abs(kp));
         var kLanden = LandenT(k);
@@ -353,9 +354,7 @@ public static class PrototypeElliptic
         for (var i = 0; i < order; i++)
         {
             var w = T.CreateChecked(2 * i + 1) / T.CreateChecked(order);
-            var d = (k * CdeT(new Complex<T>(w, T.Zero), kLanden)).Real;
-            // Order 1 degenerates to k == 0 (no finite zero): a huge finite zero keeps the bilinear transform finite (it maps to z = -1).
-            zeros[i] = new Complex<T>(T.Zero, d == T.Zero ? -T.CreateTruncating(1e16) : -T.One / d);
+            zeros[i] = new Complex<T>(T.Zero, -T.One / (k * CdeT(new Complex<T>(w, T.Zero), kLanden)).Real);
         }
         return zeros;
     }
@@ -363,7 +362,7 @@ public static class PrototypeElliptic
     /// <summary>
     /// Landen sequence in <typeparamref name="T"/>.
     /// </summary>
-    public static T[] LandenT<T>(T k, int iterCount = 5)
+    public static T[] LandenT<T>(T k, int iterCount = 12)
         where T : IFloatingPointIeee754<T>
     {
         var coeffs = new T[iterCount];
@@ -403,7 +402,7 @@ public static class PrototypeElliptic
     /// <summary>
     /// Inverse Jacobi elliptic sn.
     /// </summary>
-    public static Complex<T> AsneT<T>(Complex<T> x, T k, int iterCount = 5)
+    public static Complex<T> AsneT<T>(Complex<T> x, T k, int iterCount = 12)
         where T : struct, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
         for (var i = 1; i <= iterCount; i++)

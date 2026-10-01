@@ -13,7 +13,7 @@ namespace SP_module_test;
 
 /// <summary>
 /// 0.10.23 audit regressions: Goertzel bin, IirCombPeak gain, window length 1 / Gaussian symmetry,
-/// Chebyshev-II stopband attenuation, order-1 Elliptic, Ols block convolver with a long kernel.
+/// Chebyshev-II stopband attenuation, odd-order / order-1 Elliptic, Ols block convolver with a long kernel.
 /// </summary>
 internal static class Audit_023_test
 {
@@ -29,6 +29,7 @@ internal static class Audit_023_test
         AssertWindows();
         AssertChebyshevIIAttenuation();
         AssertEllipticOrderOne();
+        AssertEllipticOddOrders();
         AssertOlsLongKernel();
 
         if (_failures != 0)
@@ -155,7 +156,31 @@ internal static class Audit_023_test
             double w = Math.PI * i / 100.0;
             worst = Math.Max(worst, Math.Abs(Mag(lp.Numerator.ToArray(), lp.Denominator.ToArray(), w) - Mag(c1.Numerator.ToArray(), c1.Denominator.ToArray(), w)));
         }
-        Expect("Elliptic order 1 equals Chebyshev-I order 1", worst < 1e-3, $"maxΔ={worst:E2}");
+        Expect("Elliptic order 1 equals Chebyshev-I order 1", worst < 1e-9, $"maxΔ={worst:E2}");
+    }
+
+    static void AssertEllipticOddOrders()
+    {
+        // Odd orders used k1'^(N-1) instead of k1'^N in the degree equation (poles/zeros off by ~1e-5); references are SciPy ellip(n, 0.5, 30, 0.4).
+        var refs = new (int Order, double[] B, double[] A)[]
+        {
+            (3, [1.0, 1.8595752396792766, 1.8595752396792766, 1.0],
+                [1.0, -0.7218913832099707, 0.7425347899205814, -0.200328672834914]),
+            (5, [1.0, 0.8970828954937006, 1.8122122134635532, 1.8122122134635532, 0.8970828954937006, 1.0],
+                [1.0, -1.7027961843845656, 2.4422702913939665, -1.789577147895106, 0.9492389695703285, -0.22947433121754077]),
+        };
+        foreach (var (order, b, a) in refs)
+        {
+            var tf = new Ellip.LowPassFilter64(0.2, order, 0.5, 30).Tf;
+            var tb = tf.Numerator.ToArray();
+            var ta = tf.Denominator.ToArray();
+            double worst = 0;
+            for (int i = 0; i < Math.Min(a.Length, ta.Length); i++)
+                worst = Math.Max(worst, Math.Abs(ta[i] - a[i]));
+            for (int i = 0; i < Math.Min(b.Length, tb.Length); i++)
+                worst = Math.Max(worst, Math.Abs(tb[i] / tb[0] - b[i]));
+            Expect($"Elliptic LP order {order} matches SciPy", tb.Length == b.Length && ta.Length == a.Length && worst < 1e-9, $"maxΔ={worst:E2}");
+        }
     }
 
     static void AssertOlsLongKernel()
