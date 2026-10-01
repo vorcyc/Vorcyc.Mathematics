@@ -4,7 +4,7 @@
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**版本：** 0.10.22 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
+**版本：** 0.10.23 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
 
 [English readme](README.md)
 
@@ -67,7 +67,7 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 
 ## 扩展包
 
-**FFTW 扩展**（`Vorcyc.Mathematics.Extensions.FFTW`，0.10.22）— 基于 FFTW 本地库的高性能 DFT 封装（版本与主包对齐；FFTW API 无变更）。  
+**FFTW 扩展**（`Vorcyc.Mathematics.Extensions.FFTW`，0.10.23）— 基于 FFTW 本地库的高性能 DFT 封装（版本与主包对齐；FFTW API 无变更）。  
 → [wiki/wiki_hans/Module_Extensions_FFTW_zh.md](wiki/wiki_hans/Module_Extensions_FFTW_zh.md)
 
 ---

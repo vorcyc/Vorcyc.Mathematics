@@ -4,7 +4,7 @@ High-performance **.NET 10** math library: SIMD/parallel CPU numerics, signal pr
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**Version:** 0.10.22 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
+**Version:** 0.10.23 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
 
 [中文](readme_zh.md)
 
@@ -60,7 +60,7 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 
 ## Extension packages
 
-**FFTW** (`Vorcyc.Mathematics.Extensions.FFTW`, 0.10.22) — native FFTW bindings for high-performance DFTs (package version aligned; no FFTW API change).  
+**FFTW** (`Vorcyc.Mathematics.Extensions.FFTW`, 0.10.23) — native FFTW bindings for high-performance DFTs (package version aligned; no FFTW API change).  
 → [wiki/wiki_en/Module_Extensions_FFTW.md](wiki/wiki_en/Module_Extensions_FFTW.md)
 
 ---

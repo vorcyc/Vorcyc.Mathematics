@@ -16,7 +16,7 @@ public class RealFft : IComplexTransform
     /// <summary>
     /// Gets FFT size.
     /// </summary>
-    public int Size => _fftSize * 2;
+    public int Size => _fftSize == 0 ? 1 : _fftSize * 2;
 
     /// <summary>
     /// Half of FFT size (for calculations).
@@ -127,6 +127,14 @@ public class RealFft : IComplexTransform
     /// <param name="context">Optional execution policy.</param>
     public void Direct(ReadOnlySpan<float> input, Span<float> re, Span<float> im, ComputingContext? context = null)
     {
+        if (_fftSize == 0)
+        {
+            // Size == 1 base case: a single real sample is its own (real) DC coefficient.
+            re[0] = input[0];
+            im[0] = 0f;
+            return;
+        }
+
         // do half-size complex FFT:
 
         for (int i = 0, k = 0; i < _fftSize; i++)
@@ -190,6 +198,13 @@ public class RealFft : IComplexTransform
     /// <param name="context">Optional execution policy.</param>
     public void Inverse(ReadOnlySpan<float> re, ReadOnlySpan<float> im, Span<float> output, ComputingContext? context = null)
     {
+        if (_fftSize == 0)
+        {
+            // Size == 1 base case: the single DC coefficient reconstructs the one real sample.
+            output[0] = re[0];
+            return;
+        }
+
         // do the first step:
 
         for (var k = 0; k < _fftSize; k++)
@@ -249,6 +264,13 @@ public class RealFft : IComplexTransform
     /// <param name="context">Optional execution policy.</param>
     public void InverseNorm(ReadOnlySpan<float> re, ReadOnlySpan<float> im, Span<float> output, ComputingContext? context = null)
     {
+        if (_fftSize == 0)
+        {
+            // Size == 1 base case: the single DC coefficient reconstructs the one real sample.
+            output[0] = re[0];
+            return;
+        }
+
         // do the first step:
 
         for (var k = 0; k < _fftSize; k++)
