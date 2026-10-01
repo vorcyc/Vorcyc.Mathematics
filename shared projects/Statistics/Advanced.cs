@@ -66,6 +66,10 @@ public static partial class Advanced
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Percentile<T>(this Span<T> sequence, double percentile) where T : IFloatingPointIeee754<T>
     {
+        if (sequence.IsEmpty)
+            throw new ArgumentException("Sequence cannot be empty.", nameof(sequence));
+        if (!(percentile >= 0d && percentile <= 1d))
+            throw new ArgumentOutOfRangeException(nameof(percentile), "Percentile must be between 0 and 1.");
         sequence.Sort();
         int N = sequence.Length;
         double n = (N - 1) * percentile + 1;

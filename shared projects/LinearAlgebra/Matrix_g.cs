@@ -481,7 +481,7 @@ public class Matrix<T> : ICloneable<Matrix<T>>
         Q = new Matrix<T>(m, m);
         R = new Matrix<T>(m, n);
         var A = _values.ToArray();
-        for (int k = 0; k < n; k++)
+        for (int k = 0; k < Math.Min(m, n); k++) // wide matrices (m < n) only have m orthonormal columns in Q
         {
             T norm = T.Zero;
             for (int i = 0; i < m; i++)

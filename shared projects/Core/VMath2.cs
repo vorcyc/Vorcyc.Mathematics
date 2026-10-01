@@ -65,6 +65,8 @@ public static partial class VMath
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void InterpolateLinear(float[] x, ReadOnlySpan<float> y, float[] arg, float[] interp)
     {
+        if (x.Length < 2 || y.Length < x.Length)
+            throw new ArgumentException("Linear interpolation needs at least two knots, and y must be at least as long as x.");
         var left = 0;
         var right = 1;
         for (var i = 0; i < arg.Length; i++)
@@ -282,6 +284,11 @@ public static partial class VMath
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float FindNth(float[] a, int n, int start, int end)
     {
+        ArgumentNullException.ThrowIfNull(a);
+        if ((uint)start >= (uint)a.Length || (uint)end >= (uint)a.Length || start > end)
+            throw new ArgumentOutOfRangeException(nameof(start), "start/end must describe a non-empty range inside the array.");
+        if (n < start || n > end)
+            throw new ArgumentOutOfRangeException(nameof(n), "n must lie within [start, end]; otherwise the search never terminates.");
         while (true)
         {
             // ============== Partitioning =============
@@ -330,6 +337,8 @@ public static partial class VMath
     public static T FindNth<T>(Span<T> span, int n)
         where T : INumber<T>
     {
+        if ((uint)n >= (uint)span.Length)
+            throw new ArgumentOutOfRangeException(nameof(n), "n must be in [0, span.Length - 1]; otherwise the search never terminates.");
         int start = 0;
         int end = span.Length - 1;
         while (true)

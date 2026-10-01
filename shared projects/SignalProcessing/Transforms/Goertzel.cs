@@ -44,7 +44,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             var c = Complex.FromPolarCoordinates(1, 2 * Math.PI * n / _fftSize);
 
             c *= s;
-            c -= s1;
+            c -= s2; // X[k] = e^{jw} * s[N-1] - s[N-2]; s1 == s here, s2 holds s[N-2]
 
             return c;
         }
@@ -78,7 +78,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Transforms
             var c = ComplexFp32.FromPolarCoordinates(1, 2 * ConstantsFp32.PI * n / _fftSize);
 
             c *= s;
-            c -= s1;
+            c -= s2;
 
             return c;
         }

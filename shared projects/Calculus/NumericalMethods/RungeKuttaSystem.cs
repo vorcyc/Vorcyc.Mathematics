@@ -49,7 +49,7 @@ public sealed class RungeKuttaSystem<T> where T : struct, IFloatingPointIeee754<
         if (x0 == xEnd) return;
 
         EnsureBuffers(y.Length);
-        T step = h ?? (xEnd - x0) / T.CreateChecked(steps);
+        T step = NumericalStep.ResolveStep(x0, xEnd, steps, h);
         T x = x0;
         bool forward = xEnd > x0;
         T endTol = T.CreateChecked(1e-14);
@@ -95,7 +95,7 @@ public sealed class RungeKuttaSystem<T> where T : struct, IFloatingPointIeee754<
         if (odeEvent != null && odeEvent(x0, y))
             return TrimTrajectory(xs, states, dim, count);
 
-        T step = h ?? (xEnd - x0) / T.CreateChecked(steps);
+        T step = NumericalStep.ResolveStep(x0, xEnd, steps, h);
         T x = x0;
         bool forward = xEnd > x0;
         T endTol = T.CreateChecked(1e-14);

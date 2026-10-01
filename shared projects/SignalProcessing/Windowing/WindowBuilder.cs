@@ -102,6 +102,7 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] Hamming(int length)
     {
+        if (length == 1) return [1f];
         var n = 2 * Math.PI / (length - 1);
         return Enumerable.Range(0, length)
                          .Select(i => 0.54 - 0.46 * Math.Cos(i * n))
@@ -124,6 +125,7 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] Blackman(int length)
     {
+        if (length == 1) return [1f];
         var n = 2 * Math.PI / (length - 1);
         return Enumerable.Range(0, length)
                          .Select(i => 0.42 - 0.5 * Math.Cos(i * n) + 0.08 * Math.Cos(2 * i * n))
@@ -146,6 +148,7 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] Hann(int length)
     {
+        if (length == 1) return [1f];
         var n = 2 * Math.PI / (length - 1);
         return Enumerable.Range(0, length)
                          .Select(i => 0.5 * (1 - Math.Cos(i * n)))
@@ -168,7 +171,8 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] Gaussian(int length)
     {
-        var n = (length - 1) / 2;
+        if (length == 1) return [1f];
+        var n = (length - 1) / 2.0; // real-valued center; integer division made even-length windows asymmetric
         return Enumerable.Range(0, length)
                          .Select(i => Math.Exp(-0.5 * Math.Pow((i - n) / (0.4 * n), 2)))
                          .ToFloats();
@@ -182,6 +186,7 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] Kaiser(int length, double alpha = 12.0)
     {
+        if (length == 1) return [1f];
         var n = 2.0 / (length - 1);
         return Enumerable.Range(0, length)
                          .Select(i => I0(alpha * Math.Sqrt(1 - (i * n - 1) * (i * n - 1))) / I0(alpha))
@@ -223,6 +228,7 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] BartlettHann(int length)
     {
+        if (length == 1) return [1f];
         var n = 1.0 / (length - 1);
         return Enumerable.Range(0, length)
                          .Select(i => 0.62 - 0.48 * Math.Abs(i * n - 0.5) - 0.38 * Math.Cos(2 * Math.PI * i * n))
@@ -236,6 +242,7 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] Lanczos(int length)
     {
+        if (length == 1) return [1f];
         var n = 2.0 / (length - 1);
         return Enumerable.Range(0, length)
                          .Select(i => Sinc(i * n - 1))
@@ -263,6 +270,7 @@ public static class WindowBuilder
     /// <returns>Array of window coefficients.</returns>
     public static float[] Flattop(int length)
     {
+        if (length == 1) return [1f];
         var n = 2 * Math.PI / (length - 1);
         return Enumerable.Range(0, length)
                          .Select(i => 0.216 - 0.417 * Math.Cos(i * n) + 0.278 * Math.Cos(2 * i * n) - 0.084 * Math.Cos(3 * i * n) + 0.007 * Math.Cos(4 * i * n))

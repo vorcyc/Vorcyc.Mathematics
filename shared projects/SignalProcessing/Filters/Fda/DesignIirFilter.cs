@@ -105,10 +105,10 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
             var den = new float[N + 1];
 
             num[0] = beta / (1 + beta);
-            num[num.Length - 1] = -beta / (1 + beta);
+            num[num.Length - 1] = beta / (1 + beta);
 
             den[0] = 1;
-            den[den.Length - 1] = (1 - beta) / (1 + beta);
+            den[den.Length - 1] = -(1 - beta) / (1 + beta);
 
             return new TransferFunction(num, den);
         }

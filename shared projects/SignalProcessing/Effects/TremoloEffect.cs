@@ -66,14 +66,16 @@ namespace Vorcyc.Mathematics.SignalProcessing.Effects
         }
 
         /// <summary>
-        /// Constructs <see cref="TremoloEffect"/> with deferred sampling rate initialization from custom LFO.
-        /// Call <see cref="SetSamplingRate"/> before using.
+        /// Constructs <see cref="TremoloEffect"/> from a custom LFO. The effect is usable immediately
+        /// because a custom LFO carries its own sampling rate; <see cref="SetSamplingRate"/> only
+        /// re-targets a <see cref="CosineOscillator"/> LFO.
         /// </summary>
         /// <param name="lfo">LFO signal generator</param>
         /// <param name="depth">Depth</param>
         public TremoloEffect(ISampleGenerator lfo, float depth = 0.5f)
         {
             _customLfo = lfo;
+            Lfo = lfo;
             Depth = depth;
             _useCustomLfo = true;
         }

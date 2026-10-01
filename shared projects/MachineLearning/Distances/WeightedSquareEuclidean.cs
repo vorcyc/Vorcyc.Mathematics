@@ -48,11 +48,14 @@ public class WeightedSquareEuclidean<TSelf>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TSelf Distance(TSelf[] x, TSelf[] y)
     {
+        var w = _weights; // unset => documented default of all ones
+        if (w != null && w.Length < x.Length)
+            throw new ArgumentException("Weights has fewer elements than the point has dimensions.", nameof(x));
         TSelf sum = TSelf.Zero;
         for (int i = 0; i < x.Length; i++)
         {
             TSelf u = x[i] - y[i];
-            sum += u * u * _weights[i];
+            sum += w == null ? u * u : u * u * w[i];
         }
         return sum;
     }

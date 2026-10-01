@@ -72,9 +72,9 @@ public static partial class DesignFilter
         var num = new T[n + 1];
         var den = new T[n + 1];
         num[0] = beta / (T.One + beta);
-        num[^1] = -beta / (T.One + beta);
+        num[^1] = beta / (T.One + beta);
         den[0] = T.One;
-        den[^1] = (T.One - beta) / (T.One + beta);
+        den[^1] = -(T.One - beta) / (T.One + beta);
         return new TransferFunction<T>(num, den);
     }
 

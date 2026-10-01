@@ -28,7 +28,7 @@ public sealed class ImplicitEuler<T> where T : struct, IFloatingPointIeee754<T>
         if (steps < 1) throw new ArgumentException("Step count must be greater than or equal to 1.", nameof(steps));
         if (x0 == xEnd) return y0;
 
-        T step = h ?? (xEnd - x0) / T.CreateChecked(steps);
+        T step = NumericalStep.ResolveStep(x0, xEnd, steps, h);
         T x = x0;
         T y = y0;
         bool forward = xEnd > x0;

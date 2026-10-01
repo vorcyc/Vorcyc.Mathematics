@@ -19,10 +19,13 @@ internal static class ClassificationTraining_test
             new(TensorUtilities.FromVector(0.8f, 0.9f), TensorUtilities.OneHot<float>(2, 1)),
         };
 
+        // Seeded weight initialization: with an unseeded RNG roughly 10% of random inits
+        // (dead ReLU units) fail to separate the classes, making this test flaky.
+        var rng = new Random(42);
         var model = new Sequential<float>(
-            new FullyConnectedLayer<float>(2, 4),
+            new FullyConnectedLayer<float>(2, 4, null, rng),
             new ReLUActivation<float>(),
-            new FullyConnectedLayer<float>(4, 2));
+            new FullyConnectedLayer<float>(4, 2, null, rng));
 
         var trainer = new Trainer<float>();
         var loss = new CategoricalCrossEntropyLoss<float>();

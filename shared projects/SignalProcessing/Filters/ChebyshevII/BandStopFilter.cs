@@ -19,7 +19,7 @@ public class BandStopFilter : ZiFilter
     public float FrequencyHigh { get; private set; }
 
     /// <summary>
-    /// Gets ripple (in dB).
+    /// Gets stopband attenuation (in dB).
     /// </summary>
     public float Ripple { get; private set; }
 
@@ -35,8 +35,8 @@ public class BandStopFilter : ZiFilter
     /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
     /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
     /// <param name="order">Filter order</param>
-    /// <param name="ripple">Ripple (in dB)</param>
-    public BandStopFilter(float frequencyLow, float frequencyHigh, int order, float ripple = 0.1f)
+    /// <param name="ripple">Stopband attenuation (in dB)</param>
+    public BandStopFilter(float frequencyLow, float frequencyHigh, int order, float ripple = 20f)
         : base(MakeTf(frequencyLow, frequencyHigh, order, ripple))
     {
         FrequencyLow = frequencyLow;
@@ -50,8 +50,8 @@ public class BandStopFilter : ZiFilter
     /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
     /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
     /// <param name="order">Filter order</param>
-    /// <param name="ripple">Ripple (in dB)</param>
-    private static TransferFunction MakeTf(float frequencyLow, float frequencyHigh, int order, float ripple = 0.1f)
+    /// <param name="ripple">Stopband attenuation (in dB)</param>
+    private static TransferFunction MakeTf(float frequencyLow, float frequencyHigh, int order, float ripple = 20f)
     {
         return DesignFilter.IirBsTf(frequencyLow,
                                     frequencyHigh,
@@ -64,8 +64,8 @@ public class BandStopFilter : ZiFilter
     /// </summary>
     /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
     /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
-    /// <param name="ripple">Ripple (in dB)</param>
-    public void Change(float frequencyLow, float frequencyHigh, float ripple = 0.1f)
+    /// <param name="ripple">Stopband attenuation (in dB)</param>
+    public void Change(float frequencyLow, float frequencyHigh, float ripple = 20f)
     {
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;

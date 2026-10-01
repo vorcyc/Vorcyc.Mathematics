@@ -365,6 +365,7 @@ public class MatrixFp32 : ICloneable<MatrixFp32>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private float CalculateDeterminant(Span<float> values, int n)
     {
+        if (n == 0) return 1f; // determinant of the empty (0x0) matrix is the multiplicative identity
         if (n == 1) return values[0];
         if (n == 2) return values[0] * values[3] - values[1] * values[2];
 
@@ -507,7 +508,7 @@ public class MatrixFp32 : ICloneable<MatrixFp32>
         R = new MatrixFp32(m, n);
 
         var A = _values.ToArray();
-        for (int k = 0; k < n; k++)
+        for (int k = 0; k < Math.Min(m, n); k++) // wide matrices (m < n) only have m orthonormal columns in Q
         {
             float norm = 0;
             for (int i = 0; i < m; i++)

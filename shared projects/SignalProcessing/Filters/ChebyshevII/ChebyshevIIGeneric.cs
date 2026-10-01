@@ -13,16 +13,16 @@ public class LowPassFilter<T> : ZiFilter<T>
     public int Order => _a.Length - 1;
 
     public LowPassFilter(T frequency, int order, T? ripple = null)
-        : base(MakeTf(frequency, order, ripple ?? T.CreateChecked(0.1)))
+        : base(MakeTf(frequency, order, ripple ?? T.CreateChecked(20)))
     {
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
     }
 
     public void Change(T frequency, T? ripple = null)
     {
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
         Change(MakeTf(frequency, _a.Length - 1, Ripple));
     }
 
@@ -32,7 +32,7 @@ public class LowPassFilter<T> : ZiFilter<T>
 
 public sealed class LowPassFilter64 : LowPassFilter<double>
 {
-    public LowPassFilter64(double frequency, int order, double ripple = 0.1) : base(frequency, order, ripple) { }
+    public LowPassFilter64(double frequency, int order, double ripple = 20) : base(frequency, order, ripple) { }
 }
 
 /// <summary>Highpass Chebyshev-II in <typeparamref name="T"/>.</summary>
@@ -44,16 +44,16 @@ public class HighPassFilter<T> : ZiFilter<T>
     public int Order => _a.Length - 1;
 
     public HighPassFilter(T frequency, int order, T? ripple = null)
-        : base(MakeTf(frequency, order, ripple ?? T.CreateChecked(0.1)))
+        : base(MakeTf(frequency, order, ripple ?? T.CreateChecked(20)))
     {
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
     }
 
     public void Change(T frequency, T? ripple = null)
     {
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
         Change(MakeTf(frequency, _a.Length - 1, Ripple));
     }
 
@@ -63,7 +63,7 @@ public class HighPassFilter<T> : ZiFilter<T>
 
 public sealed class HighPassFilter64 : HighPassFilter<double>
 {
-    public HighPassFilter64(double frequency, int order, double ripple = 0.1) : base(frequency, order, ripple) { }
+    public HighPassFilter64(double frequency, int order, double ripple = 20) : base(frequency, order, ripple) { }
 }
 
 /// <summary>Bandpass Chebyshev-II in <typeparamref name="T"/>.</summary>
@@ -76,18 +76,18 @@ public class BandPassFilter<T> : ZiFilter<T>
     public int Order => (_a.Length - 1) / 2;
 
     public BandPassFilter(T frequencyLow, T frequencyHigh, int order, T? ripple = null)
-        : base(MakeTf(frequencyLow, frequencyHigh, order, ripple ?? T.CreateChecked(0.1)))
+        : base(MakeTf(frequencyLow, frequencyHigh, order, ripple ?? T.CreateChecked(20)))
     {
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
     }
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripple = null)
     {
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
         Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, Ripple));
     }
 
@@ -98,7 +98,7 @@ public class BandPassFilter<T> : ZiFilter<T>
 
 public sealed class BandPassFilter64 : BandPassFilter<double>
 {
-    public BandPassFilter64(double frequencyLow, double frequencyHigh, int order, double ripple = 0.1)
+    public BandPassFilter64(double frequencyLow, double frequencyHigh, int order, double ripple = 20)
         : base(frequencyLow, frequencyHigh, order, ripple) { }
 }
 
@@ -112,18 +112,18 @@ public class BandStopFilter<T> : ZiFilter<T>
     public int Order => (_a.Length - 1) / 2;
 
     public BandStopFilter(T frequencyLow, T frequencyHigh, int order, T? ripple = null)
-        : base(MakeTf(frequencyLow, frequencyHigh, order, ripple ?? T.CreateChecked(0.1)))
+        : base(MakeTf(frequencyLow, frequencyHigh, order, ripple ?? T.CreateChecked(20)))
     {
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
     }
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripple = null)
     {
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(0.1);
+        Ripple = ripple ?? T.CreateChecked(20);
         Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, Ripple));
     }
 
@@ -134,6 +134,6 @@ public class BandStopFilter<T> : ZiFilter<T>
 
 public sealed class BandStopFilter64 : BandStopFilter<double>
 {
-    public BandStopFilter64(double frequencyLow, double frequencyHigh, int order, double ripple = 0.1)
+    public BandStopFilter64(double frequencyLow, double frequencyHigh, int order, double ripple = 20)
         : base(frequencyLow, frequencyHigh, order, ripple) { }
 }

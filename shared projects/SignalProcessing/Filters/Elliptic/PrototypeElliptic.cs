@@ -87,7 +87,9 @@ public static class PrototypeElliptic
         {
             var w = (2 * i + 1.0) / order;
 
-            zeros[i] = new Complex(0, -1 / (k * Cde(w, k_landen)).Real);
+            var d = (k * Cde(w, k_landen)).Real;
+            // Order 1 degenerates to k == 0 (no finite zero): a huge finite zero keeps the bilinear transform finite (it maps to z = -1).
+            zeros[i] = new Complex(0, d == 0 ? -1e16 : -1 / d);
         }
 
         return zeros;
@@ -128,7 +130,9 @@ public static class PrototypeElliptic
         {
             var w = (2 * i + 1.0) / order;
 
-            zeros[i] = new ComplexFp32(0, -1 / (k * Cde(w, k_landen)).Real);
+            var d = (k * Cde(w, k_landen)).Real;
+            // Order 1 degenerates to k == 0 (no finite zero): a huge finite zero keeps the bilinear transform finite (it maps to z = -1).
+            zeros[i] = new ComplexFp32(0, d == 0 ? -1e8f : -1 / d);
         }
 
         return zeros;
@@ -349,7 +353,9 @@ public static class PrototypeElliptic
         for (var i = 0; i < order; i++)
         {
             var w = T.CreateChecked(2 * i + 1) / T.CreateChecked(order);
-            zeros[i] = new Complex<T>(T.Zero, -T.One / (k * CdeT(new Complex<T>(w, T.Zero), kLanden)).Real);
+            var d = (k * CdeT(new Complex<T>(w, T.Zero), kLanden)).Real;
+            // Order 1 degenerates to k == 0 (no finite zero): a huge finite zero keeps the bilinear transform finite (it maps to z = -1).
+            zeros[i] = new Complex<T>(T.Zero, d == T.Zero ? -T.CreateTruncating(1e16) : -T.One / d);
         }
         return zeros;
     }

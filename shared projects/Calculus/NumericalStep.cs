@@ -47,6 +47,21 @@ internal static class NumericalStep
     }
 
     /// <summary>
+    /// Resolves the fixed integration step: <c>(xEnd - x0) / steps</c> when <paramref name="h"/> is not given.
+    /// A user-supplied step contributes only its magnitude; its sign always follows the integration direction,
+    /// because a step opposing the direction (or a zero step) would never reach <paramref name="xEnd"/>.
+    /// </summary>
+    public static T ResolveStep<T>(T x0, T xEnd, int steps, T? h) where T : struct, IFloatingPointIeee754<T>
+    {
+        if (!h.HasValue)
+            return (xEnd - x0) / T.CreateChecked(steps);
+        var magnitude = T.Abs(h.Value);
+        if (!(magnitude > T.Zero) || !T.IsFinite(magnitude))
+            throw new ArgumentException("Step size must be a finite, non-zero value.", nameof(h));
+        return xEnd >= x0 ? magnitude : -magnitude;
+    }
+
+    /// <summary>
     /// 对中心差分一阶导数做 Richardson 外推：R = (4·D(h/2) − D(h)) / 3。
     /// </summary>
     public static T RichardsonFirstOrder<T>(T x, SingleVariableFunction<T> func, T h) where T : struct, IFloatingPointIeee754<T>

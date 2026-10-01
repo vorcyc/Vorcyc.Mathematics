@@ -23,4 +23,8 @@ Conv_019_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 Tf_020_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
+Audit_023_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Audit_023_core_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
 Console.WriteLine("SP_module_test done.");

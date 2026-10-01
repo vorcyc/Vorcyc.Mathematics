@@ -14,7 +14,7 @@ public class LowPassFilter : ZiFilter
     public float Frequency { get; private set; }
 
     /// <summary>
-    /// Gets ripple (in dB).
+    /// Gets stopband attenuation (in dB).
     /// </summary>
     public float Ripple { get; private set; }
 
@@ -28,8 +28,8 @@ public class LowPassFilter : ZiFilter
     /// </summary>
     /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
     /// <param name="order">Filter order</param>
-    /// <param name="ripple">Ripple (in dB)</param>
-    public LowPassFilter(float frequency, int order, float ripple = 0.1f) : base(MakeTf(frequency, order, ripple))
+    /// <param name="ripple">Stopband attenuation (in dB)</param>
+    public LowPassFilter(float frequency, int order, float ripple = 20f) : base(MakeTf(frequency, order, ripple))
     {
         Frequency = frequency;
         Ripple = ripple;
@@ -40,8 +40,8 @@ public class LowPassFilter : ZiFilter
     /// </summary>
     /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
     /// <param name="order">Filter order</param>
-    /// <param name="ripple">Ripple (in dB)</param>
-    private static TransferFunction MakeTf(float frequency, int order, float ripple = 0.1f)
+    /// <param name="ripple">Stopband attenuation (in dB)</param>
+    private static TransferFunction MakeTf(float frequency, int order, float ripple = 20f)
     {
         return DesignFilter.IirLpTf(frequency, PrototypeChebyshevII.Poles(order, ripple), PrototypeChebyshevII.Zeros(order));
     }
@@ -50,8 +50,8 @@ public class LowPassFilter : ZiFilter
     /// Changes filter coefficients online (preserving the state of the filter).
     /// </summary>
     /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
-    /// <param name="ripple">Ripple (in dB)</param>
-    public void Change(float frequency, float ripple = 0.1f)
+    /// <param name="ripple">Stopband attenuation (in dB)</param>
+    public void Change(float frequency, float ripple = 20f)
     {
         Frequency = frequency;
         Ripple = ripple;

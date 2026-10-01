@@ -10,13 +10,18 @@ public static class PrototypeChebyshevII
 {
     /// <summary>
     /// Evaluates analog poles of Chebyshev-II filter of given <paramref name="order"/>.
+    /// The prototype follows the MATLAB / SciPy <c>cheb2ap</c> convention: the stopband edge is at 1 rad/s
+    /// and the stopband gain stays at or below <c>-ripple</c> dB.
     /// </summary>
     /// <param name="order">Filter order</param>
-    /// <param name="ripple">Ripple (in dB)</param>
-    public static ComplexFp32[] Poles(int order, float ripple = 0.1f)
+    /// <param name="ripple">Stopband attenuation (in dB), must be positive</param>
+    public static ComplexFp32[] Poles(int order, float ripple = 20f)
     {
-        var eps = MathF.Sqrt(MathF.Pow(10, ripple / 10) - 1);
-        var s = TrigonometryHelper.Asinh(1 / eps) / order;
+        if (!(ripple > 0f))
+            throw new ArgumentOutOfRangeException(nameof(ripple), "Stopband attenuation must be positive (in dB).");
+
+        // Type II: epsilon = 1 / sqrt(10^(Rs/10) - 1), mu = asinh(1 / epsilon) / N = asinh(sqrt(10^(Rs/10) - 1)) / N.
+        var s = TrigonometryHelper.Asinh(MathF.Sqrt(MathF.Pow(10, ripple / 10) - 1)) / order;
         var sinh = MathF.Sinh(s);
         var cosh = MathF.Cosh(s);
 
@@ -51,15 +56,17 @@ public static class PrototypeChebyshevII
     }
 
     /// <summary>
-    /// Analog Chebyshev-II poles in <typeparamref name="T"/>.
+    /// Analog Chebyshev-II poles in <typeparamref name="T"/>. <paramref name="ripple"/> is the stopband attenuation in dB
+    /// (default 20, must be positive), see <see cref="Poles(int, float)"/>.
     /// </summary>
     public static Complex<T>[] Poles<T>(int order, T? ripple = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        var rip = ripple ?? T.CreateChecked(0.1);
+        var rip = ripple ?? T.CreateChecked(20);
+        if (!(rip > T.Zero))
+            throw new ArgumentOutOfRangeException(nameof(ripple), "Stopband attenuation must be positive (in dB).");
         var ten = T.CreateChecked(10);
-        var eps = T.Sqrt(T.Pow(ten, rip / ten) - T.One);
-        var s = TrigonometryHelper.Asinh(T.One / eps) / T.CreateChecked(order);
+        var s = TrigonometryHelper.Asinh(T.Sqrt(T.Pow(ten, rip / ten) - T.One)) / T.CreateChecked(order);
         var sinh = T.Sinh(s);
         var cosh = T.Cosh(s);
         var two = T.CreateChecked(2);

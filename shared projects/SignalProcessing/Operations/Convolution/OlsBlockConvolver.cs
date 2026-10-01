@@ -194,7 +194,7 @@ public class OlsBlockConvolver : IFilter, IOnlineFilter
     /// </summary>
     public void Reset()
     {
-        _bufferOffset = _kernel.Length - 1;
+        _bufferOffset = 0; // starting at kernel length - 1 overran the block buffer when kernel length > fftSize / 2
         _outputBufferOffset = 0;
 
         Array.Clear(_lastSaved, 0, _lastSaved.Length);

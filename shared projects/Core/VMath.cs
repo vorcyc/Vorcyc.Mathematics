@@ -55,7 +55,7 @@ public static partial class VMath
         return a;
     }
     /// <summary>
-    /// Computes the highest common factor (HCF) of two integers using recursion.
+    /// Computes the highest common factor (HCF) of two integers (non-negative result; <c>Hcf(0, 0) == 0</c>).
     /// </summary>
     /// <param name="a">The first integer.</param>
     /// <param name="b">The second integer.</param>
@@ -63,18 +63,11 @@ public static partial class VMath
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Hcf(int a, int b)
     {
-        // 如果两个数相等，返回其中一个数
-        if (a == b)
-        {
-            return b;
-        }
-        // 如果 a 小于 b，递归调用 Hcf(a, b - a)
-        if (a < b)
-        {
-            return Hcf(a, b - a);
-        }
-        // 否则，递归调用 Hcf(a - b, b)
-        return Hcf(a - b, b);
+        // Iterative Euclid on |a|, |b|; the former subtraction-based recursion overflowed the stack for 0, negatives and large ratios.
+        long x = System.Math.Abs((long)a), y = System.Math.Abs((long)b);
+        while (y != 0)
+            (x, y) = (y, x % y);
+        return checked((int)x);
     }
 
     ////另一种写法
@@ -115,19 +108,25 @@ public static partial class VMath
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int Lcm(int a, int b)
     {
-        return a * b / Hcf(a, b);
+        if (a == 0 || b == 0) return 0;
+        var g = Hcf(a, b);
+        return checked((int)System.Math.Abs((long)(a / g) * b)); // divide first, then multiply, in 64 bits: a * b overflowed int
     }
     //Fraction
     /// <summary>
-    /// Reduces a fraction to its simplest integer ratio.
+    /// Reduces a fraction to its simplest integer ratio (the denominator of the result is positive).
     /// </summary>
     /// <param name="numerator"></param>
-    /// <param name="denominator"></param>
+    /// <param name="denominator">Must not be zero.</param>
+    /// <exception cref="DivideByZeroException">Thrown when <paramref name="denominator"/> is zero.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static (int numerator, int denominator) SimplestIntegerRatioOfFraction(int numerator, int denominator)
     {
+        if (denominator == 0)
+            throw new DivideByZeroException("Denominator cannot be zero.");
         var hcf = Hcf(numerator, denominator);
-        return (numerator / hcf, denominator / hcf);
+        var sign = denominator < 0 ? -1 : 1;
+        return (sign * (numerator / hcf), sign * (denominator / hcf));
     }
     #endregion
 
@@ -265,7 +264,7 @@ public static partial class VMath
         {
             double xhalf = 0.5 * f;
             long i = *(long*)&f;
-            i = 0x5f375a86 - (i >> 1);
+            i = 0x5FE6EB50C7B537A9L - (i >> 1); // 64-bit magic constant (the float one is 0x5f375a86)
             f = *(double*)&i;
             f *= (1.5 - xhalf * f * f);
             return f;
