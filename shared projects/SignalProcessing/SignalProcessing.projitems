@@ -206,6 +206,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Operations\HarmonicPercussiveSeparator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Modulator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Operation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Operations\Operation.Spectral.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Identification\IdData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Identification\PolynomialModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Identification\StateSpaceModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Identification\SystemIdentification.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Resampler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\SpectralSubtractor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Operations\Tsm\PaulStretch.cs" />

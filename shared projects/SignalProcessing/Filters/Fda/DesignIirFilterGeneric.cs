@@ -150,7 +150,8 @@ public static partial class DesignFilter
             zim = new T[poles.Length * 2];
         }
 
-        var center = T.CreateChecked(2) * T.Pi * (frequencyLow + frequencyHigh) / T.CreateChecked(2);
+        // Unit gain where the prototype's DC lands, not at the arithmetic centre of the edges.
+        var center = T.CreateChecked(2) * T.Atan(T.Sqrt(T.Tan(T.Pi * frequencyLow) * T.Tan(T.Pi * frequencyHigh)));
         var tf = new TransferFunction<T>(TransferFunction<T>.ZpToTf(zre, zim), TransferFunction<T>.ZpToTf(pre, pim));
         tf.NormalizeAt(center);
         return tf;

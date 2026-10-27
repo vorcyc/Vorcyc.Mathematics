@@ -4,7 +4,7 @@
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**版本：** 0.10.23 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
+**版本：** 0.11.0 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
 
 [English readme](README.md)
 
@@ -48,16 +48,16 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 **线性代数**  
 → [wiki/wiki_hans/Module_LinearAlgebra_zh.md](wiki/wiki_hans/Module_LinearAlgebra_zh.md)
 
-**机器学习（0.9+）** — 分类/回归流水线、树与森林、提升、交叉验证、网格搜索、聚类与降维等；Isolation Forest + JSON 快照（0.10.11）与 GPR `PredictStd`（0.10.10）；曲线拟合 SIMD 大 N `StackOverflow` 修复（0.10.16）；经典 `CurveFitter` 接入 `CancellationToken`（0.10.17）；`PCA<T>` 样本外 `Transform`（0.10.18）。  
+**机器学习（0.9+）** — 分类/回归流水线、树与森林、提升、交叉验证、网格搜索、聚类与降维等；Isolation Forest + JSON 快照（0.10.11）与 GPR `PredictStd`（0.10.10）；曲线拟合 SIMD 大 N `StackOverflow` 修复（0.10.16）；经典 `CurveFitter` 接入 `CancellationToken`（0.10.17）；`PCA<T>` 样本外 `Transform`（0.10.18）。**0.11.0：** 单类支持向量机、局部离群因子、ECOC、核朴素贝叶斯、神经网络分类器，以及训完可以 `Predict` 的交叉验证分类器。  
 → [wiki/wiki_hans/Module_MachineLearning_zh.md](wiki/wiki_hans/Module_MachineLearning_zh.md)
 
-**信号处理** — **0.9 起以 `Signal` / `SignalSegment` 为时域主 API**；FFT（0.10.12 起 `TransformToFrequencyDomain` 走 SoA `FftButterflyFp32`）、泛型门面 `Fft<T>` / `RealFft<T>` / `HilbertTransform<T>`（0.10.18）、`Convolver<T>` / `OlaBlockConvolver<T>` / `ComplexConvolver<T>` / `Operation.Convolve<T>`（0.10.19）、空 zpk `ZpToTf([])` → `[1]`（0.10.20）、模态分解样本缓冲保持在 `T`（0.10.18）、`IirFilter<T>` / `FirFilter<T>` / `ZiFilter<T>` / FDA 留在 `T`（0.10.18）、Welch（0.10.13 完整窗 + `ComputingContext`；0.10.14 onesided 缩放 / 周期窗 / 频谱特性）、`FrequencyDomain.IndexToFrequency` 按 FFT `TransformLength`（0.10.15）、粉红噪声（0.10.14 Paul Kellet `PinkNoiseGenerator`）、滤波、MFCC、音效等。  
+**信号处理** — **0.9 起以 `Signal` / `SignalSegment` 为时域主 API**；FFT（0.10.12 起 `TransformToFrequencyDomain` 走 SoA `FftButterflyFp32`）、泛型门面 `Fft<T>` / `RealFft<T>` / `HilbertTransform<T>`（0.10.18）、`Convolver<T>` / `OlaBlockConvolver<T>` / `ComplexConvolver<T>` / `Operation.Convolve<T>`（0.10.19）、空 zpk `ZpToTf([])` → `[1]`（0.10.20）、模态分解样本缓冲保持在 `T`（0.10.18）、`IirFilter<T>` / `FirFilter<T>` / `ZiFilter<T>` / FDA 留在 `T`（0.10.18）、Welch（0.10.13 完整窗 + `ComputingContext`；0.10.14 onesided 缩放 / 周期窗 / 频谱特性）、`FrequencyDomain.IndexToFrequency` 按 FFT `TransformLength`（0.10.15）、粉红噪声（0.10.14 Paul Kellet `PinkNoiseGenerator`）、滤波、MFCC、音效等。**0.11.0：** `cpsd` / `mscohere` / `tfestimate`、多窗与参数谱（`pmtm`、`pyulear`、`pburg`、`pcov`），以及系统辨识（`IdData`、`arx` / `armax` / `oe` / `bj`、`n4sid` / `ssest`、`tfest`、`compare` / `resid` / `sim`）。  
 → [wiki/wiki_hans/Module_SignalProcessing_zh.md](wiki/wiki_hans/Module_SignalProcessing_zh.md)
 
 **数值模块** — 扩展整数、浮点、复数、有理数等高精度类型。  
 → [wiki/wiki_hans/Module_Numerics_zh.md](wiki/wiki_hans/Module_Numerics_zh.md)
 
-**统计模块** — 极值、均值/方差、分布、时间序列（Holt / Holt–Winters 末状态与 `ForecastHolt` 递推，0.10.18）等。  
+**统计模块** — 极值、均值/方差、分布、时间序列（Holt / Holt–Winters 末状态与 `ForecastHolt` 递推，0.10.18）等。**0.11.0：** 会估计平滑系数的 Holt 模型、乘法 Holt–Winters、ARIMA / SARIMA、GARCH 与 VAR。  
 → [wiki/wiki_hans/Module_Statistics_zh.md](wiki/wiki_hans/Module_Statistics_zh.md)
 
 **微积分** — 积分、导数、ODE、求根、级数展开等。  
@@ -67,7 +67,7 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 
 ## 扩展包
 
-**FFTW 扩展**（`Vorcyc.Mathematics.Extensions.FFTW`，0.10.23）— 基于 FFTW 本地库的高性能 DFT 封装（版本与主包对齐；FFTW API 无变更）。  
+**FFTW 扩展**（`Vorcyc.Mathematics.Extensions.FFTW`，0.11.0）— 基于 FFTW 本地库的高性能 DFT 封装（版本与主包对齐；FFTW API 无变更）。  
 → [wiki/wiki_hans/Module_Extensions_FFTW_zh.md](wiki/wiki_hans/Module_Extensions_FFTW_zh.md)
 
 ---

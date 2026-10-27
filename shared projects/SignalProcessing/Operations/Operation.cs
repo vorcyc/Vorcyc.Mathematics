@@ -25,7 +25,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Operations;
 ///     <item>periodogram (Welch / Lomb-Scargle)</item>
 /// </list>
 /// </summary>
-public static class Operation
+public static partial class Operation
 {
     /// <summary>
     /// Does fast convolution of <paramref name="signal"/> with <paramref name="kernel"/> via FFT.

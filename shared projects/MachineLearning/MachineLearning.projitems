@@ -62,6 +62,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)DimensionalityReduction\LinearDiscriminantAnalysis.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Regression\MultivariateRidgeRegression.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Classfication\LogisticRegression.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classfication\KernelNaiveBayes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classfication\NeuralNetworkClassifier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Classfication\ErrorCorrectingOutputCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Regression\RegressionMathHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\DBSCAN.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\EMBase.cs" />
@@ -100,6 +103,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Clustering\HierarchicalClustering.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IMachineLearning.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IsolationForest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OneClassSvm.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LocalOutlierFactor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CrossValidatedClassifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KNN.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KnnClassifier.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)KnnRegressor.cs" />

@@ -2,6 +2,12 @@ using ML_module_test;
 using Vorcyc.Mathematics;
 using Vorcyc.Mathematics.Framework.Utilities;
 
+if (args is ["toolbox-011"])
+{
+    Toolbox_011_test.Go();
+    return;
+}
+
 // 单独跑大 N SIMD：dotnet run --project TESTS/ML_module_test -- simd-large-n
 if (args is ["simd-large-n"])
 {
@@ -45,3 +51,5 @@ new string('-', 30).PrintLine(ConsoleColor.Green);
 GprAndIsolationForest_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 HoltPca_018_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Toolbox_011_test.Go();

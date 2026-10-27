@@ -23,5 +23,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SizeFp32.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Size_g.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UInt24.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DenseLinearAlgebra.cs" />
   </ItemGroup>
 </Project>

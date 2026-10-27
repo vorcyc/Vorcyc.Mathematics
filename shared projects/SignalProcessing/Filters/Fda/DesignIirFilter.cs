@@ -266,13 +266,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
             var pre = new float[poles.Length * 2];
             var pim = new float[poles.Length * 2];
 
-            var centerFreq = 2 * ConstantsFp32.PI * (frequencyLow + frequencyHigh) / 2;
-
             var warpedFreq1 = MathF.Tan(ConstantsFp32.PI * frequencyLow);
             var warpedFreq2 = MathF.Tan(ConstantsFp32.PI * frequencyHigh);
 
             var f0 = MathF.Sqrt(warpedFreq1 * warpedFreq2);
             var bw = warpedFreq2 - warpedFreq1;
+
+            // Unit gain where the prototype's DC lands, not at the arithmetic centre of the edges.
+            var centerFreq = 2 * MathF.Atan(f0);
 
             // 1) poles of analog filter (scaled)
 

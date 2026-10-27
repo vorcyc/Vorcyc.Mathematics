@@ -19,39 +19,8 @@ public static class PrototypeElliptic
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
     public static ComplexFp32[] Poles(int order, float ripplePass = 1f, float rippleStop = 20f)
     {
-        Guard.AgainstInvalidRange(ripplePass, rippleStop, "ripple in passband", "ripple in stopband");
-
-        var eps_p = MathF.Sqrt(MathF.Pow(10, ripplePass / 10) - 1);
-        var eps_s = MathF.Sqrt(MathF.Pow(10, rippleStop / 10) - 1);
-
-        var r = eps_p / eps_s;
-
-        var k1 = MathF.Sqrt(1 - r * r);
-        var k1_landen = Landen(k1);
-
-        var kp = ComplexFp32.One;
-        for (var i = 0; i < order / 2; i++)
-        {
-            kp *= Sne((2 * i + 1.0) / order, k1_landen);
-        }
-        // Degree equation: k' = k1'^N * prod(sn^4). The exponent is N, not 2 * floor(N / 2), which differs for odd orders.
-        kp = ComplexFp32.Pow(k1, order) * ComplexFp32.Pow(kp, 4);
-
-        var k = MathF.Sqrt(1 - ComplexFp32.Abs(kp) * ComplexFp32.Abs(kp));
-        var k_landen = Landen(k);
-
-        var v0 = -ComplexFp32.ImaginaryOne / order * Asne(ComplexFp32.ImaginaryOne / eps_p, r);
-
-        var poles = new ComplexFp32[order];
-
-        for (var i = 0; i < order; i++)
-        {
-            var w = (2 * i + 1.0f) / order;
-
-            poles[i] = ComplexFp32.ImaginaryOne * Cde(w - ComplexFp32.ImaginaryOne * v0, k_landen);
-        }
-
-        return poles;
+        // 1 - r*r (r = eps_p / eps_s) rounds to 1 in single precision once Rs is far above Rp, which collapses the Landen sequence.
+        return ToFp32(Poles<double>(order, ripplePass, rippleStop));
     }
 
     /// <summary>
@@ -104,37 +73,8 @@ public static class PrototypeElliptic
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
     public static ComplexFp32[] Zeros(int order, float ripplePass = 1, float rippleStop = 20)
     {
-        Guard.AgainstInvalidRange(ripplePass, rippleStop, "ripple in passband", "ripple in stopband");
-
-        var eps_p = MathF.Sqrt(MathF.Pow(10, ripplePass / 10) - 1);
-        var eps_s = MathF.Sqrt(MathF.Pow(10, rippleStop / 10) - 1);
-
-        var r = eps_p / eps_s;
-
-        var k1 = MathF.Sqrt(1 - r * r);
-        var k1_landen = Landen(k1);
-
-        var kp = ComplexFp32.One;
-        for (var i = 0; i < order / 2; i++)
-        {
-            kp *= Sne((2 * i + 1.0) / order, k1_landen);
-        }
-        // Degree equation: k' = k1'^N * prod(sn^4). The exponent is N, not 2 * floor(N / 2), which differs for odd orders.
-        kp = ComplexFp32.Pow(k1, order) * ComplexFp32.Pow(kp, 4);
-
-        var k = MathF.Sqrt(1 - ComplexFp32.Abs(kp) * ComplexFp32.Abs(kp));
-        var k_landen = Landen(k);
-
-        var zeros = new ComplexFp32[order];
-
-        for (var i = 0; i < order; i++)
-        {
-            var w = (2 * i + 1.0) / order;
-
-            zeros[i] = new ComplexFp32(0, -1 / (k * Cde(w, k_landen)).Real);
-        }
-
-        return zeros;
+        // See Poles(int, float, float): single precision cannot carry the Landen sequence for a large Rs / Rp ratio.
+        return ToFp32(Zeros<double>(order, ripplePass, rippleStop));
     }
 
     /// <summary>
@@ -297,6 +237,8 @@ public static class PrototypeElliptic
         var rp = ripplePass ?? T.One;
         var rs = rippleStop ?? T.CreateChecked(20);
         Guard.AgainstInvalidRange(double.CreateChecked(rp), double.CreateChecked(rs), "ripple in passband", "ripple in stopband");
+        if (typeof(T) != typeof(double))
+            return ConvertFrom64<T>(Poles<double>(order, double.CreateChecked(rp), double.CreateChecked(rs)));
 
         var ten = T.CreateChecked(10);
         var epsP = T.Sqrt(T.Pow(ten, rp / ten) - T.One);
@@ -333,6 +275,8 @@ public static class PrototypeElliptic
         var rp = ripplePass ?? T.One;
         var rs = rippleStop ?? T.CreateChecked(20);
         Guard.AgainstInvalidRange(double.CreateChecked(rp), double.CreateChecked(rs), "ripple in passband", "ripple in stopband");
+        if (typeof(T) != typeof(double))
+            return ConvertFrom64<T>(Zeros<double>(order, double.CreateChecked(rp), double.CreateChecked(rs)));
 
         var ten = T.CreateChecked(10);
         var epsP = T.Sqrt(T.Pow(ten, rp / ten) - T.One);
@@ -413,5 +357,25 @@ public static class PrototypeElliptic
             x = T.CreateChecked(2) * x / ((T.One + k) * (T.One + Complex<T>.Sqrt(T.One - prevK * prevK * prevX * prevX)));
         }
         return T.CreateChecked(2) * Complex<T>.Asin(x) / T.Pi;
+    }
+
+    private static ComplexFp32[] ToFp32(Complex<double>[] z)
+    {
+        // The zero "at infinity" of an odd order is ~1e20 for a large Rs / Rp ratio; the band transforms square it, which overflows a float.
+        const double limit = 1e15;
+        var r = new ComplexFp32[z.Length];
+        for (var i = 0; i < r.Length; i++)
+            r[i] = new ComplexFp32((float)Math.Clamp(z[i].Real, -limit, limit), (float)Math.Clamp(z[i].Imaginary, -limit, limit));
+        return r;
+    }
+
+    private static Complex<T>[] ConvertFrom64<T>(Complex<double>[] z)
+        where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
+    {
+        var limit = typeof(T) == typeof(float) ? 1e15 : double.MaxValue;
+        var r = new Complex<T>[z.Length];
+        for (var i = 0; i < r.Length; i++)
+            r[i] = new Complex<T>(T.CreateChecked(Math.Clamp(z[i].Real, -limit, limit)), T.CreateChecked(Math.Clamp(z[i].Imaginary, -limit, limit)));
+        return r;
     }
 }

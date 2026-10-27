@@ -1,6 +1,18 @@
 using SP_module_test;
 using Vorcyc.Mathematics.Framework.Utilities;
 
+if (args is ["spectral-011"])
+{
+    Spectral_011_test.Go();
+    return;
+}
+
+if (args is ["sysid-011"])
+{
+    SysId_011_test.Go();
+    return;
+}
+
 EMD_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 VMD_test.Go();
@@ -26,5 +38,11 @@ new string('-', 30).PrintLine(ConsoleColor.Green);
 Audit_023_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 Audit_023_core_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Audit_024_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Spectral_011_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+SysId_011_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 Console.WriteLine("SP_module_test done.");

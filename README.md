@@ -4,7 +4,7 @@ High-performance **.NET 10** math library: SIMD/parallel CPU numerics, signal pr
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**Version:** 0.10.23 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
+**Version:** 0.11.0 · **TFM:** `net10.0` · **NuGet:** `Vorcyc.Mathematics`
 
 [中文](readme_zh.md)
 
@@ -41,16 +41,16 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 **Linear algebra**  
 → [wiki/wiki_en/Module_LinearAlgebra.md](wiki/wiki_en/Module_LinearAlgebra.md)
 
-**Machine learning (0.9+)** — classifiers, regressors, pipelines, trees/forests, boosting, CV, grid search; Isolation Forest + JSON snapshots (0.10.11) & GPR `PredictStd` (0.10.10); CurveFitting SIMD large-N `StackOverflow` fix (0.10.16); classic `CurveFitter` methods take `CancellationToken` (0.10.17); `PCA<T>` out-of-sample `Transform` (0.10.18).  
+**Machine learning (0.9+)** — classifiers, regressors, pipelines, trees/forests, boosting, CV, grid search; Isolation Forest + JSON snapshots (0.10.11) & GPR `PredictStd` (0.10.10); CurveFitting SIMD large-N `StackOverflow` fix (0.10.16); classic `CurveFitter` methods take `CancellationToken` (0.10.17); `PCA<T>` out-of-sample `Transform` (0.10.18). **0.11.0:** one-class SVM, local outlier factor, ECOC, kernel naive Bayes, neural-network classifier, and a cross-validated classifier that can `Predict`.  
 → [wiki/wiki_en/Module_MachineLearning.md](wiki/wiki_en/Module_MachineLearning.md)
 
-**Signal processing** — **`Signal` / `SignalSegment`** as primary time-domain APIs; FFT (`TransformToFrequencyDomain` uses SoA `FftButterflyFp32` from 0.10.12), generic `Fft<T>` / `RealFft<T>` / `HilbertTransform<T>` facades (0.10.18), `Convolver<T>` / `OlaBlockConvolver<T>` / `ComplexConvolver<T>` / `Operation.Convolve<T>` (0.10.19), empty zpk `ZpToTf([])` → `[1]` (0.10.20), mode decomposition stays in `T` (0.10.18), `IirFilter<T>` / `FirFilter<T>` / `ZiFilter<T>` / FDA-in-`T` (0.10.18), Welch (`AveragePeriodogram` complete windows + `ComputingContext` from 0.10.13; SciPy onesided scale / periodic windows / spectrum helpers from 0.10.14), `FrequencyDomain.IndexToFrequency` uses FFT `TransformLength` (0.10.15), pink noise via Paul Kellet (`PinkNoiseGenerator`, 0.10.14), filters, MFCC, effects.  
+**Signal processing** — **`Signal` / `SignalSegment`** as primary time-domain APIs; FFT (`TransformToFrequencyDomain` uses SoA `FftButterflyFp32` from 0.10.12), generic `Fft<T>` / `RealFft<T>` / `HilbertTransform<T>` facades (0.10.18), `Convolver<T>` / `OlaBlockConvolver<T>` / `ComplexConvolver<T>` / `Operation.Convolve<T>` (0.10.19), empty zpk `ZpToTf([])` → `[1]` (0.10.20), mode decomposition stays in `T` (0.10.18), `IirFilter<T>` / `FirFilter<T>` / `ZiFilter<T>` / FDA-in-`T` (0.10.18), Welch (`AveragePeriodogram` complete windows + `ComputingContext` from 0.10.13; SciPy onesided scale / periodic windows / spectrum helpers from 0.10.14), `FrequencyDomain.IndexToFrequency` uses FFT `TransformLength` (0.10.15), pink noise via Paul Kellet (`PinkNoiseGenerator`, 0.10.14), filters, MFCC, effects. **0.11.0:** `cpsd` / `mscohere` / `tfestimate`, multitaper and parametric spectra (`pmtm`, `pyulear`, `pburg`, `pcov`), and system identification (`IdData`, `arx` / `armax` / `oe` / `bj`, `n4sid` / `ssest`, `tfest`, `compare` / `resid` / `sim`).  
 → [wiki/wiki_en/Module_SignalProcessing.md](wiki/wiki_en/Module_SignalProcessing.md)
 
 **Numerics** — extended integer/float/complex/rational types.  
 → [wiki/wiki_en/Module_Numerics.md](wiki/wiki_en/Module_Numerics.md)
 
-**Statistics** — reductions, distributions, time series (Holt / Holt–Winters terminal state + `ForecastHolt` recurrence, 0.10.18), extreme values.  
+**Statistics** — reductions, distributions, time series (Holt / Holt–Winters terminal state + `ForecastHolt` recurrence, 0.10.18), extreme values. **0.11.0:** Holt model that estimates smoothing weights, multiplicative Holt–Winters, ARIMA / SARIMA, GARCH, and VAR.  
 → [wiki/wiki_en/Module_Statistics.md](wiki/wiki_en/Module_Statistics.md)
 
 **Calculus** — integration, derivatives, ODEs, root finding, series.  
@@ -60,7 +60,7 @@ Vorcyc® Mathematics targets **.NET 10+**, emphasizing SIMD and parallel CPU per
 
 ## Extension packages
 
-**FFTW** (`Vorcyc.Mathematics.Extensions.FFTW`, 0.10.23) — native FFTW bindings for high-performance DFTs (package version aligned; no FFTW API change).  
+**FFTW** (`Vorcyc.Mathematics.Extensions.FFTW`, 0.11.0) — native FFTW bindings for high-performance DFTs (package version aligned; no FFTW API change).  
 → [wiki/wiki_en/Module_Extensions_FFTW.md](wiki/wiki_en/Module_Extensions_FFTW.md)
 
 ---

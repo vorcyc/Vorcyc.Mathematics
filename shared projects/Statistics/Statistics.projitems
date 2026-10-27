@@ -38,6 +38,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Advanced_NonParametric.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Distribution_InverseSampling.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TimeSeriesAnalysis_Extended.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TimeSeriesModels.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ArimaModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GarchModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VarModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TensorStatistics.cs" />
   </ItemGroup>
   <ItemGroup>
