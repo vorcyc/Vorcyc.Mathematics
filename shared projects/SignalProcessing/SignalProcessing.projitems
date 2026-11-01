@@ -122,6 +122,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\ExtendedKalmanFilter1D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\ExtendedKalmanFilter2D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\InformationFilter1D.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\KalmanTrend.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\KalmanTrendCore.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\KalmanTrendFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\KalmanTrendModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\ParticleFilter1D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\SquareRootKalmanFilter1D.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Filters\Kalman\StandardKalmanFilter1D.cs" />

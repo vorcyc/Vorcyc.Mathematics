@@ -75,6 +75,7 @@
   * :bookmark: [Other audio feature computation](Module_SignalProcessing_Features)
   * :bookmark: [Filters](Module_SignalProcessing_Filters)
   * :bookmark: [Adaptive filters (0.11.1)](Module_SignalProcessing_Filters#adaptive-filters-0111)
+  * :bookmark: [Kalman trend filter (0.11.2)](Module_SignalProcessing_Filters#kalman-trend-filter-and-smoother-0112)
   * :bookmark: [Fourier transforms](Module_SignalProcessing_Fourier)
   * :bookmark: [Common operations](Module_SignalProcessing_Operations)
   * :bookmark: [Spectral estimates (0.11.0)](Module_SignalProcessing_Operations#19-spectral-estimates-0110)

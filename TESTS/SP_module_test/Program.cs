@@ -43,6 +43,12 @@ if (args is ["adaptive-robust-011"])
     return;
 }
 
+if (args is ["kalman-011"])
+{
+    Kalman_011_test.Go();
+    return;
+}
+
 EMD_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 VMD_test.Go();
@@ -84,5 +90,7 @@ new string('-', 30).PrintLine(ConsoleColor.Green);
 IirDesign_011_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 AdaptiveRobust_011_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Kalman_011_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 Console.WriteLine("SP_module_test done.");

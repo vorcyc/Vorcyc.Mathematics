@@ -75,6 +75,7 @@
   * :bookmark: [其他音频特征计算](Module_SignalProcessing_Features_zh)
   * :bookmark: [滤波器](Module_SignalProcessing_Filters_zh)
   * :bookmark: [自适应滤波器（0.11.1）](Module_SignalProcessing_Filters_zh#自适应滤波器0111)
+  * :bookmark: [Kalman 趋势滤波与平滑（0.11.2）](Module_SignalProcessing_Filters_zh#kalman-趋势滤波与平滑0112)
   * :bookmark: [傅立叶变换](Module_SignalProcessing_Fourier_zh)
   * :bookmark: [常用操作](Module_SignalProcessing_Operations_zh)
   * :bookmark: [谱估计（0.11.0）](Module_SignalProcessing_Operations_zh#19-谱估计0110)
