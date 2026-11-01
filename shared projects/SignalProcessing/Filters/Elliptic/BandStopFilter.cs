@@ -37,9 +37,9 @@ public class BandStopFilter : ZiFilter
     /// Constructs <see cref="BandStopFilter"/> of given <paramref name="order"/> 
     /// with given cutoff frequencies <paramref name="frequencyLow"/> and <paramref name="frequencyHigh"/>.
     /// </summary>
-    /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-    /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripplePass">Passband ripple (in dB)</param>
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
     public BandStopFilter(float frequencyLow, float frequencyHigh, int order, float ripplePass = 1f, float rippleStop = 20f)
@@ -54,9 +54,9 @@ public class BandStopFilter : ZiFilter
     /// <summary>
     /// Generates transfer function.
     /// </summary>
-    /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-    /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripplePass">Passband ripple (in dB)</param>
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
     private static TransferFunction MakeTf(float frequencyLow, float frequencyHigh, int order, float ripplePass = 1f, float rippleStop = 20f  )
@@ -70,17 +70,17 @@ public class BandStopFilter : ZiFilter
     /// <summary>
     /// Changes filter coefficients online (preserving the state of the filter).
     /// </summary>
-    /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-    /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
+    /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
     /// <param name="ripplePass">Passband ripple (in dB)</param>
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
     public void Change(float frequencyLow, float frequencyHigh, float ripplePass = 1, float rippleStop = 20f)
     {
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, ripplePass, rippleStop));
+
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
         RipplePassband = ripplePass;
         RippleStopband = rippleStop;
-
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, ripplePass, rippleStop));
     }
 }

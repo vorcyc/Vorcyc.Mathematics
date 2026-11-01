@@ -152,7 +152,7 @@ public class FirFilter : LtiFilter
     /// Processes all <paramref name="samples"/> in loop.
     /// </summary>
     /// <param name="samples">Samples</param>
-    public float[] ProcessAllSamples(float[] samples)
+    public virtual float[] ProcessAllSamples(float[] samples)
     {
         // The Process() code is inlined here in the loop for better performance
         // (especially for smaller kernels).
@@ -182,7 +182,7 @@ public class FirFilter : LtiFilter
     /// Processes all <paramref name="samples"/> in loop.
     /// </summary>
     /// <param name="samples">Samples</param>
-    public float[] ProcessAllSamples(Span<float> samples)
+    public virtual float[] ProcessAllSamples(Span<float> samples)
     {
         // The Process() code is inlined here in the loop for better performance
         // (especially for smaller kernels).
@@ -241,6 +241,7 @@ public class FirFilter : LtiFilter
         {
             _b[i] = _b[_kernelSize + i] = kernel[i];
         }
+        _tf = null;     // Tf is built from the kernel again
     }
     /// <summary>
     /// Resets filter.

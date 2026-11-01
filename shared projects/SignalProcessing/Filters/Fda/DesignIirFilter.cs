@@ -121,12 +121,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
         /// <summary>
         /// Designs lowpass pole filter.
         /// </summary>
-        /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
+        /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
         /// <param name="poles">Analog prototype poles</param>
         /// <param name="zeros">Analog prototype zeros</param>
         public static TransferFunction IirLpTf(float frequency, ComplexFp32[] poles, ComplexFp32[]? zeros = null)
         {
-            Guard.AgainstInvalidRange(frequency, 0, 0.5f, "Cutoff frequency");
+            Guard.AgainstInvalidOpenRange(frequency, 0, 0.5, "Cutoff frequency");
 
             var pre = new float[poles.Length];
             var pim = new float[poles.Length];
@@ -187,12 +187,12 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
         /// <summary>
         /// Designs highpass pole filter.
         /// </summary>
-        /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
+        /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
         /// <param name="poles">Analog prototype poles</param>
         /// <param name="zeros">Analog prototype zeros</param>
         public static TransferFunction IirHpTf(float frequency, ComplexFp32[] poles, ComplexFp32[] zeros = null)
         {
-            Guard.AgainstInvalidRange(frequency, 0, 0.5f, "Cutoff frequency");
+            Guard.AgainstInvalidOpenRange(frequency, 0, 0.5, "Cutoff frequency");
 
             var pre = new float[poles.Length];
             var pim = new float[poles.Length];
@@ -253,14 +253,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
         /// <summary>
         /// Designs bandpass pole filter.
         /// </summary>
-        /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-        /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
+        /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+        /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
         /// <param name="poles">Analog prototype poles</param>
         /// <param name="zeros">Analog prototype zeros</param>
         public static TransferFunction IirBpTf(float frequencyLow, float frequencyHigh, ComplexFp32[] poles, ComplexFp32[]? zeros = null)
         {
-            Guard.AgainstInvalidRange(frequencyLow, 0, 0.5f, "lower frequency");
-            Guard.AgainstInvalidRange(frequencyHigh, 0, 0.5f, "upper frequency");
+            Guard.AgainstInvalidOpenRange(frequencyLow, 0, 0.5, "lower frequency");
+            Guard.AgainstInvalidOpenRange(frequencyHigh, 0, 0.5, "upper frequency");
             Guard.AgainstInvalidRange(frequencyLow, frequencyHigh, "lower frequency", "upper frequency");
 
             var pre = new float[poles.Length * 2];
@@ -286,7 +286,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
                 pre[k] = p1.Real;
                 pim[k] = p1.Imaginary;
 
-                var p2 = alpha * (1 - beta);
+                // the roots of s² - 2·alpha·s + f0² have the product f0²: 1 - beta would lose all digits where beta is close to 1
+                var p2 = f0 * f0 / p1;
                 pre[poles.Length + k] = p2.Real;
                 pim[poles.Length + k] = p2.Imaginary;
             }
@@ -314,7 +315,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
                     zre[k] = z1.Real;
                     zim[k] = z1.Imaginary;
 
-                    var z2 = alpha * (1 - beta);
+                    var z2 = f0 * f0 / z1;
                     zre[zeros.Length + k] = z2.Real;
                     zim[zeros.Length + k] = z2.Imaginary;
                 }
@@ -345,14 +346,14 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
         /// <summary>
         /// Designs bandstop pole filter.
         /// </summary>
-        /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-        /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
+        /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+        /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
         /// <param name="poles">Analog prototype poles</param>
         /// <param name="zeros">Analog prototype zeros</param>
         public static TransferFunction IirBsTf(float frequencyLow, float frequencyHigh, ComplexFp32[] poles, ComplexFp32[]? zeros = null)
         {
-            Guard.AgainstInvalidRange(frequencyLow, 0, 0.5f, "lower frequency");
-            Guard.AgainstInvalidRange(frequencyHigh, 0, 0.5f, "upper frequency");
+            Guard.AgainstInvalidOpenRange(frequencyLow, 0, 0.5, "lower frequency");
+            Guard.AgainstInvalidOpenRange(frequencyHigh, 0, 0.5, "upper frequency");
             Guard.AgainstInvalidRange(frequencyLow, frequencyHigh, "lower frequency", "upper frequency");
 
             // Calculation of filter coefficients is based on Neil Robertson's post:
@@ -380,7 +381,8 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
                 pre[k] = p1.Real;
                 pim[k] = p1.Imaginary;
 
-                var p2 = alpha * (1 - beta);
+                // the roots of s² - 2·alpha·s + f0² have the product f0²: 1 - beta would lose all digits where beta is close to 1
+                var p2 = f0 * f0 / p1;
                 pre[poles.Length + k] = p2.Real;
                 pim[poles.Length + k] = p2.Imaginary;
             }
@@ -408,7 +410,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Filters.Fda
                     zre[k] = z1.Real;
                     zim[k] = z1.Imaginary;
 
-                    var z2 = alpha * (1 - beta);
+                    var z2 = f0 * f0 / z1;
                     zre[zeros.Length + k] = z2.Real;
                     zim[zeros.Length + k] = z2.Imaginary;
                 }

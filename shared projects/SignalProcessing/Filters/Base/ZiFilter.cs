@@ -217,6 +217,8 @@ public class ZiFilter : LtiFilter
         if (b.Length == _b.Length)
         {
             for (var i = 0; i < _b.Length; _b[i] = b[i], i++) { }
+
+            _tf = null;     // Tf is built from the coefficients again
         }
     }
 
@@ -229,28 +231,35 @@ public class ZiFilter : LtiFilter
         if (a.Length == _a.Length)
         {
             for (var i = 0; i < _a.Length; _a[i] = a[i], i++) { }
+
+            _tf = null;
         }
     }
 
     /// <summary>
     /// Changes filter coefficients online (from transfer function <paramref name="tf"/>).
+    /// The shorter part of <paramref name="tf"/> is padded with zeros like in the constructor;
+    /// a transfer function of a higher order than the filter has is ignored.
     /// </summary>
     /// <param name="tf">Transfer function</param>
     public void Change(TransferFunction tf)
     {
         var b = tf.Numerator;
-
-        if (b.Length == _b.Length)
-        {
-            for (var i = 0; i < _b.Length; _b[i] = (float)b[i], i++) { }
-        }
-
         var a = tf.Denominator;
 
-        if (a.Length == _a.Length)
+        if (b.Length > _b.Length || a.Length > _a.Length)
         {
-            for (var i = 0; i < _a.Length; _a[i] = (float)a[i], i++) { }
+            return;
         }
+
+        Array.Copy(b, _b, b.Length);
+        Array.Clear(_b, b.Length, _b.Length - b.Length);
+
+        Array.Copy(a, _a, a.Length);
+        Array.Clear(_a, a.Length, _a.Length - a.Length);
+
+        // Tf (and ZeroPhase, which starts from Tf.Zi) has to describe the filter that is running now
+        _tf = tf;
     }
 
     /// <summary>

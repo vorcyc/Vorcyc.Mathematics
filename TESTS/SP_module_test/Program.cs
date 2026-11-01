@@ -13,6 +13,36 @@ if (args is ["sysid-011"])
     return;
 }
 
+if (args is ["adaptive-011"])
+{
+    Adaptive_011_test.Go();
+    return;
+}
+
+if (args is ["adaptive-ext-011"])
+{
+    AdaptiveExt_011_test.Go();
+    return;
+}
+
+if (args is ["cheby2-011"])
+{
+    Cheby2_011_test.Go();
+    return;
+}
+
+if (args is ["iir-design-011"])
+{
+    IirDesign_011_test.Go();
+    return;
+}
+
+if (args is ["adaptive-robust-011"])
+{
+    AdaptiveRobust_011_test.Go();
+    return;
+}
+
 EMD_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 VMD_test.Go();
@@ -44,5 +74,15 @@ new string('-', 30).PrintLine(ConsoleColor.Green);
 Spectral_011_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 SysId_011_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Adaptive_011_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+AdaptiveExt_011_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+Cheby2_011_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+IirDesign_011_test.Go();
+new string('-', 30).PrintLine(ConsoleColor.Green);
+AdaptiveRobust_011_test.Go();
 new string('-', 30).PrintLine(ConsoleColor.Green);
 Console.WriteLine("SP_module_test done.");

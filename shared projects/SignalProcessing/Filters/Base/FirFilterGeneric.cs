@@ -131,6 +131,7 @@ public class FirFilter<T> : IOnlineFilter<T>
         if (kernel.Length != _kernelSize) return;
         for (var i = 0; i < _kernelSize; i++)
             _b[i] = _b[_kernelSize + i] = kernel[i];
+        _tf = null;     // Tf is built from the kernel again
     }
 
     /// <inheritdoc />

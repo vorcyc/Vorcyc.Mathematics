@@ -21,8 +21,8 @@ public class LowPassFilter : ZiFilter
     /// <summary>
     /// Constructs <see cref="LowPassFilter"/> of given <paramref name="order"/> with given cutoff <paramref name="frequency"/>.
     /// </summary>
-    /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     public LowPassFilter(float frequency, int order) : base(MakeTf(frequency, order))
     {
         Frequency = frequency;
@@ -31,8 +31,8 @@ public class LowPassFilter : ZiFilter
     /// <summary>
     /// Generates transfer function.
     /// </summary>
-    /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     private static TransferFunction MakeTf(float frequency, int order)
     {
         return DesignFilter.IirLpTf(frequency, PrototypeBessel.Poles(order));
@@ -41,11 +41,11 @@ public class LowPassFilter : ZiFilter
     /// <summary>
     /// Changes filter coefficients online (preserving the state of the filter).
     /// </summary>
-    /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
+    /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
     public void Change(float frequency)
     {
-        Frequency = frequency;
-
         Change(MakeTf(frequency, _a.Length - 1));
+
+        Frequency = frequency;
     }
 }

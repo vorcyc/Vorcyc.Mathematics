@@ -135,25 +135,35 @@ public class ZiFilter<T> : IOnlineFilter<T>
     public void ChangeNumeratorCoeffs(ReadOnlySpan<T> b)
     {
         if (b.Length == _b.Length)
+        {
             b.CopyTo(_b);
+            _tf = null;     // Tf is built from the coefficients again
+        }
     }
 
     /// <summary>Replaces denominator coefficients online (same length required).</summary>
     public void ChangeDenominatorCoeffs(ReadOnlySpan<T> a)
     {
         if (a.Length == _a.Length)
+        {
             a.CopyTo(_a);
+            _tf = null;
+        }
     }
 
-    /// <summary>Replaces coefficients from a transfer function (padded to current length).</summary>
+    /// <summary>
+    /// Replaces coefficients from a transfer function.
+    /// The shorter part is padded with zeros like in the constructor; a transfer function of a higher order than the filter has is ignored.
+    /// </summary>
     public void Change(TransferFunction<T> tf)
     {
-        var b = FilterGenericSupport.PadTo(tf.Numerator, _b.Length);
-        var a = FilterGenericSupport.PadTo(tf.Denominator, _a.Length);
-        if (b.Length == _b.Length)
-            b.CopyTo(_b, 0);
-        if (a.Length == _a.Length)
-            a.CopyTo(_a, 0);
+        if (tf.Numerator.Length > _b.Length || tf.Denominator.Length > _a.Length)
+            return;
+
+        FilterGenericSupport.PadTo(tf.Numerator, _b.Length).CopyTo(_b, 0);
+        FilterGenericSupport.PadTo(tf.Denominator, _a.Length).CopyTo(_a, 0);
+
+        // Tf has to describe the filter that is running now
         _tf = tf;
     }
 

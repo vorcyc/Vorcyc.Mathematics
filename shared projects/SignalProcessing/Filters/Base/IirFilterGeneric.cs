@@ -138,6 +138,7 @@ public class IirFilter<T> : IOnlineFilter<T>
         if (b.Length != _numeratorSize) return;
         for (var i = 0; i < _numeratorSize; i++)
             _b[i] = _b[_numeratorSize + i] = b[i];
+        _tf = null;     // Tf is built from the coefficients again
     }
 
     /// <summary>Replaces denominator coefficients online (same length required).</summary>
@@ -145,14 +146,21 @@ public class IirFilter<T> : IOnlineFilter<T>
     {
         if (a.Length != _denominatorSize) return;
         a.CopyTo(_a);
+        _tf = null;
     }
 
     /// <summary>Replaces coefficients from a transfer function (same lengths required).</summary>
     public void Change(TransferFunction<T> tf)
     {
+        var numeratorChanged = tf.Numerator.Length == _numeratorSize;
+        var denominatorChanged = tf.Denominator.Length == _denominatorSize;
+
         ChangeNumeratorCoeffs(tf.Numerator);
         ChangeDenominatorCoeffs(tf.Denominator);
-        _tf = tf;
+
+        // Tf has to describe the filter that is running now
+        if (numeratorChanged && denominatorChanged)
+            _tf = tf;
     }
 
     /// <inheritdoc />

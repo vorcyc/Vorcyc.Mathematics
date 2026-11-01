@@ -21,9 +21,10 @@ public class LowPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(0.1);
+        Change(MakeTf(frequency, _a.Length - 1, rp));
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(0.1);
-        Change(MakeTf(frequency, _a.Length - 1, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripple)
@@ -52,9 +53,10 @@ public class HighPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(0.1);
+        Change(MakeTf(frequency, _a.Length - 1, rp));
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(0.1);
-        Change(MakeTf(frequency, _a.Length - 1, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripple)
@@ -85,10 +87,11 @@ public class BandPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(0.1);
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, rp));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(0.1);
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order, T ripple)
@@ -120,10 +123,11 @@ public class BandStopFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(0.1);
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, rp));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(0.1);
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order, T ripple)

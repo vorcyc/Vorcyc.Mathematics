@@ -4,7 +4,10 @@ using Vorcyc.Mathematics.SignalProcessing.Filters.Fda;
 
 namespace Vorcyc.Mathematics.SignalProcessing.Filters.ChebyshevII;
 
-/// <summary>Lowpass Chebyshev-II in <typeparamref name="T"/>.</summary>
+/// <summary>
+/// Lowpass Chebyshev-II in <typeparamref name="T"/>. The frequency is the stopband edge in range (0, 0.5), the end points excluded:
+/// the gain first reaches <c>-Ripple</c> dB there (like in SciPy's <c>cheby2</c>).
+/// </summary>
 public class LowPassFilter<T> : ZiFilter<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
@@ -21,9 +24,10 @@ public class LowPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(20);
+        Change(MakeTf(frequency, _a.Length - 1, rp));
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(20);
-        Change(MakeTf(frequency, _a.Length - 1, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripple)
@@ -35,7 +39,10 @@ public sealed class LowPassFilter64 : LowPassFilter<double>
     public LowPassFilter64(double frequency, int order, double ripple = 20) : base(frequency, order, ripple) { }
 }
 
-/// <summary>Highpass Chebyshev-II in <typeparamref name="T"/>.</summary>
+/// <summary>
+/// Highpass Chebyshev-II in <typeparamref name="T"/>. The frequency is the stopband edge in range (0, 0.5), the end points excluded:
+/// the gain first reaches <c>-Ripple</c> dB there (like in SciPy's <c>cheby2</c>).
+/// </summary>
 public class HighPassFilter<T> : ZiFilter<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
@@ -52,9 +59,10 @@ public class HighPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(20);
+        Change(MakeTf(frequency, _a.Length - 1, rp));
         Frequency = frequency;
-        Ripple = ripple ?? T.CreateChecked(20);
-        Change(MakeTf(frequency, _a.Length - 1, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripple)
@@ -66,7 +74,11 @@ public sealed class HighPassFilter64 : HighPassFilter<double>
     public HighPassFilter64(double frequency, int order, double ripple = 20) : base(frequency, order, ripple) { }
 }
 
-/// <summary>Bandpass Chebyshev-II in <typeparamref name="T"/>.</summary>
+/// <summary>
+/// Bandpass Chebyshev-II in <typeparamref name="T"/>. The frequencies are the stopband edges in range (0, 0.5), the end points excluded:
+/// the gain first reaches <c>-Ripple</c> dB there (like in SciPy's <c>cheby2</c>).
+/// The order is the order of the lowpass prototype, the transfer function has degree <c>2 * order</c>.
+/// </summary>
 public class BandPassFilter<T> : ZiFilter<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
@@ -85,10 +97,11 @@ public class BandPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(20);
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, rp));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(20);
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order, T ripple)
@@ -102,7 +115,11 @@ public sealed class BandPassFilter64 : BandPassFilter<double>
         : base(frequencyLow, frequencyHigh, order, ripple) { }
 }
 
-/// <summary>Bandstop Chebyshev-II in <typeparamref name="T"/>.</summary>
+/// <summary>
+/// Bandstop Chebyshev-II in <typeparamref name="T"/>. The frequencies are the stopband edges in range (0, 0.5), the end points excluded:
+/// the gain first reaches <c>-Ripple</c> dB there (like in SciPy's <c>cheby2</c>).
+/// The order is the order of the lowpass prototype, the transfer function has degree <c>2 * order</c>.
+/// </summary>
 public class BandStopFilter<T> : ZiFilter<T>
     where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
 {
@@ -121,10 +138,11 @@ public class BandStopFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripple = null)
     {
+        var rp = ripple ?? T.CreateChecked(20);
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, rp));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Ripple = ripple ?? T.CreateChecked(20);
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, Ripple));
+        Ripple = rp;
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order, T ripple)

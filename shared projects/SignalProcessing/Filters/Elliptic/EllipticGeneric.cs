@@ -23,10 +23,12 @@ public class LowPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency, T? ripplePass = null, T? rippleStop = null)
     {
+        var rp = ripplePass ?? T.One;
+        var rs = rippleStop ?? T.CreateChecked(20);
+        Change(MakeTf(frequency, _a.Length - 1, rp, rs));
         Frequency = frequency;
-        RipplePassband = ripplePass ?? T.One;
-        RippleStopband = rippleStop ?? T.CreateChecked(20);
-        Change(MakeTf(frequency, _a.Length - 1, RipplePassband, RippleStopband));
+        RipplePassband = rp;
+        RippleStopband = rs;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripplePass, T rippleStop)
@@ -60,10 +62,12 @@ public class HighPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency, T? ripplePass = null, T? rippleStop = null)
     {
+        var rp = ripplePass ?? T.One;
+        var rs = rippleStop ?? T.CreateChecked(20);
+        Change(MakeTf(frequency, _a.Length - 1, rp, rs));
         Frequency = frequency;
-        RipplePassband = ripplePass ?? T.One;
-        RippleStopband = rippleStop ?? T.CreateChecked(20);
-        Change(MakeTf(frequency, _a.Length - 1, RipplePassband, RippleStopband));
+        RipplePassband = rp;
+        RippleStopband = rs;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order, T ripplePass, T rippleStop)
@@ -99,11 +103,13 @@ public class BandPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripplePass = null, T? rippleStop = null)
     {
+        var rp = ripplePass ?? T.One;
+        var rs = rippleStop ?? T.CreateChecked(20);
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, rp, rs));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        RipplePassband = ripplePass ?? T.One;
-        RippleStopband = rippleStop ?? T.CreateChecked(20);
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, RipplePassband, RippleStopband));
+        RipplePassband = rp;
+        RippleStopband = rs;
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order, T ripplePass, T rippleStop)
@@ -139,11 +145,13 @@ public class BandStopFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh, T? ripplePass = null, T? rippleStop = null)
     {
+        var rp = ripplePass ?? T.One;
+        var rs = rippleStop ?? T.CreateChecked(20);
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, rp, rs));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        RipplePassband = ripplePass ?? T.One;
-        RippleStopband = rippleStop ?? T.CreateChecked(20);
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2, RipplePassband, RippleStopband));
+        RipplePassband = rp;
+        RippleStopband = rs;
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order, T ripplePass, T rippleStop)

@@ -15,11 +15,15 @@ public class NlmsFilter : AdaptiveFilter
     /// Constructs <see cref="NlmsFilter"/> of given <paramref name="order"/>.
     /// </summary>
     /// <param name="order">Filter order</param>
-    /// <param name="mu">Mu</param>
-    /// <param name="eps">Epsilon</param>
-    /// <param name="leakage">Leakage</param>
+    /// <param name="mu">Step size, stable for 0 &lt; mu &lt; 2 regardless of the input scale</param>
+    /// <param name="eps">Epsilon, regularizes the normalization (added to the regressor power); keep it small compared to the expected power of the input over <paramref name="order"/> samples</param>
+    /// <param name="leakage">Leakage, not negative; <paramref name="leakage"/> · <paramref name="mu"/> must not exceed 1</param>
     public NlmsFilter(int order, float mu = 0.75f, float eps = 1, float leakage = 0) : base(order)
     {
+        AdaptiveArgument.Positive(mu, nameof(mu));
+        AdaptiveArgument.NonNegative(eps, nameof(eps));
+        AdaptiveArgument.Leakage(leakage, mu);
+
         _mu = mu;
         _eps = eps;
         _leakage = leakage;
@@ -41,7 +45,26 @@ public class NlmsFilter : AdaptiveFilter
 
         var e = desired - y;
 
-        var norm = _eps + _delayLine.Sum(x => x * x);
+        if (!float.IsFinite(e))
+        {
+            return y;
+        }
+
+        // only the regressor must be counted: the second half of the delay line is its duplicate
+        var power = 0f;
+        for (var i = 0; i < _kernelSize; i++)
+        {
+            var v = _delayLine[offset + i];
+            power += v * v;
+        }
+
+        var norm = _eps + power;
+
+        // with eps = 0 a regressor of zeros (leading digital silence) would give 0 / 0
+        if (!(norm > 0))
+        {
+            return y;
+        }
 
         for (var i = 0; i < _kernelSize; i++, offset++)
         {

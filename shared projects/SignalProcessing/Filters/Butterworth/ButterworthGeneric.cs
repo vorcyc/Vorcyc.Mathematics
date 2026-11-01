@@ -15,8 +15,8 @@ public class LowPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency)
     {
-        Frequency = frequency;
         Change(MakeTf(frequency, _a.Length - 1));
+        Frequency = frequency;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order)
@@ -39,8 +39,8 @@ public class HighPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequency)
     {
-        Frequency = frequency;
         Change(MakeTf(frequency, _a.Length - 1));
+        Frequency = frequency;
     }
 
     private static TransferFunction<T> MakeTf(T frequency, int order)
@@ -68,9 +68,9 @@ public class BandPassFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh)
     {
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2));
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order)
@@ -98,9 +98,9 @@ public class BandStopFilter<T> : ZiFilter<T>
 
     public void Change(T frequencyLow, T frequencyHigh)
     {
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2));
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2));
     }
 
     private static TransferFunction<T> MakeTf(T frequencyLow, T frequencyHigh, int order)

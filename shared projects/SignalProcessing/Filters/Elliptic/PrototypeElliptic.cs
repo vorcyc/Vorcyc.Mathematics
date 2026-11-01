@@ -14,9 +14,10 @@ public static class PrototypeElliptic
     /// <summary>
     /// Evaluates analog poles of elliptic filter of given <paramref name="order"/>.
     /// </summary>
-    /// <param name="order">Filter order</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripplePass">Passband ripple (in dB)</param>
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static ComplexFp32[] Poles(int order, float ripplePass = 1f, float rippleStop = 20f)
     {
         // 1 - r*r (r = eps_p / eps_s) rounds to 1 in single precision once Rs is far above Rp, which collapses the Landen sequence.
@@ -26,11 +27,15 @@ public static class PrototypeElliptic
     /// <summary>
     /// Evaluates analog zeros of elliptic filter of given <paramref name="order"/>.
     /// </summary>
-    /// <param name="order">Filter order</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripplePass">Passband ripple (in dB)</param>
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static Complex[] Zeros(int order, double ripplePass = 1, double rippleStop = 20)
     {
+        if (order < 1)
+            throw new ArgumentOutOfRangeException(nameof(order), order, "Filter order must be at least 1.");
+
         Guard.AgainstInvalidRange(ripplePass, rippleStop, "ripple in passband", "ripple in stopband");
 
         var eps_p = Math.Sqrt(Math.Pow(10, ripplePass / 10) - 1);
@@ -68,9 +73,10 @@ public static class PrototypeElliptic
     /// <summary>
     /// Evaluates analog zeros of elliptic filter of given <paramref name="order"/>.
     /// </summary>
-    /// <param name="order">Filter order</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripplePass">Passband ripple (in dB)</param>
     /// <param name="rippleStop">Stopband ripple (in dB)</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static ComplexFp32[] Zeros(int order, float ripplePass = 1, float rippleStop = 20)
     {
         // See Poles(int, float, float): single precision cannot carry the Landen sequence for a large Rs / Rp ratio.
@@ -231,9 +237,13 @@ public static class PrototypeElliptic
     /// <summary>
     /// Analog elliptic poles in <typeparamref name="T"/>.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static Complex<T>[] Poles<T>(int order, T? ripplePass = null, T? rippleStop = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
+        if (order < 1)
+            throw new ArgumentOutOfRangeException(nameof(order), order, "Filter order must be at least 1.");
+
         var rp = ripplePass ?? T.One;
         var rs = rippleStop ?? T.CreateChecked(20);
         Guard.AgainstInvalidRange(double.CreateChecked(rp), double.CreateChecked(rs), "ripple in passband", "ripple in stopband");
@@ -269,9 +279,13 @@ public static class PrototypeElliptic
     /// <summary>
     /// Analog elliptic zeros in <typeparamref name="T"/>.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static Complex<T>[] Zeros<T>(int order, T? ripplePass = null, T? rippleStop = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
+        if (order < 1)
+            throw new ArgumentOutOfRangeException(nameof(order), order, "Filter order must be at least 1.");
+
         var rp = ripplePass ?? T.One;
         var rs = rippleStop ?? T.CreateChecked(20);
         Guard.AgainstInvalidRange(double.CreateChecked(rp), double.CreateChecked(rs), "ripple in passband", "ripple in stopband");

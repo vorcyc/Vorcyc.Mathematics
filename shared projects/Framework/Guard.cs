@@ -85,6 +85,21 @@ internal static class Guard
     }
 
     /// <summary>
+    /// Guards against the number being not in the open range (<paramref name="low"/>, <paramref name="high"/>). NaN is rejected as well.
+    /// </summary>
+    /// <param name="value">Argument (number)</param>
+    /// <param name="low">Lower boundary of the range (excluded)</param>
+    /// <param name="high">Upper boundary of the range (excluded)</param>
+    /// <param name="valueName">Argument name</param>
+    public static void AgainstInvalidOpenRange(double value, double low, double high, string valueName = "value")
+    {
+        if (!(value > low && value < high))
+        {
+            throw new ArgumentException($"{valueName} must be in range ({low}, {high})!");
+        }
+    }
+
+    /// <summary>
     /// Guards against the case when the first and the second arguments are not valid boundaries of a range.
     /// </summary>
     /// <param name="low">The first argument</param>

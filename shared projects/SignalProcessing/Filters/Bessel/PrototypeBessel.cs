@@ -32,7 +32,8 @@ public static class PrototypeBessel
     /// <summary>
     /// Evaluates analog poles of Bessel filter of given <paramref name="order"/>.
     /// </summary>
-    /// <param name="order">Filter order</param>
+    /// <param name="order">Filter order, at least 1</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static ComplexFp32[] Poles(int order)
     {
         // Durand-Kerner on the Bessel polynomial does not converge in single precision from order 7 up (wrong poles, NaN at 8-9).
@@ -58,9 +59,13 @@ public static class PrototypeBessel
     /// <summary>
     /// Analog Bessel poles in <typeparamref name="T"/>.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static Complex<T>[] Poles<T>(int order)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
+        if (order < 1)
+            throw new ArgumentOutOfRangeException(nameof(order), order, "Filter order must be at least 1.");
+
         if (typeof(T) != typeof(double))
         {
             var wide = Poles<double>(order);

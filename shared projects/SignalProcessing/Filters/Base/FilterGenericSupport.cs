@@ -28,6 +28,20 @@ internal static class FilterGenericSupport
             "lower frequency", "upper frequency");
     }
 
+    // The pole filter designs (Butterworth, Chebyshev, ...) warp the frequency with tan(pi * f): 0 and 0.5 are no frequencies of a design.
+    public static void GuardOpenNormFreq<T>(T frequency, string name)
+        where T : IFloatingPointIeee754<T>
+        => Guard.AgainstInvalidOpenRange(double.CreateChecked(frequency), 0, 0.5, name);
+
+    public static void GuardOpenBand<T>(T frequencyLow, T frequencyHigh)
+        where T : IFloatingPointIeee754<T>
+    {
+        GuardOpenNormFreq(frequencyLow, "lower frequency");
+        GuardOpenNormFreq(frequencyHigh, "upper frequency");
+        Guard.AgainstInvalidRange(double.CreateChecked(frequencyLow), double.CreateChecked(frequencyHigh),
+            "lower frequency", "upper frequency");
+    }
+
     public static T[] PadTo<T>(T[] source, int size)
     {
         var dst = new T[size];

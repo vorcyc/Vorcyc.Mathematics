@@ -281,17 +281,40 @@ public class TransferFunction<T>
         return pd;
     }
 
-    /// <summary>Normalizes frequency response at the given digital frequency (radians).</summary>
-    public void NormalizeAt(T freq)
+    /// <summary>
+    /// Normalizes frequency response at the given digital frequency (radians): the numerator is scaled to unit gain there.
+    /// The gain is that of the stored coefficients. When the transfer function was created from zeros and poles and the
+    /// expanded coefficients no longer agree with them to within 1 dB at <paramref name="freq"/> (narrow-band or high-order designs
+    /// lose the response in the rounding of single precision coefficients), the gain of the zeros and poles is used instead.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="freq"/> is not finite.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// The frequency response is zero, infinite or not defined at <paramref name="freq"/>, or the normalized numerator is out of range of <typeparamref name="T"/>.
+    /// The transfer function is not changed then.
+    /// </exception>
+    public void NormalizeAt(T freq) => NormalizeAt(freq, FilterResponse.Roots(_zeros), FilterResponse.Roots(_poles));
+
+    /// <summary>
+    /// Normalizes frequency response at <paramref name="freq"/> from the given zeros and poles
+    /// (the design functions know them exactly while the expanded coefficients do not).
+    /// </summary>
+    internal void NormalizeAt(T freq, Complex[]? zeros, Complex[]? poles)
     {
-        var w = Complex<T>.FromPolarCoordinates(T.One, freq);
-        T den = Complex<T>.Abs(VMath.EvaluatePolynomial(Denominator, w));
-        T num = Complex<T>.Abs(VMath.EvaluatePolynomial(Numerator, w));
-        T tiny = T.CreateChecked(1e-30);
-        if (num < tiny) return;
-        T gain = den / num;
-        for (var i = 0; i < Numerator.Length; i++)
-            Numerator[i] *= gain;
+        if (!T.IsFinite(freq))
+            throw new ArgumentOutOfRangeException(nameof(freq), "The frequency must be a finite number.");
+
+        var scale = FilterResponse.UnitGainScale(FilterResponse.Coefficients(Numerator), FilterResponse.Coefficients(Denominator),
+                                                 zeros, poles, double.CreateChecked(freq));
+
+        var scaled = new T[Numerator.Length];
+        for (var i = 0; i < scaled.Length; i++)
+        {
+            scaled[i] = T.CreateTruncating(double.CreateChecked(Numerator[i]) * scale);
+            if (!T.IsFinite(scaled[i]))
+                throw new InvalidOperationException($"The normalized numerator is out of range of {typeof(T).Name}.");
+        }
+
+        scaled.CopyTo(Numerator, 0);
     }
 
     /// <summary>Divides numerator and denominator by a[0].</summary>

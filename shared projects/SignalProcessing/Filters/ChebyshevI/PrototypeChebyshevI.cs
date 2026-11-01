@@ -11,10 +11,14 @@ public static class PrototypeChebyshevI
     /// <summary>
     /// Evaluates analog poles of Chebyshev-I filter of given <paramref name="order"/>.
     /// </summary>
-    /// <param name="order">Filter order</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripple">Ripple (in dB)</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static ComplexFp32[] Poles(int order, float ripple = 0.1f)
     {
+        if (order < 1)
+            throw new ArgumentOutOfRangeException(nameof(order), order, "Filter order must be at least 1.");
+
         var eps = MathF.Sqrt(MathF.Pow(10, ripple / 10) - 1);
         var s = TrigonometryHelper.Asinh(1 / eps) / order;
         var sinh = MathF.Sinh(s);
@@ -36,9 +40,13 @@ public static class PrototypeChebyshevI
     /// <summary>
     /// Analog Chebyshev-I poles in <typeparamref name="T"/>.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="order"/> is less than 1.</exception>
     public static Complex<T>[] Poles<T>(int order, T? ripple = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
+        if (order < 1)
+            throw new ArgumentOutOfRangeException(nameof(order), order, "Filter order must be at least 1.");
+
         var rip = ripple ?? T.CreateChecked(0.1);
         var ten = T.CreateChecked(10);
         var eps = T.Sqrt(T.Pow(ten, rip / ten) - T.One);

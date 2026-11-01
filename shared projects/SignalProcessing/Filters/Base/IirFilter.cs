@@ -234,6 +234,8 @@ public class IirFilter : LtiFilter
             {
                 _b[i] = _b[_numeratorSize + i] = b[i];
             }
+
+            _tf = null;     // Tf is built from the coefficients again
         }
     }
 
@@ -246,6 +248,8 @@ public class IirFilter : LtiFilter
         if (a.Length == _denominatorSize)
         {
             for (var i = 0; i < _denominatorSize; _a[i] = a[i], i++) { }
+
+            _tf = null;
         }
     }
 
@@ -256,8 +260,9 @@ public class IirFilter : LtiFilter
     public void Change(TransferFunction tf)
     {
         var b = tf.Numerator;
+        var numeratorChanged = b.Length == _numeratorSize;
 
-        if (b.Length == _numeratorSize)
+        if (numeratorChanged)
         {
             for (var i = 0; i < _numeratorSize; i++)
             {
@@ -266,10 +271,17 @@ public class IirFilter : LtiFilter
         }
 
         var a = tf.Denominator;
+        var denominatorChanged = a.Length == _denominatorSize;
 
-        if (a.Length == _denominatorSize)
+        if (denominatorChanged)
         {
             for (var i = 0; i < _a.Length; _a[i] = (float)a[i], i++) { }
+        }
+
+        // Tf has to describe the filter that is running now
+        if (numeratorChanged || denominatorChanged)
+        {
+            _tf = numeratorChanged && denominatorChanged ? tf : null;
         }
     }
 

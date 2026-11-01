@@ -12,10 +12,13 @@ public class LmsFilter : AdaptiveFilter
     /// Constructs <see cref="LmsFilter"/> of given <paramref name="order"/>.
     /// </summary>
     /// <param name="order">Filter order</param>
-    /// <param name="mu">Mu</param>
-    /// <param name="leakage">Leakage</param>
-    public LmsFilter(int order, float mu = 0.75f, float leakage = 0) : base(order)
+    /// <param name="mu">Step size. It must be small compared to 2 / (<paramref name="order"/> · input power), otherwise the filter diverges; use <see cref="NlmsFilter"/> when the input scale is unknown</param>
+    /// <param name="leakage">Leakage, not negative; <paramref name="leakage"/> · <paramref name="mu"/> must not exceed 1</param>
+    public LmsFilter(int order, float mu = 0.001f, float leakage = 0) : base(order)
     {
+        AdaptiveArgument.Positive(mu, nameof(mu));
+        AdaptiveArgument.Leakage(leakage, mu);
+
         _mu = mu;
         _leakage = leakage;
     }
@@ -35,6 +38,11 @@ public class LmsFilter : AdaptiveFilter
         var y = Process(input);
 
         var e = desired - y;
+
+        if (!float.IsFinite(e))
+        {
+            return y;
+        }
         
         for (var i = 0; i < _kernelSize; i++, offset++)
         {

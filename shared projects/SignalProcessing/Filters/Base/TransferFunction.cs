@@ -370,20 +370,40 @@ public class TransferFunction
 
     /// <summary>
     /// Normalizes frequency response at given frequency 
-    /// (normalizes numerator to map frequency response onto [0, 1])
+    /// (normalizes numerator to map frequency response onto [0, 1]).
+    /// The gain is that of the stored coefficients. When the transfer function was created from zeros and poles and the
+    /// expanded coefficients no longer agree with them to within 1 dB at <paramref name="freq"/> (narrow-band or high-order designs
+    /// lose the response in the rounding of single precision coefficients), the gain of the zeros and poles is used instead.
     /// </summary>
-    /// <param name="freq">Frequency</param>
+    /// <param name="freq">Frequency (radians)</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="freq"/> is not finite.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// The frequency response is zero, infinite or not defined at <paramref name="freq"/>, or the normalized numerator is out of range of <see cref="float"/>.
+    /// The transfer function is not changed then.
+    /// </exception>
     public void NormalizeAt(float freq)
     {
-        var w = ComplexFp32.FromPolarCoordinates(1, freq);
-
-        var gain = ComplexFp32.Abs(VMath.EvaluatePolynomial(Denominator, w) /
-                               VMath.EvaluatePolynomial(Numerator, w));
-
-        for (var i = 0; i < Numerator.Length; i++)
+        if (!float.IsFinite(freq))
         {
-            Numerator[i] *= gain;
+            throw new ArgumentOutOfRangeException(nameof(freq), "The frequency must be a finite number.");
         }
+
+        var scale = FilterResponse.UnitGainScale(FilterResponse.Coefficients(Numerator), FilterResponse.Coefficients(Denominator),
+                                                 FilterResponse.Roots(_zeros), FilterResponse.Roots(_poles), freq);
+
+        var scaled = new float[Numerator.Length];
+
+        for (var i = 0; i < scaled.Length; i++)
+        {
+            scaled[i] = (float)(Numerator[i] * scale);
+
+            if (!float.IsFinite(scaled[i]))
+            {
+                throw new InvalidOperationException("The normalized numerator is out of range of single precision.");
+            }
+        }
+
+        scaled.CopyTo(Numerator, 0);
     }
 
     /// <summary>

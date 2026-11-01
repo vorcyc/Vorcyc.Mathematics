@@ -1,7 +1,9 @@
 ﻿namespace Vorcyc.Mathematics.SignalProcessing.Filters.Adaptive;
 
 /// <summary>
-/// Represents LMS Adaptive filter (Least-Mean-Squares) with variable steps.
+/// Represents LMS Adaptive filter (Least-Mean-Squares) with an individual, fixed step size for every tap
+/// (w[i] += mu[i] · e · x[i]). The steps do not change over time; for step sizes that adapt to the error
+/// see <see cref="VssLmsFilter"/> and <see cref="GassLmsFilter"/>.
 /// </summary>
 public class VariableStepLmsFilter : AdaptiveFilter
 {
@@ -12,12 +14,21 @@ public class VariableStepLmsFilter : AdaptiveFilter
     /// Constructs <see cref="VariableStepLmsFilter"/> of given <paramref name="order"/>.
     /// </summary>
     /// <param name="order">Filter order</param>
-    /// <param name="mu">Mu</param>
-    /// <param name="leakage">Leakage</param>
-    public VariableStepLmsFilter(int order, float[] mu = null, float leakage = 0) : base(order)
+    /// <param name="mu">Step size of every tap (<paramref name="order"/> values, each positive and finite); 0.001 for every tap if omitted. The values are copied</param>
+    /// <param name="leakage">Leakage, not negative; <paramref name="leakage"/> times the largest step size must not exceed 1</param>
+    public VariableStepLmsFilter(int order, float[]? mu = null, float leakage = 0) : base(order)
     {
-        _mu = mu ?? Enumerable.Repeat(0.75f, order).ToArray();
+        // an own copy: the caller could change the array behind the checks
+        _mu = mu is null ? Enumerable.Repeat(0.001f, order).ToArray() : (float[])mu.Clone();
         Guard.AgainstInequality(order, _mu.Length, "Filter order", "Steps array size");
+
+        var largest = 0f;
+        foreach (var step in _mu)
+        {
+            AdaptiveArgument.Positive(step, nameof(mu));
+            largest = Math.Max(largest, step);
+        }
+        AdaptiveArgument.Leakage(leakage, largest);
 
         _leakage = leakage;
     }
@@ -37,6 +48,11 @@ public class VariableStepLmsFilter : AdaptiveFilter
         var y = Process(input);
 
         var e = desired - y;
+
+        if (!float.IsFinite(e))
+        {
+            return y;
+        }
 
         for (var i = 0; i < _kernelSize; i++, offset++)
         {

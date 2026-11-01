@@ -27,9 +27,9 @@ public class BandPassFilter : ZiFilter
     /// Constructs <see cref="BandPassFilter"/> of given <paramref name="order"/> 
     /// with given cutoff frequencies <paramref name="frequencyLow"/> and <paramref name="frequencyHigh"/>.
     /// </summary>
-    /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-    /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     public BandPassFilter(float frequencyLow, float frequencyHigh, int order) : base(MakeTf(frequencyLow, frequencyHigh, order))
     {
         FrequencyLow = frequencyLow;
@@ -39,9 +39,9 @@ public class BandPassFilter : ZiFilter
     /// <summary>
     /// Generates transfer function.
     /// </summary>
-    /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-    /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     private static TransferFunction MakeTf(float frequencyLow, float frequencyHigh, int order)
     {
         return DesignFilter.IirBpTf(frequencyLow, frequencyHigh, PrototypeBessel.Poles(order));
@@ -50,13 +50,13 @@ public class BandPassFilter : ZiFilter
     /// <summary>
     /// Changes filter coefficients online (preserving the state of the filter).
     /// </summary>
-    /// <param name="frequencyLow">Normalized low cutoff frequency in range [0..0.5]</param>
-    /// <param name="frequencyHigh">Normalized high cutoff frequency in range [0..0.5]</param>
+    /// <param name="frequencyLow">Normalized low cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="frequencyHigh">Normalized high cutoff frequency in range (0..0.5), the end points excluded</param>
     public void Change(float frequencyLow, float frequencyHigh)
     {
+        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2));
+
         FrequencyLow = frequencyLow;
         FrequencyHigh = frequencyHigh;
-
-        Change(MakeTf(frequencyLow, frequencyHigh, (_a.Length - 1) / 2));
     }
 }

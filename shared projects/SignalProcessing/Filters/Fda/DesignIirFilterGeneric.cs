@@ -78,11 +78,11 @@ public static partial class DesignFilter
         return new TransferFunction<T>(num, den);
     }
 
-    /// <summary>Designs a lowpass pole filter in <typeparamref name="T"/>.</summary>
+    /// <summary>Designs a lowpass pole filter in <typeparamref name="T"/> (the frequency is in range (0, 0.5), the end points excluded).</summary>
     public static TransferFunction<T> IirLpTf<T>(T frequency, Complex<T>[] poles, Complex<T>[]? zeros = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        FilterGenericSupport.GuardNormFreq(frequency, "Cutoff frequency");
+        FilterGenericSupport.GuardOpenNormFreq(frequency, "Cutoff frequency");
         var warped = T.Tan(T.Pi * frequency);
         FilterGenericSupport.SplitReIm(Scale(poles, warped), out var pre, out var pim);
         VMath.BilinearTransform(pre, pim);
@@ -100,15 +100,15 @@ public static partial class DesignFilter
         }
 
         var tf = new TransferFunction<T>(TransferFunction<T>.ZpToTf(zre, zim), TransferFunction<T>.ZpToTf(pre, pim));
-        tf.NormalizeAt(T.Zero);
+        tf.NormalizeAt(T.Zero, FilterResponse.Roots(zre, zim), FilterResponse.Roots(pre, pim));
         return tf;
     }
 
-    /// <summary>Designs a highpass pole filter in <typeparamref name="T"/>.</summary>
+    /// <summary>Designs a highpass pole filter in <typeparamref name="T"/> (the frequency is in range (0, 0.5), the end points excluded).</summary>
     public static TransferFunction<T> IirHpTf<T>(T frequency, Complex<T>[] poles, Complex<T>[]? zeros = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        FilterGenericSupport.GuardNormFreq(frequency, "Cutoff frequency");
+        FilterGenericSupport.GuardOpenNormFreq(frequency, "Cutoff frequency");
         var warped = T.Tan(T.Pi * frequency);
         FilterGenericSupport.SplitReIm(InvertScale(poles, warped), out var pre, out var pim);
         VMath.BilinearTransform(pre, pim);
@@ -126,15 +126,15 @@ public static partial class DesignFilter
         }
 
         var tf = new TransferFunction<T>(TransferFunction<T>.ZpToTf(zre, zim), TransferFunction<T>.ZpToTf(pre, pim));
-        tf.NormalizeAt(T.Pi);
+        tf.NormalizeAt(T.Pi, FilterResponse.Roots(zre, zim), FilterResponse.Roots(pre, pim));
         return tf;
     }
 
-    /// <summary>Designs a bandpass pole filter in <typeparamref name="T"/>.</summary>
+    /// <summary>Designs a bandpass pole filter in <typeparamref name="T"/> (the frequencies are in range (0, 0.5), the end points excluded).</summary>
     public static TransferFunction<T> IirBpTf<T>(T frequencyLow, T frequencyHigh, Complex<T>[] poles, Complex<T>[]? zeros = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        FilterGenericSupport.GuardBand(frequencyLow, frequencyHigh);
+        FilterGenericSupport.GuardOpenBand(frequencyLow, frequencyHigh);
         SpectralTransformBp(poles, frequencyLow, frequencyHigh, out var pre, out var pim);
         VMath.BilinearTransform(pre, pim);
 
@@ -153,15 +153,15 @@ public static partial class DesignFilter
         // Unit gain where the prototype's DC lands, not at the arithmetic centre of the edges.
         var center = T.CreateChecked(2) * T.Atan(T.Sqrt(T.Tan(T.Pi * frequencyLow) * T.Tan(T.Pi * frequencyHigh)));
         var tf = new TransferFunction<T>(TransferFunction<T>.ZpToTf(zre, zim), TransferFunction<T>.ZpToTf(pre, pim));
-        tf.NormalizeAt(center);
+        tf.NormalizeAt(center, FilterResponse.Roots(zre, zim), FilterResponse.Roots(pre, pim));
         return tf;
     }
 
-    /// <summary>Designs a bandstop pole filter in <typeparamref name="T"/>.</summary>
+    /// <summary>Designs a bandstop pole filter in <typeparamref name="T"/> (the frequencies are in range (0, 0.5), the end points excluded).</summary>
     public static TransferFunction<T> IirBsTf<T>(T frequencyLow, T frequencyHigh, Complex<T>[] poles, Complex<T>[]? zeros = null)
         where T : unmanaged, IFloatingPointIeee754<T>, IMinMaxValue<T>
     {
-        FilterGenericSupport.GuardBand(frequencyLow, frequencyHigh);
+        FilterGenericSupport.GuardOpenBand(frequencyLow, frequencyHigh);
         var f1 = T.Tan(T.Pi * frequencyLow);
         var f2 = T.Tan(T.Pi * frequencyHigh);
         var f0 = T.Sqrt(f1 * f2);
@@ -193,7 +193,7 @@ public static partial class DesignFilter
         }
 
         var tf = new TransferFunction<T>(TransferFunction<T>.ZpToTf(zre, zim), TransferFunction<T>.ZpToTf(pre, pim));
-        tf.NormalizeAt(T.Zero);
+        tf.NormalizeAt(T.Zero, FilterResponse.Roots(zre, zim), FilterResponse.Roots(pre, pim));
         return tf;
     }
 
@@ -330,7 +330,8 @@ public static partial class DesignFilter
             var p1 = alpha * (T.One + beta);
             re[k] = p1.Real;
             im[k] = p1.Imaginary;
-            var p2 = alpha * (T.One - beta);
+            // the roots of s² - 2·alpha·s + f0² have the product f0²: 1 - beta would lose all digits where beta is close to 1
+            var p2 = f0 * f0 / p1;
             re[z.Length + k] = p2.Real;
             im[z.Length + k] = p2.Imaginary;
         }
@@ -348,7 +349,8 @@ public static partial class DesignFilter
             var p1 = alpha * (T.One + beta);
             re[k] = p1.Real;
             im[k] = p1.Imaginary;
-            var p2 = alpha * (T.One - beta);
+            // the roots of s² - 2·alpha·s + f0² have the product f0²: 1 - beta would lose all digits where beta is close to 1
+            var p2 = f0 * f0 / p1;
             re[z.Length + k] = p2.Real;
             im[z.Length + k] = p2.Imaginary;
         }

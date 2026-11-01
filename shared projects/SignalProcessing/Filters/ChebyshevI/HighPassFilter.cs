@@ -26,8 +26,8 @@ public class HighPassFilter : ZiFilter
     /// <summary>
     /// Constructs <see cref="HighPassFilter"/> of given <paramref name="order"/> with given cutoff <paramref name="frequency"/>.
     /// </summary>
-    /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripple">Ripple (in dB)</param>
     public HighPassFilter(float frequency, int order, float ripple = 0.1f) : base(MakeTf(frequency, order, ripple))
     {
@@ -38,8 +38,8 @@ public class HighPassFilter : ZiFilter
     /// <summary>
     /// Generates transfer function.
     /// </summary>
-    /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
-    /// <param name="order">Filter order</param>
+    /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
+    /// <param name="order">Filter order, at least 1</param>
     /// <param name="ripple">Ripple (in dB)</param>
     private static TransferFunction MakeTf(float frequency, int order, float ripple = 0.1f)
     {
@@ -49,13 +49,13 @@ public class HighPassFilter : ZiFilter
     /// <summary>
     /// Changes filter coefficients online (preserving the state of the filter).
     /// </summary>
-    /// <param name="frequency">Normalized cutoff frequency in range [0..0.5]</param>
+    /// <param name="frequency">Normalized cutoff frequency in range (0..0.5), the end points excluded</param>
     /// <param name="ripple">Ripple (in dB)</param>
     public void Change(float frequency, float ripple = 0.1f)
     {
+        Change(MakeTf(frequency, _a.Length - 1, ripple));
+
         Frequency = frequency;
         Ripple = ripple;
-
-        Change(MakeTf(frequency, _a.Length - 1, ripple));
     }
 }
