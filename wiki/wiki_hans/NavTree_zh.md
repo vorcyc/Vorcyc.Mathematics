@@ -83,6 +83,7 @@
   * :bookmark: [时标变换（Tsm）](Module_SignalProcessing_Operations_zh#时标变换operationstsm)
   * :bookmark: [信号定义和相关操作](Module_SignalProcessing_Signals_zh)
   * :bookmark: [Generators（0.9+）](Module_SignalProcessing_Signals_zh#generators生成器09)
+  * :bookmark: [相位用 double（0.11.3）](Module_SignalProcessing_Signals_zh#相位用-double0113)
   * :bookmark: [变换操作](Module_SignalProcessing_Transforms_zh)
   * :bookmark: [窗函数](Module_SignalProcessing_Windowing_zh)
   * :bookmark: [其它](Module_SignalProcessing_Others_zh)

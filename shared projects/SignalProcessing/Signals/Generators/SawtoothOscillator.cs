@@ -6,7 +6,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 public sealed class SawtoothOscillator : IAmplitudeOscillator
 {
     private int _n;
-    private float _cycles;
+    private double _cycles;
 
     /// <inheritdoc />
     public float SamplingRate
@@ -44,7 +44,9 @@ public sealed class SawtoothOscillator : IAmplitudeOscillator
     /// <inheritdoc />
     public float NextSample()
     {
-        var sample = Min + (Max - Min) * (_n % _cycles) / _cycles;
+        // _n 先转 float 再取余，长信号相位小数会丢。int 转 double 仍是精确整数。
+        double x = _n % _cycles;
+        var sample = (float)(Min + (Max - Min) * (x / _cycles));
         _n++;
         return sample;
     }
@@ -54,7 +56,9 @@ public sealed class SawtoothOscillator : IAmplitudeOscillator
 
     private void UpdateCycles(bool resetPhase)
     {
-        _cycles = _samplingRate / _frequency;
+        _cycles = (double)_samplingRate / _frequency;
+        if (_cycles < 1)
+            _cycles = 1;
         if (resetPhase)
         {
             _n = (int)(_cycles / 2);

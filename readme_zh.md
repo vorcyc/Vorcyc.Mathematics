@@ -4,7 +4,7 @@
 
 ![VMath logo](https://raw.githubusercontent.com/vorcyc/Vorcyc.Mathematics/main/docs/logos/logo1.png)
 
-**版本：** 0.11.2 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
+**版本：** 0.11.3 · **目标框架：** `net10.0` · **NuGet：** `Vorcyc.Mathematics`
 
 [English readme](README.md)
 
@@ -51,7 +51,7 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 **机器学习（0.9+）** — 分类/回归流水线、树与森林、提升、交叉验证、网格搜索、聚类与降维等；Isolation Forest + JSON 快照（0.10.11）与 GPR `PredictStd`（0.10.10）；曲线拟合 SIMD 大 N `StackOverflow` 修复（0.10.16）；经典 `CurveFitter` 接入 `CancellationToken`（0.10.17）；`PCA<T>` 样本外 `Transform`（0.10.18）。**0.11.0：** 单类支持向量机、局部离群因子、ECOC、核朴素贝叶斯、神经网络分类器，以及训完可以 `Predict` 的交叉验证分类器。  
 → [wiki/wiki_hans/Module_MachineLearning_zh.md](wiki/wiki_hans/Module_MachineLearning_zh.md)
 
-**信号处理** — **0.9 起以 `Signal` / `SignalSegment` 为时域主 API**；FFT（0.10.12 起 `TransformToFrequencyDomain` 走 SoA `FftButterflyFp32`）、泛型门面 `Fft<T>` / `RealFft<T>` / `HilbertTransform<T>`（0.10.18）、`Convolver<T>` / `OlaBlockConvolver<T>` / `ComplexConvolver<T>` / `Operation.Convolve<T>`（0.10.19）、空 zpk `ZpToTf([])` → `[1]`（0.10.20）、模态分解样本缓冲保持在 `T`（0.10.18）、`IirFilter<T>` / `FirFilter<T>` / `ZiFilter<T>` / FDA 留在 `T`（0.10.18）、Welch（0.10.13 完整窗 + `ComputingContext`；0.10.14 onesided 缩放 / 周期窗 / 频谱特性）、`FrequencyDomain.IndexToFrequency` 按 FFT `TransformLength`（0.10.15）、粉红噪声（0.10.14 Paul Kellet `PinkNoiseGenerator`）、滤波、MFCC、音效等。**0.11.0：** `cpsd` / `mscohere` / `tfestimate`、多窗与参数谱（`pmtm`、`pyulear`、`pburg`、`pcov`），以及系统辨识（`IdData`、`arx` / `armax` / `oe` / `bj`、`n4sid` / `ssest`、`tfest`、`compare` / `resid` / `sim`）。**0.11.1：** 自适应滤波器（`Filters.Adaptive`：修复 `RlsFilter` / `NlmsFilter`，新增 30 余种算法——LMS 族、RLS / QRD-RLS / 最小二乘格型 / 滑动窗口 RLS、频域、复数值、多通道、Volterra 与核滤波器、谱线增强器、自适应陷波、工频干扰消除、FxLMS），以及 `Change…` 方法（`Tf` 不同步）、`TransferFunction.NormalizeAt`（单精度出现 NaN）、极点型滤波器设计的参数检查（以及每个原型的阶数检查）与带阻 / 带通设计的修复（复查 Chebyshev II 时发现），自适应滤波器会校验数值参数并忽略非有限样本。**0.11.2：** Kalman 趋势滤波与平滑（`Filters.Kalman`：`KalmanTrend.Filter` / `Smooth`，局部水平与局部趋势两种模型——因果估计与固定区间（RTS）平滑、缺失样本、遇到真实水平变化会让路的离群门限、自动测量方差、状态标准差 / 斜率 / 标准化新息、等效窗长换算——以及流式 `KalmanTrendFilter`）。  
+**信号处理** — **0.9 起以 `Signal` / `SignalSegment` 为时域主 API**；FFT（0.10.12 起 `TransformToFrequencyDomain` 走 SoA `FftButterflyFp32`）、泛型门面 `Fft<T>` / `RealFft<T>` / `HilbertTransform<T>`（0.10.18）、`Convolver<T>` / `OlaBlockConvolver<T>` / `ComplexConvolver<T>` / `Operation.Convolve<T>`（0.10.19）、空 zpk `ZpToTf([])` → `[1]`（0.10.20）、模态分解样本缓冲保持在 `T`（0.10.18）、`IirFilter<T>` / `FirFilter<T>` / `ZiFilter<T>` / FDA 留在 `T`（0.10.18）、Welch（0.10.13 完整窗 + `ComputingContext`；0.10.14 onesided 缩放 / 周期窗 / 频谱特性）、`FrequencyDomain.IndexToFrequency` 按 FFT `TransformLength`（0.10.15）、粉红噪声（0.10.14 Paul Kellet `PinkNoiseGenerator`）、滤波、MFCC、音效等。**0.11.0：** `cpsd` / `mscohere` / `tfestimate`、多窗与参数谱（`pmtm`、`pyulear`、`pburg`、`pcov`），以及系统辨识（`IdData`、`arx` / `armax` / `oe` / `bj`、`n4sid` / `ssest`、`tfest`、`compare` / `resid` / `sim`）。**0.11.1：** 自适应滤波器（`Filters.Adaptive`：修复 `RlsFilter` / `NlmsFilter`，新增 30 余种算法——LMS 族、RLS / QRD-RLS / 最小二乘格型 / 滑动窗口 RLS、频域、复数值、多通道、Volterra 与核滤波器、谱线增强器、自适应陷波、工频干扰消除、FxLMS），以及 `Change…` 方法（`Tf` 不同步）、`TransferFunction.NormalizeAt`（单精度出现 NaN）、极点型滤波器设计的参数检查（以及每个原型的阶数检查）与带阻 / 带通设计的修复（复查 Chebyshev II 时发现），自适应滤波器会校验数值参数并忽略非有限样本。**0.11.2：** Kalman 趋势滤波与平滑（`Filters.Kalman`：`KalmanTrend.Filter` / `Smooth`，局部水平与局部趋势两种模型——因果估计与固定区间（RTS）平滑、缺失样本、遇到真实水平变化会让路的离群门限、自动测量方差、状态标准差 / 斜率 / 标准化新息、等效窗长换算——以及流式 `KalmanTrendFilter`）。**0.11.3：** 正弦、余弦、方波、锯齿和三角波生成器在 double 里计算相位，写出的样点仍是 `float`，长音在大约 2^24 个样本之后不再丢掉小数相位。  
 → [wiki/wiki_hans/Module_SignalProcessing_zh.md](wiki/wiki_hans/Module_SignalProcessing_zh.md)
 
 **数值模块** — 扩展整数、浮点、复数、有理数等高精度类型。  
@@ -67,7 +67,7 @@ Vorcyc® Mathematics 是一套主要面向 .NET 的数学库，旨在充分利�
 
 ## 扩展包
 
-**FFTW 扩展**（`Vorcyc.Mathematics.Extensions.FFTW`，0.11.2）— 基于 FFTW 本地库的高性能 DFT 封装（版本与主包对齐；FFTW API 无变更）。  
+**FFTW 扩展**（`Vorcyc.Mathematics.Extensions.FFTW`，0.11.3）— 基于 FFTW 本地库的高性能 DFT 封装（版本与主包对齐；FFTW API 无变更）。  
 → [wiki/wiki_hans/Module_Extensions_FFTW_zh.md](wiki/wiki_hans/Module_Extensions_FFTW_zh.md)
 
 ---

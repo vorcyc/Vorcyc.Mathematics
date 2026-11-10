@@ -535,10 +535,11 @@ public static class SignalGeneratingExtension
     /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateCosineWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
-        float omega = 2 * ConstantsFp32.PI * frequency / signal.SamplingRate;
+        // omega * i 用 float 时，下标超过约 2^24 后小数相位被吃掉。
+        double omega = 2 * Math.PI * frequency / signal.SamplingRate;
         for (int i = 0; i < signal.Length; i++)
         {
-            var value = MathF.Cos(omega * i);
+            var value = (float)Math.Cos(omega * i);
             action(i, value);
         }
     }
@@ -563,10 +564,14 @@ public static class SignalGeneratingExtension
         //    var sample = sampleSaw > 0 ? 1 : -1;
         //    action(i, sample);
         //}
-        var period = signal.SamplingRate / frequency;
+        // 周期用 double。i % float 会先把下标收成单精度，长信号后半段只剩几个电平。
+        double period = (double)signal.SamplingRate / frequency;
+        if (period < 1)
+            period = 1;
         for (int i = 0; i < signal.Length; i++)
         {
-            var sample = (i % period) < (period / 2) ? 1.0f : -1.0f;
+            double x = i % period;
+            var sample = x < period / 2 ? 1.0f : -1.0f;
             action(i, sample);
         }
     }
@@ -578,11 +583,14 @@ public static class SignalGeneratingExtension
     /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateSawtoothWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
-        float increment = frequency / signal.SamplingRate;
+        // 样点下标乘 float 频率比，过了约 2^24 个点相位小数就没了。
+        // 一万秒、440 Hz 时每一列的最大和最小塌成同一个数，图上只剩一条台阶。
+        double increment = (double)frequency / signal.SamplingRate;
         for (int i = 0; i < signal.Length; i++)
         {
-            var value = 2 * (i * increment - MathF.Floor(0.5f + i * increment));
-            action(i, value);
+            double phase = i * increment;
+            double value = 2.0 * (phase - Math.Floor(phase + 0.5));
+            action(i, (float)value);
         }
     }
     /// <summary>
@@ -593,11 +601,12 @@ public static class SignalGeneratingExtension
     /// <param name="action">瀵规瘡涓敓鎴愮殑鍊兼墽琛岀殑鎿嶄綔銆?/param>
     internal static void GenerateTriangleWave(ITimeDomainSignal signal, float frequency, Action<int, float> action)
     {
-        float increment = frequency / signal.SamplingRate;
+        double increment = (double)frequency / signal.SamplingRate;
         for (int i = 0; i < signal.Length; i++)
         {
-            var value = 2 * MathF.Abs(2 * (i * increment - MathF.Floor(i * increment + 0.5f))) - 1;
-            action(i, value);
+            double phase = i * increment;
+            double value = 2.0 * Math.Abs(2.0 * (phase - Math.Floor(phase + 0.5))) - 1.0;
+            action(i, (float)value);
         }
     }
     /// <summary>

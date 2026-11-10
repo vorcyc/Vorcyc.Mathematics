@@ -25,7 +25,8 @@ public sealed class CosineOscillator : IAmplitudeOscillator
     /// <inheritdoc />
     public float NextSample()
     {
-        var sample = MathF.Cos(2 * MathF.PI * Frequency / SamplingRate * _n + Phase);
+        double angle = 2 * Math.PI * Frequency / SamplingRate * _n + Phase;
+        var sample = (float)Math.Cos(angle);
         sample = Min + (Max - Min) * (1 + sample) / 2;
         _n++;
         return sample;

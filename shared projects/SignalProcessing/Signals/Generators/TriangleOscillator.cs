@@ -6,7 +6,7 @@ namespace Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 public sealed class TriangleOscillator : IAmplitudeOscillator
 {
     private int _n;
-    private float _cycles;
+    private double _cycles;
 
     /// <inheritdoc />
     public float SamplingRate
@@ -44,10 +44,10 @@ public sealed class TriangleOscillator : IAmplitudeOscillator
     /// <inheritdoc />
     public float NextSample()
     {
-        var x = _n % _cycles;
-        var sample = x < _cycles / 2
+        double x = _n % _cycles;
+        var sample = (float)(x < _cycles / 2
             ? Min + 2 * x * (Max - Min) / _cycles
-            : Max + 2 * (x - _cycles / 2) * (Min - Max) / _cycles;
+            : Max + 2 * (x - _cycles / 2) * (Min - Max) / _cycles);
         _n++;
         return sample;
     }
@@ -57,7 +57,9 @@ public sealed class TriangleOscillator : IAmplitudeOscillator
 
     private void UpdateCycles(bool resetPhase)
     {
-        _cycles = _samplingRate / _frequency;
+        _cycles = (double)_samplingRate / _frequency;
+        if (_cycles < 1)
+            _cycles = 1;
         if (resetPhase)
         {
             _n = (int)(_cycles / 4);

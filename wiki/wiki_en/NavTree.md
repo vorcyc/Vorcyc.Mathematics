@@ -83,6 +83,7 @@
   * :bookmark: [Time-scale modification (Tsm)](Module_SignalProcessing_Operations#time-scale-modification-operationstsm)
   * :bookmark: [Signal definition and related operations](Module_SignalProcessing_Signals)
   * :bookmark: [Generators (0.9+)](Module_SignalProcessing_Signals#generators-09)
+  * :bookmark: [Phase in double (0.11.3)](Module_SignalProcessing_Signals#phase-in-double-0113)
   * :bookmark: [Transform operations](Module_SignalProcessing_Transforms)
   * :bookmark: [Window functions](Module_SignalProcessing_Windowing)
   * :bookmark: [Other](Module_SignalProcessing_Others)

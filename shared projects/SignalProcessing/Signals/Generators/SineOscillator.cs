@@ -1,5 +1,3 @@
-using Vorcyc.Mathematics;
-
 namespace Vorcyc.Mathematics.SignalProcessing.Signals.Generators;
 
 /// <summary>
@@ -27,7 +25,8 @@ public sealed class SineOscillator : IAmplitudeOscillator
     /// <inheritdoc />
     public float NextSample()
     {
-        var sample = MathF.Sin(2 * ConstantsFp32.PI * Frequency / SamplingRate * _n + Phase);
+        double angle = 2 * Math.PI * Frequency / SamplingRate * _n + Phase;
+        var sample = (float)Math.Sin(angle);
         sample = Min + (Max - Min) * (1 + sample) / 2;
         _n++;
         return sample;
